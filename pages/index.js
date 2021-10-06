@@ -2,7 +2,6 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table'
-import { useState } from 'react'
 import axios from 'axios'
 import supertrend from '../utils/supertrend'
 

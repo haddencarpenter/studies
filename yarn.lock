@@ -709,11 +709,6 @@ caniuse-lite@^1.0.30001202, caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.300012
   dependencies:
     nanocolors "^0.1.0"
 
-cdata@^0.1.1:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/cdata/-/cdata-0.1.3.tgz#efbb366a7ea0e5f6c2857876a957e9c9874c4061"
-  integrity sha512-z0R4cT5357OEAVkP1CEFTHz1egpu2gYiWm2WJOY/sQDhojEXUYL4m3v2kYi5wER3PkMRL+GgfDhed2kGzrHSZA==
-
 chalk@2.4.2, chalk@^2.0.0:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -918,13 +913,6 @@ csstype@^3.0.2:
   version "3.0.9"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.9.tgz#6410af31b26bd0520933d02cbc64fce9ce3fbf0b"
   integrity sha512-rpw6JPxK6Rfg1zLOYCSwle2GFOOsnjmDYDaBwEcwoOg4qlsIVCN789VkBZDJAGi4T07gI4YSutR43t9Zz4Lzuw==
-
-cwait@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/cwait/-/cwait-1.1.2.tgz#2a6a84fa7f1305486399df90feacb4f4a6719ca2"
-  integrity sha512-kIx8zE5jJ1iBgZytTr01aj57HdC+thPsg8W9Tw0gbf30/F7wfRRUS+BiXT90Dn+A0oGtF0xLT5293Ua4w/ZsNA==
-  dependencies:
-    cdata "^0.1.1"
 
 damerau-levenshtein@^1.0.6:
   version "1.0.7"
@@ -2032,11 +2020,6 @@ lodash.truncate@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
-
-lodash@^4.17.21:
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
-  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
