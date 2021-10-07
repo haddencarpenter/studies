@@ -5,7 +5,6 @@ import Table from 'react-bootstrap/Table'
 import axios from 'axios'
 import supertrend from '../utils/supertrend'
 
-
 export async function getServerSideProps({ query }) {
   const markets = query.markets?.split(',') || ['usd', 'eth', 'btc']
   const days = query.days || 30
@@ -14,8 +13,8 @@ export async function getServerSideProps({ query }) {
   try {
     const coins = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/coins/markets?vs_currency=usd`)
     let results = []
-    for (let coin of coins.data.slice(0, 20)) {
-      const ohlcRoutes = markets.map(market => market !== coin.id ? `${process.env.NEXT_PUBLIC_API_URL}/coins/${coin.id}/ohlc?vs_currency=${market}&days=${days}` : '')
+    for (let coin of coins.data) {
+      const ohlcRoutes = markets.map(market => market !== coin.symbol ? `${process.env.NEXT_PUBLIC_API_URL}/coins/${coin.id}/ohlc?vs_currency=${market}&days=${days}` : '')
       let trends = []
       for (let route of ohlcRoutes) {
         try {
@@ -35,6 +34,7 @@ export async function getServerSideProps({ query }) {
         }
       }
       let trend = [...trends].filter(entry => entry === 'buy').length
+      // Figure out if there are more buys than sells
       trend = trend >= Math.round(trends.length / 2) ? 'buy' : 'sell'
       results.push([coin.id, trends, trend].flat())
     }
