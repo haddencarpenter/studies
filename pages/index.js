@@ -17,8 +17,12 @@ export async function getStaticProps() {
   const multiplier = 1.5
 
   const coins = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/coins/markets?vs_currency=usd`)
+  let coinData = coins.data
+  if(process.env.NODE_ENV == "development"){
+    coinData = coinData.slice(0, 3)
+  }
   let results = []
-  for (let coin of coins.data) {
+  for (let coin of coinData) {
     const ohlcRoutes = markets.map(market => {
       if(market === coin.symbol) { return '' }
 
