@@ -3,6 +3,7 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table'
 import axios from 'axios'
+import * as rax from 'retry-axios'
 import chunk from 'lodash/chunk'
 
 import mode from '../utils/mode'
@@ -14,9 +15,18 @@ const atrPeriods = 5
 const multiplier = 1.5
 
 export async function getStaticProps() {
-  const coinsMarketResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/coins/markets?vs_currency=usd`)
+  const coinGeckoAPI = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    timeout: 30000
+  })
+  coinGeckoAPI.defaults.raxConfig = {
+    instance: coinGeckoAPI
+  }
+  rax.attach(coinGeckoAPI)
+
+  const coinsMarketResponse = await coinGeckoAPI.get('/coins/markets?vs_currency=usd')
   let coinsMarketData = coinsMarketResponse.data
-  if(process.env.NODE_ENV == "development"){
+  if (process.env.NODE_ENV == "development") {
     coinsMarketData = coinsMarketData.slice(0, 3)
   }
 
@@ -34,7 +44,7 @@ export async function getStaticProps() {
         continue
       }
       console.log(`Requesting ${route}`)
-      const response = await axios.get(route)
+      const response = await coinGeckoAPI.get(route)
       data.push(response.data)
       // In order to not hit the free Coingecko API rate limit of 50 calls/min
       await new Promise((res) => setTimeout(res, 1200))
@@ -87,7 +97,6 @@ export default function Home({ coinsOHLCs }) {
                       return [dayOpen, dayHigh, dayLow, dayClose]
                     })
                     coinOHLCdata.reverse()
-                    // REFACTOR: The supertrend return value should only be binary buy/sell
                     let trend = supertrend(coinOHLCdata, { atrPeriods, multiplier })
                     return trend[trend.length - 1] || ''
                   })
