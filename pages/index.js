@@ -8,8 +8,6 @@ import chunk from 'lodash/chunk'
 import mode from '../utils/mode'
 import supertrend from '../utils/supertrend'
 
-const FETCH_ERROR = 'FETCH_ERROR'
-
 export async function getStaticProps() {
   const markets = ['usd', 'eth', 'btc']
   const days = 30
@@ -34,7 +32,6 @@ export async function getStaticProps() {
         trends.push('')
         continue
       }
-      try {
         console.log(`Requesting ${route}`)
         const response = await axios.get(route)
 
@@ -62,17 +59,10 @@ export async function getStaticProps() {
         trends.push(trend[trend.length - 1] || '')
         // In order to not hit the free Coingecko API rate limit of 50 calls/min
         await new Promise((res) => setTimeout(res, 1200))
-      } catch (error) {
-        console.error(`Error retrieving history for ${route}`)
-        console.error(error.message)
-        trends.push(FETCH_ERROR)
-      }
     }
     let superSupertrend;
     const superTrends = trends.filter(trend => trend.length)
-    if (trends.includes(FETCH_ERROR)) {
-      superSupertrend = FETCH_ERROR
-    } else if (superTrends.length === 2) {
+    if (superTrends.length === 2) {
       superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : 'tie'
     } else {
       superSupertrend = mode(superTrends)
@@ -118,11 +108,10 @@ export default function Home({ markets, results }) {
                   return (
                     <tr key={result.coin} className={classNames}>
                       <th className="text-center text-uppercase" scope="row">{result.coin}</th>
-                      {result.trends.map((res) => {
-                        const value = res === FETCH_ERROR ? 'API Error' : res;
+                        {result.trends.map((trend) => {
                         return (
                           // eslint-disable-next-line react/jsx-key
-                          <td className="text-center">{value}</td>
+                            <td className="text-center">{trend}</td>
                         );
                       })}
                     </tr>
