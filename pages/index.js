@@ -132,12 +132,21 @@ export default function Home({ coinsOHLCs }) {
 
                         return [dayOpen, dayHigh, dayLow, dayClose]
                       })
-                      let trend = supertrend(coinOHLCdata, { atrPeriods, multiplier })
-                      return trend[trend.length - 1] || ''
+                      const trends = supertrend(coinOHLCdata, { atrPeriods, multiplier })
+                      const lastTrend = trends[trends.length - 1] || ''
+                      let trendLength = 0
+                      for (let i = trends.length - 1; i > 0; i--) {
+                        if (lastTrend === trends[i]) {
+                          trendLength++
+                        } else {
+                          break
+                        }
+                      }
+                      return [lastTrend, trendLength]
                     })
 
                     let superSupertrend
-                    const superTrends = trends.filter(trend => trend.length)
+                    const superTrends = trends.map(trend => trend[0]).filter(trend => trend.length)
                     if (superTrends.length === 2) {
                       superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
                     } else if (superTrends.every(tr => tr === signals.buy)) {
@@ -160,7 +169,11 @@ export default function Home({ coinsOHLCs }) {
                     return (
                       <tr key={coinOHLC.coin} className={classNames}>
                         <th className="text-center text-uppercase" scope="row">{coinOHLC.coin}</th>
-                        {trends.map((trend, idx) => <td key={markets[idx]} className="text-center">{trend}</td>)}
+                        {trends.map((trend, idx) =>
+                          <td key={markets[idx]} className="text-center">
+                            {trend[0] && `${trend[0]} (${trend[1]})`}
+                          </td>
+                        )}
                       </tr>
                     )
                   })
