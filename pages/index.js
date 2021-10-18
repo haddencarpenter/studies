@@ -2,9 +2,11 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Table from 'react-bootstrap/Table'
+import Form from 'react-bootstrap/Form'
 import axios from 'axios'
 import * as rax from 'retry-axios'
 import groupBy from 'lodash/groupBy'
+import { useState } from 'react'
 
 import mode from '../utils/mode'
 import supertrend from '../utils/supertrend'
@@ -60,6 +62,7 @@ export async function getStaticProps() {
     coinsOHLCs.push({
       coin: coinMarketData.symbol,
       data,
+      marketCap: coinMarketData.market_cap
     })
   }
   return ({
@@ -72,74 +75,92 @@ export async function getStaticProps() {
 }
 
 export default function Home({ coinsOHLCs }) {
+  const [marketCapMin, setMarketCapMin] = useState(coinsOHLCs[coinsOHLCs.length - 1].marketCap)
+  const [marketCapMax, setMarketCapMax] = useState(coinsOHLCs[0].marketCap)
+
+  const displayedCoins = coinsOHLCs.filter((coinOHLC) => {
+    const max = marketCapMax || Number.POSITIVE_INFINITY
+    const min = marketCapMin || Number.NEGATIVE_INFINITY
+    return coinOHLC.marketCap <= max && coinOHLC.marketCap >= min
+  })
   return (
-    <Container className='mt-5'>
-      <Row>
-        <Col>
-        <Table bordered spellCheck={false}>
-          <thead>
-            <tr>
-              <th className="text-center bg-primary text-white">Coin</th>
-              {
-                markets.map(market => <th key={`market-${market}`} className="text-center">{market.toUpperCase()}</th>)
-              }
-            </tr>
-          </thead>
-          <tbody>
-              {
-                coinsOHLCs.map((coinOHLC) => {
-                  const trends = coinOHLC.data.map((coinOHLCdata) => {
-                    // Convert 4 hour chunks into days
-                    coinOHLCdata = groupBy(coinOHLCdata, (tohlc) => {
-                      const date = new Date(tohlc[0])
-                      return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
-                    })
-                    coinOHLCdata = Object.values(coinOHLCdata)
-                    coinOHLCdata = coinOHLCdata.map((dailyOhlcs) => {
-                      const dayOpen = dailyOhlcs[0][1]
-                      const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
-                      const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
-                      const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
+    <Form>
+      <Container className='mt-5'>
+        <Row>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Label>Min Market cap</Form.Label>
+            <Form.Control type="number" value={marketCapMin} onChange={(e) => setMarketCapMin(e.target.value)}/>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Max Market cap</Form.Label>
+            <Form.Control type="number" value={marketCapMax} onChange={(e) => setMarketCapMax(e.target.value)}/>
+          </Form.Group>
+          <Col>
+          <Table bordered spellCheck={false}>
+            <thead>
+              <tr>
+                <th className="text-center bg-primary text-white">Coin</th>
+                {
+                  markets.map(market => <th key={`market-${market}`} className="text-center">{market.toUpperCase()}</th>)
+                }
+              </tr>
+            </thead>
+            <tbody>
+                {
+                  displayedCoins.map((coinOHLC) => {
+                    const trends = coinOHLC.data.map((coinOHLCdata) => {
+                      // Convert 4 hour chunks into days
+                      coinOHLCdata = groupBy(coinOHLCdata, (tohlc) => {
+                        const date = new Date(tohlc[0])
+                        return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+                      })
+                      coinOHLCdata = Object.values(coinOHLCdata)
+                      coinOHLCdata = coinOHLCdata.map((dailyOhlcs) => {
+                        const dayOpen = dailyOhlcs[0][1]
+                        const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
+                        const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
+                        const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
 
-                      return [dayOpen, dayHigh, dayLow, dayClose]
+                        return [dayOpen, dayHigh, dayLow, dayClose]
+                      })
+                      let trend = supertrend(coinOHLCdata, { atrPeriods, multiplier })
+                      return trend[trend.length - 1] || ''
                     })
-                    let trend = supertrend(coinOHLCdata, { atrPeriods, multiplier })
-                    return trend[trend.length - 1] || ''
+
+                    let superSupertrend
+                    const superTrends = trends.filter(trend => trend.length)
+                    if (superTrends.length === 2) {
+                      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
+                    } else if (superTrends.every(tr => tr === signals.buy)) {
+                      superSupertrend = signals.strongBuy
+                    } else if (superTrends.every(tr => tr === signals.sell)) {
+                      superSupertrend = signals.strongSell
+                    } else {
+                      superSupertrend = mode(superTrends)
+                    }
+                    const classNames = []
+                    if (superSupertrend === signals.buy) {
+                      classNames.push("bg-info")
+                    } else if (superSupertrend === signals.sell) {
+                      classNames.push("bg-warning")
+                    } else if (superSupertrend === signals.strongBuy) {
+                      classNames.push("bg-success")
+                    } else if (superSupertrend === signals.strongSell) {
+                      classNames.push("bg-danger")
+                    }
+                    return (
+                      <tr key={coinOHLC.coin} className={classNames}>
+                        <th className="text-center text-uppercase" scope="row">{coinOHLC.coin}</th>
+                        {trends.map((trend, idx) => <td key={markets[idx]} className="text-center">{trend}</td>)}
+                      </tr>
+                    )
                   })
-
-                  let superSupertrend
-                  const superTrends = trends.filter(trend => trend.length)
-                  if (superTrends.length === 2) {
-                    superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
-                  } else if (superTrends.every(tr => tr === signals.buy)) {
-                    superSupertrend = signals.strongBuy
-                  } else if (superTrends.every(tr => tr === signals.sell)) {
-                    superSupertrend = signals.strongSell
-                  } else {
-                    superSupertrend = mode(superTrends)
-                  }
-                  const classNames = []
-                  if (superSupertrend === signals.buy) {
-                    classNames.push("bg-info")
-                  } else if (superSupertrend === signals.sell) {
-                    classNames.push("bg-warning")
-                  } else if (superSupertrend === signals.strongBuy) {
-                    classNames.push("bg-success")
-                  } else if (superSupertrend === signals.strongSell) {
-                    classNames.push("bg-danger")
-                  }
-                  return (
-                    <tr key={coinOHLC.coin} className={classNames}>
-                      <th className="text-center text-uppercase" scope="row">{coinOHLC.coin}</th>
-                      {trends.map((trend, idx) => <td key={markets[idx]} className="text-center">{trend}</td>)}
-                    </tr>
-                  )
-                })
-              }
-          </tbody>
-        </Table>
-        </Col>
-      </Row>
-    </Container>
+                }
+            </tbody>
+          </Table>
+          </Col>
+        </Row>
+      </Container>
+    </Form>
   )
 }
