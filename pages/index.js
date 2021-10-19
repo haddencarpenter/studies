@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form'
 import axios from 'axios'
 import * as rax from 'retry-axios'
 import groupBy from 'lodash/groupBy'
+import isFinite from 'lodash/isFinite'
 import { useState } from 'react'
 
 import mode from '../utils/mode'
@@ -13,8 +14,6 @@ import supertrend from '../utils/supertrend'
 
 const markets = ['usd', 'eth', 'btc']
 const days = 30
-const atrPeriods = 5
-const multiplier = 1.5
 const excludedMarkets = ['usdt', 'dai', 'ust', 'weth', 'wbtc', 'usdc', 'busd', 'ceth', 'steth', 'cdai', 'cusdc', 'tusd']
 const signals = {
   buy: 'buy',
@@ -40,50 +39,118 @@ export async function getStaticProps() {
     coinsMarketData = coinsMarketData.slice(0, 3)
   }
 
-  let coinsOHLCs = []
+  let coinsData = []
   for (let coinMarketData of coinsMarketData) {
     const ohlcRoutes = markets.map(market => {
       if(market === coinMarketData.symbol) { return '' }
 
       return `https://api.coingecko.com/api/v3/coins/${coinMarketData.id}/ohlc?vs_currency=${market}&days=${days}`
     })
-    let data = []
+    let ohlcs = []
     for (let route of ohlcRoutes) {
       if (!route) {
-        data.push([])
+        ohlcs.push([])
         continue
       }
       console.log(`Requesting ${route}`)
       const response = await coinGeckoAPI.get(route)
-      data.push(response.data)
+      ohlcs.push(response.data)
       // In order to not hit the free Coingecko API rate limit of 50 calls/min
       await new Promise((res) => setTimeout(res, 1200))
     }
-    coinsOHLCs.push({
-      coin: coinMarketData.symbol,
-      data,
+    coinsData.push({
+      symbol: coinMarketData.symbol,
+      ohlcs,
       marketCap: coinMarketData.market_cap
     })
   }
   return ({
     props: {
       markets,
-      coinsOHLCs
+      coinsData
     },
     revalidate: 60 * 60 * 24
   })
 }
 
-export default function Home({ coinsOHLCs }) {
-  const [marketCapMin, setMarketCapMin] = useState(coinsOHLCs[coinsOHLCs.length - 1].marketCap)
-  const [marketCapMax, setMarketCapMax] = useState(coinsOHLCs[0].marketCap)
+export default function Home({ coinsData }) {
+  const [marketCapMin, setMarketCapMin] = useState(coinsData[coinsData.length - 1].marketCap)
+  const [marketCapMax, setMarketCapMax] = useState(coinsData[0].marketCap)
+  const [trendLengthMin, setTrendLengthMin] = useState('')
+  const [trendLengthMax, setTrendLengthMax] = useState('')
   const [coinNameFilter, setCoinNameFilter] = useState('')
+  const [atrPeriods, setAtrPeriods] = useState(5)
+  const [multiplier, setMultiplier] = useState(1.5)
 
-  const displayedCoins = coinsOHLCs.filter((coinOHLC) => {
+  let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY
-    return coinOHLC.marketCap <= max && coinOHLC.marketCap >= min && coinOHLC.coin.toLowerCase().includes(coinNameFilter)
+    return coinData.marketCap <= max &&
+           coinData.marketCap >= min &&
+           coinData.symbol.toLowerCase().includes(coinNameFilter)
   })
+  displayedCoinData = displayedCoinData.map((coinData) => {
+    const trends = coinData.ohlcs.map((coinOHLCdata) => {
+      // Convert 4 hour chunks into days
+      coinOHLCdata = groupBy(coinOHLCdata, (tohlc) => {
+        const date = new Date(tohlc[0])
+        return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+      })
+      coinOHLCdata = Object.values(coinOHLCdata)
+      coinOHLCdata = coinOHLCdata.map((dailyOhlcs) => {
+        const dayOpen = dailyOhlcs[0][1]
+        const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
+        const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
+        const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
+
+        return [dayOpen, dayHigh, dayLow, dayClose]
+      })
+      const trends = supertrend(coinOHLCdata, { atrPeriods, multiplier })
+      const lastTrend = trends[trends.length - 1] || ''
+      let trendLength = 0
+      for (let i = trends.length - 1; i > 0; i--) {
+        if (lastTrend === trends[i]) {
+          trendLength++
+        } else {
+          break
+        }
+      }
+      return [lastTrend, trendLength]
+    })
+    let superSupertrend
+    const superTrends = trends.map(trend => trend[0]).filter(trend => trend.length)
+    if (superTrends.length === 2) {
+      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
+    } else if (superTrends.every(tr => tr === signals.buy)) {
+      superSupertrend = signals.strongBuy
+    } else if (superTrends.every(tr => tr === signals.sell)) {
+      superSupertrend = signals.strongSell
+    } else {
+      superSupertrend = mode(superTrends)
+    }
+
+    return {
+      ...coinData,
+      trends,
+      superSupertrend
+    }
+  })
+  displayedCoinData = displayedCoinData.filter((coinData) => {
+    let min = parseInt(trendLengthMin)
+    min = isFinite(min) ? min : 0
+    let max = parseInt(trendLengthMax)
+    max = isFinite(max) ? max : Number.POSITIVE_INFINITY
+
+    const matchingTrends = coinData
+      .trends
+      .filter(trend => trend[0].length)
+      .map(trend => trend[1])
+      .filter(trendLength => trendLength >= min)
+      .filter(trendLength => trendLength <= max)
+
+    return Boolean(matchingTrends.length)
+  })
+
   return (
     <Form>
       <Container className='mt-5'>
@@ -95,6 +162,35 @@ export default function Home({ coinsOHLCs }) {
           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
             <Form.Label>Max Market cap</Form.Label>
             <Form.Control type="number" value={marketCapMax} onChange={(e) => setMarketCapMax(e.target.value)}/>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Label>Min signal streak</Form.Label>
+            <Form.Control type="number" value={trendLengthMin} onChange={(e) => setTrendLengthMin(e.target.value)}/>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Max signal streak</Form.Label>
+            <Form.Control type="number" value={trendLengthMax} onChange={(e) => setTrendLengthMax(e.target.value)}/>
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+            <Form.Label>ATR periods</Form.Label>
+            <Form.Control
+              type="number"
+              required={true}
+              value={atrPeriods}
+              min="1"
+              onChange={(e) => setAtrPeriods(Number(e.target.value))}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Multiplier</Form.Label>
+            <Form.Control
+              type="number"
+              required={true}
+              step=".01"
+              min=".01"
+              value={multiplier}
+              onChange={(e) => setMultiplier(Number(e.target.value))}
+            />
           </Form.Group>
           <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
             <Form.Label>Search for a coin name</Form.Label>
@@ -116,60 +212,21 @@ export default function Home({ coinsOHLCs }) {
             </thead>
             <tbody>
                 {
-                  displayedCoins.map((coinOHLC) => {
-                    const trends = coinOHLC.data.map((coinOHLCdata) => {
-                      // Convert 4 hour chunks into days
-                      coinOHLCdata = groupBy(coinOHLCdata, (tohlc) => {
-                        const date = new Date(tohlc[0])
-                        return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
-                      })
-                      coinOHLCdata = Object.values(coinOHLCdata)
-                      coinOHLCdata = coinOHLCdata.map((dailyOhlcs) => {
-                        const dayOpen = dailyOhlcs[0][1]
-                        const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
-                        const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
-                        const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
-
-                        return [dayOpen, dayHigh, dayLow, dayClose]
-                      })
-                      const trends = supertrend(coinOHLCdata, { atrPeriods, multiplier })
-                      const lastTrend = trends[trends.length - 1] || ''
-                      let trendLength = 0
-                      for (let i = trends.length - 1; i > 0; i--) {
-                        if (lastTrend === trends[i]) {
-                          trendLength++
-                        } else {
-                          break
-                        }
-                      }
-                      return [lastTrend, trendLength]
-                    })
-
-                    let superSupertrend
-                    const superTrends = trends.map(trend => trend[0]).filter(trend => trend.length)
-                    if (superTrends.length === 2) {
-                      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
-                    } else if (superTrends.every(tr => tr === signals.buy)) {
-                      superSupertrend = signals.strongBuy
-                    } else if (superTrends.every(tr => tr === signals.sell)) {
-                      superSupertrend = signals.strongSell
-                    } else {
-                      superSupertrend = mode(superTrends)
-                    }
+                  displayedCoinData.map((coinData) => {
                     const classNames = []
-                    if (superSupertrend === signals.buy) {
+                    if (coinData.superSupertrend === signals.buy) {
                       classNames.push("bg-info")
-                    } else if (superSupertrend === signals.sell) {
+                    } else if (coinData.superSupertrend === signals.sell) {
                       classNames.push("bg-warning")
-                    } else if (superSupertrend === signals.strongBuy) {
+                    } else if (coinData.superSupertrend === signals.strongBuy) {
                       classNames.push("bg-success")
-                    } else if (superSupertrend === signals.strongSell) {
+                    } else if (coinData.superSupertrend === signals.strongSell) {
                       classNames.push("bg-danger")
                     }
                     return (
-                      <tr key={coinOHLC.coin} className={classNames}>
-                        <th className="text-center text-uppercase" scope="row">{coinOHLC.coin}</th>
-                        {trends.map((trend, idx) =>
+                      <tr key={coinData.symbol} className={classNames}>
+                        <th className="text-center text-uppercase" scope="row">{coinData.symbol}</th>
+                        {coinData.trends.map((trend, idx) =>
                           <td key={markets[idx]} className="text-center">
                             {trend[0] && `${trend[0]} (${trend[1]})`}
                           </td>
