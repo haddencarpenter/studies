@@ -153,14 +153,11 @@ export default function Home({ coinsData }) {
     let max = parseInt(trendLengthMax)
     max = isFinite(max) ? max : Number.POSITIVE_INFINITY
 
-    const matchingTrends = coinData
+    return coinData
       .trends
       .filter(trend => trend[0].length)
       .map(trend => trend[1])
-      .filter(trendLength => trendLength >= min)
-      .filter(trendLength => trendLength <= max)
-
-    return Boolean(matchingTrends.length)
+      .every(trendLength => trendLength >= min && trendLength <= max)
   })
 
   return (
