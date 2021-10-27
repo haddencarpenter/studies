@@ -12,7 +12,7 @@ import { useState, useCallback } from 'react'
 import mode from '../utils/mode'
 import supertrend from '../utils/supertrend'
 
-const quoteSymbols = ['usdt', 'eth', 'btc']
+const quoteSymbols = ['usd', 'eth', 'btc']
 const days = 30
 const excludedSymbols = ['usdt', 'dai', 'ust', 'weth', 'wbtc', 'usdc', 'busd', 'ceth', 'steth', 'cdai', 'cusdc', 'tusd', 'hbtc', 'renbtc', 'seth', 'xsushi', 'cvxcrv', 'husd', 'usdp', 'cusdt', 'lusd', 'usdn', 'sbtc']
 const signals = {
@@ -41,12 +41,12 @@ export async function getStaticProps() {
 
   let coinsData = []
   for (let coinMarketData of coinsMarketData) {
-    const ohlcRequests = quoteSymbols.map((quoteSymbol) => {
+    const ohlcRoutes = quoteSymbols.map((quoteSymbol) => {
       if(coinMarketData.symbol === quoteSymbol) {
-        return {}
+        return ''
       }
 
-      return `https://api.coingecko.com/api/v3/coins/${coinMarketData.id}/ohlc?vs_currency=${market}&days=${days}`
+      return `https://api.coingecko.com/api/v3/coins/${coinMarketData.id}/ohlc?vs_currency=${quoteSymbol}&days=${days}`
     })
     let ohlcs = []
     for (let route of ohlcRoutes) {
@@ -68,7 +68,6 @@ export async function getStaticProps() {
   }
   return {
     props: {
-      markets,
       coinsData
     },
     revalidate: 60 * 60 * 4
@@ -217,7 +216,7 @@ export default function Home({ coinsData }) {
               <tr>
                 <th className="text-center bg-primary text-white">Coin</th>
                 {
-                  quoteSymbols.map(quoteSymbol => <th key={`market-${quoteSymbol}`} className="text-center">{quoteSymbol.toUpperCase()}</th>)
+                  quoteSymbols.map(quoteSymbol => <th key={`quote-${quoteSymbol}`} className="text-center">{quoteSymbol.toUpperCase()}</th>)
                 }
               </tr>
             </thead>
