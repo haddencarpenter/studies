@@ -34,7 +34,7 @@ export async function getStaticProps() {
   rax.attach(coinGeckoAPI)
 
   const coinsMarketResponse = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250')
-  let coinsMarketData = coinsMarketResponse.data.filter(coinMarket => !excludedMarkets.includes(coinMarket.symbol))
+  let coinsMarketData = coinsMarketResponse.data.filter(coinMarket => !excludedSymbols.includes(coinMarket.symbol))
   if (process.env.NODE_ENV == "development") {
     coinsMarketData = coinsMarketData.slice(0, 3)
   }
