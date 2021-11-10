@@ -7,11 +7,13 @@ import axios from 'axios'
 import * as rax from 'retry-axios'
 import groupBy from 'lodash/groupBy'
 import isFinite from 'lodash/isFinite'
-import isSameDay from 'date-fns/isSameDay'
+import subDays from 'date-fns/subDays'
 import { useState, useCallback } from 'react'
 
 import mode from '../utils/mode'
 import supertrend from '../utils/supertrend'
+import isSameUTCDay from '../utils/isSameUTCDay'
+import { subHours } from 'date-fns'
 
 const quoteSymbols = ['usd', 'eth', 'btc']
 const days = 30
@@ -34,32 +36,106 @@ export async function getStaticProps() {
   }
   rax.attach(coinGeckoAPI)
 
+  const cryptowatchAPI = axios.create({
+    baseURL: 'https://api.cryptowat.ch',
+    timeout: 30000,
+    headers: { 'X-CW-API-Key': process.env.CRYPTOWATCH_API_KEY }
+  })
+  cryptowatchAPI.defaults.raxConfig = {
+    instance: cryptowatchAPI
+  }
+  rax.attach(cryptowatchAPI)
+
   const coinsMarketResponse = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250')
   let coinsMarketData = coinsMarketResponse.data.filter(coinMarket => !excludedSymbols.includes(coinMarket.symbol))
+  coinsMarketData = coinsMarketData.map((data) => ({...data, symbol: data.symbol.toLowerCase()}))
   if (process.env.NODE_ENV == "development") {
     coinsMarketData = coinsMarketData.slice(0, 3)
   }
 
+  const cryptowatchMarketsResponse = await cryptowatchAPI.get('/markets')
+  const cryptowatchMarkets = cryptowatchMarketsResponse.data.result
+
   let coinsData = []
   for (let coinMarketData of coinsMarketData) {
-    const ohlcRoutes = quoteSymbols.map((quoteSymbol) => {
+    const ohlcRequests = quoteSymbols.map((quoteSymbol) => {
       if(coinMarketData.symbol === quoteSymbol) {
         return ''
       }
 
-      return `https://api.coingecko.com/api/v3/coins/${coinMarketData.id}/ohlc?vs_currency=${quoteSymbol}&days=${days}`
+      let inverse = false
+      let matchingMarkets = cryptowatchMarkets.filter((market) => market.pair === `${coinMarketData.symbol}${quoteSymbol}` && market.active)
+      if (!matchingMarkets.length) {
+        inverse = true
+        matchingMarkets = cryptowatchMarkets.filter((market) => market.pair === `${quoteSymbol}${coinMarketData.symbol}` && market.active)
+      }
+      const bestMarket = matchingMarkets.find((market) => market.exchange === 'binance') ||
+                         matchingMarkets.find((market) => market.exchange === 'bitfinex') ||
+                         matchingMarkets.find((market) => market.exchange === 'huobi') ||
+                         matchingMarkets[0]
+
+      if (!bestMarket) {
+        return {
+          coinGecko: true,
+          route: `https://api.coingecko.com/api/v3/coins/${coinMarketData.id}/ohlc?vs_currency=${quoteSymbol}&days=${days}`
+        }
+      }
+
+      let after = subDays(new Date(), days)
+      after = Math.round(after.valueOf() / 1000)
+
+      return {
+        route: `https://api.cryptowat.ch/markets/${bestMarket.exchange}/${bestMarket.pair}/ohlc?periods=86400&after=${after}`,
+        inverse
+      }
     })
     let ohlcs = []
-    for (let route of ohlcRoutes) {
+    const today = new Date()
+    for (let { route, inverse, coinGecko } of ohlcRequests) {
       if (!route) {
         ohlcs.push([])
         continue
       }
       console.log(`Requesting ${route}`)
-      const response = await coinGeckoAPI.get(route)
-      ohlcs.push(response.data)
-      // In order to not hit the free Coingecko API rate limit of 50 calls/min
-      await new Promise((res) => setTimeout(res, 1200))
+
+      if (coinGecko) {
+        const response = await coinGeckoAPI.get(route)
+        let ohlcData = response.data
+        // Remove todays 4 hour signals to avoid repainting of the current day
+        ohlcData = ohlcData.filter((tohlc) => {
+          const date = new Date(tohlc[0])
+          return !isSameUTCDay(date, today)
+        })
+        ohlcData = groupBy(ohlcData, (tohlc) => {
+          const date = new Date(tohlc[0])
+          return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
+        })
+        ohlcData = Object.values(ohlcData)
+        ohlcData = ohlcData.map((dailyOhlcs) => {
+          const dayOpen = dailyOhlcs[0][1]
+          const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
+          const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
+          const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
+
+          return [dayOpen, dayHigh, dayLow, dayClose]
+        })
+        ohlcs.push(ohlcData)
+      } else {
+        const response = await cryptowatchAPI.get(route)
+        let ohlcData = response.data.result['86400']
+        // Don't include data of the current day to avoid repainting
+        ohlcData = ohlcData.filter((frame) => {
+          let date = new Date(frame[0] * 1000)
+          // We have to subtract 1 hour from the date, as it's given in it's midnight format and would be recognized as the next day instead
+          date = subHours(date, 1)
+          return !isSameUTCDay(date, today)
+        })
+        ohlcData = ohlcData.map((frame) => [frame[1], frame[2], frame[3], frame[4]])
+        if (inverse) {
+          ohlcData = ohlcData.map((frame) => [1 / frame[0], 1 / frame[1], 1 / frame[2], 1 / frame[3]])
+        }
+        ohlcs.push(ohlcData)
+      }
     }
     coinsData.push({
       symbol: coinMarketData.symbol,
@@ -95,7 +171,6 @@ export default function Home({ coinsData }) {
       setMultiplier(newMultiplier)
     }
   }, [])
-  const today = new Date()
 
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
@@ -105,27 +180,8 @@ export default function Home({ coinsData }) {
            coinData.symbol.toLowerCase().includes(coinNameFilter.toLowerCase())
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
-    const trends = coinData.ohlcs.map((coinOHLCdata) => {
-      // Remove todays 4 hour signals to avoid repainting of the current day
-      coinOHLCdata = coinOHLCdata.filter((tohlc) => {
-        const date = new Date(tohlc[0])
-        return !isSameDay(date, today)
-      })
-      // Convert 4 hour chunks into days
-      coinOHLCdata = groupBy(coinOHLCdata, (tohlc) => {
-        const date = new Date(tohlc[0])
-        return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`
-      })
-      coinOHLCdata = Object.values(coinOHLCdata)
-      coinOHLCdata = coinOHLCdata.map((dailyOhlcs) => {
-        const dayOpen = dailyOhlcs[0][1]
-        const dayHigh = Math.max(...dailyOhlcs.map(ohlc => ohlc[2]))
-        const dayLow = Math.min(...dailyOhlcs.map(ohlc => ohlc[3]))
-        const dayClose = dailyOhlcs[dailyOhlcs.length - 1][4]
-
-        return [dayOpen, dayHigh, dayLow, dayClose]
-      })
-      const trends = supertrend(coinOHLCdata, { atrPeriods, multiplier })
+    const trends = coinData.ohlcs.map((ohcls) => {
+      const trends = supertrend(ohcls, { atrPeriods, multiplier })
       const lastTrend = trends[trends.length - 1] || ''
       let trendLength = 0
       for (let i = trends.length - 1; i > 0; i--) {
