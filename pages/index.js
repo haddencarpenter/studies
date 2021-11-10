@@ -5,6 +5,7 @@ import Table from 'react-bootstrap/Table'
 import Form from 'react-bootstrap/Form'
 import axios from 'axios'
 import * as rax from 'retry-axios'
+import * as AxiosLogger from 'axios-logger'
 import groupBy from 'lodash/groupBy'
 import isFinite from 'lodash/isFinite'
 import subDays from 'date-fns/subDays'
@@ -34,6 +35,7 @@ export async function getStaticProps() {
   coinGeckoAPI.defaults.raxConfig = {
     instance: coinGeckoAPI
   }
+  coinGeckoAPI.interceptors.request.use(AxiosLogger.requestLogger);
   rax.attach(coinGeckoAPI)
 
   const cryptowatchAPI = axios.create({
@@ -44,6 +46,7 @@ export async function getStaticProps() {
   cryptowatchAPI.defaults.raxConfig = {
     instance: cryptowatchAPI
   }
+  cryptowatchAPI.interceptors.request.use(AxiosLogger.requestLogger);
   rax.attach(cryptowatchAPI)
 
   const coinsMarketResponse = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250')
@@ -96,7 +99,6 @@ export async function getStaticProps() {
         ohlcs.push([])
         continue
       }
-      console.log(`Requesting ${route}`)
 
       if (coinGecko) {
         const response = await coinGeckoAPI.get(route)
