@@ -101,6 +101,8 @@ export async function getStaticProps() {
       }
 
       if (coinGecko) {
+        // In order to not hit the free Coingecko API rate limit of 50 calls/min
+        await new Promise((res) => setTimeout(res, 1200))
         const response = await coinGeckoAPI.get(route)
         let ohlcData = response.data
         // Remove todays 4 hour signals to avoid repainting of the current day
