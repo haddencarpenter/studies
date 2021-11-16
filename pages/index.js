@@ -152,8 +152,7 @@ export async function getStaticProps() {
   return {
     props: {
       coinsData
-    },
-    revalidate: 60 * 60 * 4
+    }
   }
 }
 
