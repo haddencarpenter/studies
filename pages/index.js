@@ -18,7 +18,7 @@ import { subHours } from 'date-fns'
 
 const quoteSymbols = ['usd', 'eth', 'btc']
 const days = 30
-const excludedSymbols = ['usdt', 'dai', 'ust', 'weth', 'wbtc', 'usdc', 'busd', 'ceth', 'steth', 'cdai', 'cusdc', 'tusd', 'hbtc', 'renbtc', 'seth', 'xsushi', 'cvxcrv', 'husd', 'usdp', 'cusdt', 'lusd', 'usdn', 'sbtc']
+const excludedSymbols = ['usdt', 'dai', 'ust', 'weth', 'wbtc', 'usdc', 'busd', 'ceth', 'steth', 'cdai', 'cusdc', 'tusd', 'hbtc', 'renbtc', 'seth', 'xsushi', 'cvxcrv', 'husd', 'usdp', 'cusdt', 'lusd', 'usdn', 'sbtc', 'vai', 'xsgd']
 const signals = {
   buy: 'buy',
   sell: 'sell',
@@ -55,7 +55,7 @@ export async function getStaticProps() {
   coinsMarketData = coinsMarketData.filter(coinMarket => !excludedSymbols.includes(coinMarket.symbol))
   coinsMarketData = coinsMarketData.map((data) => ({...data, symbol: data.symbol.toLowerCase()}))
   if (process.env.NODE_ENV == "development") {
-    coinsMarketData = coinsMarketData.slice(0, 3)
+    coinsMarketData = coinsMarketData.slice(0, 8)
   }
 
   const cryptowatchMarketsResponse = await cryptowatchAPI.get('/markets')
