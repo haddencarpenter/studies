@@ -1,8 +1,3 @@
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-import Table from 'react-bootstrap/Table'
-import Form from 'react-bootstrap/Form'
 import axios from 'axios'
 import * as rax from 'retry-axios'
 import * as AxiosLogger from 'axios-logger'
@@ -234,95 +229,96 @@ export default function Home({ coinsData }) {
       .every(trendLength => trendLength >= min && trendLength <= max)
   })
 
-  return (
-    <Form>
-      <Container className='mt-5'>
-        <Row>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Min Market cap</Form.Label>
-            <Form.Control type="number" value={marketCapMin} onChange={(e) => setMarketCapMin(e.target.value)}/>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Max Market cap</Form.Label>
-            <Form.Control type="number" value={marketCapMax} onChange={(e) => setMarketCapMax(e.target.value)}/>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>Min signal streak</Form.Label>
-            <Form.Control type="number" value={trendLengthMin} onChange={(e) => setTrendLengthMin(e.target.value)}/>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Max signal streak</Form.Label>
-            <Form.Control type="number" value={trendLengthMax} onChange={(e) => setTrendLengthMax(e.target.value)}/>
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-            <Form.Label>ATR periods</Form.Label>
-            <Form.Control
-              type="number"
-              required={true}
-              value={atrPeriods}
-              min="1"
-              onChange={(e) => setValidAtrPeriods(e)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Multiplier</Form.Label>
-            <Form.Control
-              type="number"
-              required={true}
-              step=".01"
-              min=".01"
-              value={multiplier}
-              onChange={(e) => setValidMulitiplier(e)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-            <Form.Label>Search for a coin name</Form.Label>
-            <Form.Control
-              type="search"
-              value={coinNameFilter}
-              onChange={(e) => setCoinNameFilter(e.target.value)}
-            />
-          </Form.Group>
-          <Col>
-          <Table bordered spellCheck={false}>
-            <thead>
-              <tr>
-                <th className="text-center bg-primary text-white">Coin</th>
-                {
-                  quoteSymbols.map(quoteSymbol => <th key={`quote-${quoteSymbol}`} className="text-center">{quoteSymbol.toUpperCase()}</th>)
-                }
-              </tr>
-            </thead>
-            <tbody>
-                {
-                  displayedCoinData.map((coinData) => {
-                    const classNames = []
-                    if (coinData.superSupertrend === signals.buy) {
-                      classNames.push("bg-info")
-                    } else if (coinData.superSupertrend === signals.sell) {
-                      classNames.push("bg-warning")
-                    } else if (coinData.superSupertrend === signals.strongBuy) {
-                      classNames.push("bg-success")
-                    } else if (coinData.superSupertrend === signals.strongSell) {
-                      classNames.push("bg-danger")
-                    }
-                    return (
-                      <tr key={coinData.symbol} className={classNames}>
-                        <th className="text-center text-uppercase" scope="row">{coinData.symbol}</th>
-                        {coinData.trends.map((trend, idx) =>
-                          <td key={quoteSymbols[idx]} className="text-center">
-                            {trend[0] && `${trend[0]} (${trend[1]})`}
-                          </td>
-                        )}
-                      </tr>
-                    )
-                  })
-                }
-            </tbody>
-          </Table>
-          </Col>
-        </Row>
-      </Container>
-    </Form>
-  )
+  return <>Body</>
+  // return (
+  //   <Form>
+  //     <Container className='mt-5'>
+  //       <Row>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+  //           <Form.Label>Min Market cap</Form.Label>
+  //           <Form.Control type="number" value={marketCapMin} onChange={(e) => setMarketCapMin(e.target.value)}/>
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+  //           <Form.Label>Max Market cap</Form.Label>
+  //           <Form.Control type="number" value={marketCapMax} onChange={(e) => setMarketCapMax(e.target.value)}/>
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+  //           <Form.Label>Min signal streak</Form.Label>
+  //           <Form.Control type="number" value={trendLengthMin} onChange={(e) => setTrendLengthMin(e.target.value)}/>
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+  //           <Form.Label>Max signal streak</Form.Label>
+  //           <Form.Control type="number" value={trendLengthMax} onChange={(e) => setTrendLengthMax(e.target.value)}/>
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+  //           <Form.Label>ATR periods</Form.Label>
+  //           <Form.Control
+  //             type="number"
+  //             required={true}
+  //             value={atrPeriods}
+  //             min="1"
+  //             onChange={(e) => setValidAtrPeriods(e)}
+  //           />
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+  //           <Form.Label>Multiplier</Form.Label>
+  //           <Form.Control
+  //             type="number"
+  //             required={true}
+  //             step=".01"
+  //             min=".01"
+  //             value={multiplier}
+  //             onChange={(e) => setValidMulitiplier(e)}
+  //           />
+  //         </Form.Group>
+  //         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+  //           <Form.Label>Search for a coin name</Form.Label>
+  //           <Form.Control
+  //             type="search"
+  //             value={coinNameFilter}
+  //             onChange={(e) => setCoinNameFilter(e.target.value)}
+  //           />
+  //         </Form.Group>
+  //         <Col>
+  //         <Table bordered spellCheck={false}>
+  //           <thead>
+  //             <tr>
+  //               <th className="text-center bg-primary text-white">Coin</th>
+  //               {
+  //                 quoteSymbols.map(quoteSymbol => <th key={`quote-${quoteSymbol}`} className="text-center">{quoteSymbol.toUpperCase()}</th>)
+  //               }
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //               {
+  //                 displayedCoinData.map((coinData) => {
+  //                   const classNames = []
+  //                   if (coinData.superSupertrend === signals.buy) {
+  //                     classNames.push("bg-info")
+  //                   } else if (coinData.superSupertrend === signals.sell) {
+  //                     classNames.push("bg-warning")
+  //                   } else if (coinData.superSupertrend === signals.strongBuy) {
+  //                     classNames.push("bg-success")
+  //                   } else if (coinData.superSupertrend === signals.strongSell) {
+  //                     classNames.push("bg-danger")
+  //                   }
+  //                   return (
+  //                     <tr key={coinData.symbol} className={classNames}>
+  //                       <th className="text-center text-uppercase" scope="row">{coinData.symbol}</th>
+  //                       {coinData.trends.map((trend, idx) =>
+  //                         <td key={quoteSymbols[idx]} className="text-center">
+  //                           {trend[0] && `${trend[0]} (${trend[1]})`}
+  //                         </td>
+  //                       )}
+  //                     </tr>
+  //                   )
+  //                 })
+  //               }
+  //           </tbody>
+  //         </Table>
+  //         </Col>
+  //       </Row>
+  //     </Container>
+  //   </Form>
+  // )
 }
