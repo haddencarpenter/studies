@@ -51,7 +51,9 @@ export async function getStaticProps() {
 
   const coinMarketsPage1 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250')
   const coinMarketsPage2 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250&page=2')
-  let coinsMarketData = [...coinMarketsPage1.data, ...coinMarketsPage2.data]
+  const coinMarketsPage3 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250&page=3')
+  const coinMarketsPage4 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250&page=4')
+  let coinsMarketData = [...coinMarketsPage1.data, ...coinMarketsPage2.data, ...coinMarketsPage3.data, ...coinMarketsPage4.data]
   coinsMarketData = coinsMarketData.filter(coinMarket => !excludedSymbols.includes(coinMarket.symbol))
   coinsMarketData = coinsMarketData.filter(coinMarket => !excludedTokens.includes(coinMarket.id))
   coinsMarketData = coinsMarketData.map((data) => ({...data, symbol: data.symbol.toLowerCase()}))
