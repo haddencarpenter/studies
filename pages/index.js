@@ -186,6 +186,26 @@ export default function Home({ coinsData }) {
       setMultiplier(newMultiplier)
     }
   }, [])
+  const setValidTrendLengthMin = useCallback((e) => {
+    let newTrendLengthMin = e.target.value
+    if (newTrendLengthMin === '') {
+      setTrendLengthMin('')
+    }
+    newTrendLengthMin = parseInt(newTrendLengthMin)
+    if (isFinite(newTrendLengthMin)) {
+      setTrendLengthMin(newTrendLengthMin)
+    }
+  }, [])
+  const setValidTrendLengthMax = useCallback((e) => {
+    let newTrendLengthMax = e.target.value
+    if (newTrendLengthMax === '') {
+      setTrendLengthMax('')
+    }
+    newTrendLengthMax = parseInt(newTrendLengthMax)
+    if (isFinite(newTrendLengthMax)) {
+      setTrendLengthMax(newTrendLengthMax)
+    }
+  }, [])
 
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
@@ -400,9 +420,9 @@ export default function Home({ coinsData }) {
       </Card></Col>
       <Col span={18}><Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderLeft)}>
         <div className={styles.formLabel}>Signal Streak</div>
-        <Input className={styles.formRangeInput} size="large" onChange={setTrendLengthMin} value={trendLengthMin} placeholder="1"></Input>
+        <Input className={styles.formRangeInput} size="large" onChange={setValidTrendLengthMin} value={trendLengthMin} placeholder="1"></Input>
         <Text type="secondary" className={styles.formRangeLabel}>TO</Text>
-        <Input className={styles.formRangeInput} size="large" onChange={setTrendLengthMax} value={trendLengthMax} placeholder="50"></Input>
+        <Input className={styles.formRangeInput} size="large" onChange={setValidTrendLengthMax} value={trendLengthMax} placeholder="50"></Input>
         <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength1}>1-5</Button>
         <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength2}>5-10</Button>
         <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength3}>10-20</Button>
