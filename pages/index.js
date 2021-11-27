@@ -170,7 +170,6 @@ export default function Home({ coinsData }) {
   const [marketCapMax, setMarketCapMax] = useState(coinsData[0].marketCap)
   const [trendLengthMin, setTrendLengthMin] = useState('')
   const [trendLengthMax, setTrendLengthMax] = useState('')
-  // TODO: Implement this filter
   const [trendType, setTrendType] = useState('all')
   const [coinNameFilter, setCoinNameFilter] = useState('')
   const [atrPeriods, setAtrPeriods] = useState(5)
@@ -245,6 +244,15 @@ export default function Home({ coinsData }) {
     return trends
       .map(trend => trend[1])
       .every(trendLength => trendLength >= min && trendLength <= max)
+  })
+  displayedCoinData = displayedCoinData.filter((coinData) => {
+    if (trendType === 'all') {
+      return true
+    } else if (trendType === signals.buy) {
+      return coinData.superSupertrend === signals.buy || coinData.superSupertrend === signals.strongBuy
+    } else if (trendType === signals.sell) {
+      return coinData.superSupertrend === signals.sell || coinData.superSupertrend === signals.strongSell
+    }
   })
 
   const tableData = displayedCoinData.map((coinData) => {
@@ -386,8 +394,8 @@ export default function Home({ coinsData }) {
         <div className={styles.formLabel}>Signal</div>
         <Select size="large" value={trendType} onChange={setTrendType} className={styles.formSelect}>
           <Option value="all">All</Option>
-          <Option value="buy">Buy</Option>
-          <Option value="sell">Sell</Option>
+          <Option value={signals.buy}>Buy</Option>
+          <Option value={signals.sell}>Sell</Option>
         </Select>
       </Card></Col>
       <Col span={18}><Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderLeft)}>
