@@ -45,10 +45,11 @@
   background: white;
   text-align: center;
   padding: 12px;
+  height: 72px;
 }
 
 .footerLove {
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
   margin-top: 4px;
 }
 
