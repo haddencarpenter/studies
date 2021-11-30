@@ -442,7 +442,7 @@ export default function Home({ coinsData }) {
       <Table
         columns={columns}
         dataSource={tableData}
-        pagination={{ position: ['none', 'none'] }}
+        pagination={{ position: ['none', 'none'], pageSize: 1000 }}
         bordered
         className={styles.coinsTable}
       />
