@@ -10,7 +10,6 @@ import { subHours } from 'date-fns'
 import Image from 'next/image'
 import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag } from 'antd'
 
-import mode from '../utils/mode'
 import supertrend from '../utils/supertrend'
 import isSameUTCDay from '../utils/isSameUTCDay'
 import styles from '../styles/index.module.css'
@@ -26,9 +25,7 @@ const excludedTokens = ['thorchain-erc20']
 const signals = {
   buy: 'Buy',
   sell: 'Sell',
-  strongBuy: 'Strong buy',
-  strongSell: 'Strong sell',
-  tie: 'Tie'
+  neutral: 'Neutral'
 }
 
 export async function getStaticProps() {
@@ -240,13 +237,13 @@ export default function Home({ coinsData }) {
     let superSupertrend
     const superTrends = trends.map(trend => trend[0]).filter(trend => trend.length)
     if (superTrends.length === 2) {
-      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.tie
+      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.neutral
     } else if (superTrends.every(tr => tr === signals.buy)) {
-      superSupertrend = signals.strongBuy
+      superSupertrend = signals.buy
     } else if (superTrends.every(tr => tr === signals.sell)) {
-      superSupertrend = signals.strongSell
+      superSupertrend = signals.sell
     } else {
-      superSupertrend = mode(superTrends)
+      superSupertrend = signals.neutral
     }
 
     return {
@@ -278,9 +275,9 @@ export default function Home({ coinsData }) {
     if (trendType === 'all') {
       return true
     } else if (trendType === signals.buy) {
-      return coinData.superSupertrend === signals.buy || coinData.superSupertrend === signals.strongBuy
+      return coinData.superSupertrend === signals.buy
     } else if (trendType === signals.sell) {
-      return coinData.superSupertrend === signals.sell || coinData.superSupertrend === signals.strongSell
+      return coinData.superSupertrend === signals.sell
     }
   })
 
@@ -361,16 +358,12 @@ export default function Home({ coinsData }) {
       width: 72,
       render: (superSupertrend) => {
         switch (superSupertrend) {
-          case signals.strongBuy:
-            return <Tag className={styles.tableTag} color="#52C41A">Buy</Tag>
           case signals.buy:
-            return <Tag className={styles.tableTag} color="#13C2C2">Buy</Tag>
+            return <Tag className={styles.tableTag} color="#52C41A">Buy</Tag>
           case signals.sell:
-            return <Tag className={styles.tableTag} color="#FAAD14">Sell</Tag>
-          case signals.strongSell:
             return <Tag className={styles.tableTag} color="#F5222D">Sell</Tag>
           default:
-            return <Tag className={styles.tableTag} color="#2F54EB">Tie</Tag>
+            return <Tag className={styles.tableTag} color="#2F54EB">Neutral</Tag>
         }
       }
     },
