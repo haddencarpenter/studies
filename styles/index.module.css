@@ -63,10 +63,12 @@
 
 .tableRow {
   width: 100%;
+  flex-grow: 1;
 }
 
 .coinsTable {
   width: 100%;
+  height: 100%;
 }
 
 .coinsTable table {
@@ -78,7 +80,7 @@
   font-weight: bold;
 }
 
-.coinsTable table .ant-tag {
+.tableTag {
   margin-right: 0;
 }
 
