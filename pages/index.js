@@ -180,7 +180,7 @@ export default function Home({ coinsData }) {
   const inputRef = useRef(null)
   useEffect(() => {
     inputRef.current.input?.focus();
-  })
+  }, [])
 
   const setValidAtrPeriods = useCallback((e) => {
     const newAtrPeriod = parseInt(e.target.value)
