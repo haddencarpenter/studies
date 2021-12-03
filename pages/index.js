@@ -24,7 +24,7 @@ const signals = {
   all: 'All',
   buy: 'Buy',
   sell: 'Sell',
-  neutral: 'Neutral'
+  hodl: 'HODL'
 }
 
 export async function getStaticProps() {
@@ -275,13 +275,13 @@ export default function Home({ coinsData }) {
     let superSupertrend
     const superTrends = trends.map(trend => trend[0]).filter(trend => trend.length)
     if (superTrends.length === 2) {
-      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.neutral
+      superSupertrend = superTrends[0] === superTrends[1] ? superTrends[0] : signals.hodl
     } else if (superTrends.every(tr => tr === signals.buy)) {
       superSupertrend = signals.buy
     } else if (superTrends.every(tr => tr === signals.sell)) {
       superSupertrend = signals.sell
     } else {
-      superSupertrend = signals.neutral
+      superSupertrend = signals.hodl
     }
 
     return {
@@ -403,7 +403,7 @@ export default function Home({ coinsData }) {
           case signals.sell:
             return <Tag className={styles.tableTag} color="#F5222D">Sell</Tag>
           default:
-            return <Tag className={styles.tableTag} color="#2F54EB">Neutral</Tag>
+            return <Tag className={styles.tableTag} color="#2F54EB">HODL</Tag>
         }
       }
     },
