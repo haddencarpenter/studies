@@ -7,6 +7,7 @@ import isFinite from 'lodash/isFinite'
 import subDays from 'date-fns/subDays'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { subHours } from 'date-fns'
+import { useRouter } from 'next/router'
 import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag } from 'antd'
 
 import supertrend from '../utils/supertrend'
@@ -177,6 +178,9 @@ export async function getStaticProps() {
 }
 
 export default function Home({ coinsData }) {
+  const router = useRouter()
+  const portfolio = router.query.portfolio
+
   const defaultCoinNameFilter = ''
   const defaultMarketCapMin = coinsData[coinsData.length - 1].marketCap
   const defaultMarketCapMax = coinsData[0].marketCap
@@ -195,6 +199,11 @@ export default function Home({ coinsData }) {
   useEffect(() => {
     inputRef.current.input?.focus();
   }, [])
+  useEffect(() => {
+    if (portfolio) {
+      setCoinNameFilter(portfolio)
+    }
+  }, [portfolio])
 
   const setValidAtrPeriods = useCallback((e) => {
     const newAtrPeriod = parseInt(e.target.value)
@@ -248,12 +257,20 @@ export default function Home({ coinsData }) {
       setMarketCapMax(newMarketCapMax)
     }
   }, [defaultMarketCapMax])
+  const setCoinName = useCallback((e) => {
+    const newCoinNames = e.target.value
+    setCoinNameFilter(newCoinNames)
+    router.replace({
+      pathname: router.pathname,
+      query: { portfolio: newCoinNames }
+    }, null, { shallow: true })
+  }, [router])
 
   const coinsFilter = coinNameFilter
     .replace(/\s/g, '')
     .split(',')
     .map((coinName) => coinName.toLowerCase())
-    .filter((coinName) => coinName !== '')
+    .filter((coinName) => coinName.length)
 
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
@@ -441,7 +458,7 @@ export default function Home({ coinsData }) {
             placeholder="Bitcoin, ETH, Polygon..."
             allowClear
             value={coinNameFilter}
-            onChange={(e) => setCoinNameFilter(e.target.value)}
+            onChange={setCoinName}
             size="large"
           />
         </Card>
