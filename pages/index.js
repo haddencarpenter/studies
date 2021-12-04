@@ -408,7 +408,7 @@ export default function Home({ coinsData }) {
         return (
           <span className={styles.tableCoinWrapper}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imageSrc} alt={coinData.name} className={styles.tableCoinThumb} />
+            <img src={imageSrc} alt={coinData.name} className={styles.tableCoinThumb} loading="lazy"/>
             <span className={styles.tableCoinName}>{coinData.name}</span>
             <span className={styles.tableCoinSymbol}>{coinData.symbol}</span>
           </span>
