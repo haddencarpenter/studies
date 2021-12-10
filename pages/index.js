@@ -12,6 +12,7 @@ import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag } from 'a
 
 import supertrend from '../utils/supertrend'
 import isSameUTCDay from '../utils/isSameUTCDay'
+import convertToWeeklySignals from '../utils/convertToWeeklySignals'
 import styles from '../styles/index.module.css'
 
 const { Title, Paragraph, Text } = Typography;
@@ -194,6 +195,7 @@ export default function Home({ coinsData }) {
   const [coinNameFilter, setCoinNameFilter] = useState(defaultCoinNameFilter)
   const [atrPeriods, setAtrPeriods] = useState(5)
   const [multiplier, setMultiplier] = useState(1.5)
+  const [showWeeklySignals, setShowWeeklySignals] = useState(false)
 
   const inputRef = useRef(null)
   useEffect(() => {
@@ -283,8 +285,11 @@ export default function Home({ coinsData }) {
            matchesNameFilter
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
-    const trends = coinData.ohlcs.map((ohcls) => {
-      const trends = supertrend(ohcls, { atrPeriods, multiplier })
+    const trends = coinData.ohlcs.map((ohlcs) => {
+      if (showWeeklySignals) {
+        ohlcs = convertToWeeklySignals(ohlcs)
+      }
+      const trends = supertrend(ohlcs, { atrPeriods, multiplier })
       const lastTrend = trends[trends.length - 1] || ''
       let trendLength = 0
       for (let i = trends.length - 1; i > 0; i--) {
