@@ -41,17 +41,19 @@
   margin-bottom: 8px;
 }
 
+@media screen and (max-width: 768px) {
+  .hiddenFormLabel {
+    display: none;
+  }
+}
+
 .formRangeInput {
   width: 120px;
   margin-right: 12px;
 }
 
-.formRangeLabel {
-  margin-right: 12px;
-}
-
 .formSelect {
-  width: 396px;
+  width: 100%;
 }
 
 .formButton {
@@ -99,4 +101,12 @@
 .tableCoinSymbol {
   text-transform: uppercase;
   margin-left: 5px;
+}
+
+.filterModalRow {
+  margin-bottom: 16px;
+}
+
+.filterModalInput {
+  width: 100%;
 }

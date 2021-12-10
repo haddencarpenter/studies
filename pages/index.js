@@ -8,7 +8,8 @@ import subDays from 'date-fns/subDays'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { subHours } from 'date-fns'
 import { useRouter } from 'next/router'
-import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag, Modal, Divider, Switch } from 'antd'
+import { CloseCircleOutlined, SlidersOutlined } from '@ant-design/icons'
 
 import supertrend from '../utils/supertrend'
 import isSameUTCDay from '../utils/isSameUTCDay'
@@ -195,6 +196,7 @@ export default function Home({ coinsData }) {
   const [coinNameFilter, setCoinNameFilter] = useState(defaultCoinNameFilter)
   const [atrPeriods, setAtrPeriods] = useState(5)
   const [multiplier, setMultiplier] = useState(1.5)
+  const [filterModalVisible, setFilterModalVisible] = useState(false)
   const [showWeeklySignals, setShowWeeklySignals] = useState(false)
 
   const inputRef = useRef(null)
@@ -259,8 +261,7 @@ export default function Home({ coinsData }) {
       setMarketCapMax(newMarketCapMax)
     }
   }, [defaultMarketCapMax])
-  const setCoinName = useCallback((e) => {
-    const newCoinNames = e.target.value
+  const setCoinName = useCallback((newCoinNames) => {
     setCoinNameFilter(newCoinNames)
     router.replace({
       pathname: router.pathname,
@@ -403,6 +404,16 @@ export default function Home({ coinsData }) {
     setTrendLengthMin(20)
     setTrendLengthMax('')
   }, [])
+  const resetFilters = useCallback(() => {
+    setMarketCapMin(defaultMarketCapMin)
+    setMarketCapMax(defaultMarketCapMax)
+    setTrendLengthMin('')
+    setTrendLengthMax('')
+    setTrendType(defaultTrendType)
+    setCoinName(defaultCoinNameFilter)
+    setAtrPeriods(5)
+    setMultiplier(1.5)
+  }, [defaultMarketCapMax, defaultMarketCapMin, defaultTrendType, setCoinName])
 
   const columns = [
     {
@@ -454,58 +465,143 @@ export default function Home({ coinsData }) {
     <Title className={styles.title}>Rotate. Your. Dinero. Amigo.</Title>
     <Paragraph className={styles.subTitle} type="secondary">Use the SuperTrend to find promising coins. Swap your portfolio to be in a constant bull market.</Paragraph>
     {/* <Button className={styles.marketHealth} type="primary">Market Health</Button> */}
-    <Row className={styles.formRow}>
-      <Col span={6}>
-        <Card className={styles.formCard}>
+    <Row className={styles.formRow} type="flex">
+      <Col xs={24} md={8}>
+        <Card className={classnames(styles.formCard, styles.noFormBorderRight, styles.noFormBorderTop)}>
           <div className={styles.formLabel}>Coin</div>
           <Input
             ref={inputRef}
             placeholder="Bitcoin, ETH, Polygon..."
             allowClear
             value={coinNameFilter}
-            onChange={setCoinName}
+            onChange={(e) => setCoinName(e.target.value)}
             size="large"
           />
         </Card>
       </Col>
-      <Col span={3}><Card className={classnames(styles.formCard, styles.noFormBorderRight, styles.noFormBorderLeft, styles.parameterCard)}>
-        <div className={styles.formLabel}>ATR periods</div>
-        <Input size="large" onChange={setValidAtrPeriods} value={atrPeriods}></Input>
-      </Card></Col>
-      <Col span={3}><Card className={classnames(styles.formCard, styles.noFormBorderLeft, styles.parameterCard)}>
-        <div className={styles.formLabel}>Multiplier</div>
-        <Input size="large" onChange={setValidMulitiplier} value={multiplier}></Input>
-      </Card></Col>
-      <Col span={12}><Card className={styles.formCard}>
-        <div className={styles.formLabel}>Market Cap</div>
-        <Input className={styles.formRangeInput} size="large" onChange={setValidMarketCapMin} value={marketCapMin} placeholder="$1"></Input>
-        <Text type="secondary" className={styles.formRangeLabel}>TO</Text>
-        <Input className={styles.formRangeInput} size="large" onChange={setValidMarketCapMax} value={marketCapMax} placeholder="$100,000"></Input>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap4}>$10B+</Button>
-      </Card></Col>
+      <Col xs={24} md={8}>
+        <Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderRight, styles.noFormBorderLeft)}>
+          <div className={styles.formLabel}>Signal</div>
+          <Select size="large" value={trendType} onChange={setTrendType} className={styles.formSelect}>
+            <Option value={signals.all}>All</Option>
+            <Option value={signals.buy}>Buy</Option>
+            <Option value={signals.sell}>Sell</Option>
+          </Select>
+        </Card>
+      </Col>
+      <Col xs={24} md={8}>
+        <Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderLeft)}>
+          <div className={classnames(styles.formLabel, styles.hiddenFormLabel)}>&nbsp;</div>
+          <Button
+            size="large"
+            onClick={() => setFilterModalVisible(true)}
+            icon={<SlidersOutlined />}
+          >
+            All Filters
+          </Button>
+        </Card>
+      </Col>
     </Row>
-    <Row className={classnames(styles.formRow, styles.signalRow)}>
-      <Col span={6}><Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderRight)}>
-        <div className={styles.formLabel}>Signal</div>
-        <Select size="large" value={trendType} onChange={setTrendType} className={styles.formSelect}>
-          <Option value={signals.all}>All</Option>
-          <Option value={signals.buy}>Buy</Option>
-          <Option value={signals.sell}>Sell</Option>
-        </Select>
-      </Card></Col>
-      <Col span={18}><Card className={classnames(styles.formCard, styles.noFormBorderTop, styles.noFormBorderLeft)}>
-        <div className={styles.formLabel}>Signal Streak</div>
-        <Input className={styles.formRangeInput} size="large" onChange={setValidTrendLengthMin} value={trendLengthMin} placeholder="1"></Input>
-        <Text type="secondary" className={styles.formRangeLabel}>TO</Text>
-        <Input className={styles.formRangeInput} size="large" onChange={setValidTrendLengthMax} value={trendLengthMax} placeholder="50"></Input>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength1}>1-5</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength2}>5-10</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength3}>10-20</Button>
-        <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength4}>20+</Button>
-      </Card></Col>
+    <Row className={styles.formRow}>
+      <Modal
+        visible={filterModalVisible}
+        title="Filters"
+        onCancel={() => setFilterModalVisible(false)}
+        footer={[
+          <Button
+            key="reset"
+            onClick={resetFilters}
+            size="large"
+            danger
+            type="primary"
+            icon={<CloseCircleOutlined />}
+          >
+            Reset Filters
+          </Button>
+        ]}
+      >
+        {/* <Row className={styles.formRow} justify="space-between">
+          <Col>
+            <span>Weekly Signals</span>
+          </Col>
+          <Col>
+            <Switch checked={showWeeklySignals} onChange={setShowWeeklySignals} />
+          </Col>
+        </Row>
+        <Divider /> */}
+        <Row className={styles.formRow} gutter={16}>
+          <Col span={12} className="gutter-row">
+            <div className={styles.formLabel}>ATR periods</div>
+            <Input size="large" onChange={setValidAtrPeriods} value={atrPeriods}></Input>
+          </Col>
+          <Col span={12} className="gutter-row">
+            <div className={styles.formLabel}>Multiplier</div>
+            <Input size="large" onChange={setValidMulitiplier} value={multiplier}></Input>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div className={styles.formLabel}>Market Cap</div>
+          </Col>
+        </Row>
+        <Row className={styles.filterModalRow} justify="center" align="middle" gutter={12}>
+          <Col className="gutter-row" flex="auto">
+            <Input className={classnames(styles.filterModalInput)} size="large" onChange={setValidMarketCapMin} value={marketCapMin} placeholder="$1"></Input>
+          </Col>
+          <Col className="gutter-row" flex="20px">
+            <Text type="secondary">TO</Text>
+          </Col>
+          <Col className="gutter-row" flex="auto">
+            <Input className={classnames(styles.filterModalInput)} size="large" onChange={setValidMarketCapMax} value={marketCapMax} placeholder="$100,000"></Input>
+          </Col>
+        </Row>
+        <Row>
+          <Col flex={1}>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
+          </Col>
+          <Col flex={1}>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
+          </Col>
+          <Col flex={1}>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
+          </Col>
+          <Col flex={1}>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedMarketCap4}>$10B+</Button>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div className={styles.formLabel}>Signal Streak</div>
+          </Col>
+        </Row>
+        <Row className={styles.filterModalRow} justify="center" align="middle" gutter={12}>
+          <Col className="gutter-row" flex="auto">
+            <Input className={styles.filterModalInput} size="large" onChange={setValidTrendLengthMin} value={trendLengthMin} placeholder="1"></Input>
+          </Col>
+          <Col className="gutter-row" flex="30px">
+            <Text type="secondary">TO</Text>
+          </Col>
+          <Col className="gutter-row" flex="auto">
+            <Input className={styles.filterModalInput} size="large" onChange={setValidTrendLengthMax} value={trendLengthMax} placeholder="50"></Input>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength1}>1-5</Button>
+          </Col>
+          <Col>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength2}>5-10</Button>
+          </Col>
+          <Col>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength3}>10-20</Button>
+          </Col>
+          <Col>
+            <Button size="large" className={styles.formButton} onClick={setPredefinedTrendLength4}>20+</Button>
+          </Col>
+        </Row>
+      </Modal>
     </Row>
     <Row className={styles.tableRow}>
       <Table
