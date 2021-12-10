@@ -8,7 +8,7 @@ import subDays from 'date-fns/subDays'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { subHours } from 'date-fns'
 import { useRouter } from 'next/router'
-import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag, Modal, Divider, Switch, Grid } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag, Modal, Divider, Switch, Grid, Layout } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined } from '@ant-design/icons'
 
 import supertrend from '../utils/supertrend'
@@ -19,6 +19,7 @@ import styles from '../styles/index.module.css'
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 const { useBreakpoint } = Grid;
+const { Content } = Layout;
 
 const quoteSymbols = ['usd', 'eth', 'btc']
 const days = 30
@@ -516,7 +517,7 @@ export default function Home({ coinsData }) {
     ])
   }
 
-  return <>
+  return <Content className={styles.content}>
     <Title className={styles.title}>Rotate. Your. Dinero. Amigo.</Title>
     <Paragraph className={styles.subTitle} type="secondary">Use the SuperTrend to find promising coins. Swap your portfolio to be in a constant bull market.</Paragraph>
     {/* <Button className={styles.marketHealth} type="primary">Market Health</Button> */}
@@ -663,5 +664,5 @@ export default function Home({ coinsData }) {
         className={styles.coinsTable}
       />
     </Row>
-  </>
+  </Content>
 }

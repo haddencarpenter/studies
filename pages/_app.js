@@ -1,14 +1,13 @@
 import "../styles/ant.less"
 import styles from '../styles/globals.module.css'
 import Head from 'next/head'
-import Image from 'next/image'
+import Link from 'next/link'
 import { Layout, Menu, Typography } from 'antd'
 
 import useDarkMode from '../hooks/usedarkmode'
 import DarkModeSwitch from '../components/DarkModeSwitch'
-import Paragraph from "antd/lib/skeleton/Paragraph"
 
-const { Header, Content, Footer } = Layout;
+const { Header, Footer } = Layout;
 
 function MyApp({ Component, pageProps }) {
   const [darkMode, setDarkMode] = useDarkMode();
@@ -23,17 +22,19 @@ function MyApp({ Component, pageProps }) {
         <Header className={styles.header}>
           <Menu mode="horizontal">
             <Menu.Item key="logo" className={styles.logo} data-id="logo">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/coin.svg" alt="Logo" height={24} width={24} className={styles.logoSvg}/>
-              <span className={styles.logoTitle}><b>Coin</b>Rotator</span>
+              <Link href="/" passHref>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/coin.svg" alt="Logo" height={24} width={24} className={styles.logoSvg}/>
+              </Link>
+              <Link href="/" passHref>
+                <span className={styles.logoTitle}><b>Coin</b>Rotator</span>
+              </Link>
             </Menu.Item>
-            {/* <Menu.Item key="faq">FAQ</Menu.Item> */}
+            <Menu.Item key="faq"><Link href="/faq">FAQ</Link></Menu.Item>
             {/* <Menu.Item key="dark-mode"><DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode}/></Menu.Item> */}
           </Menu>
         </Header>
-        <Content className={styles.content}>
-          <Component {...pageProps} />
-        </Content>
+        <Component {...pageProps} />
         <Footer className={styles.footer}>
           <b className={styles.footerTitle}>CoinRotator</b>
           <Typography.Paragraph className={styles.footerLove} type="secondary">

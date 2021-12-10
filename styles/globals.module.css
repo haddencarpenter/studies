@@ -49,13 +49,6 @@
   padding: 4px;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 65px 25px;
-}
-
 .footer {
   background: white;
   text-align: center;
