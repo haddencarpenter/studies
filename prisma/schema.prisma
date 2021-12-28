@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["extendedIndexes"]
 }
 
 datasource db {
@@ -15,5 +16,35 @@ model Coin {
   symbol     String
   name     String
   categories     String[]
-  icon_url String
+  images Json
+  description String
+  homepage String
+  twitter String
+  twitterFollowers Int
+  currentPriceUsd Decimal
+  ath Decimal
+  atl Decimal
+  marketCap BigInt
+  marketCapRank Int
+  fullyDilutedValuation Decimal?
+  circulatingSupply Decimal
+  ohlcs Ohlc[]
+
+  @@index([marketCapRank])
+}
+
+model Ohlc {
+  id Int @id @default(autoincrement())
+  closeTime DateTime
+  open Decimal
+  high Decimal
+  low Decimal
+  close Decimal
+  coinId String @db.VarChar(255)
+  coin Coin @relation(fields: [coinId], references: [id])
+  quoteSymbol String
+
+  @@index([coinId, quoteSymbol])
+  @@index([closeTime(sort: Desc)])
+  @@unique([coinId, quoteSymbol, closeTime])
 }

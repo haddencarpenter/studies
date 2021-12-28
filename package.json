@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "fetch-data": "parcel build scripts/fetch-data.js --no-source-maps",
     "start": "next start",
     "lint": "next lint"
   },
@@ -21,6 +22,7 @@
     "lodash": "^4.17.21",
     "next": "^12.0.1",
     "next-with-less": "^2.0.2",
+    "parcel": "^2.0.1",
     "prisma": "3.6.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",

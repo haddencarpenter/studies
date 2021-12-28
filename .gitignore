@@ -3,3 +3,5 @@ node_modules
 .env
 markets.json
 .next
+.parcel-cache
+dist/**
