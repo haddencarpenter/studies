@@ -1,6 +1,8 @@
 const withLess = require("next-with-less");
+const { withSuperjson } = require('next-superjson')
 
-module.exports = withLess({
+
+module.exports = withLess(withSuperjson()({
   lessLoaderOptions: {
     /* ... */
   },
@@ -9,4 +11,4 @@ module.exports = withLess({
   images: {
     domains: ['assets.coingecko.com'],
   },
-});
+}));

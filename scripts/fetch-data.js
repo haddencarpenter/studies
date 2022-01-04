@@ -153,7 +153,6 @@ const script = async () => {
           ohlcData = response.data.result['14400']
           // Sometimes cryptowatch can't give us all the OHLC data, because a coin just recently got listed on an exchange
           if (ohlcData.length < fetchOhlcDays * 6) {
-            console.log(ohlcData)
             continue
           }
           ohlcData = ohlcData.map((frame) => {

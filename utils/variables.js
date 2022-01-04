@@ -1,0 +1,1 @@
+export const quoteSymbols = ['usd', 'eth', 'btc']
