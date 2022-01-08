@@ -76,6 +76,7 @@ const script = async () => {
       marketCapRank: coinData.market_data.market_cap_rank,
       fullyDilutedValuation: coinData.market_data.fully_diluted_valuation.usd,
       circulatingSupply: coinData.market_data.circulating_supply,
+      tickers: coinData.tickers,
     }
 
     await prisma.coin.upsert({

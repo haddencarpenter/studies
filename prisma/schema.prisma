@@ -29,6 +29,7 @@ model Coin {
   fullyDilutedValuation Decimal?
   circulatingSupply Decimal
   ohlcs Ohlc[]
+  tickers Json
 
   @@index([marketCapRank])
 }
