@@ -1,0 +1,117 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 25px;
+}
+
+.breadcrumb {
+  margin-bottom: 32px;
+}
+
+.cardGrid {
+  padding: 16px;
+  min-height: 64px;
+}
+
+.chartGrid {
+  display: block;
+  width: 100%;
+  height: 300px !important;
+}
+
+.cardData {
+  min-height: 224px;
+  width: 25%;
+}
+
+.cardHeader {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 32px;
+}
+
+.linkTag {
+  line-height: 26px;
+}
+
+.labelValueGroup {
+  margin-bottom: 16px;
+}
+
+.label {
+  color: #8C8C8C;
+  line-height: 24px;
+}
+
+.value {
+  color: #262626;
+  line-height: 24px;
+  font-weight: bold;
+}
+
+.similarCoinLink {
+  cursor: pointer;
+}
+
+.similarCoin {
+  margin-bottom: 2px;
+  margin-right: 5px;
+}
+
+.exchangesTable {
+  margin-top: 32px;
+}
+
+.exchangeSpace {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.trustScore {
+  width: 16px;
+  height: 16px;
+  border-radius: 100px;
+}
+
+.trustScoreGreen {
+  background: #52C41A;
+}
+
+.trustScoreRed {
+  background: #F5222D;
+}
+
+@media screen and (max-width: 480px) {
+  .nameCard, .priceCard, .socialCard, .cardData {
+    width: 100%;
+    min-height: unset;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .tagCard, .similarCoinCard {
+    min-height: unset;
+  }
+
+  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+    width: 50%;
+  }
+
+  .socialCard {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .tagCard, .similarCoinCard {
+    min-height: unset;
+  }
+
+  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+    width: 50%;
+  }
+
+  .socialCard {
+    width: 100%;
+  }
+}
