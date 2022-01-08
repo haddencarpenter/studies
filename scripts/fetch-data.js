@@ -189,7 +189,6 @@ const script = async () => {
     await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
   }
 
-  // TODO: Set TZ=UTC everywhere
   // TODO: Do this CRON job at 4:10 AM UTC every day via render.com and run it once manually
   // TODO: Remove the cron job org thing
   if (process.env.NODE_ENV === 'production') {

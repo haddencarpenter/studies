@@ -11,4 +11,7 @@ module.exports = withLess(withSuperjson()({
   images: {
     domains: ['assets.coingecko.com'],
   },
+  env: {
+    'TZ': 'UTC',
+  },
 }));
