@@ -77,9 +77,13 @@
   margin-right: 12px;
 }
 
-.tableRow {
+.tableGridRow {
   width: 100%;
   flex-grow: 1;
+}
+
+.tableRow {
+  cursor: pointer;
 }
 
 .coinsTable {
@@ -98,10 +102,6 @@
 
 .tableTag {
   margin-right: 0;
-}
-
-.tableCoinWrapper > :first-child {
-  top: 2px;
 }
 
 .tableCoinName {

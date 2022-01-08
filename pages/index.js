@@ -24,6 +24,7 @@ export async function getStaticProps() {
     orderBy: { marketCapRank: 'asc' },
     take: 1000,
     select: {
+      id: true,
       symbol: true,
       name: true,
       images: true,
@@ -521,10 +522,14 @@ export default function Home({ coinsData }) {
         </Col>
       </Row>
     </Modal>
-    <Row className={styles.tableRow}>
+    <Row className={styles.tableGridRow}>
       <Table
         columns={columns}
         dataSource={tableData}
+        onRow={(coin) => ({ onClick: () => {
+          router.push(`/coin/${coin.coinData.id}`);
+        }}) }
+        rowClassName={styles.tableRow}
         pagination={{ position: ['none', 'none'], pageSize: 1000 }}
         bordered
         className={styles.coinsTable}
