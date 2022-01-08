@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma migrate deploy && next build",
     "fetch-data": "parcel build scripts/fetch-data.js --no-source-maps",
     "start": "next start",
     "lint": "next lint"
