@@ -190,8 +190,6 @@ const script = async () => {
     await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
   }
 
-  // TODO: Do this CRON job at 4:10 AM UTC every day via render.com and run it once manually
-  // TODO: Remove the cron job org thing
   if (process.env.NODE_ENV === 'production') {
     await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/ZzMCeSY4lD')
   }
