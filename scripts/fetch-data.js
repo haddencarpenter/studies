@@ -136,8 +136,8 @@ const script = async () => {
         if (coinGecko) {
           await new Promise((res) => setTimeout(res, 1200))
           const response = await coinGeckoAPI.get(route)
-          const closeTime = new Date(frame[0])
           ohlcData = response.data.map((frame) => {
+            const closeTime = new Date(frame[0])
             return {
               closeTime,
               open: frame[1],
