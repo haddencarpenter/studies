@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import isFinite from 'lodash/isFinite'
+import uniq from 'lodash/uniq'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Typography, Card, Row, Col, Input, Button, Select, Table, Tag, Modal, Divider, Switch, Grid, Layout } from 'antd'
@@ -30,6 +31,7 @@ export async function getStaticProps() {
       images: true,
       marketCap: true,
       marketCapRank: true,
+      categories: true,
       ohlcs: {
         select: {
           closeTime: true,
@@ -62,14 +64,16 @@ export async function getStaticProps() {
       ohlcs
     }
   })
+  const categories = uniq(coinsData.flatMap(coin => coin.categories))
   return {
     props: {
-      coinsData
+      coinsData,
+      categories
     }
   }
 }
 
-export default function Home({ coinsData }) {
+export default function Home({ coinsData, categories }) {
   const router = useRouter()
   const portfolio = router.query.portfolio
 
@@ -78,6 +82,7 @@ export default function Home({ coinsData }) {
   const defaultTrendLengthMin = ''
   const defaultTrendLengthMax = ''
   const defaultTrendType = signals.all
+  const defaultCategory = 'all'
   const defaultCoinNameFilter = ''
 
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
@@ -85,6 +90,7 @@ export default function Home({ coinsData }) {
   const [trendLengthMin, setTrendLengthMin] = useState(defaultTrendLengthMin)
   const [trendLengthMax, setTrendLengthMax] = useState(defaultTrendLengthMax)
   const [trendType, setTrendType] = useState(defaultTrendType)
+  const [category, setCategory] = useState(defaultCategory)
   const [coinNameFilter, setCoinNameFilter] = useState(defaultCoinNameFilter)
   const [atrPeriods, setAtrPeriods] = useState(defaultAtrPeriods)
   const [multiplier, setMultiplier] = useState(defaultMultiplier)
@@ -184,9 +190,11 @@ export default function Home({ coinsData }) {
     const coinSymbolLower = coinData.symbol.toLowerCase()
     const coinNameLower = coinData.name.toLowerCase()
     const matchesNameFilter = coinNameFilter === '' || coinsFilter.some((coinName) => coinNameLower.includes(coinName) || coinSymbolLower.includes(coinName))
+    const matchesCategory = category === defaultCategory || coinData.categories.includes(category)
     return coinData.marketCap <= max &&
            coinData.marketCap >= min &&
-           matchesNameFilter
+           matchesNameFilter &&
+           matchesCategory
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
     const [trends, superSupertrend] = getTrends(coinData.ohlcs, atrPeriods, multiplier)
@@ -283,10 +291,11 @@ export default function Home({ coinsData }) {
     resetMarketCap()
     resetTrendLength()
     setTrendType(defaultTrendType)
+    setCategory(defaultCategory)
     setCoinName(defaultCoinNameFilter)
     setAtrPeriods(defaultAtrPeriods)
     setMultiplier(defaultMultiplier)
-  }, [defaultTrendType, setCoinName, resetMarketCap, resetTrendLength])
+  }, [defaultTrendType, defaultCategory, setCoinName, resetMarketCap, resetTrendLength])
 
   const columns = [
     {
@@ -339,6 +348,7 @@ export default function Home({ coinsData }) {
     const marketCapFilterApplied = marketCapMin !== defaultMarketCapMin || marketCapMax !== defaultMarketCapMax
     const trendLengthFilterApplied = trendLengthMin !== defaultTrendLengthMin || trendLengthMax !== defaultTrendLengthMax
     const trendTypeFilterApplied = trendType !== defaultTrendType
+    const categoryFilterApplied = category !== defaultCategory
     const coinNameFilterApplied = coinNameFilter !== defaultCoinNameFilter
     const atrPeriodsFilterApplied = atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = multiplier !== defaultMultiplier
@@ -346,6 +356,7 @@ export default function Home({ coinsData }) {
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
       trendTypeFilterApplied ||
+      categoryFilterApplied ||
       coinNameFilterApplied ||
       atrPeriodsFilterApplied ||
       multiplierFilterApplied
@@ -380,7 +391,7 @@ export default function Home({ coinsData }) {
     {/* <Button className={styles.marketHealth} type="primary">Market Health</Button> */}
     <Card className={styles.formCard}>
       <Row className={styles.formRow} type="flex" gutter={16}>
-        <Col xs={24} md={8} className={styles.formCol}>
+        <Col xs={24} md={6} className={styles.formCol}>
           <div className={styles.formLabel}>Coin</div>
           <Input
             ref={inputRef}
@@ -391,7 +402,7 @@ export default function Home({ coinsData }) {
             size="large"
           />
         </Col>
-        <Col xs={24} md={8} className={styles.formCol}>
+        <Col xs={24} md={6} className={styles.formCol}>
           <div className={styles.formLabel}>Signal</div>
           <Select size="large" value={trendType} onChange={setTrendType} className={styles.formSelect}>
             <Option value={signals.all}>All</Option>
@@ -399,7 +410,16 @@ export default function Home({ coinsData }) {
             <Option value={signals.sell}>Sell</Option>
           </Select>
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6} className={styles.formCol}>
+          <div className={styles.formLabel}>Category</div>
+          <Select size="large" value={category} onChange={setCategory} className={styles.formSelect}>
+            <Option value={defaultCategory} key="all">All</Option>
+            {
+              categories.map((category) => <Option value={category} key={category}>{category}</Option>)
+            }
+          </Select>
+        </Col>
+        <Col xs={24} md={6}>
           <div className={classnames(styles.formLabel, styles.hiddenFormLabel)}>&nbsp;</div>
           <Button
             size="large"
