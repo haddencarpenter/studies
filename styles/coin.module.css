@@ -81,8 +81,12 @@
   background: #F5222D;
 }
 
+.nameCard, .socialCard {
+  width: 50%;
+}
+
 @media screen and (max-width: 480px) {
-  .nameCard, .priceCard, .socialCard, .cardData {
+  .nameCard, .socialCard, .cardData {
     width: 100%;
     min-height: unset;
   }
@@ -93,7 +97,7 @@
     min-height: unset;
   }
 
-  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+  .nameCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
     width: 50%;
   }
 
@@ -107,7 +111,7 @@
     min-height: unset;
   }
 
-  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+  .nameCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
     width: 50%;
   }
 
