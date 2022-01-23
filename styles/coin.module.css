@@ -62,6 +62,10 @@
   margin-top: 32px;
 }
 
+.exchangesTable table {
+  table-layout: fixed !important;
+}
+
 .exchangeSpace {
   width: 100%;
   justify-content: space-between;
@@ -81,23 +85,32 @@
   background: #F5222D;
 }
 
-.nameCard, .socialCard {
-  width: 50%;
-}
-
 @media screen and (max-width: 480px) {
-  .nameCard, .socialCard, .cardData {
+  .nameCard {
+    width: 75% !important;
+  }
+
+  .priceCard {
+    width: 25% !important;
+  }
+
+  .socialCard, .cardData {
     width: 100%;
     min-height: unset;
+  }
+
+  .tagCard, .similarCoinCard {
+    min-height: unset;
+    width: 100% !important;
   }
 }
 
 @media screen and (max-width: 600px) {
-  .tagCard, .similarCoinCard {
-    min-height: unset;
+  .priceCard {
+    box-shadow: none;
   }
 
-  .nameCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
     width: 50%;
   }
 
@@ -111,7 +124,7 @@
     min-height: unset;
   }
 
-  .nameCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
     width: 50%;
   }
 

@@ -49,6 +49,7 @@ export default function Coin(coin) {
     {
       title: '#',
       dataIndex: 'index',
+      responsive: ['md'],
     },
     {
       title: 'Exchange',
@@ -71,6 +72,7 @@ export default function Coin(coin) {
     {
       title: '24h volume',
       dataIndex: 'volume',
+      responsive: ['md'],
       render: (volume) => {
         return new Intl.NumberFormat([], {
           style: 'currency',
@@ -82,6 +84,7 @@ export default function Coin(coin) {
     {
       title: 'Trust score',
       dataIndex: 'trustScore',
+      responsive: ['md'],
       render: (trustScore) => {
         const good = trustScore === 'green'
         const classNames = {
@@ -109,10 +112,7 @@ export default function Coin(coin) {
         </Space>
       </Card.Grid>
       <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.priceCard)}>
-        <Space>
-          <Text className={styles.cardHeader}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol' }).format(coin.currentPriceUsd)}</Text>
-          {signalTag}
-        </Space>
+        {signalTag}
       </Card.Grid>
       <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
         <Space>
@@ -133,7 +133,7 @@ export default function Coin(coin) {
       <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard1)}>
         <div className={styles.labelValueGroup}>
           <div className={styles.label}>Market Cap</div>
-          <Space>
+          <Space wrap>
             <span className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol' }).format(coin.marketCap)}</span>
             <Tag>#{coin.marketCapRank}</Tag>
           </Space>
