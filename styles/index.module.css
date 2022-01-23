@@ -112,12 +112,6 @@
   margin-left: 5px;
 }
 
-@media screen and (max-width: 768px) {
-  .tableCoinName {
-    display: block;
-  }
-}
-
 .tableCoinThumb {
   width: 16px;
   height: 16px;

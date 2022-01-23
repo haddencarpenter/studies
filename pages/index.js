@@ -333,14 +333,17 @@ export default function Home({ coinsData, categories }) {
     {
       title: 'USD',
       dataIndex: 'usd',
+      responsive: ['sm'],
     },
     {
       title: 'ETH',
       dataIndex: 'eth',
+      responsive: ['sm'],
     },
     {
       title: 'BTC',
       dataIndex: 'btc',
+      responsive: ['sm'],
     },
   ];
 
