@@ -1,5 +1,6 @@
 import { Button, Breadcrumb, Card, Layout, Typography, Space, Tag, Table, Grid } from 'antd';
 import Link from 'next/link'
+import Head from 'next/head'
 import { TwitterOutlined, GlobalOutlined } from '@ant-design/icons';
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import classnames from 'classnames';
@@ -18,15 +19,19 @@ const { Text } = Typography;
 
 export default function Coin(coin) {
   const [_trends, superSuperTrend] = getTrends(coin.ohlcs, defaultAtrPeriods, defaultMultiplier)
+  let signal
   let signalTag
   switch (superSuperTrend) {
     case signals.buy:
+      signal = 'Buy'
       signalTag = <Tag color="#52C41A">Buy</Tag>
       break;
     case signals.sell:
+      signal = 'Sell'
       signalTag = <Tag color="#F5222D">Sell</Tag>
       break;
     default:
+      signal = 'HODL'
       signalTag = <Tag color="#2F54EB">HODL</Tag>
   }
   let url
@@ -119,116 +124,136 @@ export default function Coin(coin) {
 
   const notation = screens.xs ? 'compact' : 'standard'
 
-  return <Content className={styles.content}>
-    <Breadcrumb className={styles.breadcrumb}>
-      <Breadcrumb.Item><Link href="/">Home</Link></Breadcrumb.Item>
-      <Breadcrumb.Item>{coin.name}</Breadcrumb.Item>
-    </Breadcrumb>
-    <Card>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.nameCard)}>
-        <Space>
-          {/* // eslint-disable-next-line @next/next/no-img-element */}
-          <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
-          <Text className={styles.cardHeader}>{coin.name}</Text>
-          <Tag>{coin.symbol.toUpperCase()}</Tag>
-        </Space>
-      </Card.Grid>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.priceCard)}>
-        {signalTag}
-      </Card.Grid>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
+  const metaTitle = `${coin.name} | ${new Intl.DateTimeFormat([], { dateStyle: 'full' }).format(new Date())} | ${signal} | Rotate into the Freshest Crypto Signals Daily.`
+  const metaDescription = `Coinrotator issues a daily signal for ${coin.name}. Always be on the right side of the market.`
+
+  return (
+    <>
+      <Head>
+        <title key="title">{metaTitle}</title>
+        <meta name="description" key="description" content={metaDescription}/>
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:url" content={coin.currentUrl} />
+        <meta property="og:type" content="app" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:image" content={coin.images.large} />
+        <meta property="og:image:width" content="250" />
+        <meta property="og:image:height" content="250" />
+        <meta property="og:image:type" content="image/png" />
+      </Head>
+      <Content className={styles.content}>
+        <Breadcrumb className={styles.breadcrumb}>
+          <Breadcrumb.Item><Link href="/">Home</Link></Breadcrumb.Item>
+          <Breadcrumb.Item>{coin.name}</Breadcrumb.Item>
+        </Breadcrumb>
+        <Card>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.nameCard)}>
+            <Space>
+              {/* // eslint-disable-next-line @next/next/no-img-element */}
+              <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
+              <Text className={styles.cardHeader}>{coin.name}</Text>
+              <Tag>{coin.symbol.toUpperCase()}</Tag>
+            </Space>
+          </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.priceCard)}>
+            {signalTag}
+          </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
             <Space wrap>
-          <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
-            <Tag icon={<TwitterOutlined />} color="#55ACEE" className={styles.linkTag}>
-              @{coin.twitter}&nbsp;({new Intl.NumberFormat([], { notation: 'compact' }).format(coin.twitterFollowers)})
-            </Tag>
-          </a>
-          { url ? (
-            <a href={coin.homepage} target="_blank" rel="noreferrer">
-              <Tag icon={<GlobalOutlined />} color="#262626" className={styles.linkTag}>
-                {url}
-              </Tag>
-            </a>
-          ) : <></>}
-        </Space>
-      </Card.Grid>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard1)}>
-        <div className={styles.labelValueGroup}>
-          <div className={styles.label}>Market Cap</div>
-          <Space wrap>
-            <span className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', notation }).format(coin.marketCap)}</span>
-            <Tag>#{coin.marketCapRank}</Tag>
-          </Space>
-        </div>
-        <div className={styles.labelValueGroup}>
-          <div className={styles.label}>All-Time High</div>
-          <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 20, notation }).format(coin.ath)}</div>
-        </div>
-        <div className={styles.labelValueGroup}>
-          <div className={styles.label}>All-Time Low</div>
-          <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 20, notation }).format(coin.atl)}</div>
-        </div>
-      </Card.Grid>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard2)}>
-        { coin.fullyDilutedValuation ? (
-          <div className={styles.labelValueGroup}>
-            <div className={styles.label}>Fully Diluted Valuation</div>
-            <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', notation }).format(coin.fullyDilutedValuation)}</div>
-          </div>
-        ) : <></>}
-        <div className={styles.labelValueGroup}>
-          <div className={styles.label}>Circulating Supply</div>
-          <div className={styles.value}>{new Intl.NumberFormat([], { notation }).format(coin.circulatingSupply)}</div>
-        </div>
-      </Card.Grid>
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.tagCard)}>
-        <div className={styles.label}>Tags</div>
-        {
-          coin.categories.map(tag => <Tag key={tag}>{tag}</Tag>)
-        }
-      </Card.Grid>
-      {
-        coin.similarCoins.length ? (
-          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.similarCoinCard)}>
-            <div className={styles.label}>Similar Coins</div>
+              <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
+                <Tag icon={<TwitterOutlined />} color="#55ACEE" className={styles.linkTag}>
+                  @{coin.twitter}&nbsp;({new Intl.NumberFormat([], { notation: 'compact' }).format(coin.twitterFollowers)})
+                </Tag>
+              </a>
+              { url ? (
+                <a href={coin.homepage} target="_blank" rel="noreferrer">
+                  <Tag icon={<GlobalOutlined />} color="#262626" className={styles.linkTag}>
+                    {url}
+                  </Tag>
+                </a>
+              ) : <></>}
+            </Space>
+          </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard1)}>
+            <div className={styles.labelValueGroup}>
+              <div className={styles.label}>Market Cap</div>
+              <Space wrap>
+                <span className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', notation }).format(coin.marketCap)}</span>
+                <Tag>#{coin.marketCapRank}</Tag>
+              </Space>
+            </div>
+            <div className={styles.labelValueGroup}>
+              <div className={styles.label}>All-Time High</div>
+              <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 20, notation }).format(coin.ath)}</div>
+            </div>
+            <div className={styles.labelValueGroup}>
+              <div className={styles.label}>All-Time Low</div>
+              <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 20, notation }).format(coin.atl)}</div>
+            </div>
+          </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard2)}>
+            { coin.fullyDilutedValuation ? (
+              <div className={styles.labelValueGroup}>
+                <div className={styles.label}>Fully Diluted Valuation</div>
+                <div className={styles.value}>{new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', notation }).format(coin.fullyDilutedValuation)}</div>
+              </div>
+            ) : <></>}
+            <div className={styles.labelValueGroup}>
+              <div className={styles.label}>Circulating Supply</div>
+              <div className={styles.value}>{new Intl.NumberFormat([], { notation }).format(coin.circulatingSupply)}</div>
+            </div>
+          </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.tagCard)}>
+            <div className={styles.label}>Tags</div>
             {
-              // eslint-disable-next-line @next/next/no-img-element
-              coin.similarCoins.map(coin =>
-                (
-                  <Link href={`/coin/${coin.id}`} key={coin.id} passHref>
-                    <Tag
-                      className={styles.similarCoinLink}
-                      // eslint-disable-next-line @next/next/no-img-element
-                      icon={<img className={styles.similarCoin} width={14} height={14} src={coin.images.thumb} alt={coin.name} />}
-                      key={coin.name}
-                    >
-                      {coin.name}
-                    </Tag>
-                  </Link>
-                )
-              )
+              coin.categories.map(tag => <Tag key={tag}>{tag}</Tag>)
             }
           </Card.Grid>
-        ) : <></>
-      }
-      <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.chartGrid)}>
-        <AdvancedRealTimeChart
-          autosize
-          interval="D"
-          symbol={`${coin.symbol.toUpperCase()}USDT`}
+          {
+            coin.similarCoins.length ? (
+              <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.similarCoinCard)}>
+                <div className={styles.label}>Similar Coins</div>
+                {
+                  // eslint-disable-next-line @next/next/no-img-element
+                  coin.similarCoins.map(coin =>
+                    (
+                      <Link href={`/coin/${coin.id}`} key={coin.id} passHref>
+                        <Tag
+                          className={styles.similarCoinLink}
+                          // eslint-disable-next-line @next/next/no-img-element
+                          icon={<img className={styles.similarCoin} width={14} height={14} src={coin.images.thumb} alt={coin.name} />}
+                          key={coin.name}
+                        >
+                          {coin.name}
+                        </Tag>
+                      </Link>
+                    )
+                  )
+                }
+              </Card.Grid>
+            ) : <></>
+          }
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.chartGrid)}>
+            <AdvancedRealTimeChart
+              autosize
+              interval="D"
+              symbol={`${coin.symbol.toUpperCase()}USDT`}
               hide_side_toolbar={screens.xs}
-        >
-        </AdvancedRealTimeChart>
-      </Card.Grid>
-    </Card>
-    <Table
-      columns={columns}
-      dataSource={tableData}
-      pagination={{ position: ['none', 'none'], pageSize: 1000 }}
-      bordered
-      className={styles.exchangesTable}
-    />
-  </Content>
+            >
+            </AdvancedRealTimeChart>
+          </Card.Grid>
+        </Card>
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          pagination={{ position: ['none', 'none'], pageSize: 1000 }}
+          bordered
+          className={styles.exchangesTable}
+        />
+      </Content>
+    </>
+  );
 }
 
 export async function getStaticPaths() {
