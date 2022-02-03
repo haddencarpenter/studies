@@ -289,7 +289,7 @@ export async function getStaticProps({ params }) {
           lte: endOfYesterday(),
         }
       },
-      orderBy: { closeTime: 'desc' }
+      orderBy: { closeTime: 'asc' }
     }}
   })
   const similarCoins = await prisma.coin.findMany({
