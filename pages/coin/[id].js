@@ -95,6 +95,8 @@ export default function Coin(coin) {
       title: '24h volume',
       dataIndex: 'volume',
       responsive: ['md'],
+      sorter: (a, b) => a.volume - b.volume,
+      sortOrder: 'descend',
       render: (volume) => {
         return new Intl.NumberFormat([], {
           style: 'currency',
