@@ -63,7 +63,6 @@ const script = async () => {
     const dbCoinData = {
       symbol: coinMarketData.symbol,
       name: coinMarketData.name,
-      categories: compact(coinData.categories),
       images: coinData.image,
       description: coinData.description.en,
       homepage: coinData.links.homepage[0],
@@ -83,6 +82,7 @@ const script = async () => {
       where: { id: coinMarketData.id },
       create: {
         id: coinMarketData.id,
+        categories: compact(coinData.categories),
         ...dbCoinData
       },
       update: dbCoinData,
