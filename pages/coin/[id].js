@@ -1,7 +1,8 @@
-import { Button, Breadcrumb, Card, Layout, Typography, Space, Tag, Table, Grid } from 'antd';
+import { useState, useEffect } from 'react';
+import { Breadcrumb, Button, Card, Grid, Layout, Space, Table, Tag, Tooltip, Typography } from 'antd';
 import Link from 'next/link'
 import Head from 'next/head'
-import { TwitterOutlined, GlobalOutlined } from '@ant-design/icons';
+import { TwitterOutlined, GlobalOutlined, WarningOutlined } from '@ant-design/icons';
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import classnames from 'classnames';
 import endOfYesterday from 'date-fns/endOfYesterday';
@@ -121,6 +122,10 @@ export default function Coin(coin) {
 
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
+  let [isHoverable, setIsHoverable] = useState(true);
+  useEffect(() => {
+    setIsHoverable(!window.matchMedia( "(hover: none)" ).matches)
+  }, [setIsHoverable])
 
   const notation = screens.xs ? 'compact' : 'standard'
 
@@ -157,7 +162,15 @@ export default function Coin(coin) {
             </Space>
           </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.priceCard)}>
-            {signalTag}
+            <Space>
+              {signalTag}
+              <Tooltip
+                trigger={isHoverable ? 'hover' : 'click'}
+                title="Signal is generated daily at 00:00 UTC. Markets may move without a signal change, please use proper risk management."
+              >
+                <WarningOutlined className={styles.signalWarning} />
+              </Tooltip>
+            </Space>
           </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
             <Space wrap>
@@ -240,6 +253,7 @@ export default function Coin(coin) {
               interval="D"
               symbol={`${coin.symbol.toUpperCase()}USDT`}
               hide_side_toolbar={screens.xs}
+              container_id={styles.coinChart}
             >
             </AdvancedRealTimeChart>
           </Card.Grid>

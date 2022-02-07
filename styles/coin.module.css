@@ -8,6 +8,14 @@
   margin-bottom: 32px;
 }
 
+.signalWarning path {
+  fill: #BFBFBF;
+}
+
+.signalWarning:hover path {
+  fill: #8c8c8c;
+}
+
 .cardGrid {
   padding: 16px;
   min-height: 64px;
@@ -92,11 +100,11 @@
 
 @media screen and (max-width: 480px) {
   .nameCard {
-    width: 75% !important;
+    width: 100% !important;
   }
 
   .priceCard {
-    width: 25% !important;
+    width: 100% !important;
   }
 
   .socialCard, .cardData {
