@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <title key="title">CoinRotator</title>
-        <meta name="description" key="description" content="Coinrotator issues a daily signal for the top 1000 crypto coins. Always be on the right side of the market."/>
+        <meta name="description" key="description" content="Coinrotator screens the top 1000 crypto coins daily for fresh signals. Always be on the right side of the market."/>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         <link rel="canonical" href={currentUrl} />
       </Head>
