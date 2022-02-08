@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Breadcrumb, Button, Card, Grid, Layout, Space, Table, Tag, Tooltip, Typography } from 'antd';
 import Link from 'next/link'
 import Head from 'next/head'
-import { TwitterOutlined, GlobalOutlined, WarningOutlined } from '@ant-design/icons';
+import { TwitterOutlined, GlobalOutlined, InfoCircleFilled } from '@ant-design/icons';
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import classnames from 'classnames';
 import endOfYesterday from 'date-fns/endOfYesterday';
@@ -165,10 +165,12 @@ export default function Coin(coin) {
             <Space>
               {signalTag}
               <Tooltip
+                placement={screens.xs ? 'bottomRight' : 'bottom'}
+                overlayClassName={styles.tooltip}
                 trigger={isHoverable ? 'hover' : 'click'}
                 title="Signal is generated daily at 00:00 UTC. Markets may move without a signal change, please use proper risk management."
               >
-                <WarningOutlined className={styles.signalWarning} />
+                <InfoCircleFilled className={styles.signalWarning} />
               </Tooltip>
             </Space>
           </Card.Grid>
