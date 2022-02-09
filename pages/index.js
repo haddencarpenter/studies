@@ -58,6 +58,7 @@ export async function getStaticProps() {
       atl: Number(coinData.atl),
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
       circulatingSupply: Number(coinData.circulatingSupply),
+      totalSupply: Number(coinData.totalSupply),
       ohlcs
     }
   })

@@ -12,6 +12,7 @@ import styles from '../../styles/coin.module.css'
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables'
 import getTrends from '../../utils/getTrends'
 import convertToDailySignals from '../../utils/convertToDailySignals'
+import round from 'lodash/round';
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -127,6 +128,10 @@ export default function Coin(coin) {
     setIsHoverable(!window.matchMedia( "(hover: none)" ).matches)
   }, [setIsHoverable])
 
+  let circulatingSupplyPercentage
+  if (coin.circulatingSupply && coin.totalSupply) {
+    circulatingSupplyPercentage = round(coin.circulatingSupply / coin.totalSupply * 100, 2)
+  }
   const notation = screens.xs ? 'compact' : 'standard'
 
   const metaTitle = `${coin.name} | ${signal.toUpperCase()} | ${new Intl.DateTimeFormat([], { dateStyle: 'medium' }).format(new Date())} | Coinrotator`
@@ -216,8 +221,17 @@ export default function Coin(coin) {
             ) : <></>}
             <div className={styles.labelValueGroup}>
               <div className={styles.label}>Circulating Supply</div>
-              <div className={styles.value}>{new Intl.NumberFormat([], { notation }).format(coin.circulatingSupply)}</div>
+              <div className={styles.value}>
+                {new Intl.NumberFormat([], { notation }).format(coin.circulatingSupply)}
+                { circulatingSupplyPercentage ? ` / ${circulatingSupplyPercentage}%` : <></>}
+              </div>
             </div>
+            { coin.totalSupply ? (
+              <div className={styles.labelValueGroup}>
+                <div className={styles.label}>Total Supply</div>
+                <div className={styles.value}>{new Intl.NumberFormat([], { notation }).format(coin.totalSupply)}</div>
+              </div>
+            ) : <></>}
           </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.tagCard)}>
             <div className={styles.label}>Tags</div>
@@ -339,6 +353,7 @@ export async function getStaticProps({ params }) {
       atl: Number(coinData.atl),
       fullyDilutedValuation: Number(coinData.fullyDilutedValuation),
       circulatingSupply: Number(coinData.circulatingSupply),
+      totalSupply: Number(coinData.totalSupply),
       similarCoins,
       ohlcs,
     }
