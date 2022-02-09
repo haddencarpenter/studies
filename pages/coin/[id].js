@@ -322,16 +322,19 @@ export async function getStaticProps({ params }) {
       orderBy: { closeTime: 'asc' }
     }}
   })
-  const similarCoins = await prisma.$queryRaw`
-    SELECT id, images, name, count(*)
-    FROM "Coin",
-    unnest(array[${Prisma.join(coinData.categories)}]) unnested_categories
-    WHERE categories @> array[unnested_categories]
-    AND id != ${coinData.id}
-    GROUP BY id
-    ORDER BY 4 desc, 1
-    LIMIT 10;
-  `;
+  let similarCoins = []
+  if (coinData.categories.length) {
+    similarCoins = await prisma.$queryRaw`
+      SELECT id, images, name, count(*)
+      FROM "Coin",
+      unnest(array[${Prisma.join(coinData.categories)}]) unnested_categories
+      WHERE categories @> array[unnested_categories]
+      AND id != ${coinData.id}
+      GROUP BY id
+      ORDER BY 4 desc, 1
+      LIMIT 10;
+    `;
+  }
   let ohlcs = coinData.ohlcs.map(ohlc => ({
     ...ohlc,
     open: Number(ohlc.open),
