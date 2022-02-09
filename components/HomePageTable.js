@@ -1,5 +1,6 @@
 import { Tag, Table } from 'antd'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 import styles from '../styles/index.module.css'
 import { signals } from '../utils/variables'
@@ -97,12 +98,14 @@ const HomePageTable = ({
       dataIndex: 'coinData',
       render: (coinData) => {
         return (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coinData.images.large} alt={coinData.name} className={styles.tableCoinThumb} loading="lazy"/>
-            <span className={styles.tableCoinName}>{coinData.name}</span>
-            <span className={styles.tableCoinSymbol}>{coinData.symbol}</span>
-          </>
+          <Link href={`/coin/${coinData.id}`}>
+            <a className={styles.fakeLink}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={coinData.images.large} alt={coinData.name} className={styles.tableCoinThumb} loading="lazy"/>
+              <span className={styles.tableCoinName}>{coinData.name}</span>
+              <span className={styles.tableCoinSymbol}>{coinData.symbol}</span>
+            </a>
+          </Link>
         )
       }
     },
