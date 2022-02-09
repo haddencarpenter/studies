@@ -16,7 +16,7 @@ import convertToDailySignals from '../../utils/convertToDailySignals'
 import round from 'lodash/round';
 
 const { Content } = Layout;
-const { Text } = Typography;
+const { Title } = Typography;
 
 export default function Coin(coin) {
   const [_trends, superSuperTrend] = getTrends(coin.ohlcs, defaultAtrPeriods, defaultMultiplier)
@@ -163,7 +163,7 @@ export default function Coin(coin) {
             <Space>
               {/* // eslint-disable-next-line @next/next/no-img-element */}
               <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
-              <Text className={styles.cardHeader}>{coin.name}</Text>
+              <Title className={styles.cardHeader}>{coin.name}</Title>
               <Tag>{coin.symbol.toUpperCase()}</Tag>
             </Space>
           </Card.Grid>
