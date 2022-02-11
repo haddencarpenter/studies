@@ -1,11 +1,11 @@
 import axios from 'axios'
 import * as rax from 'retry-axios'
 import * as AxiosLogger from 'axios-logger'
-import compact from 'lodash/compact'
 import dotenv from 'dotenv';
 import subDays from 'date-fns/subDays'
 
 import { quoteSymbols } from '../utils/variables'
+import getCategories from '../utils/getCategories'
 import prisma from '../lib/prisma'
 
 dotenv.config();
@@ -35,6 +35,8 @@ const script = async () => {
   }
   cryptowatchAPI.interceptors.request.use(AxiosLogger.requestLogger);
   rax.attach(cryptowatchAPI)
+
+  const categories = await getCategories();
 
   const coinMarketsPage1 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250')
   const coinMarketsPage2 = await coinGeckoAPI.get('/coins/markets?vs_currency=usd&per_page=250&page=2')
@@ -77,13 +79,13 @@ const script = async () => {
       circulatingSupply: coinData.market_data.circulating_supply,
       totalSupply: coinData.market_data.total_supply,
       tickers: coinData.tickers,
+      categories: categories[coinMarketData.symbol],
     }
 
     await prisma.coin.upsert({
       where: { id: coinMarketData.id },
       create: {
         id: coinMarketData.id,
-        categories: compact(coinData.categories),
         ...dbCoinData
       },
       update: dbCoinData,
