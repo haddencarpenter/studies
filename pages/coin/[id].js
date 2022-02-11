@@ -56,11 +56,6 @@ export default function Coin(coin) {
 
   const columns = [
     {
-      title: '#',
-      dataIndex: 'index',
-      responsive: ['md'],
-    },
-    {
       title: 'Exchange',
       dataIndex: 'name',
       responsive: ['sm'],
