@@ -8,6 +8,10 @@
   margin-bottom: 48px;
 }
 
+.mainTitle {
+  font-size: 32px !important;
+}
+
 .title {
   text-align: center;
 }
