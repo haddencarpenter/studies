@@ -235,7 +235,13 @@ export default function Coin(coin) {
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.tagCard)}>
             <Title level={3} className={styles.label}>Tags</Title>
             {
-              coin.categories.map(tag => <Tag key={tag}>{tag}</Tag>)
+              coin.categories.map((tag) => {
+                return (
+                  <Link href={`/?category=${tag}`} key={tag}>
+                    <a><Tag>{tag}</Tag></a>
+                  </Link>
+                );
+              })
             }
           </Card.Grid>
           {
