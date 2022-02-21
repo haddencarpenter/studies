@@ -133,7 +133,8 @@ export default function Coin(coin) {
   }
   const notation = screens.xs ? 'compact' : 'standard'
 
-  const metaTitle = `${coin.name} | ${signal.toUpperCase()} | ${new Intl.DateTimeFormat([], { dateStyle: 'medium' }).format(new Date())} | Coinrotator`
+  const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${signal.toUpperCase()} | Daily Crypto Screener`
+  const ogTitle = `${coin.name} | ${signal.toUpperCase()} | ${new Intl.DateTimeFormat([], { dateStyle: 'medium' }).format(new Date())} | Coinrotator`
   const metaDescription = `Coinrotator issues a daily signal for ${coin.name}. Always be on the right side of the cryptomarket.`
 
   return (
@@ -141,7 +142,7 @@ export default function Coin(coin) {
       <Head>
         <title key="title">{metaTitle}</title>
         <meta name="description" key="description" content={metaDescription}/>
-        <meta property="og:title" content={metaTitle} />
+        <meta property="og:title" content={ogTitle} />
         <meta property="og:description" content={metaDescription} />
         <meta property="og:url" content={coin.currentUrl} />
         <meta property="og:type" content="app" />
