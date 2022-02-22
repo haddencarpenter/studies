@@ -1,0 +1,29 @@
+.header {
+  background: white;
+  padding: 0;
+  position: static;
+  width: 100%;
+  z-index: 1;
+  height: 60px;
+}
+
+.logo {
+  flex-grow: 1;
+}
+
+.logo:hover {
+  text-decoration: none;
+  transition: none !important;
+}
+
+.logo::after {
+  border-bottom: 0 !important;
+}
+
+.darkMode {
+  background: #F5F5F5;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 4px;
+}

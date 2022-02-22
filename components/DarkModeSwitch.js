@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import styles from '../styles/globals.module.css'
+import styles from '../styles/header.module.css'
 
 const DarkModeSwitch = ({ darkMode, setDarkMode }) => {
   const switchMode = useCallback(() => {
