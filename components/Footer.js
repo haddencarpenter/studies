@@ -112,7 +112,7 @@ const Footer = ({ topCoins, topCategories }) => {
     grid = (
       <>
         <Row>
-          <Col>{logo}</Col>
+          <Col span={24}>{logo}</Col>
         </Row>
         <Row>
           <Col span={24}>{horizontalDivider}</Col>
@@ -135,9 +135,9 @@ const Footer = ({ topCoins, topCategories }) => {
     )
   } else {
     grid = (
-      <>
+      <span>
         <Row>
-          <Col>{logo}</Col>
+          <Col span={24}>{logo}</Col>
         </Row>
         <Row>
           <Col span={24}>{horizontalDivider}</Col>
@@ -158,7 +158,7 @@ const Footer = ({ topCoins, topCategories }) => {
             {socialMediaBlock}
           </Col>
         </Row>
-      </>
+      </span>
     )
   }
 
