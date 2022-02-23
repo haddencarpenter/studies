@@ -12,6 +12,7 @@ import convertToDailySignals from '../utils/convertToDailySignals';
 import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 import HomePageTable from '../components/HomePageTable';
 import { getCategories } from '../utils/categories';
+import globalData from '../lib/globalData';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
@@ -19,6 +20,7 @@ const { useBreakpoint } = Grid;
 const { Content } = Layout;
 
 export async function getStaticProps() {
+  const appData = await globalData();
   let coinsData = await prisma.coin.findMany({
     orderBy: { marketCapRank: 'asc' },
     take: 1000,
@@ -66,7 +68,8 @@ export async function getStaticProps() {
   return {
     props: {
       coinsData,
-      categories
+      categories,
+      appData
     }
   }
 }

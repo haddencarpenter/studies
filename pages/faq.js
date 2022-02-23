@@ -5,6 +5,7 @@ import styles from '../styles/faq.module.css'
 import BuyTag from '../components/BuyTag'
 import SellTag from '../components/SellTag'
 import HodlTag from '../components/HodlTag'
+import globalData from '../lib/globalData';
 
 const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -61,4 +62,10 @@ export default function Faq() {
         </Panel>
       </Collapse>
     </Content>);
+}
+
+export async function getStaticProps() {
+  const appData = await globalData();
+
+  return { props: { appData } };
 }

@@ -17,6 +17,7 @@ import convertToDailySignals from '../../utils/convertToDailySignals'
 import BuyTag from '../../components/BuyTag'
 import SellTag from '../../components/SellTag'
 import HodlTag from '../../components/HodlTag'
+import globalData from '../../lib/globalData';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -309,6 +310,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
+  const appData = await globalData();
   const coinData = await prisma.coin.findUnique({
     where: {
       id: params.id,
@@ -362,6 +364,7 @@ export async function getStaticProps({ params }) {
       totalSupply: Number(coinData.totalSupply),
       similarCoins,
       ohlcs,
+      appData
     }
   }
 }

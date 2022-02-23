@@ -13,6 +13,8 @@ function MyApp({ Component, pageProps }) {
   const currentUrl = `${process.env.SITE_URL}${router.asPath}`
   pageProps.currentUrl = currentUrl
 
+  const {topCoins, topCategories} = pageProps.appData
+
   return (
     <>
       <Head>
@@ -23,7 +25,7 @@ function MyApp({ Component, pageProps }) {
       </Head>
       <Header />
       <Component {...pageProps} />
-      <Footer />
+      <Footer topCoins={topCoins} topCategories={topCategories} />
     </>
   )
 }

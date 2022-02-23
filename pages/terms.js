@@ -3,6 +3,7 @@ import Link from 'next/link'
 import classnames from 'classnames'
 
 import styles from '../styles/terms.module.css'
+import globalData from '../lib/globalData';
 
 const { Title, Paragraph } = Typography;
 const { Content } = Layout;
@@ -80,4 +81,10 @@ export default function Faq() {
       <Paragraph>In no event shall CoinRotator be responsible or liable for any failure or delay in the performance of its obligations hereunder arising out of or caused by, directly or indirectly, forces beyond its control, including, without limitation, strikes, work stoppages, accidents, acts of war or terrorism, civil or military disturbances, nuclear or natural catastrophes or acts of God, and interruptions, loss or malfunctions of utilities, communications or computer (software and hardware) services.</Paragraph>
       <Paragraph>Any heading or section title contained herein is for convenience of reference only and shall not affect the meaning or interpretation of these Terms. The terms &quot;include&quot; and &quot;including&quot; are deemed to include the phrase &quot;without limitation&quot; immediately thereafter.</Paragraph>
     </Content>);
+}
+
+export async function getStaticProps() {
+  const appData = await globalData();
+
+  return { props: { appData } };
 }

@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Layout, Menu } from 'antd'
 
 import styles from '../styles/header.module.css'
@@ -13,7 +12,6 @@ const Header = () => {
         <Menu.Item key="logo" className={styles.logo} data-id="logo">
           <Logo />
         </Menu.Item>
-        <Menu.Item key="faq"><Link href="/faq"><a>FAQ</a></Link></Menu.Item>
         {/* <Menu.Item key="dark-mode"><DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode}/></Menu.Item> */}
       </Menu>
     </AntHeader>
