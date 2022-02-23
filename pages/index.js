@@ -2,13 +2,14 @@ import classnames from 'classnames';
 import isFinite from 'lodash/isFinite'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Grid, Layout } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import endOfYesterday from 'date-fns/endOfYesterday';
 
 import prisma from '../lib/prisma'
 import styles from '../styles/index.module.css'
 import convertToDailySignals from '../utils/convertToDailySignals';
+import useBreakpoint from '../utils/useBreakpoint';
 import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 import HomePageTable from '../components/HomePageTable';
 import { getCategories } from '../utils/categories';
@@ -16,7 +17,6 @@ import globalData from '../lib/globalData';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
-const { useBreakpoint } = Grid;
 const { Content } = Layout;
 
 export async function getStaticProps() {
@@ -246,7 +246,7 @@ export default function Home({ coinsData, categories }) {
     setMultiplier(defaultMultiplier)
   }, [defaultTrendType, defaultCategory, setCoinName, resetMarketCap, resetTrendLength, setCategory])
 
-  const buttonSize = screens.xs ? 'small' : screens.xl ? 'large' : 'medium'
+  const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = marketCapMin !== defaultMarketCapMin || marketCapMax !== defaultMarketCapMax
@@ -265,7 +265,7 @@ export default function Home({ coinsData, categories }) {
       atrPeriodsFilterApplied ||
       multiplierFilterApplied
 
-    if (!anyFiltersApplied || screens.xs) {
+    if (!anyFiltersApplied || !screens.sm) {
       return null
     }
     return ([

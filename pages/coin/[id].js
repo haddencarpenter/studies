@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { useState, useEffect } from 'react';
-import { Breadcrumb, Button, Card, Grid, Layout, Space, Table, Tag, Tooltip, Typography } from 'antd';
+import { Breadcrumb, Button, Card, Layout, Space, Table, Tag, Tooltip, Typography } from 'antd';
 import Link from 'next/link'
 import Head from 'next/head'
 import { TwitterOutlined, GlobalOutlined, InfoCircleFilled } from '@ant-design/icons';
@@ -14,6 +14,7 @@ import styles from '../../styles/coin.module.css'
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables'
 import getTrends from '../../utils/getTrends'
 import convertToDailySignals from '../../utils/convertToDailySignals'
+import useBreakpoint from '../../utils/useBreakpoint'
 import BuyTag from '../../components/BuyTag'
 import SellTag from '../../components/SellTag'
 import HodlTag from '../../components/HodlTag'
@@ -121,7 +122,6 @@ export default function Coin(coin) {
     },
   ];
 
-  const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
   let [isHoverable, setIsHoverable] = useState(true);
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function Coin(coin) {
   if (coin.circulatingSupply && coin.totalSupply) {
     circulatingSupplyPercentage = round(coin.circulatingSupply / coin.totalSupply * 100, 2)
   }
-  const notation = screens.xs ? 'compact' : 'standard'
+  const notation = screens.sm ? 'standard' : 'compact'
 
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${signal.toUpperCase()} | Daily Crypto Screener`
   const ogTitle = `${coin.name} | ${signal.toUpperCase()} | ${new Intl.DateTimeFormat([], { dateStyle: 'medium' }).format(new Date())} | Coinrotator`
@@ -171,7 +171,7 @@ export default function Coin(coin) {
             <Space>
               {signalTag}
               <Tooltip
-                placement={screens.xs ? 'bottomRight' : 'bottom'}
+                placement={screens.sm ? 'bottom' : 'bottomRight'}
                 overlayClassName={styles.tooltip}
                 trigger={isHoverable ? 'hover' : 'click'}
                 title="Signal is generated daily at 00:00 UTC. Markets may move without a signal change, please use proper risk management."
@@ -277,7 +277,7 @@ export default function Coin(coin) {
               autosize
               interval="D"
               symbol={`${coin.symbol.toUpperCase()}USDT`}
-              hide_side_toolbar={screens.xs}
+              hide_side_toolbar={!screens.sm}
               container_id={styles.coinChart}
             >
             </AdvancedRealTimeChart>
