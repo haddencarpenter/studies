@@ -297,8 +297,9 @@ export default function Home({ coinsData, categories }) {
       <Card className={styles.formCard}>
         <Row className={styles.formRow} type="flex" gutter={16}>
           <Col xs={24} md={6} className={styles.formCol}>
-            <div className={styles.formLabel}>Coin</div>
+            <label className={styles.formLabel} htmlFor="coin-name">Coin</label>
             <Input
+              id="coin-name"
               ref={inputRef}
               placeholder="Bitcoin, ETH, Polygon..."
               allowClear
@@ -308,16 +309,28 @@ export default function Home({ coinsData, categories }) {
             />
           </Col>
           <Col xs={24} md={6} className={styles.formCol}>
-            <div className={styles.formLabel}>Signal</div>
-            <Select size="large" value={trendType} onChange={setTrendType} className={styles.formSelect}>
+            <label className={styles.formLabel} htmlFor="signal">Signal</label>
+            <Select
+              size="large"
+              value={trendType}
+              onChange={setTrendType}
+              id="signal"
+              className={styles.formSelect}
+            >
               <Option value={signals.all}>All</Option>
               <Option value={signals.buy}>Buy</Option>
               <Option value={signals.sell}>Sell</Option>
             </Select>
           </Col>
           <Col xs={24} md={6} className={styles.formCol}>
-            <div className={styles.formLabel}>Category</div>
-            <Select size="large" value={categoryFilter} onChange={setCategory} className={styles.formSelect}>
+            <label className={styles.formLabel} htmlFor="category">Category</label>
+            <Select
+              size="large"
+              value={categoryFilter}
+              onChange={setCategory}
+              id="category"
+              className={styles.formSelect}
+            >
               <Option value={defaultCategory} key="all">All</Option>
               {
                 categories.map((category) => <Option value={category} key={category}>{category}</Option>)
@@ -325,7 +338,6 @@ export default function Home({ coinsData, categories }) {
             </Select>
           </Col>
           <Col xs={24} md={6}>
-            <div className={classnames(styles.formLabel, styles.hiddenFormLabel)}>&nbsp;</div>
             <Button
               size="large"
               onClick={() => setFilterModalVisible(true)}
@@ -376,12 +388,12 @@ export default function Home({ coinsData, categories }) {
         <Divider /> */}
         <Row className={styles.formRow} gutter={16}>
           <Col span={12} className="gutter-row">
-            <div className={styles.formLabel}>ATR periods</div>
-            <Input size="large" onChange={setValidAtrPeriods} value={atrPeriods}></Input>
+            <label className={styles.formLabel} htmlFor="atr-periods">ATR periods</label>
+            <Input size="large" onChange={setValidAtrPeriods} value={atrPeriods} id="atr-periods"></Input>
           </Col>
           <Col span={12} className="gutter-row">
-            <div className={styles.formLabel}>Multiplier</div>
-            <Input size="large" onChange={setValidMulitiplier} value={multiplier}></Input>
+            <label className={styles.formLabel} htmlFor="multiplier">Multiplier</label>
+            <Input size="large" onChange={setValidMulitiplier} value={multiplier} id="multiplier"></Input>
           </Col>
         </Row>
         <Divider />
@@ -392,13 +404,27 @@ export default function Home({ coinsData, categories }) {
         </Row>
         <Row className={styles.filterModalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
           <Col className="gutter-row" xs={10} md={11}>
-            <Input className={classnames(styles.filterModalInput)} size="large" onChange={setValidMarketCapMin} value={marketCapMin} placeholder="$1"></Input>
+            <Input
+              className={classnames(styles.filterModalInput)}
+              size="large"
+              onChange={setValidMarketCapMin}
+              value={marketCapMin}
+              placeholder="$1"
+              aria-label="Market Cap Min"
+            />
           </Col>
           <Col className={classnames('gutter-row', styles.formRangeLabel)} xs={3} md={2}>
             <Text type="secondary">TO</Text>
           </Col>
           <Col className="gutter-row" xs={11} md={11}>
-            <Input className={classnames(styles.filterModalInput)} size="large" onChange={setValidMarketCapMax} value={marketCapMax} placeholder="$100,000"></Input>
+            <Input
+              className={classnames(styles.filterModalInput)}
+              size="large"
+              onChange={setValidMarketCapMax}
+              value={marketCapMax}
+              placeholder="$100,000"
+              aria-label="Market Cap Max"
+            />
           </Col>
         </Row>
         <Row justify="space-between">
@@ -423,13 +449,27 @@ export default function Home({ coinsData, categories }) {
         </Row>
         <Row className={styles.filterModalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
           <Col className="gutter-row" xs={10} md={11}>
-            <Input className={styles.filterModalInput} size="large" onChange={setValidTrendLengthMin} value={trendLengthMin} placeholder="1"></Input>
+            <Input
+              className={styles.filterModalInput}
+              size="large"
+              onChange={setValidTrendLengthMin}
+              value={trendLengthMin}
+              placeholder="1"
+              aria-label="Trend Length Min"
+            />
           </Col>
           <Col className={classnames('gutter-row', styles.formRangeLabel)} xs={3} md={2}>
             <Text type="secondary">TO</Text>
           </Col>
           <Col className="gutter-row" xs={11} md={11}>
-            <Input className={styles.filterModalInput} size="large" onChange={setValidTrendLengthMax} value={trendLengthMax} placeholder="50"></Input>
+            <Input
+              className={styles.filterModalInput}
+              size="large"
+              onChange={setValidTrendLengthMax}
+              value={trendLengthMax}
+              placeholder="50"
+              aria-label="Trend Length Max"
+            />
           </Col>
         </Row>
         <Row justify="space-between">

@@ -44,24 +44,12 @@
   margin-bottom: 12px;
 }
 
-@media screen and (max-width: @screen-md) {
-  .formCol {
-    margin-bottom: 12px;
-  }
-}
-
 .parameterCard {
   background: @fake-white;
 }
 
 .formLabel {
   margin-bottom: 8px;
-}
-
-@media screen and (max-width: 768px) {
-  .hiddenFormLabel {
-    display: none;
-  }
 }
 
 .formRangeInput {
@@ -79,6 +67,7 @@
 
 .formAllFilters {
   width: 100%;
+  margin-top: 22px;
 }
 
 .formButton {
@@ -150,4 +139,14 @@
 
 .filterModalInput {
   width: 100%;
+}
+
+@media screen and (max-width: @screen-md) {
+  .formCol {
+    margin-bottom: 12px;
+  }
+
+  .formAllFilters {
+    margin: 0;
+  }
 }
