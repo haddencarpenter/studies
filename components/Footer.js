@@ -67,15 +67,15 @@ const Footer = ({ topCoins, topCategories }) => {
       <Space size={12}>
         <a href="https://discord.gg/zfnxHyrhSK" target="_blank" rel="noreferrer" className={styles.socialLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/discord.svg" alt="Discord Logo" className={styles.socialImage}/>
+          <img src="/discord.svg" alt="Discord Logo" className={styles.socialImage} width={24} height={19} />
         </a>
         <a href="https://twitter.com/coinrotatorapp" target="_blank" rel="noreferrer" className={styles.socialLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/twitter.svg" alt="Twitter Logo" className={styles.socialImage}/>
+          <img src="/twitter.svg" alt="Twitter Logo" className={styles.socialImage} width={24} height={20}/>
         </a>
         <a href="https://coinrotator.medium.com/" target="_blank" rel="noreferrer" className={styles.socialLink}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/medium.svg" alt="Medium Logo" className={styles.socialImage}/>
+          <img src="/medium.svg" alt="Medium Logo" className={styles.socialImage} width={24} height={24}/>
         </a>
       </Space>
     </Space>
