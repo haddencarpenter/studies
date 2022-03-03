@@ -251,13 +251,11 @@ export default function Home({ coinsData, categories }) {
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = marketCapMin !== defaultMarketCapMin || marketCapMax !== defaultMarketCapMax
     const trendLengthFilterApplied = trendLengthMin !== defaultTrendLengthMin || trendLengthMax !== defaultTrendLengthMax
-    const coinNameFilterApplied = coinNameFilter !== defaultCoinNameFilter
     const atrPeriodsFilterApplied = atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = multiplier !== defaultMultiplier
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
-      coinNameFilterApplied ||
       atrPeriodsFilterApplied ||
       multiplierFilterApplied
 
