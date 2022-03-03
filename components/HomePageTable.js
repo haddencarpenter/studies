@@ -30,7 +30,14 @@ const HomePageTable = ({
 
   const router = useRouter()
   const isHoverable = useIsHoverable()
-
+  const superTrends = useMemo(() => {
+    const cache = {}
+    coinsData.forEach(coin => {
+      cache[coin.id] = getTrends(coin.ohlcs, atrPeriods, multiplier)
+    })
+    return cache
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [atrPeriods, multiplier])
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY
@@ -44,7 +51,7 @@ const HomePageTable = ({
            matchesCategory
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
-    const [trends, superSupertrend] = getTrends(coinData.ohlcs, atrPeriods, multiplier)
+    const [trends, superSupertrend] = superTrends[coinData.id]
 
     return {
       ...coinData,
