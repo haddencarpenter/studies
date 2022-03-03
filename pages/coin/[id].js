@@ -66,9 +66,12 @@ export default function Coin(coin) {
         return (
           <Space className={styles.exchangeSpace}>
             <b>{name}</b>
-            <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
-              <Button type="primary">Trade</Button>
-            </a>
+            {data.tradeLink ? (
+              <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
+                <Button type="primary">Trade</Button>
+              </a>) : ''
+            }
+
           </Space>
         )
       }
@@ -82,9 +85,11 @@ export default function Coin(coin) {
         return (
           <Space className={styles.exchangeSpace}>
             <b>{name}</b>
-            <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
-              <Button type="primary">Trade</Button>
-            </a>
+            {data.tradeLink ? (
+              <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
+                <Button type="primary">Trade</Button>
+              </a>) : ''
+            }
           </Space>
         )
       }
