@@ -2,6 +2,8 @@ import { Table, Tooltip } from 'antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { QuestionCircleFilled } from '@ant-design/icons';
+import { useMemo } from 'react';
+import { VList } from 'virtuallist-antd'
 
 import BuyTag from './BuyTag'
 import SellTag from './SellTag'
@@ -167,6 +169,14 @@ const HomePageTable = ({
     },
   ];
 
+  // The table rows are 56px high.
+  const tableHeight = 10 * 56;
+  const vComponents = useMemo(() => {
+		return VList({
+			height: tableHeight
+		})
+	}, [tableHeight])
+
   return (
     <Table
       columns={columns}
@@ -178,6 +188,10 @@ const HomePageTable = ({
       pagination={{ position: ['none', 'none'], pageSize: 1000 }}
       bordered
       className={styles.coinsTable}
+      scroll={{
+				y: tableHeight
+			}}
+      components={vComponents}
     />
   )
 }
