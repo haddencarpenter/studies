@@ -80,6 +80,8 @@ const HomePageTable = ({
       return true
     } else if (trendType === signals.buy) {
       return coinData.superSupertrend === signals.buy
+    } else if (trendType === signals.hodl) {
+      return coinData.superSupertrend === signals.hodl
     } else if (trendType === signals.sell) {
       return coinData.superSupertrend === signals.sell
     }

@@ -313,6 +313,7 @@ export default function Home({ coinsData, categories }) {
             >
               <Option value={signals.all}>All</Option>
               <Option value={signals.buy}>Buy</Option>
+              <Option value={signals.hodl}>HODL</Option>
               <Option value={signals.sell}>Sell</Option>
             </Select>
           </Col>
