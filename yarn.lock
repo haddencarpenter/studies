@@ -4439,10 +4439,10 @@ next-superjson@^0.0.2:
     babel-loader "^8.2.2"
     babel-plugin-superjson-next "^0.4.2"
 
-next-with-less@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.npmjs.org/next-with-less/-/next-with-less-2.0.2.tgz"
-  integrity sha512-ARPjT6jNwSlGc8RRAhEiOMGfr4HuvvJ2k26WXmEVkpsuSXUe0h4KTb/ML67zxZy1EoBaH3r9Eos0f+SnWTZ1pA==
+next-with-less@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/next-with-less/-/next-with-less-2.0.5.tgz#901dc94918bb19f08e879a5bc7b11b44c9351f6c"
+  integrity sha512-1MJDcgFOPucFPCMXV7rTqcWiLI2nLSBi8bA6msvkiNLhYyZMXaFl4MkyYf7eOEUUEtA/c5eD0grPhbcDkrKqPQ==
   dependencies:
     clone-deep "^4.0.1"
 
