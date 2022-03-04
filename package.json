@@ -38,8 +38,5 @@
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.2",
     "next-sitemap": "^2.1.13"
-  },
-  "engines": {
-    "node": ">=14.18.0"
   }
 }
