@@ -143,9 +143,9 @@ const HomePageTable = ({
       sorter: (a, b, sortOrder) => {
         if (a.superSupertrend === b.superSupertrend) {
           if (sortOrder === 'ascend') {
-            return a.coinData.name.localeCompare(b.coinData.name)
+            return a.marketCap < b.marketCap ? 1 : -1
           } else {
-            return b.coinData.name.localeCompare(a.coinData.name)
+            return b.marketCap < a.marketCap ? 1 : -1
           }
         } else {
           if (a.superSupertrend === signals.sell) {
