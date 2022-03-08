@@ -341,6 +341,7 @@ export async function getStaticProps({ params }) {
   }))
   ohlcs = convertToDailySignals(ohlcs)
   const [_trends, superSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier)
+  delete coinData.ohlcs
   return {
     props: {
       ...coinData,
