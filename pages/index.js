@@ -10,6 +10,7 @@ import prisma from '../lib/prisma'
 import styles from '../styles/index.module.less'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import useBreakPoint from '../utils/useBreakPoint';
+import useIsHoverable from '../utils/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 import HomePageTable from '../components/HomePageTable';
 import { getCategories } from '../utils/categories';
@@ -108,11 +109,14 @@ export default function Home({ coinsData, categories }) {
   }, [defaultTrendLengthMin, defaultTrendLengthMax])
 
   const screens = useBreakPoint();
+  const isHoverable = useIsHoverable();
 
   const inputRef = useRef(null)
   useEffect(() => {
-    inputRef.current.input?.focus();
-  }, [])
+    if (isHoverable) {
+      inputRef.current.input?.focus();
+    }
+  }, [isHoverable])
   useEffect(() => {
     if (portfolioParam) {
       setCoinNameFilter(portfolioParam)
