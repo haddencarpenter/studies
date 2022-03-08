@@ -398,7 +398,7 @@ export default function Home({ coinsData, categories }) {
           </Button>
         ]}
       >
-        {/* <Row className={styles.formRow} justify="space-between">
+        <Row className={styles.formRow} justify="space-between">
           <Col>
             <span>Weekly Signals</span>
           </Col>
@@ -406,7 +406,12 @@ export default function Home({ coinsData, categories }) {
             <Switch checked={showWeeklySignals} onChange={setShowWeeklySignals} />
           </Col>
         </Row>
-        <Divider /> */}
+        <Row className={styles.explainerRow}>
+          <Col>
+            <Text type="secondary">Weekly signals only update at 00:00 UTC each Monday. Selecting this option will override the Default signals.</Text>
+          </Col>
+        </Row>
+        <Divider />
         <Row className={styles.formRow} gutter={16}>
           <Col span={12} className="gutter-row">
             <label className={styles.formLabel} htmlFor="atr-periods">ATR periods</label>
@@ -522,6 +527,7 @@ export default function Home({ coinsData, categories }) {
           defaultCategory={defaultCategory}
           atrPeriods={atrPeriods}
           multiplier={multiplier}
+          showWeeklySignals={showWeeklySignals}
         />
       </Row>
     </Content>
