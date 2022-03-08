@@ -57,51 +57,40 @@ export default function Coin(coin) {
     }
   })
 
-  const columns = [
-    {
-      title: 'Exchange',
-      dataIndex: 'name',
-      responsive: ['sm'],
-      render: (name, data) => {
-        return (
-          <Space className={styles.exchangeSpace}>
-            <b>{name}</b>
-            {data.tradeLink ? (
-              <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
-                <Button type="primary">Trade</Button>
-              </a>) : ''
-            }
+  const screens = useBreakPoint();
+  const isHoverable = useIsHoverable();
+  const isServer = typeof window === 'undefined';
 
-          </Space>
-        )
-      }
-    },
-    {
-      title: 'Exchange',
-      dataIndex: 'name',
-      responsive: ['xs'],
-      width: 200,
-      render: (name, data) => {
-        return (
-          <Space className={styles.exchangeSpace}>
-            <b>{name}</b>
-            {data.tradeLink ? (
-              <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
-                <Button type="primary">Trade</Button>
-              </a>) : ''
-            }
-          </Space>
-        )
-      }
-    },
-    {
-      title: 'Pair',
-      dataIndex: 'pair',
-    },
-    {
+  const columns = []
+  const exchangeColumn = {
+    title: 'Exchange',
+    dataIndex: 'name',
+    render: (name, data) => {
+      return (
+        <Space className={styles.exchangeSpace}>
+          <b>{name}</b>
+          {data.tradeLink ? (
+            <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
+              <Button type="primary">Trade</Button>
+            </a>) : ''
+          }
+
+        </Space>
+      )
+    }
+  }
+  if (!screens.sm) {
+    exchangeColumn.width = 200
+  }
+  columns.push(exchangeColumn)
+  columns.push({
+    title: 'Pair',
+    dataIndex: 'pair',
+  })
+  if (screens.md || isServer) {
+    columns.push({
       title: '24h volume',
       dataIndex: 'volume',
-      responsive: ['md'],
       sorter: (a, b) => a.volume - b.volume,
       sortOrder: 'descend',
       render: (volume) => {
@@ -111,11 +100,10 @@ export default function Coin(coin) {
           currencyDisplay: 'narrowSymbol'
         }).format(volume)
       }
-    },
-    {
+    })
+    columns.push({
       title: 'Trust score',
       dataIndex: 'trustScore',
-      responsive: ['md'],
       render: (trustScore) => {
         const good = trustScore === 'green'
         const classNames = {
@@ -125,11 +113,8 @@ export default function Coin(coin) {
         }
         return <div className={classnames(classNames)} />
       }
-    },
-  ];
-
-  const screens = useBreakPoint();
-  const isHoverable = useIsHoverable();
+    })
+  }
 
   let circulatingSupplyPercentage
   if (coin.circulatingSupply && coin.totalSupply) {
