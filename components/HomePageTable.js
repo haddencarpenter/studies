@@ -26,6 +26,7 @@ const HomePageTable = ({
     defaultCategory,
     atrPeriods,
     multiplier,
+    showWeeklySignals,
   }) => {
 
   const router = useRouter()
@@ -33,11 +34,11 @@ const HomePageTable = ({
   const superTrends = useMemo(() => {
     const cache = {}
     coinsData.forEach(coin => {
-      cache[coin.id] = getTrends(coin.ohlcs, atrPeriods, multiplier)
+      cache[coin.id] = getTrends(coin.ohlcs, atrPeriods, multiplier, showWeeklySignals)
     })
     return cache
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [atrPeriods, multiplier])
+  }, [atrPeriods, multiplier, showWeeklySignals])
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY
