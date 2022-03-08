@@ -402,6 +402,11 @@ export default function Home({ coinsData, categories }) {
             <Switch checked={showWeeklySignals} onChange={setShowWeeklySignals} />
           </Col>
         </Row>
+        <Row className={styles.explainerRow}>
+          <Col>
+            <Text type="secondary">Weekly signals are based on the weekly Supertrend and only update at 00:00 UTC Monday. Selecting this option will override the Daily signals.</Text>
+          </Col>
+        </Row>
         <Divider />
         <Row className={styles.formRow} gutter={16}>
           <Col span={12} className="gutter-row">
