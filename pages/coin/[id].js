@@ -19,6 +19,7 @@ import BuyTag from '../../components/BuyTag'
 import SellTag from '../../components/SellTag'
 import HodlTag from '../../components/HodlTag'
 import globalData from '../../lib/globalData';
+import cleanupExchangeLink from '../../utils/cleanupExchangeLink';
 import useIsHoverable from '../../utils/useIsHoverable';
 
 const { Content } = Layout;
@@ -65,11 +66,12 @@ export default function Coin(coin) {
     title: 'Exchange',
     dataIndex: 'name',
     render: (name, data) => {
+      const tradeLink = cleanupExchangeLink(data.tradeLink)
       return (
         <Space className={styles.exchangeSpace}>
           <b>{name}</b>
-          {data.tradeLink ? (
-            <a href={data.tradeLink} target="_blank" rel="noopener noreferrer">
+          {tradeLink ? (
+            <a href={tradeLink} target="_blank" rel="noopener noreferrer">
               <Button type="primary">Trade</Button>
             </a>) : ''
           }
