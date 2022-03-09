@@ -11,6 +11,7 @@ import HodlTag from './HodlTag'
 import styles from '../styles/index.module.less'
 import { signals } from '../utils/variables'
 import getTrends from '../utils/getTrends'
+import useBreakPoint from '../utils/useBreakPoint';
 import useIsHoverable from '../utils/useIsHoverable';
 
 const HomePageTable = ({
@@ -198,7 +199,11 @@ const HomePageTable = ({
         )
       }
     },
-    {
+  ];
+
+  const screens = useBreakPoint();
+  if (screens.sm) {
+    columns.push({
       title: 'USD',
       dataIndex: 'usd',
       responsive: ['sm'],
@@ -212,8 +217,8 @@ const HomePageTable = ({
       title: 'BTC',
       dataIndex: 'btc',
       responsive: ['sm'],
-    },
-  ];
+    })
+  }
 
   // The table rows are 56px high.
   const tableHeight = 9 * 56;
