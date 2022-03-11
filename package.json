@@ -32,6 +32,7 @@
     "react-ts-tradingview-widgets": "^1.0.9",
     "retry-axios": "^2.6.0",
     "superjson": "^1.8.1",
+    "twitter-lite": "^1.1.0",
     "virtuallist-antd": "^0.7.2"
   },
   "devDependencies": {
@@ -40,6 +41,6 @@
     "next-sitemap": "^2.5.7"
   },
   "engines": {
-    "node": ">=14.18.0"
+    "node": ">=14.18.3"
   }
 }
