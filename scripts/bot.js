@@ -55,9 +55,11 @@ const bot = async () => {
   coinsData = coinsData.sort((a, b) => Number(b.marketCap - a.marketCap))
   coinsData = coinsData.slice(0, 5)
   coinsData.forEach((coinData) => {
-    const statusUpdate = `${coinData.name} ($${coinData.symbol.toUpperCase()}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id} #CoinRotator`
-    tweet(statusUpdate)
-    channelCreateMessage(statusUpdate)
+    const symbol = coinData.symbol.toUpperCase()
+    const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol}`
+    const channelPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id}`
+    tweet(tweetPost)
+    channelCreateMessage(channelPost)
   })
 }
 
