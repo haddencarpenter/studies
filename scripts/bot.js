@@ -19,6 +19,7 @@ const bot = async () => {
       symbol: true,
       name: true,
       marketCap: true,
+      twitter: true,
       ohlcs: {
         select: {
           closeTime: true,
@@ -56,7 +57,7 @@ const bot = async () => {
   coinsData = coinsData.slice(0, 5)
   coinsData.forEach((coinData) => {
     const symbol = coinData.symbol.toUpperCase()
-    const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol}`
+    const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol} @${coinData.twitter}`
     const channelPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id}`
     tweet(tweetPost)
     channelCreateMessage(channelPost)
