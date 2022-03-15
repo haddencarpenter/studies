@@ -21,6 +21,7 @@ import HodlTag from '../../components/HodlTag'
 import globalData from '../../lib/globalData';
 import cleanupExchangeLink from '../../utils/cleanupExchangeLink';
 import useIsHoverable from '../../utils/useIsHoverable';
+import { getDescriptionByCoin } from '../../utils/coinDescriptions';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -191,6 +192,11 @@ export default function Coin(coin) {
               </Tooltip>
             </Space>
           </Card.Grid>
+          {coin.description ? (
+            <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.descriptionCard)}>
+                {coin.description}
+            </Card.Grid>
+          ) : ''}
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
             <Space wrap>
               <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
@@ -343,7 +349,6 @@ export async function getStaticProps({ params }) {
       orderBy: { closeTime: 'asc' }
     }}
   })
-  console.log({...coinData, ohlcs: null})
   let similarCoins = []
   if (coinData.categories.length) {
     similarCoins = await prisma.$queryRaw`
@@ -367,6 +372,7 @@ export async function getStaticProps({ params }) {
   ohlcs = convertToDailySignals(ohlcs)
   const [trends, superSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier)
   delete coinData.ohlcs
+  const description = await getDescriptionByCoin(coinData.symbol)
   return {
     props: {
       ...coinData,
@@ -379,7 +385,8 @@ export async function getStaticProps({ params }) {
       similarCoins,
       superSuperTrend,
       trends,
-      appData
+      appData,
+      description
     }
   }
 }
