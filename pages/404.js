@@ -8,6 +8,7 @@ const { Title, Paragraph } = Typography;
 export default function Custom404() {
   return (
     <Layout.Content className={styles.content}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/coin.svg" alt="CoinRotator Logo Grayscaled" className={styles.logoGrayscaled} />
       <div className={styles.text}>
         <Title className={styles.title}>Page Not Found</Title>
