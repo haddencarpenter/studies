@@ -169,6 +169,28 @@ export default function Coin(coin) {
               </Tooltip>
             </Space>
           </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.priceDetailCard)}>
+            <Space size={12} className={styles.trendTags}>
+              {Object.keys(coin.trends).map((trendKey) => {
+                const trend = coin.trends[trendKey]
+                const trendText = `${trend[0]} (${trend[1]})`
+                return (
+                  <Tag key={trendKey}>
+                    <span className={styles.trendKey}>{trendKey.toUpperCase()}:&nbsp;</span>
+                    {trendText}
+                  </Tag>
+                )
+              })}
+              <Tooltip
+                placement={screens.sm ? 'bottom' : 'bottomRight'}
+                overlayClassName={styles.tooltip}
+                trigger={isHoverable ? 'hover' : 'click'}
+                title="The numbers in parenthesis indicate the signal streak - how many days a coin has been a Buy or Sell against USD, BTC or ETH."
+              >
+                <InfoCircleFilled className={styles.signalWarning} />
+              </Tooltip>
+            </Space>
+          </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
             <Space wrap>
               <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
@@ -321,6 +343,7 @@ export async function getStaticProps({ params }) {
       orderBy: { closeTime: 'asc' }
     }}
   })
+  console.log({...coinData, ohlcs: null})
   let similarCoins = []
   if (coinData.categories.length) {
     similarCoins = await prisma.$queryRaw`
@@ -342,7 +365,7 @@ export async function getStaticProps({ params }) {
     close: Number(ohlc.close),
   }))
   ohlcs = convertToDailySignals(ohlcs)
-  const [_trends, superSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier)
+  const [trends, superSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier)
   delete coinData.ohlcs
   return {
     props: {
@@ -355,6 +378,7 @@ export async function getStaticProps({ params }) {
       totalSupply: Number(coinData.totalSupply),
       similarCoins,
       superSuperTrend,
+      trends,
       appData
     }
   }
