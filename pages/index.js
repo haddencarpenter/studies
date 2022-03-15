@@ -86,6 +86,7 @@ export default function Home({ coinsData, categories }) {
   const defaultTrendType = signals.all
   const defaultCategory = 'all'
   const defaultCoinNameFilter = ''
+  const defaultShowWeeklySignals = false
 
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
   const [marketCapMax, setMarketCapMax] = useState(defaultMarketCapMax)
@@ -97,7 +98,7 @@ export default function Home({ coinsData, categories }) {
   const [atrPeriods, setAtrPeriods] = useState(defaultAtrPeriods)
   const [multiplier, setMultiplier] = useState(defaultMultiplier)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
-  const [showWeeklySignals, setShowWeeklySignals] = useState(false)
+  const [showWeeklySignals, setShowWeeklySignals] = useState(defaultShowWeeklySignals)
 
   const resetMarketCap = useCallback(() => {
     setMarketCapMin(defaultMarketCapMin)
@@ -248,7 +249,8 @@ export default function Home({ coinsData, categories }) {
     setCoinName(defaultCoinNameFilter)
     setAtrPeriods(defaultAtrPeriods)
     setMultiplier(defaultMultiplier)
-  }, [defaultTrendType, defaultCategory, setCoinName, resetMarketCap, resetTrendLength, setCategory])
+    setShowWeeklySignals(defaultShowWeeklySignals)
+  }, [defaultTrendType, defaultCategory, defaultShowWeeklySignals, setCoinName, resetMarketCap, resetTrendLength, setCategory, setShowWeeklySignals])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
   const priorityCategories = categories.filter((category) => {
@@ -271,11 +273,13 @@ export default function Home({ coinsData, categories }) {
     const trendLengthFilterApplied = trendLengthMin !== defaultTrendLengthMin || trendLengthMax !== defaultTrendLengthMax
     const atrPeriodsFilterApplied = atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = multiplier !== defaultMultiplier
+    const showWeeklySignalsFilterApplied = showWeeklySignals !== defaultShowWeeklySignals
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
       atrPeriodsFilterApplied ||
-      multiplierFilterApplied
+      multiplierFilterApplied ||
+      showWeeklySignalsFilterApplied
 
     if (!advancedFiltersApplied || !screens.sm) {
       return null
@@ -295,6 +299,9 @@ export default function Home({ coinsData, categories }) {
           )}
           {multiplierFilterApplied && (
             <Tag color="geekblue" closable onClose={() => setMultiplier(defaultMultiplier)}>Multiplier: {multiplier}</Tag>
+          )}
+          {showWeeklySignalsFilterApplied && (
+            <Tag color="geekblue" closable onClose={() => setShowWeeklySignals(defaultShowWeeklySignals)}>Weekly signals</Tag>
           )}
         </Col>
       </Row>
