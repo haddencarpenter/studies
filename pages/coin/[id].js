@@ -13,9 +13,11 @@ import styles from '../../styles/coin.module.less'
 import variables from '../../styles/variables.module.less'
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables'
 import getTrends from '../../utils/getTrends'
+import getPlatformData from '../../utils/getPlatformData'
 import convertToDailySignals from '../../utils/convertToDailySignals'
 import useBreakPoint from '../../utils/useBreakPoint'
 import BuyTag from '../../components/BuyTag'
+import ContractTag from '../../components/ContractTag';
 import SellTag from '../../components/SellTag'
 import HodlTag from '../../components/HodlTag'
 import globalData from '../../lib/globalData';
@@ -123,6 +125,23 @@ export default function Coin(coin) {
     circulatingSupplyPercentage = round(coin.circulatingSupply / coin.totalSupply * 100, 2)
   }
   const notation = screens.sm ? 'standard' : 'compact'
+  let platforms;
+  if (coin.platforms.length) {
+    platforms = (
+      <>
+        <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.contractCard)}>
+          <ContractTag
+            image={coin.images.large}
+            defaultPlatform={coin.defaultPlatform}
+            platform={coin.platforms[0][0]}
+            symbol={coin.symbol.toUpperCase()}
+            address={coin.platforms[0][1]}
+          />
+        </Card.Grid>
+        {otherPlatforms}
+      </>
+    );
+  }
 
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${signal.toUpperCase()} | Daily Crypto Screener`
   const ogTitle = `${coin.name} | ${signal.toUpperCase()} | ${new Intl.DateTimeFormat([], { dateStyle: 'medium' }).format(new Date())} | Coinrotator`
@@ -197,6 +216,7 @@ export default function Coin(coin) {
                 {coin.description}
             </Card.Grid>
           ) : ''}
+          {platforms}
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.socialCard)}>
             <Space wrap>
               <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
@@ -379,6 +399,8 @@ export async function getStaticProps({ params }) {
   const [trends, superSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier)
   delete coinData.ohlcs
   const description = await getDescriptionByCoin(coinData.symbol)
+
+  const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   return {
     props: {
       ...coinData,
@@ -392,7 +414,8 @@ export async function getStaticProps({ params }) {
       superSuperTrend,
       trends,
       appData,
-      description
+      description,
+      platforms,
     }
   }
 }

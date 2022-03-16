@@ -75,7 +75,7 @@ const script = async () => {
     const dbCoinData = {
       symbol: coinMarketData.symbol,
       name: coinMarketData.name,
-      default_platform: coinData.asset_platform_id,
+      defaultPlatform: coinData.asset_platform_id,
       platforms,
       images: coinData.image,
       description: coinData.description.en,
