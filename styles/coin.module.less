@@ -33,6 +33,22 @@
   min-height: 64px;
 }
 
+.nameCard, .priceCard {
+  width: 25%;
+}
+
+.priceDetailCard {
+  width: 50%;
+}
+
+.descriptionCard {
+  width: 100%;
+}
+
+.contractCard, .socialCard {
+  width: 50%;
+}
+
 .platformDropdown {
   padding: 0 !important;
 }
@@ -142,25 +158,17 @@
   background: @error-color;
 }
 
-@media screen and (max-width: @screen-sm) {
-  .nameCard, .priceCard, .priceDetailCard {
-    width: 100% !important;
-  }
-
-  .socialCard, .cardData {
-    width: 100%;
-    min-height: unset;
-  }
-
+@media screen and (max-width: @screen-lg) {
   .tagCard, .similarCoinCard {
     min-height: unset;
-    width: 100% !important;
   }
 
-  .chartGrid {
-    padding: 0;
-    padding-bottom: 16px;
-    height: 350px !important;
+  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
+    width: 50%;
+  }
+
+  .priceDetailCard, .contractCard {
+    width: 100%;
   }
 }
 
@@ -178,16 +186,24 @@
   }
 }
 
-@media screen and (max-width: @screen-lg) {
-  .tagCard, .similarCoinCard {
+@media screen and (max-width: @screen-sm) {
+  .nameCard, .priceCard, .priceDetailCard {
+    width: 100%;
+  }
+
+  .socialCard, .cardData {
+    width: 100% !important;
     min-height: unset;
   }
 
-  .nameCard, .priceCard, .dataCard1, .dataCard2, .tagCard, .similarCoinCard {
-    width: 50%;
+  .tagCard, .similarCoinCard {
+    min-height: unset;
+    width: 100%;
   }
 
-  .socialCard {
-    width: 100%;
+  .chartGrid {
+    padding: 0;
+    padding-bottom: 16px;
+    height: 350px !important;
   }
 }
