@@ -7,7 +7,6 @@ import subDays from 'date-fns/subDays'
 import { quoteSymbols } from '../utils/variables'
 import { getCategoriesByCoin } from '../utils/categories'
 import prisma from '../lib/prisma'
-import bot from './bot'
 
 dotenv.config();
 
@@ -194,14 +193,9 @@ const script = async () => {
     await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
   }
 
-  await afterFetch()
-}
-
-const afterFetch = async () => {
   if (process.env.NODE_ENV === 'production') {
     await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/ZzMCeSY4lD')
   }
-  await bot()
 }
 
 script()

@@ -64,4 +64,4 @@ const bot = async () => {
   })
 }
 
-export default bot
+bot()
