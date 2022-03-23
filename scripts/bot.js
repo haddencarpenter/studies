@@ -1,6 +1,8 @@
 import endOfYesterday from 'date-fns/endOfYesterday';
 import isSameDay from 'date-fns/isSameDay';
 import subDays from 'date-fns/subDays';
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 import prisma from '../lib/prisma'
 import { tweet } from '../lib/twitter'
@@ -9,10 +11,25 @@ import convertToDailySignals from '../utils/convertToDailySignals';
 import getTrends from '../utils/getTrends';
 import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
+
 const bot = async () => {
+  const transaction = Sentry.startTransaction({
+    op: "Bot",
+    name: "Bot Transaction",
+  });
   try {
     const yesterday = endOfYesterday();
     const thirtyDaysAgo = subDays(new Date(), 30)
+
+    throw('test sentry!')
 
     let coinsData = await prisma.coin.findMany({
       orderBy: { marketCapRank: 'asc' },
@@ -68,7 +85,10 @@ const bot = async () => {
     })
   } catch (error) {
     console.log(error)
+    Sentry.captureException(error);
     throw(error)
+  } finally {
+    transaction.finish();
   }
 }
 
