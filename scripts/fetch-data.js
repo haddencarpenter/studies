@@ -4,6 +4,8 @@ import * as AxiosLogger from 'axios-logger'
 import dotenv from 'dotenv';
 import subDays from 'date-fns/subDays'
 import pickBy from 'lodash/pickBy'
+import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 import { quoteSymbols } from '../utils/variables'
 import { getCategoriesByCoin } from '../utils/categories'
@@ -209,4 +211,25 @@ const script = async () => {
   }
 }
 
-script()
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
+const transaction = Sentry.startTransaction({
+  op: "Datafetch",
+  name: `Datafetch ${new Date()}`,
+});
+
+setTimeout(() => {
+  try {
+    script();
+  } catch (e) {
+    Sentry.captureException(e);
+  } finally {
+    transaction.finish();
+  }
+}, 99);
