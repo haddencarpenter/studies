@@ -194,12 +194,18 @@ const HomePageTable = ({
   const screens = useBreakPoint();
   if (screens.sm) {
     columns.push({
-      title: 'Market cap',
+      title: 'Market Cap',
       dataIndex: 'marketCap',
       render: (marketCap) => {
+        const formatter = new Intl.NumberFormat([], {
+          notation: 'compact',
+          compactDisplay: 'long',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
         return (
           <>
-            {new Intl.NumberFormat([], { notation: 'compact', compactDisplay: 'long' }).format(marketCap)}
+            {formatter.format(marketCap)}
           </>
         )
       }
