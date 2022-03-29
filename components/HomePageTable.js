@@ -103,7 +103,7 @@ const HomePageTable = ({
   })
 
   const tableData = displayedCoinData.map((coinData) => {
-    const data = {
+    return {
       key: `${coinData.id}-${coinData.name}`,
       coinData: {
         id: coinData.id,
@@ -114,16 +114,6 @@ const HomePageTable = ({
       marketCap: coinData.marketCap,
       superSupertrend: coinData.superSupertrend,
     }
-
-    for (const [quoteSymbol, trend] of Object.entries(coinData.trends)) {
-      if (trend[0] === '') {
-        data[quoteSymbol] = '-'
-      } else {
-        data[quoteSymbol] = `${trend[0]} (${trend[1]})`
-      }
-    }
-
-    return data
   })
 
   const columns = [
@@ -204,19 +194,15 @@ const HomePageTable = ({
   const screens = useBreakPoint();
   if (screens.sm) {
     columns.push({
-      title: 'USD',
-      dataIndex: 'usd',
-      responsive: ['sm'],
-    },
-    {
-      title: 'ETH',
-      dataIndex: 'eth',
-      responsive: ['sm'],
-    },
-    {
-      title: 'BTC',
-      dataIndex: 'btc',
-      responsive: ['sm'],
+      title: 'Market cap',
+      dataIndex: 'marketCap',
+      render: (marketCap) => {
+        return (
+          <>
+            {new Intl.NumberFormat([], { notation: 'compact', compactDisplay: 'long' }).format(marketCap)}
+          </>
+        )
+      }
     })
   }
 
