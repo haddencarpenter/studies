@@ -7,6 +7,7 @@ import * as Tracing from '@sentry/tracing';
 import prisma from '../lib/prisma'
 import { tweet } from '../lib/twitter'
 import { channelCreateMessage } from '../lib/discord'
+import { postMessage } from '../lib/telegram'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import getTrends from '../utils/getTrends';
 import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
@@ -80,6 +81,7 @@ const bot = async () => {
       const channelPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id}`
       tweet(tweetPost)
       channelCreateMessage(channelPost)
+      postMessage(channelPost)
     })
   } catch (error) {
     console.log(error)
