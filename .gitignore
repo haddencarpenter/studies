@@ -5,5 +5,3 @@ markets.json
 .next
 .parcel-cache
 dist/**
-# Sentry
-.sentryclirc
