@@ -70,7 +70,27 @@ const script = async () => {
   marketPriority.reverse()
 
   for (let coinId of coinIds) {
-    const coinData = (await coinGeckoAPI.get(`/coins/${coinId}`)).data
+    let coinData
+    try {
+      coinData = (await coinGeckoAPI.get(`/coins/${coinId}`)).data
+    } catch (e) {
+      if (e.response.status === 404) {
+        // CoinGecko doesn't know this coin, so we assume it got delisted
+        await prisma.ohlc.deleteMany({
+          where: {
+            coinId,
+          },
+        })
+        await prisma.coin.delete({
+          where: {
+            id: coinId,
+          },
+        })
+        continue
+      } else {
+        throw(e)
+      }
+    }
     const symbol = coinData.symbol.toLowerCase()
     await new Promise((res) => setTimeout(res, 1200))
 
