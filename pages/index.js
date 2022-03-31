@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import isFinite from 'lodash/isFinite'
-import { useState, useCallback, useEffect, useRef } from 'react'
+import isNil from 'lodash/isNil'
+import { useState, useCallback, useEffect, useReducer, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
@@ -84,17 +85,56 @@ export default function Home({ coinsData, categories }) {
   const defaultTrendLengthMin = ''
   const defaultTrendLengthMax = ''
   const defaultTrendType = signals.all
-  const defaultCategory = 'all'
-  const defaultCoinNameFilter = ''
   const defaultShowWeeklySignals = false
 
+  const defaultFormState = {
+    category: 'all',
+    portfolio: ''
+  }
+  const initialFormState = {
+    category: categoryParam || defaultFormState.category,
+    portfolio: portfolioParam || defaultFormState.portfolio
+  }
+  const updateQueryParam = useCallback((key, value) => {
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        [key]: value
+      }
+    }, null, { shallow: true })
+  }, [router])
+  const [formState, formDispatch] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'SET_CATEGORY':
+        if (isNil(action.payload)) { return state }
+        updateQueryParam('category', action.payload)
+        return {
+          ...state,
+          category: action.payload
+        }
+      case 'SET_PORTFOLIO':
+        if (isNil(action.payload)) { return state }
+        updateQueryParam('portfolio', action.payload)
+        return {
+          ...state,
+          portfolio: action.payload
+        }
+      case 'RESET':
+        router.push({
+          pathname: router.pathname,
+          query: {}
+        }, null, { shallow: true })
+        return defaultFormState
+      default:
+        return state
+    }
+  }, initialFormState)
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
   const [marketCapMax, setMarketCapMax] = useState(defaultMarketCapMax)
   const [trendLengthMin, setTrendLengthMin] = useState(defaultTrendLengthMin)
   const [trendLengthMax, setTrendLengthMax] = useState(defaultTrendLengthMax)
   const [trendType, setTrendType] = useState(defaultTrendType)
-  const [categoryFilter, setCategoryFilter] = useState(defaultCategory)
-  const [coinNameFilter, setCoinNameFilter] = useState(defaultCoinNameFilter)
   const [atrPeriods, setAtrPeriods] = useState(defaultAtrPeriods)
   const [multiplier, setMultiplier] = useState(defaultMultiplier)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
@@ -118,16 +158,11 @@ export default function Home({ coinsData, categories }) {
       inputRef.current.input?.focus();
     }
   }, [isHoverable])
+
   useEffect(() => {
-    if (portfolioParam) {
-      setCoinNameFilter(portfolioParam)
-    }
-  }, [portfolioParam])
-  useEffect(() => {
-    if (categoryParam) {
-      setCategoryFilter(categoryParam)
-    }
-  }, [categoryParam])
+    formDispatch({ type: 'SET_PORTFOLIO', payload: portfolioParam })
+    formDispatch({ type: 'SET_CATEGORY', payload: categoryParam })
+  }, [portfolioParam, categoryParam])
 
   const setValidAtrPeriods = useCallback((e) => {
     const newAtrPeriod = parseInt(e.target.value)
@@ -181,28 +216,8 @@ export default function Home({ coinsData, categories }) {
       setMarketCapMax(newMarketCapMax)
     }
   }, [defaultMarketCapMax])
-  const setCoinName = useCallback((newCoinNames) => {
-    setCoinNameFilter(newCoinNames)
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        portfolio: newCoinNames,
-        category: categoryFilter
-      }
-    }, null, { shallow: true })
-  }, [router, categoryFilter])
-  const setCategory = useCallback((newCategory) => {
-    setCategoryFilter(newCategory)
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        category: newCategory,
-        portfolio: portfolioParam
-      }
-    }, null, { shallow: true })
-  }, [router, portfolioParam])
 
-  const coinsFilter = coinNameFilter
+  const portfolioFilter = formState.portfolio
     .replace(/\s/g, '')
     .split(',')
     .map((coinName) => coinName.toLowerCase())
@@ -245,12 +260,11 @@ export default function Home({ coinsData, categories }) {
     resetMarketCap()
     resetTrendLength()
     setTrendType(defaultTrendType)
-    setCategory(defaultCategory)
-    setCoinName(defaultCoinNameFilter)
+    formDispatch({ type: 'RESET' })
     setAtrPeriods(defaultAtrPeriods)
     setMultiplier(defaultMultiplier)
     setShowWeeklySignals(defaultShowWeeklySignals)
-  }, [defaultTrendType, defaultCategory, defaultShowWeeklySignals, setCoinName, resetMarketCap, resetTrendLength, setCategory, setShowWeeklySignals])
+  }, [defaultTrendType, defaultShowWeeklySignals, resetMarketCap, resetTrendLength, setShowWeeklySignals])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
   const priorityCategories = categories.filter((category) => {
@@ -322,8 +336,8 @@ export default function Home({ coinsData, categories }) {
               ref={inputRef}
               placeholder="Bitcoin, ETH, Polygon..."
               allowClear
-              value={coinNameFilter}
-              onChange={(e) => setCoinName(e.target.value)}
+              value={formState.portfolio}
+              onChange={(e) => formDispatch({ type: 'SET_PORTFOLIO', payload: e.target.value })}
               size="large"
             />
           </Col>
@@ -347,12 +361,12 @@ export default function Home({ coinsData, categories }) {
             <Select
               showSearch
               size="large"
-              value={categoryFilter}
-              onChange={setCategory}
+              value={formState.category}
+              onChange={(newCategory) => formDispatch({ type: 'SET_CATEGORY', payload: newCategory })}
               id="category"
               className={styles.formSelect}
             >
-              <Option value={defaultCategory} key="all">All</Option>
+              <Option value={defaultFormState.category} key="all">All</Option>
               <OptGroup label="Popular categories">
                 {
                   priorityCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
@@ -527,11 +541,11 @@ export default function Home({ coinsData, categories }) {
           marketCapMin={marketCapMin}
           trendLengthMin={trendLengthMin}
           trendLengthMax={trendLengthMax}
-          coinNameFilter={coinNameFilter}
-          coinsFilter={coinsFilter}
-          category={categoryFilter}
+          portfolio={formState.portfolio}
+          portfolioFilter={portfolioFilter}
+          category={formState.category}
           trendType={trendType}
-          defaultCategory={defaultCategory}
+          defaultCategory={defaultFormState.category}
           atrPeriods={atrPeriods}
           multiplier={multiplier}
           showWeeklySignals={showWeeklySignals}
