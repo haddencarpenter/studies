@@ -120,8 +120,9 @@ const HomePageTable = ({
   })
 
   const screens = useBreakPoint();
+  const isServer = typeof window === 'undefined';
   let columnsConfig
-  if (screens.lg) {
+  if (isServer || screens.lg) {
     columnsConfig = {
       coinData: {},
       superSupertrend: {
