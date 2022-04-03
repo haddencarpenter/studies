@@ -13,6 +13,7 @@ import { signals } from '../utils/variables'
 import getTrends from '../utils/getTrends'
 import useBreakPoint from '../utils/useBreakPoint';
 import useIsHoverable from '../utils/useIsHoverable';
+import classNames from 'classnames';
 
 const HomePageTable = ({
     coinsData,
@@ -103,7 +104,7 @@ const HomePageTable = ({
   })
 
   const tableData = displayedCoinData.map((coinData) => {
-    const data = {
+    return {
       key: `${coinData.id}-${coinData.name}`,
       coinData: {
         id: coinData.id,
@@ -111,25 +112,20 @@ const HomePageTable = ({
         images: coinData.images,
         name: coinData.name
       },
+      dailyChange: coinData.dailyChange,
+      weeklyChange: coinData.weeklyChange,
       marketCap: coinData.marketCap,
       superSupertrend: coinData.superSupertrend,
     }
-
-    for (const [quoteSymbol, trend] of Object.entries(coinData.trends)) {
-      if (trend[0] === '') {
-        data[quoteSymbol] = '-'
-      } else {
-        data[quoteSymbol] = `${trend[0]} (${trend[1]})`
-      }
-    }
-
-    return data
   })
+
+  const screens = useBreakPoint();
 
   const columns = [
     {
       title: 'Coin',
       dataIndex: 'coinData',
+      fixed: screens.lg ? null : 'left',
       sorter: (a, b) => a.coinData.name.localeCompare(b.coinData.name),
       render: (coinData) => {
         return (
@@ -145,6 +141,7 @@ const HomePageTable = ({
       }
     },
     {
+      width: 120,
       title: <>
         <span>Signal</span>
         <Tooltip
@@ -156,7 +153,6 @@ const HomePageTable = ({
         </Tooltip>
       </>,
       dataIndex: 'superSupertrend',
-      width: 120,
       sorter: (a, b, sortOrder) => {
         if (a.superSupertrend === b.superSupertrend) {
           if (sortOrder === 'ascend') {
@@ -199,26 +195,56 @@ const HomePageTable = ({
         )
       }
     },
+    {
+      title: 'Market Cap',
+      dataIndex: 'marketCap',
+      width: 150,
+      sorter: (a, b) => Number(a.marketCap) - Number(b.marketCap),
+      render: (marketCap) => {
+        const formatter = new Intl.NumberFormat([], {
+          notation: 'compact',
+          compactDisplay: 'long',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+        return (
+          <>
+            {formatter.format(marketCap)}
+          </>
+        )
+      }
+    },
+    {
+      title: '24h Change',
+      dataIndex: 'dailyChange',
+      width: 130,
+      sorter: (a, b) => a.dailyChange - b.dailyChange,
+      render: (dailyChange) => {
+        const formatter = new Intl.NumberFormat([], {
+          notation: 'compact',
+          compactDisplay: 'long',
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2
+        })
+        return (<span className={classNames(styles.tableNumberNegative, { [styles.tableNumberPositive]: dailyChange >= 0 })}>{formatter.format(dailyChange)}%</span>)
+      }
+    },
+    {
+      title: '7d Change',
+      dataIndex: 'weeklyChange',
+      width: 130,
+      sorter: (a, b) => a.weeklyChange - b.weeklyChange,
+      render: (weeklyChange) => {
+        const formatter = new Intl.NumberFormat([], {
+          notation: 'compact',
+          compactDisplay: 'long',
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        })
+        return (<span className={classNames(styles.tableNumberNegative, { [styles.tableNumberPositive]: weeklyChange >= 0 })}>{formatter.format(weeklyChange)}%</span>)
+      }
+    }
   ];
-
-  const screens = useBreakPoint();
-  if (screens.sm) {
-    columns.push({
-      title: 'USD',
-      dataIndex: 'usd',
-      responsive: ['sm'],
-    },
-    {
-      title: 'ETH',
-      dataIndex: 'eth',
-      responsive: ['sm'],
-    },
-    {
-      title: 'BTC',
-      dataIndex: 'btc',
-      responsive: ['sm'],
-    })
-  }
 
   // The table rows are 56px high.
   const tableHeight = 9 * 56;
