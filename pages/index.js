@@ -33,6 +33,8 @@ export async function getStaticProps() {
       marketCap: true,
       marketCapRank: true,
       categories: true,
+      dailyChange: true,
+      weeklyChange: true,
       ohlcs: {
         select: {
           closeTime: true,
@@ -62,6 +64,8 @@ export async function getStaticProps() {
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
+      dailyChange: Number(coinData.dailyChange),
+      weeklyChange: Number(coinData.weeklyChange),
       ohlcs
     }
   })
