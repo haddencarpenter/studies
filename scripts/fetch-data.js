@@ -71,7 +71,6 @@ const script = async () => {
   let marketPriority = ['binance', 'bitfinex', 'huobi', 'ftx']
   marketPriority.reverse()
 
-  coinIds = ['compound-basic-attention-token']
   for (let coinId of coinIds) {
     let coinData
     try {
