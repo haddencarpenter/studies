@@ -1,7 +1,8 @@
 import classnames from 'classnames';
 import isFinite from 'lodash/isFinite'
 import isNil from 'lodash/isNil'
-import { useState, useCallback, useEffect, useReducer, useRef } from 'react'
+import pickBy from 'lodash/pickBy'
+import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
@@ -82,7 +83,6 @@ export async function getStaticProps() {
 
 export default function Home({ coinsData, categories }) {
   const router = useRouter()
-  const { portfolio: portfolioParam, category: categoryParam } = router.query
 
   const defaultMarketCapMin = coinsData[coinsData.length - 1].marketCap
   const defaultMarketCapMax = coinsData[0].marketCap
@@ -91,49 +91,49 @@ export default function Home({ coinsData, categories }) {
   const defaultTrendType = signals.all
   const defaultShowWeeklySignals = false
 
-  const defaultFormState = {
-    category: 'all',
-    portfolio: ''
-  }
-  const initialFormState = {
-    category: categoryParam || defaultFormState.category,
-    portfolio: portfolioParam || defaultFormState.portfolio
-  }
-  const updateQueryParam = useCallback((key, value) => {
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        [key]: value
-      }
-    }, null, { shallow: true })
-  }, [router])
+  const defaultFormState = useMemo(() =>
+    ({
+      category: 'all',
+      portfolio: ''
+    })
+  , [])
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_CATEGORY':
         if (isNil(action.payload)) { return state }
-        updateQueryParam('category', action.payload)
         return {
           ...state,
           category: action.payload
         }
       case 'SET_PORTFOLIO':
         if (isNil(action.payload)) { return state }
-        updateQueryParam('portfolio', action.payload)
         return {
           ...state,
           portfolio: action.payload
         }
       case 'RESET':
-        router.push({
-          pathname: router.pathname,
-          query: {}
-        }, null, { shallow: true })
         return defaultFormState
       default:
         return state
     }
-  }, initialFormState)
+  }, defaultFormState)
+  useEffect(() => {
+    if (router.isReady) {
+      const changedParams = pickBy(formState, (value, key) => {
+        return value !== router.query[key]
+      })
+      if (Object.keys(changedParams).length > 0) {
+        router.push({
+          pathname: router.pathname,
+          query: {
+            ...router.query,
+            ...changedParams
+          }
+        }, null, { shallow: true })
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState, defaultFormState])
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
   const [marketCapMax, setMarketCapMax] = useState(defaultMarketCapMax)
   const [trendLengthMin, setTrendLengthMin] = useState(defaultTrendLengthMin)
@@ -164,9 +164,12 @@ export default function Home({ coinsData, categories }) {
   }, [isHoverable])
 
   useEffect(() => {
+    const { portfolio: portfolioParam, category: categoryParam } = router.query
+    if (!router.isReady) { return; }
+
     formDispatch({ type: 'SET_PORTFOLIO', payload: portfolioParam })
     formDispatch({ type: 'SET_CATEGORY', payload: categoryParam })
-  }, [portfolioParam, categoryParam])
+  }, [router.isReady, router.query])
 
   const setValidAtrPeriods = useCallback((e) => {
     const newAtrPeriod = parseInt(e.target.value)
