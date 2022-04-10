@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import isFinite from 'lodash/isFinite'
+import isEqual from 'lodash/isEqual'
 import isNil from 'lodash/isNil'
 import pickBy from 'lodash/pickBy'
 import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
@@ -122,18 +123,34 @@ export default function Home({ coinsData, categories }) {
       const changedParams = pickBy(formState, (value, key) => {
         return value !== router.query[key]
       })
+      const changedParamsThatAreDefault = Object.keys(changedParams).filter((key) => {
+        return changedParams[key] === defaultFormState[key]
+      })
       if (Object.keys(changedParams).length > 0) {
-        router.push({
-          pathname: router.pathname,
-          query: {
-            ...router.query,
-            ...changedParams
-          }
-        }, null, { shallow: true })
+        let query = {
+          ...router.query,
+          ...changedParams
+        }
+        changedParamsThatAreDefault.forEach(defaultParam => {
+          delete query[defaultParam]
+        })
+        if (!isEqual(query, router.query)) {
+          router.push({
+            pathname: router.pathname,
+            query
+          }, null, { shallow: true })
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState, defaultFormState])
+  useEffect(() => {
+    if (!router.isReady) { return; }
+
+    formDispatch({ type: 'SET_PORTFOLIO', payload: router.query.portfolio })
+    formDispatch({ type: 'SET_CATEGORY', payload: router.query.category })
+  }, [router.isReady, router.query])
+
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
   const [marketCapMax, setMarketCapMax] = useState(defaultMarketCapMax)
   const [trendLengthMin, setTrendLengthMin] = useState(defaultTrendLengthMin)
@@ -162,14 +179,6 @@ export default function Home({ coinsData, categories }) {
       inputRef.current.input?.focus();
     }
   }, [isHoverable])
-
-  useEffect(() => {
-    const { portfolio: portfolioParam, category: categoryParam } = router.query
-    if (!router.isReady) { return; }
-
-    formDispatch({ type: 'SET_PORTFOLIO', payload: portfolioParam })
-    formDispatch({ type: 'SET_CATEGORY', payload: categoryParam })
-  }, [router.isReady, router.query])
 
   const setValidAtrPeriods = useCallback((e) => {
     const newAtrPeriod = parseInt(e.target.value)
