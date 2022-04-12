@@ -85,8 +85,6 @@ export async function getStaticProps() {
 
 export default function Home({ coinsData, categories }) {
   const router = useRouter()
-
-
   const defaultFormState = useMemo(() =>
   ({
       category: 'all',
@@ -97,9 +95,12 @@ export default function Home({ coinsData, categories }) {
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
       trendLengthMax: '',
+      atrPeriods: defaultAtrPeriods,
+      multiplier: defaultMultiplier,
     })
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
+  const [filterModalVisible, setFilterModalVisible] = useState(false)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_FROM_ROUTE_PARAMS':
@@ -191,6 +192,26 @@ export default function Home({ coinsData, categories }) {
           ...state,
           trendLengthMax: trendLengthMax
         }
+      case 'SET_ATR_PERIODS':
+        const newAtrPeriods = parseFloat(action.payload)
+        if (!isFinite(newAtrPeriods)) {
+          break
+        }
+
+        return {
+          ...state,
+          atrPeriods: newAtrPeriods
+        }
+      case 'SET_MULTIPLIER':
+        const newMultiplier = parseFloat(action.payload)
+        if (!isFinite(newMultiplier)) {
+          break
+        }
+
+        return {
+          ...state,
+          multiplier: newMultiplier
+        }
       case 'RESET':
         return defaultFormState
       default:
@@ -238,6 +259,8 @@ export default function Home({ coinsData, categories }) {
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,
         trendLengthMax: router.query.trendLengthMax,
+        atrPeriods: router.query.atrPeriods,
+        multiplier: router.query.multiplier,
       }
     })
   }, [router.isReady, router.query])
@@ -245,32 +268,15 @@ export default function Home({ coinsData, categories }) {
     formDispatch({ type: 'SET_PORTFOLIO', payload: portfolio })
   }, 400), [])
   useEffect(() => setPortfolioDebounced(portfolioInputValue), [portfolioInputValue, setPortfolioDebounced])
-  const [atrPeriods, setAtrPeriods] = useState(defaultAtrPeriods)
-  const [multiplier, setMultiplier] = useState(defaultMultiplier)
-  const [filterModalVisible, setFilterModalVisible] = useState(false)
 
   const screens = useBreakPoint();
   const isHoverable = useIsHoverable();
-
   const inputRef = useRef(null)
   useEffect(() => {
     if (isHoverable) {
       inputRef.current.input?.focus();
     }
   }, [isHoverable])
-
-  const setValidAtrPeriods = useCallback((e) => {
-    const newAtrPeriod = parseInt(e.target.value)
-    if (isFinite(newAtrPeriod)) {
-      setAtrPeriods(newAtrPeriod)
-    }
-  }, [])
-  const setValidMulitiplier = useCallback((e) => {
-    const newMultiplier = parseFloat(e.target.value)
-    if (isFinite(newMultiplier)) {
-      setMultiplier(newMultiplier)
-    }
-  }, [])
 
   const portfolioFilter = formState.portfolio
     .replace(/\s/g, '')
@@ -311,11 +317,6 @@ export default function Home({ coinsData, categories }) {
     formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: 20})
     formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: ''})
   }, [])
-  const resetFilters = useCallback(() => {
-    formDispatch({ type: 'RESET' })
-    setAtrPeriods(defaultAtrPeriods)
-    setMultiplier(defaultMultiplier)
-  }, [])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
   const priorityCategories = categories.filter((category) => {
@@ -338,8 +339,8 @@ export default function Home({ coinsData, categories }) {
                                    Number(formState.marketCapMax) !== Number(defaultFormState.marketCapMax)
     const trendLengthFilterApplied = Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
-    const atrPeriodsFilterApplied = atrPeriods !== defaultAtrPeriods
-    const multiplierFilterApplied = multiplier !== defaultMultiplier
+    const atrPeriodsFilterApplied = formState.atrPeriods !== defaultAtrPeriods
+    const multiplierFilterApplied = formState.multiplier !== defaultMultiplier
     const showWeeklySignalsFilterApplied = formState.weeklySignals !== defaultFormState.weeklySignals
     const advancedFiltersApplied =
       marketCapFilterApplied ||
@@ -373,10 +374,10 @@ export default function Home({ coinsData, categories }) {
             }}>Signal Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
           )}
           {atrPeriodsFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => setAtrPeriods(defaultAtrPeriods)}>ATR periods: {atrPeriods}</Tag>
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_ATR_PERIODS', payload: defaultFormState.atrPeriods })}>ATR periods: {formState.atrPeriods}</Tag>
           )}
           {multiplierFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => setMultiplier(defaultMultiplier)}>Multiplier: {multiplier}</Tag>
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_MULTIPLIER', payload: defaultFormState.multiplier })}>Multiplier: {formState.multiplier}</Tag>
           )}
           {formState.weeklySignals && (
             <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: defaultFormState.weeklySignals })}>Weekly signals</Tag>
@@ -473,7 +474,7 @@ export default function Home({ coinsData, categories }) {
           </Button>,
           <Button
             key="reset"
-            onClick={resetFilters}
+            onClick={() => formDispatch({ type: 'RESET' })}
             size="large"
             danger
             type="primary"
@@ -500,11 +501,11 @@ export default function Home({ coinsData, categories }) {
         <Row className={styles.formRow} gutter={16}>
           <Col span={12} className="gutter-row">
             <label className={styles.formLabel} htmlFor="atr-periods">ATR periods</label>
-            <Input size="large" onChange={setValidAtrPeriods} value={atrPeriods} id="atr-periods"></Input>
+            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
           </Col>
           <Col span={12} className="gutter-row">
             <label className={styles.formLabel} htmlFor="multiplier">Multiplier</label>
-            <Input size="large" onChange={setValidMulitiplier} value={multiplier} id="multiplier"></Input>
+            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
           </Col>
         </Row>
         <Divider />
@@ -610,8 +611,8 @@ export default function Home({ coinsData, categories }) {
           category={formState.category}
           trendType={formState.trendType}
           defaultCategory={defaultFormState.category}
-          atrPeriods={atrPeriods}
-          multiplier={multiplier}
+          atrPeriods={formState.atrPeriods}
+          multiplier={formState.multiplier}
           showWeeklySignals={formState.weeklySignals}
         />
       </Row>
