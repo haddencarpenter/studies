@@ -102,6 +102,12 @@ export default function Home({ coinsData, categories }) {
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
+      case 'SET_FROM_ROUTE_PARAMS':
+        const routeParams = pickBy(action.payload, (value) => !isNil(value))
+        return {
+          ...state,
+          ...routeParams
+        }
       case 'SET_CATEGORY':
         if (isNil(action.payload)) { return state }
         return {
@@ -156,9 +162,15 @@ export default function Home({ coinsData, categories }) {
     if (!router.isReady) { return; }
 
     setPortfolioInputValue(router.query.portfolio)
-    formDispatch({ type: 'SET_CATEGORY', payload: router.query.category })
-    formDispatch({ type: 'SET_TREND_TYPE', payload: router.query.trendType })
-  }, [router.isReady, router.query, setPortfolioInputValue])
+    formDispatch({
+      type: 'SET_FROM_ROUTE_PARAMS',
+      payload: {
+        category: router.query.category,
+        portfolio: router.query.portfolio,
+        trendType: router.query.trendType
+      }
+    })
+  }, [router.isReady, router.query])
   const setPortfolioDebounced = useCallback(debounce((portfolio) => {
     formDispatch({ type: 'SET_PORTFOLIO', payload: portfolio })
   }, 400), [])
