@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import debounce from 'lodash/debounce'
 import isFinite from 'lodash/isFinite'
 import isEqual from 'lodash/isEqual'
 import isNil from 'lodash/isNil'
@@ -98,6 +99,7 @@ export default function Home({ coinsData, categories }) {
       trendType: signals.all
     })
   , [])
+  const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_CATEGORY':
@@ -153,11 +155,14 @@ export default function Home({ coinsData, categories }) {
   useEffect(() => {
     if (!router.isReady) { return; }
 
-    formDispatch({ type: 'SET_PORTFOLIO', payload: router.query.portfolio })
+    setPortfolioInputValue(router.query.portfolio)
     formDispatch({ type: 'SET_CATEGORY', payload: router.query.category })
     formDispatch({ type: 'SET_TREND_TYPE', payload: router.query.trendType })
-  }, [router.isReady, router.query])
-
+  }, [router.isReady, router.query, setPortfolioInputValue])
+  const setPortfolioDebounced = useCallback(debounce((portfolio) => {
+    formDispatch({ type: 'SET_PORTFOLIO', payload: portfolio })
+  }, 400), [])
+  useEffect(() => setPortfolioDebounced(portfolioInputValue), [portfolioInputValue, setPortfolioDebounced])
   const [marketCapMin, setMarketCapMin] = useState(defaultMarketCapMin)
   const [marketCapMax, setMarketCapMax] = useState(defaultMarketCapMax)
   const [trendLengthMin, setTrendLengthMin] = useState(defaultTrendLengthMin)
@@ -357,8 +362,8 @@ export default function Home({ coinsData, categories }) {
               ref={inputRef}
               placeholder="Bitcoin, ETH, Polygon..."
               allowClear
-              value={formState.portfolio}
-              onChange={(e) => formDispatch({ type: 'SET_PORTFOLIO', payload: e.target.value })}
+              value={portfolioInputValue}
+              onChange={(e) => setPortfolioInputValue(e.target.value)}
               size="large"
             />
           </Col>
