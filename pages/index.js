@@ -90,13 +90,13 @@ export default function Home({ coinsData, categories }) {
   const defaultMarketCapMax = coinsData[0].marketCap
   const defaultTrendLengthMin = ''
   const defaultTrendLengthMax = ''
-  const defaultShowWeeklySignals = false
 
   const defaultFormState = useMemo(() =>
     ({
       category: 'all',
       portfolio: '',
-      trendType: signals.all
+      trendType: signals.all,
+      weeklySignals: false
     })
   , [])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
@@ -125,6 +125,11 @@ export default function Home({ coinsData, categories }) {
         return {
           ...state,
           trendType: action.payload
+        }
+      case 'SET_WEEKLY_SIGNALS':
+        return {
+          ...state,
+          weeklySignals: action.payload
         }
       case 'RESET':
         return defaultFormState
@@ -167,7 +172,8 @@ export default function Home({ coinsData, categories }) {
       payload: {
         category: router.query.category,
         portfolio: router.query.portfolio,
-        trendType: router.query.trendType
+        trendType: router.query.trendType,
+        weeklySignals: router.query.weeklySignals,
       }
     })
   }, [router.isReady, router.query])
@@ -182,7 +188,6 @@ export default function Home({ coinsData, categories }) {
   const [atrPeriods, setAtrPeriods] = useState(defaultAtrPeriods)
   const [multiplier, setMultiplier] = useState(defaultMultiplier)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
-  const [showWeeklySignals, setShowWeeklySignals] = useState(defaultShowWeeklySignals)
 
   const resetMarketCap = useCallback(() => {
     setMarketCapMin(defaultMarketCapMin)
@@ -301,8 +306,7 @@ export default function Home({ coinsData, categories }) {
     formDispatch({ type: 'RESET' })
     setAtrPeriods(defaultAtrPeriods)
     setMultiplier(defaultMultiplier)
-    setShowWeeklySignals(defaultShowWeeklySignals)
-  }, [defaultShowWeeklySignals, resetMarketCap, resetTrendLength, setShowWeeklySignals])
+  }, [resetMarketCap, resetTrendLength])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
   const priorityCategories = categories.filter((category) => {
@@ -325,7 +329,7 @@ export default function Home({ coinsData, categories }) {
     const trendLengthFilterApplied = trendLengthMin !== defaultTrendLengthMin || trendLengthMax !== defaultTrendLengthMax
     const atrPeriodsFilterApplied = atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = multiplier !== defaultMultiplier
-    const showWeeklySignalsFilterApplied = showWeeklySignals !== defaultShowWeeklySignals
+    const showWeeklySignalsFilterApplied = formState.weeklySignals !== defaultFormState.weeklySignals
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
@@ -352,8 +356,8 @@ export default function Home({ coinsData, categories }) {
           {multiplierFilterApplied && (
             <Tag color="geekblue" closable onClose={() => setMultiplier(defaultMultiplier)}>Multiplier: {multiplier}</Tag>
           )}
-          {showWeeklySignalsFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => setShowWeeklySignals(defaultShowWeeklySignals)}>Weekly signals</Tag>
+          {formState.weeklySignals && (
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: defaultFormState.weeklySignals })}>Weekly signals</Tag>
           )}
         </Col>
       </Row>
@@ -462,7 +466,7 @@ export default function Home({ coinsData, categories }) {
             <span>Weekly Signals</span>
           </Col>
           <Col>
-            <Switch checked={showWeeklySignals} onChange={setShowWeeklySignals} />
+            <Switch checked={formState.weeklySignals} onChange={(checked) => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: checked })} />
           </Col>
         </Row>
         <Row className={styles.explainerRow}>
@@ -586,7 +590,7 @@ export default function Home({ coinsData, categories }) {
           defaultCategory={defaultFormState.category}
           atrPeriods={atrPeriods}
           multiplier={multiplier}
-          showWeeklySignals={showWeeklySignals}
+          showWeeklySignals={formState.weeklySignals}
         />
       </Row>
     </Content>
