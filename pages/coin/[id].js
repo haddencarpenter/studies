@@ -51,12 +51,15 @@ export default function Coin(coin) {
   } catch(e) {}
 
   const tableData = coin.tickers.map((ticker, index) => {
+    const baseSymbol = ticker.base.toUpperCase()
+    const quoteSymbol = ticker.target.toUpperCase()
     return {
       index: index + 1,
       name: ticker.market.name,
       tradeLink: ticker.trade_url,
       volume: ticker.volume,
-      pair: `${ticker.base.toUpperCase()}/${ticker.target.toUpperCase()}`,
+      baseSymbol: baseSymbol,
+      pair: `${baseSymbol}/${quoteSymbol}`,
       trustScore: ticker.trust_score,
     }
   })
@@ -70,7 +73,7 @@ export default function Coin(coin) {
     title: 'Exchange',
     dataIndex: 'name',
     render: (name, data) => {
-      const tradeLink = cleanupExchangeLink(data.tradeLink)
+      const tradeLink = cleanupExchangeLink(data.tradeLink, data.baseSymbol)
       return (
         <Space className={styles.exchangeSpace}>
           <b>{name}</b>
@@ -396,7 +399,6 @@ export async function getStaticProps({ params }) {
   return {
     props: {
       ...coinData,
-      currentPriceUsd: Number(coinData.currentPriceUsd),
       ath: Number(coinData.ath),
       atl: Number(coinData.atl),
       fullyDilutedValuation: Number(coinData.fullyDilutedValuation),

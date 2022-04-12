@@ -107,6 +107,8 @@ const script = async () => {
       }
     }
 
+    const dailyChange = coinData.market_data.price_change_percentage_24h || undefined
+    const weeklyChange = coinData.market_data.price_change_percentage_7d || undefined
     const dbCoinData = {
       symbol,
       name: coinData.name,
@@ -117,7 +119,6 @@ const script = async () => {
       homepage: coinData.links.homepage[0],
       twitter: coinData.links.twitter_screen_name,
       twitterFollowers: coinData.community_data.twitter_followers,
-      currentPriceUsd: coinData.market_data.current_price.usd,
       ath: coinData.market_data.ath.usd,
       atl: coinData.market_data.atl.usd,
       marketCap: coinData.market_data.market_cap.usd,
@@ -127,8 +128,8 @@ const script = async () => {
       totalSupply: coinData.market_data.total_supply,
       tickers: coinData.tickers,
       categories: categories[`${symbol}-${coinData.name}`],
-      dailyChange: coinData.market_data.price_change_percentage_24h,
-      weeklyChange: coinData.market_data.price_change_percentage_7d,
+      dailyChange: dailyChange,
+      weeklyChange: weeklyChange,
     }
 
     await prisma.coin.upsert({
