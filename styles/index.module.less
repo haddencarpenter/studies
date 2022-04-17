@@ -39,11 +39,11 @@
 
 .subTitleHighlight {
   font-weight: 600;
-  color: @fake-black !important;
+  color: @cr-black !important;
 }
 
 .fakeLink {
-  color: @fake-black;
+  color: @cr-black;
 }
 
 .marketHealth {
@@ -64,7 +64,7 @@
 }
 
 .parameterCard {
-  background: @fake-white;
+  background: @cr-white;
 }
 
 .formLabel {
@@ -87,10 +87,14 @@
 .formAllFilters {
   width: 100%;
   margin-top: 22px;
+
+  @media screen and (max-width: @screen-md) {
+    margin: 0;
+  }
 }
 
 .formButton {
-  background: @fake-white;
+  background: @cr-white;
   margin-right: 12px;
 }
 
@@ -117,8 +121,8 @@
   font-weight: bold;
 }
 
-@media screen and (max-width: @screen-lg) {
-  .coinsTable colgroup col:first-child {
+.coinsTable colgroup col:first-child {
+  @media screen and (max-width: @screen-lg) {
     width: 150px;
   }
 }
@@ -129,18 +133,6 @@
 
 .signalExplanation svg {
   width: 10px;
-}
-
-.signalExplanation {
-  path {
-    fill: @icon-bg;
-  }
-
-  &:hover {
-    path {
-      fill: @text-color-secondary;
-    }
-  }
 }
 
 .tableTag {
@@ -163,11 +155,11 @@
 }
 
 .tableNumberNegative {
-  color: @error-color
+  color: @cr-error-color
 }
 
 .tableNumberPositive {
-  color: @success-color !important;
+  color: @cr-success-color !important;
 }
 
 .filterModalRow {
@@ -178,12 +170,8 @@
   width: 100%;
 }
 
-@media screen and (max-width: @screen-md) {
-  .formCol {
+.formCol {
+  @media screen and (max-width: @screen-md) {
     margin-bottom: 12px;
-  }
-
-  .formAllFilters {
-    margin: 0;
   }
 }

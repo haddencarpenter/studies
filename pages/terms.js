@@ -1,6 +1,5 @@
 import { Breadcrumb, Typography, Layout } from 'antd';
 import Link from 'next/link'
-import classnames from 'classnames'
 
 import styles from '../styles/terms.module.less'
 import globalData from '../lib/globalData';

@@ -3,13 +3,10 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import Script from 'next/script'
 
-import useDarkMode from '../hooks/usedarkmode'
-import DarkModeSwitch from '../components/DarkModeSwitch'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 
 function MyApp({ Component, pageProps }) {
-  const [darkMode, setDarkMode] = useDarkMode();
   const router = useRouter();
 
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${router.asPath}`
