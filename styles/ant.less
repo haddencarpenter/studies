@@ -1,26 +1,10 @@
 @import "~antd/dist/antd.less";
 @import './variables.module.less';
 
-.ant-menu-title-content {
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.ant-menu-item:hover::after {
-  border-bottom: 0 !important;
-}
-
-[data-id="logo"] .ant-menu-title-content {
-  display: inline-block;
-  line-height: 64px;
-}
-
-[data-id="logo"] .ant-menu-title-content span:first-child {
-  top: 4px;
-}
+// BODY SETUP
 
 body {
-  background: @fake-white;
+  background: @cr-white;
 }
 
 #__next {
@@ -28,8 +12,28 @@ body {
   flex-direction: column;
 }
 
+// ANT OVERRIDES
+
 .ant-card-body {
   padding: 16px;
+}
+
+.ant-menu-title-content {
+  font-size: 14px;
+  line-height: 20px;
+
+  &:hover::after {
+    border-bottom: 0 !important;
+  }
+}
+
+[data-id="logo"] .ant-menu-title-content {
+  display: inline-block;
+  line-height: 64px;
+
+  span:first-child {
+    top: 4px;
+  }
 }
 
 .ant-tooltip .ant-tooltip-arrow-content, .ant-tooltip .ant-tooltip-inner {
