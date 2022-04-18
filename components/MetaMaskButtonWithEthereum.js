@@ -1,3 +1,4 @@
+import detectEthereumProvider from '@metamask/detect-provider'
 import { useCallback } from 'react';
 import { notification } from 'antd'
 
@@ -7,10 +8,10 @@ const MetaMaskButtonWithEthereum = ({ symbol, address, chainId, decimals=18, ima
   const currentChainId = useChainId()
   const addCoin = useCallback((e) => {
     e.stopPropagation();
-    const switchNetwork = async () => {
+    const switchNetwork = async (provider) => {
       if (currentChainId === chainId) { return; }
       try {
-        await window.ethereum.request({
+        await provider.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: `0x${Number(chainId).toString(16)}` }]
         })
@@ -22,10 +23,17 @@ const MetaMaskButtonWithEthereum = ({ symbol, address, chainId, decimals=18, ima
       }
     }
     const addMetamaskCoin = async () => {
-      await switchNetwork();
+      const provider = await detectEthereumProvider()
+      if (!provider) {
+        notification.error({
+          description: "Please install MetaMask",
+        })
+        return
+      }
+      await switchNetwork(provider);
       let wasAdded;
       try {
-        wasAdded = await window.ethereum.request({
+        wasAdded = await provider.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC20',

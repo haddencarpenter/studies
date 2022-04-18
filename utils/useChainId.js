@@ -1,21 +1,24 @@
+import detectEthereumProvider from '@metamask/detect-provider'
 import { useState, useEffect } from 'react';
 
 const useChainId = () => {
   const [currentChainId, setCurrentChainId] = useState(null)
   useEffect(() => {
-    const getCurrentId = async () => {
-      const chainId = await window.ethereum.request({
-        method: 'eth_chainId',
-      })
+    detectEthereumProvider().then((provider) => {
+      const getCurrentId = async () => {
+        const chainId = await provider.request({
+          method: 'eth_chainId',
+        })
 
-      setCurrentChainId(parseInt(chainId))
-    }
+        setCurrentChainId(parseInt(chainId))
+      }
 
-    getCurrentId();
+      getCurrentId();
 
-    const changeHandler = (chainId) => setCurrentChainId(parseInt(chainId))
-    window.ethereum.on('chainChanged', changeHandler);
-    return () => window.ethereum.removeListener('chainChanged', changeHandler);
+      const changeHandler = (chainId) => setCurrentChainId(parseInt(chainId))
+      provider.on('chainChanged', changeHandler);
+      return () => provider.removeListener('chainChanged', changeHandler);
+    })
   }, [])
 
   return currentChainId
