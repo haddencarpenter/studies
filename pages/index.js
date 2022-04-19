@@ -415,9 +415,9 @@ export default function Home({ coinsData, categories }) {
               className={styles.formSelect}
             >
               <Option value={signals.all}>All</Option>
-              <Option value={signals.buy}>Up</Option>
+              <Option value={signals.buy}>UP</Option>
               <Option value={signals.hodl}>HODL</Option>
-              <Option value={signals.sell}>Down</Option>
+              <Option value={signals.sell}>DOWN</Option>
             </Select>
           </Col>
           <Col xs={24} md={6} className={styles.formCol}>

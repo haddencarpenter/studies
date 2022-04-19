@@ -34,11 +34,11 @@ export default function Coin(coin) {
   let signalTag
   switch (coin.superSuperTrend) {
     case signals.buy:
-      signal = 'Up'
+      signal = 'UP'
       signalTag = <a href="#markets"><BuyTag /></a>
       break;
     case signals.sell:
-      signal = 'Down'
+      signal = 'DOWN'
       signalTag = <a href="#markets"><SellTag /></a>
       break;
     default:
@@ -192,7 +192,7 @@ export default function Coin(coin) {
                 placement={screens.sm ? 'bottom' : 'bottomRight'}
                 overlayClassName={styles.tooltip}
                 trigger={isHoverable ? 'hover' : 'click'}
-                title="The numbers in parenthesis indicate the trend streak - how many days a coin has been a Up or Down trend against ETH, BTC or USD."
+                title="The numbers in parenthesis indicate the trend streak - how many days a coin has been a UP or DOWN trend against ETH, BTC or USD."
               >
                 <InfoCircleFilled className={styles.signalWarning} />
               </Tooltip>

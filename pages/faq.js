@@ -29,7 +29,7 @@ export default function Faq() {
           <ol>
             <li>Check for new trends daily in order to buy into coins which are outperforming BTC ETH and USDT. After checking the news, general health of the market, you can take a position and check its performance daily. The CoinRotator screener currently updates once per day at 00:00 UTC.</li>
             <li>Search your favorite altcoin in the top 1000 (based on market cap) and see if it is a <BuyTag /> <SellTag /> and <HodlTag /> trend. Consider your time horizon and profit expectations. If you are in profit, consider taking some profits based on what the CoinRotator trend reports.</li>
-            <li>Seek out undervalued low marketcap coins by applying advanced settings in the filter. Choose &lt;100m and trend streak 1-5 and select Up only. Here will be a screen result of the best performing small marketcap coins in the top 1000. Be warned, these coins are more volatile than the top ranked coins but if BTC behaves you will see much larger gains in our experience.</li>
+            <li>Seek out undervalued low marketcap coins by applying advanced settings in the filter. Choose &lt;100m and trend streak 1-5 and select UP only. Here will be a screen result of the best performing small marketcap coins in the top 1000. Be warned, these coins are more volatile than the top ranked coins but if BTC behaves you will see much larger gains in our experience.</li>
           </ol>
         </Panel>
         <Panel header="Does CoinRotator work in bear markets?" key="2">
