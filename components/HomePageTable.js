@@ -167,15 +167,15 @@ const HomePageTable = ({
             }
           } else {
             if (a.dailySuperSuperTrend === signals.sell) {
-              return -1
+              return 1
             } else if (a.dailySuperSuperTrend === signals.hodl) {
               if (b.dailySuperSuperTrend === signals.sell) {
-                return 1
-              } else {
                 return -1
+              } else {
+                return 1
               }
             } else {
-              return 1
+              return -1
             }
           }
         },
@@ -214,15 +214,15 @@ const HomePageTable = ({
           if (a.weeklySuperSuperTrend === b.weeklySuperSuperTrend) {
             return 0
           } else if (a.weeklySuperSuperTrend === signals.sell) {
-            return -1
+            return 1
           } else if (a.weeklySuperSuperTrend === signals.hodl) {
             if (b.weeklySuperSuperTrend === signals.sell) {
-              return 1
-            } else {
               return -1
+            } else {
+              return 1
             }
           } else {
-            return 1
+            return -1
           }
         },
         multiple: 2,
