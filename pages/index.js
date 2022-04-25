@@ -26,7 +26,7 @@ const { Content } = Layout;
 
 export async function getStaticProps() {
   const appData = await globalData();
-  let coinsData = await prisma.coin.findMany({
+  const coinQuery = {
     orderBy: { marketCapRank: 'asc' },
     take: 1000,
     select: {
@@ -56,7 +56,11 @@ export async function getStaticProps() {
         orderBy: { closeTime: 'asc' }
       }
     }
-  })
+  }
+  if (process.env.NODE_ENV === 'development') {
+    coinQuery.take = 20;
+  }
+  let coinsData = await prisma.coin.findMany(coinQuery)
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
 
