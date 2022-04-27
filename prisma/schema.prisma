@@ -29,6 +29,7 @@ model Coin {
   circulatingSupply Decimal
   totalSupply Decimal?
   ohlcs Ohlc[]
+  coinTimes CoinTime[]
   tickers Json
   defaultPlatform String?
   platforms Json?
@@ -52,4 +53,13 @@ model Ohlc {
   @@index([coinId, quoteSymbol])
   @@index([closeTime(sort: Desc)])
   @@unique([coinId, quoteSymbol, closeTime])
+}
+
+model CoinTime {
+  id Int @id @default(autoincrement())
+  coinId String @db.VarChar(255)
+  coin Coin @relation(fields: [coinId], references: [id])
+  date DateTime @db.Date()
+  marketCap BigInt
+  volume BigInt
 }

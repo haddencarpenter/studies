@@ -109,6 +109,7 @@ const script = async () => {
 
     const dailyChange = coinData.market_data.price_change_percentage_24h || undefined
     const weeklyChange = coinData.market_data.price_change_percentage_7d || undefined
+    const marketCap = Math.ceil(coinData.market_data.market_cap.usd)
     const dbCoinData = {
       symbol,
       name: coinData.name,
@@ -121,7 +122,7 @@ const script = async () => {
       twitterFollowers: coinData.community_data.twitter_followers,
       ath: coinData.market_data.ath.usd,
       atl: coinData.market_data.atl.usd,
-      marketCap: Math.ceil(coinData.market_data.market_cap.usd),
+      marketCap,
       marketCapRank: coinData.market_data.market_cap_rank,
       fullyDilutedValuation: coinData.market_data.fully_diluted_valuation.usd,
       circulatingSupply: coinData.market_data.circulating_supply,
@@ -139,6 +140,15 @@ const script = async () => {
         ...dbCoinData
       },
       update: dbCoinData,
+    })
+
+    await prisma.coinTime.create({
+      data: {
+        coinId,
+        date: new Date(),
+        marketCap,
+        volume: coinData.market_data.total_volume.usd,
+      }
     })
 
     let cryptoWatchAfterParam = Math.round((subDays(new Date(), fetchOhlcDays)).valueOf() / 1000)
