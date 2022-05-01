@@ -35,6 +35,9 @@ model Coin {
   platforms Json?
   dailyChange Decimal @default(0.0)
   weeklyChange Decimal @default(0.0)
+  launch_price Decimal?
+  launch_date_start DateTime?
+  launch_date_end DateTime?
 
   @@index([marketCapRank])
 }
@@ -62,4 +65,9 @@ model CoinTime {
   date DateTime @db.Date()
   marketCap BigInt
   volume BigInt
+}
+
+model DropsTab {
+  url String
+  symbol String @id
 }
