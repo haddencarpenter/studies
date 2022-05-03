@@ -374,7 +374,7 @@ export default function Home({ coinsData, categories }) {
             <Tag color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: defaultFormState.trendLengthMin })
               formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: defaultFormState.trendLengthMax })
-            }}>Signal Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
+            }}>Trend Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
           )}
           {atrPeriodsFilterApplied && (
             <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_ATR_PERIODS', payload: defaultFormState.atrPeriods })}>ATR periods: {formState.atrPeriods}</Tag>
