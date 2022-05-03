@@ -75,14 +75,16 @@ const fetchRoi = async () => {
 
     for (const coinData of data) {
       const matchingCoin = await findMatchingCoinDropstab(coinData.symbol, coinData.name);
-      await prisma.coin.update({
-        where: { id: matchingCoin.id },
-        data: {
-          launch_roi_usd: coinData.usd,
-          launch_roi_eth: coinData.eth,
-          launch_roi_btc: coinData.btc,
-        }
-      })
+      if (matchingCoin) {
+        await prisma.coin.update({
+          where: { id: matchingCoin.id },
+          data: {
+            launch_roi_usd: coinData.usd,
+            launch_roi_eth: coinData.eth,
+            launch_roi_btc: coinData.btc,
+          }
+        })
+      }
     }
   } catch (error) {
     console.log(error)
