@@ -3,6 +3,7 @@ import * as Tracing from '@sentry/tracing';
 import puppeteer from 'puppeteer';
 
 import prisma from '../lib/prisma'
+import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -13,7 +14,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-const fetchCoinData = async (url, coinId) => {
+const fetchCoinData = async (url, page, coin) => {
   console.log('Fetch launch data for', coin.symbol);
   await page.goto(url, {waitUntil: 'domcontentloaded'});
 
@@ -30,7 +31,7 @@ const fetchCoinData = async (url, coinId) => {
 
   await prisma.coin.update({
     where: {
-      id: coinId
+      id: coin.id
     },
     data: {
       launch_price: price,
@@ -54,10 +55,13 @@ const getDropsTabData = async (page) => {
       const data = [];
       for (const element of elements) {
         const url = element.querySelector('a').href;
-        const symbol = element.querySelector('.uppercase').innerText;
+        const symbolElement = element.querySelector('.uppercase')
+        const symbol = symbolElement.innerText;
+        const name = symbolElement.nextSibling.innerText;
         data.push({
           url,
-          symbol
+          symbol,
+          name
         })
       }
 
@@ -98,20 +102,10 @@ const dropsTab = async () => {
 
     const dropsTabData = await getDropsTabData(page);
 
-    const coins = await prisma.coin.findMany({
-      select: {
-        id: true,
-        symbol: true
-      },
-      where: {
-        launch_price: null
-      }
-    });
-
-    for (const coin of coins) {
-      const match = dropsTabData.find((drop) => drop.symbol === coin.symbol.toUpperCase());
-      if (match) {
-        await fetchCoinData(match.url, coin.id);
+    for (const dropsData of dropsTabData) {
+      const coin = await findMatchingCoinDropstab(dropsData.symbol, dropsData.name);
+      if (coin) {
+        await fetchCoinData(dropsData.url, page, coin);
       }
     }
   } catch (error) {

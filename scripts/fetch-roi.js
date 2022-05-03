@@ -3,6 +3,7 @@ import * as Tracing from '@sentry/tracing';
 import puppeteer from 'puppeteer';
 
 import prisma from '../lib/prisma'
+import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -12,36 +13,6 @@ Sentry.init({
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 });
-
-// TODO: Copy this function over to dropstab.js and use it there
-const findMatchingCoinId = async (symbol, name) => {
-  symbol = symbol.toLowerCase();
-  let matchingCoin;
-  const matchingCoinsBySymbol = await prisma.coin.findMany({
-    where: { symbol },
-    select: {
-      id: true,
-      symbol: true,
-      name: true,
-      marketCap: true,
-    }
-  });
-
-  // TODO: Sometimes the symbol doesn't seem to match the coingecko symbol???
-
-  // Symbols can be used by multiple coins, so we need to find the coin heuristically in some cases
-  if (matchingCoinsBySymbol.length > 1) {
-    // TODO: We need to find the best match by name string comparison
-    // Find a library for that
-    // Find examples to try this on
-    matchingCoin = matchingCoinsBySymbol[0];
-  } else {
-    matchingCoin = matchingCoinsBySymbol[0];
-  }
-
-  console.log(symbol)
-  return matchingCoin.id;
-}
 
 const fetchRoi = async () => {
   let browser;
@@ -103,9 +74,9 @@ const fetchRoi = async () => {
     }
 
     for (const coinData of data) {
-      const matchingCoinId = await findMatchingCoinId(coinData.symbol, coinData.name);
+      const matchingCoin = await findMatchingCoinDropstab(coinData.symbol, coinData.name);
       await prisma.coin.update({
-        where: { id: matchingCoinId },
+        where: { id: matchingCoin.id },
         data: {
           launch_roi_usd: coinData.usd,
           launch_roi_eth: coinData.eth,
