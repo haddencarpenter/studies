@@ -25,7 +25,6 @@ const fetchRoi = async () => {
     const page = await browser.newPage();
 
     await page.goto('https://dropstab.com/ico-roi', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000); // Wait for the next button to become interactive
 
     const data = [];
     let hasNextPage = true;
@@ -58,16 +57,8 @@ const fetchRoi = async () => {
 
       const nextPage = await page.$('[aria-label="Next page"]');
       if (nextPage) {
-        await nextPage.click();
         currentPage++;
-        await page.waitForFunction(
-          (currentPage) => {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('p') == currentPage;
-          },
-          {},
-          currentPage
-        )
+        await page.goto(`https://dropstab.com/ico-roi?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
       } else {
         hasNextPage = false
       }
