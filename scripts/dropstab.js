@@ -14,7 +14,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-const fetchCoinData = async (url, page, coin) => {
+const fetchCoinData = async (url, coin, page) => {
   console.log('Fetch launch data for', coin.symbol);
   await page.goto(url, {waitUntil: 'domcontentloaded'});
 
@@ -41,9 +41,9 @@ const fetchCoinData = async (url, page, coin) => {
   })
 }
 
-const getDropsTabData = async (page) => {
-  await page.goto('https://dropstab.com/', {waitUntil: 'load'});
-  await page.waitForTimeout(2000); // Wait for the next button to become interactive
+const getDropsTabData = async (browser) => {
+  const page = await browser.newPage();
+  await page.goto('https://dropstab.com/', {waitUntil: 'domcontentloaded'});
 
   const data = [];
   let hasNextPage = true;
@@ -72,20 +72,14 @@ const getDropsTabData = async (page) => {
 
     const nextPage = await page.$('[aria-label="Next page"]');
     if (nextPage) {
-      await nextPage.click();
       currentPage++;
-      await page.waitForFunction(
-        (currentPage) => {
-          const params = new URLSearchParams(window.location.search);
-          return params.get('p') == currentPage;
-        },
-        {},
-        currentPage
-      )
+      await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
     } else {
       hasNextPage = false
     }
   }
+
+  await page.close();
 
   return data
 }
@@ -98,14 +92,14 @@ const dropsTab = async () => {
   });
   try {
     browser = await puppeteer.launch();
+
+    const dropsTabData = await getDropsTabData(browser);
+
     const page = await browser.newPage();
-
-    const dropsTabData = await getDropsTabData(page);
-
     for (const dropsData of dropsTabData) {
       const coin = await findMatchingCoinDropstab(dropsData.symbol, dropsData.name);
       if (coin) {
-        await fetchCoinData(dropsData.url, page, coin);
+        await fetchCoinData(dropsData.url, coin, page);
       }
     }
   } catch (error) {
