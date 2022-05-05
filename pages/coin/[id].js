@@ -6,6 +6,7 @@ import { TwitterOutlined, GlobalOutlined, InfoCircleFilled } from '@ant-design/i
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import classnames from 'classnames';
 import endOfYesterday from 'date-fns/endOfYesterday';
+import pick from 'lodash/pick';
 import round from 'lodash/round';
 
 import prisma from '../../lib/prisma'
@@ -380,7 +381,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const appData = await globalData();
-  const coinData = await prisma.coin.findUnique({
+  let coinData = await prisma.coin.findUnique({
     where: {
       id: params.id,
     },
@@ -429,6 +430,22 @@ export async function getStaticProps({ params }) {
 
   const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   const chainsData = await getChainsData();
+
+  coinData = pick(coinData, [
+    'id',
+    'symbol',
+    'name',
+    'images',
+    'categories',
+    'defaultPlatform',
+    'marketCap',
+    'ath',
+    'atl',
+    'fullyDilutedValuation',
+    'circulatingSupply',
+    'totalSupply',
+    'tickers'
+  ])
   return {
     props: {
       ...coinData,
@@ -437,17 +454,15 @@ export async function getStaticProps({ params }) {
       fullyDilutedValuation: Number(coinData.fullyDilutedValuation),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
-      dailyChange: Number(coinData.dailyChange),
-      weeklyChange: Number(coinData.weeklyChange),
-      similarCoins,
+      platforms,
+      chainsData,
       dailyTrends,
       dailySuperSuperTrend,
       weeklyTrends,
       weeklySuperSuperTrend,
-      appData,
       description,
-      platforms,
-      chainsData
+      similarCoins,
+      appData,
     }
   }
 }
