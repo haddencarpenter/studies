@@ -371,7 +371,7 @@ export default function Coin(coin) {
 export async function getStaticPaths() {
   const coinsData = await prisma.coin.findMany({
     select: { id: true },
-    take: 1,
+    take: 10,
   })
 
   return {
