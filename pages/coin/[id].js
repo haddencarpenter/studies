@@ -8,7 +8,6 @@ import classnames from 'classnames';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
 import round from 'lodash/round';
-import * as Sentry from '@sentry/nextjs';
 
 import prisma from '../../lib/prisma'
 import styles from '../../styles/coin.module.less'
@@ -372,7 +371,7 @@ export default function Coin(coin) {
 export async function getStaticPaths() {
   const coinsData = await prisma.coin.findMany({
     select: { id: true },
-    take: 10,
+    take: 1,
   })
 
   return {
@@ -382,11 +381,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  Sentry.withScope(scope => {
-    scope.setLevel('debug');
-    scope.setExtra('params', params);
-    Sentry.captureMessage(`Building`);
-  });
   const appData = await globalData();
   let coinData = await prisma.coin.findUnique({
     where: {
@@ -409,11 +403,6 @@ export async function getStaticProps({ params }) {
       orderBy: { closeTime: 'asc' }
     }}
   })
-  Sentry.withScope(scope => {
-    scope.setLevel('debug');
-    scope.setExtra('params', params);
-    Sentry.captureMessage(`Got build data`);
-  });
   let similarCoins = []
   if (coinData.categories.length) {
     similarCoins = await prisma.$queryRaw`
@@ -457,11 +446,6 @@ export async function getStaticProps({ params }) {
     'totalSupply',
     'tickers'
   ])
-  Sentry.withScope(scope => {
-    scope.setLevel('debug');
-    scope.setExtra('params', params);
-    Sentry.captureMessage(`Calculated all data`);
-  });
   return {
     props: {
       ...coinData,
