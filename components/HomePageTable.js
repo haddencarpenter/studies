@@ -5,8 +5,8 @@ import { QuestionCircleFilled } from '@ant-design/icons';
 import { useMemo } from 'react';
 import { VList } from 'virtuallist-antd'
 
-import BuyTag from './BuyTag'
-import SellTag from './SellTag'
+import UpTag from './UpTag'
+import DownTag from './DownTag'
 import HodlTag from './HodlTag'
 import styles from '../styles/index.module.less'
 import { signals } from '../utils/variables'
@@ -185,10 +185,10 @@ const HomePageTable = ({
         let tag;
         switch (dailySuperSupertrend) {
           case signals.buy:
-            tag = <BuyTag className={styles.tableTag} />
+            tag = <UpTag className={styles.tableTag} />
             break
           case signals.sell:
-            tag = <SellTag className={styles.tableTag} />
+            tag = <DownTag className={styles.tableTag} />
             break
           default:
             tag = <HodlTag className={styles.tableTag} />
@@ -231,10 +231,10 @@ const HomePageTable = ({
         let tag;
         switch (weeklySuperSuperTrend) {
           case signals.buy:
-            tag = <BuyTag className={styles.tableTag} />
+            tag = <UpTag className={styles.tableTag} />
             break
           case signals.sell:
-            tag = <SellTag className={styles.tableTag} />
+            tag = <DownTag className={styles.tableTag} />
             break
           default:
             tag = <HodlTag className={styles.tableTag} />
