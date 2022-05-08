@@ -4,6 +4,6 @@ import classnames from 'classnames'
 import variableStyles from '../styles/variables.module.less'
 import signalStyles from '../styles/signalTag.module.less'
 
-const HodlTag = ({ className = '' }) => <Tag className={classnames(signalStyles.tag, className)} color={variableStyles.primaryColor}>HODL</Tag>
+const UpTag = ({ className = '' }) => <Tag className={classnames(signalStyles.tag, className)} color={variableStyles.successColor}>UP</Tag>
 
-export default HodlTag
+export default UpTag

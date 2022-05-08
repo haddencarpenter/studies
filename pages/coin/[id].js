@@ -18,9 +18,9 @@ import getChainsData from '../../utils/getChainsData'
 import getPlatformData from '../../utils/getPlatformData'
 import convertToDailySignals from '../../utils/convertToDailySignals'
 import useBreakPoint from '../../hooks/useBreakPoint'
-import BuyTag from '../../components/BuyTag'
-import ContractTagAndMore from '../../components/ContractTagAndMore';
-import SellTag from '../../components/SellTag'
+import UpTag from '../../components/UpTag'
+import PlatformSelect from '../../components/PlatformSelect';
+import DownTag from '../../components/DownTag'
 import HodlTag from '../../components/HodlTag'
 import globalData from '../../lib/globalData';
 import cleanupExchangeLink from '../../utils/cleanupExchangeLink';
@@ -36,11 +36,11 @@ export default function Coin(coin) {
   switch (coin.dailySuperSuperTrend) {
     case signals.buy:
       dailySignal = 'UP'
-      dailySignalTag = <a href="#markets"><BuyTag /></a>
+      dailySignalTag = <a href="#markets"><UpTag /></a>
       break;
     case signals.sell:
       dailySignal = 'DOWN'
-      dailySignalTag = <a href="#markets"><SellTag /></a>
+      dailySignalTag = <a href="#markets"><DownTag /></a>
       break;
     default:
       dailySignal = 'HODL'
@@ -49,10 +49,10 @@ export default function Coin(coin) {
   let weeklySignalTag
   switch (coin.weeklySuperSuperTrend) {
     case signals.buy:
-      weeklySignalTag = <a href="#markets"><BuyTag /></a>
+      weeklySignalTag = <a href="#markets"><UpTag /></a>
       break;
     case signals.sell:
-      weeklySignalTag = <a href="#markets"><SellTag /></a>
+      weeklySignalTag = <a href="#markets"><DownTag /></a>
       break;
     default:
       weeklySignalTag = <a href="#markets"><HodlTag /></a>
@@ -238,7 +238,7 @@ export default function Coin(coin) {
           ) : ''}
           {coin.platforms.length ? (
             <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.contractCard)}>
-              <ContractTagAndMore
+              <PlatformSelect
                 images={coin.images}
                 platforms={coin.platforms}
                 symbol={coin.symbol}
