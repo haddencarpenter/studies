@@ -1,16 +1,18 @@
 import { Space, Tag, notification } from 'antd'
 import capitalize from 'lodash/capitalize'
 
-import CopyButton from '../components/CopyButton'
-import MetaMaskButton from '../components/MetaMaskButton'
-import styles from '../styles/contractTag.module.less'
 import addToClipboard from '../utils/addToClipboard'
 
-const ContractTag = ({ image, platform, symbol, address, decimals=18, chainData }) => {
+import CopyButton from '../components/CopyButton'
+import MetaMaskButton from '../components/MetaMaskButton'
+
+import platformSelectStyles from '../styles/platformSelect.module.less'
+
+const PlatformSelectMP = ({ image, platform, symbol, address, decimals=18, chainData }) => {
   const displayedAddress = `${address.substr(0, 6)}...${address.substr(-4)}`
 
   const metamaskButton = <MetaMaskButton
-    className={styles.metamask}
+    className={platformSelectStyles.metamaskButton}
     symbol={symbol}
     image={image}
     decimals={decimals}
@@ -25,14 +27,14 @@ const ContractTag = ({ image, platform, symbol, address, decimals=18, chainData 
   }
 
   return (
-    <Tag className={styles.tag} onClick={() => {
+    <Tag className={platformSelectStyles.mainPlatform} onClick={() => {
       addToClipboard(address)
       showSuccessNotification()
     }}>
       <Space size={8}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {/* <img src={image} alt={symbol} className={styles.icon} /> */}
-        <span><span className={styles.platform}>{capitalize(platform)}:</span> {displayedAddress}</span>
+        {/* <img src={image} alt={symbol} className={platformSelectStyles.icon} /> */}
+        <span className={platformSelectStyles.text}><span>{capitalize(platform)}:</span> {displayedAddress}</span>
         {metamaskButton}
         <CopyButton text={address} after={showSuccessNotification}/>
       </Space>
@@ -40,4 +42,4 @@ const ContractTag = ({ image, platform, symbol, address, decimals=18, chainData 
   );
 };
 
-export default ContractTag
+export default PlatformSelectMP

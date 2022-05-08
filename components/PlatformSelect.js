@@ -3,8 +3,9 @@ import startCase from 'lodash/startCase';
 
 import CopyButton from './CopyButton'
 import MetaMaskButton from './MetaMaskButton'
-import ContractTag from './ContractTag';
-import styles from '../styles/contractTag.module.less'
+import PlatformSelectMP from './PlatformSelectMP';
+
+import platformSelectStyles from '../styles/platformSelect.module.less'
 
 // TODO: Remove this hack once we have the right names
 const getChainData = (chainsData, platform, platformName) => {
@@ -12,15 +13,15 @@ const getChainData = (chainsData, platform, platformName) => {
   chain.name.toLowerCase().includes(platform.toLowerCase()))
 }
 
-const ContractTagAndMore = ({ images, platforms, symbol, chainsData }) => {
+const PlatformSelect = ({ images, platforms, symbol, chainsData }) => {
   const upperCaseSymbol = symbol.toUpperCase();
   let otherPlatforms;
   if (platforms.length > 1) {
     otherPlatforms = (
       <Select
         placeholder="More"
-        className={styles.platformSelector}
-        dropdownClassName={styles.platformDropdown}
+        className={platformSelectStyles.selectPlatform}
+        dropdownClassName={platformSelectStyles.selectDropdown}
         dropdownMatchSelectWidth={false}
       >
         {platforms.slice(1).map((platformData) => {
@@ -29,7 +30,7 @@ const ContractTagAndMore = ({ images, platforms, symbol, chainsData }) => {
           const chainData = getChainData(chainsData, platform, platformName)
           const displayedAddress = `${address.substr(0, 6)}...${address.substr(-6)}`
           const metamaskButton = <MetaMaskButton
-            className={styles.metamaskButton}
+            className={platformSelectStyles.metamaskButton}
             symbol={upperCaseSymbol}
             image={images.large}
             address={address}
@@ -41,9 +42,9 @@ const ContractTagAndMore = ({ images, platforms, symbol, chainsData }) => {
             })
           }
           return (
-            <Select.Option key={platform} disabled className={styles.platformOptions}>
-              <Space className={styles.platformSpace}>
-                <Space direction="vertical" size={2} className={styles.platformSpaceName}>
+            <Select.Option key={platform} disabled className={platformSelectStyles.option}>
+              <Space className={platformSelectStyles.space}>
+                <Space direction="vertical" size={2}>
                   <b>{platformName}</b>
                   {displayedAddress}
                 </Space>
@@ -63,7 +64,7 @@ const ContractTagAndMore = ({ images, platforms, symbol, chainsData }) => {
   const chainData = getChainData(chainsData, firstPlatform, startCase(firstPlatform))
   return (
     <Space size={12} wrap>
-      <ContractTag
+      <PlatformSelectMP
         image={images.large}
         platform={firstPlatform}
         symbol={upperCaseSymbol}
@@ -75,4 +76,4 @@ const ContractTagAndMore = ({ images, platforms, symbol, chainsData }) => {
   );
 };
 
-export default ContractTagAndMore
+export default PlatformSelect

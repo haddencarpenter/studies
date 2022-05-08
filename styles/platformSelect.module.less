@@ -1,0 +1,51 @@
+@import './variables.module.less';
+
+// Main Platform
+
+.mainPlatform {
+  line-height: 30px !important;
+  margin-right: 0 !important;
+  cursor: pointer;
+
+  &:hover {
+    border: 1px solid @cr-primary-color;
+  }
+
+  .text > :first-child {
+    color: @text-color-secondary !important;
+  }
+
+  .metamaskButton {
+    margin-top: -2px;
+  }
+}
+
+// Select Platform Input + Dropdown
+
+.selectPlatform {
+  line-height: 32px;
+
+  span {
+    color: @text-color;
+  }
+}
+
+.selectDropdown {
+  .option {
+    cursor: default;
+    color: @text-color;
+
+    &:hover {
+      background: @geekblue-1;
+    }
+  }
+
+  .metamaskButton {
+    margin-right: 10px;
+  }
+
+  .space {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
