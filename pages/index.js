@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import endOfYesterday from 'date-fns/endOfYesterday';
+import subWeeks from 'date-fns/subWeeks';
 
 import prisma from '../lib/prisma'
 import styles from '../styles/index.module.less'
@@ -25,9 +26,7 @@ const { Option, OptGroup } = Select;
 const { Content } = Layout;
 
 export async function getStaticProps() {
-  console.debug('start building index');
   const appData = await globalData();
-  console.debug('getting global data');
   const coinQuery = {
     orderBy: { marketCapRank: 'asc' },
     take: 1000,
@@ -53,6 +52,7 @@ export async function getStaticProps() {
         where: {
           closeTime: {
             lte: endOfYesterday(),
+            gte: subWeeks(endOfYesterday(), 8)
           }
         },
         orderBy: { closeTime: 'asc' }
