@@ -25,6 +25,7 @@ const { Option, OptGroup } = Select;
 const { Content } = Layout;
 
 export async function getStaticProps() {
+  console.debug('start building index');
   const appData = await globalData();
   const coinQuery = {
     orderBy: { marketCapRank: 'asc' },
@@ -77,6 +78,7 @@ export async function getStaticProps() {
     }
   })
   let categories = await getCategories()
+  console.debug('done building index');
   return {
     props: {
       coinsData,

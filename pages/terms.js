@@ -84,7 +84,9 @@ export default function Terms() {
 }
 
 export async function getStaticProps() {
+  console.debug('building terms');
   const appData = await globalData();
+  console.debug('done building terms');
 
   return { props: { appData } };
 }
