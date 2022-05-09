@@ -264,6 +264,9 @@ export default function Coin(coin) {
               ) : <></>}
             </Space>
           </Card.Grid>
+          <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.tokenomicsHeader)}>
+            <Title level={2}>{coin.name} Tokenomics</Title>
+          </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(styles.cardGrid, styles.cardData, styles.dataCard1)}>
             <div className={styles.labelValueGroup}>
               <Title level={3} className={styles.label}>Market Cap</Title>
@@ -371,10 +374,12 @@ export default function Coin(coin) {
 }
 
 export async function getStaticPaths() {
+  console.debug('get static coin paths');
   const coinsData = await prisma.coin.findMany({
     select: { id: true },
   })
 
+  console.debug('done get static coin paths');
   return {
     paths: coinsData.map(coin => ({ params: { ...coin }}) ),
     fallback: false
@@ -382,6 +387,7 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
+  console.debug('get static coin props', params.id);
   const appData = await globalData();
   let coinData = await prisma.coin.findUnique({
     where: {
@@ -450,6 +456,7 @@ export async function getStaticProps({ params }) {
     'twitterFollowers',
     'homepage'
   ])
+  console.debug('done get static coin props', params.id);
   return {
     props: {
       ...coinData,

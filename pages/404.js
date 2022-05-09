@@ -22,7 +22,9 @@ export default function Custom404() {
 }
 
 export async function getStaticProps() {
+  console.debug('building 404');
   const appData = await globalData();
+  console.debug('done building 404');
 
   return { props: { appData } };
 }

@@ -67,7 +67,9 @@ export default function Faq() {
 }
 
 export async function getStaticProps() {
+  console.debug('building faq');
   const appData = await globalData();
+  console.debug('done building faq');
 
   return { props: { appData } };
 }
