@@ -86,6 +86,11 @@ const script = async () => {
             coinId,
           },
         })
+        await prisma.coinTime.deleteMany({
+          where: {
+            coinId,
+          },
+        })
         await prisma.coin.delete({
           where: {
             id: coinId,
