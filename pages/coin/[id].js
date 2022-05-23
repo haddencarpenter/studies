@@ -423,7 +423,7 @@ export default function Coin(coin) {
               </Card.Grid>
             ) : <></>
           }
-          <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.chartGrid)}>
+          <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionChart)}>
             <AdvancedRealTimeChart
               autosize
               interval="D"
