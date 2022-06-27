@@ -79,6 +79,7 @@ const bot = async () => {
       const symbol = coinData.symbol.toUpperCase()
       const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol} @${coinData.twitter}`
       const channelPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id}`
+      console.log(tweetPost, channelPost)
       tweet(tweetPost)
       channelCreateMessage(channelPost)
       postMessage(channelPost)
