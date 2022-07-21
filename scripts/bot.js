@@ -76,7 +76,7 @@ const bot = async () => {
     })
     coinsData = coinsData.filter((coinData) => coinData.superSuperTrend !== coinData.yesterdaySuperSuperTrend);
     coinsData = coinsData.sort((a, b) => Number(b.marketCap - a.marketCap))
-    coinsData = coinsData.slice(0, 5)
+    coinsData = coinsData.slice(0, 20)
     coinsData.forEach((coinData) => {
       const symbol = coinData.symbol.toUpperCase()
       const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol} @${coinData.twitter}`
