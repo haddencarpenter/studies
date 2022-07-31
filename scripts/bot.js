@@ -77,15 +77,16 @@ const bot = async () => {
     coinsData = coinsData.filter((coinData) => coinData.superSuperTrend !== coinData.yesterdaySuperSuperTrend);
     coinsData = coinsData.sort((a, b) => Number(b.marketCap - a.marketCap))
     coinsData = coinsData.slice(0, 20)
-    coinsData.forEach((coinData) => {
-      const symbol = coinData.symbol.toUpperCase()
-      const tweetPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at coinrotator.app/coin/${coinData.id} #CoinRotator $${symbol} @${coinData.twitter}`
-      const channelPost = `${coinData.name} (${symbol}) changed from ${coinData.yesterdaySuperSuperTrend} to ${coinData.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coinData.id}`
+    for (const coin of coinsData) {
+      const symbol = coin.symbol.toUpperCase()
+      const tweetPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.superSuperTrend} today! Find out more at coinrotator.app/coin/${coin.id} #CoinRotator $${symbol} @${coin.twitter}`
+      const channelPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coin.id}`
       console.log(tweetPost, channelPost)
       tweet(tweetPost)
       channelCreateMessage(channelPost)
       postMessage(channelPost)
-    })
+      await new Promise((res) => setTimeout(res, 1000))
+    }
   } catch (error) {
     console.log(error)
     Sentry.captureException(error);
