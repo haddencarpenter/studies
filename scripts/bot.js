@@ -90,6 +90,7 @@ const bot = async () => {
       postMessage(channelPost)
       await new Promise((res) => setTimeout(res, 1000))
     }
+    await new Promise((res) => setTimeout(res, 5000))
     const groupedTrends = groupBy(trimmedCoinsData, 'superSuperTrend')
     for (const [superSuperTrend, trendData] of Object.entries(groupedTrends)) {
       const fileName = `${format(new Date(), 'MM-dd-yyyy')} ${superSuperTrend} Trends.txt`
@@ -97,6 +98,7 @@ const bot = async () => {
         .map(coin => `Binance:${coin.symbol.toUpperCase()}USDT`)
         .join(`\n`)
       sendDocument(fileName, Readable.from(documentText))
+      await new Promise((res) => setTimeout(res, 1000))
     }
   } catch (error) {
     console.log(error)
