@@ -28,7 +28,8 @@ const script = async () => {
     timeout: 30000
   })
   coinGeckoAPI.defaults.raxConfig = {
-    instance: coinGeckoAPI
+    instance: coinGeckoAPI,
+    onRetryAttempt: (err) => console.log(err)
   }
   coinGeckoAPI.interceptors.request.use(AxiosLogger.requestLogger);
   rax.attach(coinGeckoAPI)
@@ -39,7 +40,8 @@ const script = async () => {
     headers: { 'X-CW-API-Key': process.env.CRYPTOWATCH_API_KEY }
   })
   cryptowatchAPI.defaults.raxConfig = {
-    instance: cryptowatchAPI
+    instance: cryptowatchAPI,
+    onRetryAttempt: (err) => console.log(err)
   }
   cryptowatchAPI.interceptors.request.use(AxiosLogger.requestLogger);
   rax.attach(cryptowatchAPI)
