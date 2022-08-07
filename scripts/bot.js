@@ -90,7 +90,7 @@ const bot = async () => {
       postMessage(channelPost)
       await new Promise((res) => setTimeout(res, 1000))
     }
-    await new Promise((res) => setTimeout(res, 5000))
+    await new Promise((res) => setTimeout(res, 50000))
     const groupedTrends = groupBy(trimmedCoinsData, 'superSuperTrend')
     for (const [superSuperTrend, trendData] of Object.entries(groupedTrends)) {
       const fileName = `${format(new Date(), 'MM-dd-yyyy')} ${superSuperTrend} Trends.txt`
