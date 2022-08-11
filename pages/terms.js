@@ -84,7 +84,6 @@ export default function Terms() {
 }
 
 export async function getStaticProps() {
-  console.log('terms', 'end')
   const appData = await globalData();
 
   return { props: { appData } };

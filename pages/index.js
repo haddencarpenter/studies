@@ -30,6 +30,7 @@ const { Content } = Layout;
 export async function getStaticProps() {
   console.log('index', 'start')
   const appData = await globalData();
+  console.log('index', '1')
   const coinQuery = {
     orderBy: { marketCapRank: 'asc' },
     take: 1000,
@@ -65,7 +66,9 @@ export async function getStaticProps() {
   if (process.env.NODE_ENV === 'development') {
     coinQuery.take = 20;
   }
+  console.log('index', '2')
   let coinsData = await prisma.coin.findMany(coinQuery)
+  console.log('index', '3')
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
 
@@ -81,8 +84,9 @@ export async function getStaticProps() {
       ohlcs
     }
   })
+  console.log('index', '4')
   let categories = await getCategories()
-  console.log('index', 'end')
+  console.log('index', '5')
   return {
     props: {
       coinsData,

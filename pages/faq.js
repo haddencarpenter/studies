@@ -68,7 +68,6 @@ export default function Faq() {
 
 export async function getStaticProps() {
   const appData = await globalData();
-  console.log('faq')
 
   return { props: { appData } };
 }
