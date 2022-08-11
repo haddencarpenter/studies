@@ -31,9 +31,9 @@ const bot = async () => {
       const tweetPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.superSuperTrend} today! Find out more at coinrotator.app/coin/${coin.id} #CoinRotator $${symbol} @${coin.twitter}`
       const channelPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.superSuperTrend} today! Find out more at https://coinrotator.app/coin/${coin.id}`
       console.log(tweetPost, channelPost)
-      tweet(tweetPost)
-      channelCreateMessage(channelPost)
-      postMessage(channelPost)
+      await tweet(tweetPost)
+      await channelCreateMessage(channelPost)
+      await postMessage(channelPost)
       await new Promise((res) => setTimeout(res, 1000))
     }
     await new Promise((res) => setTimeout(res, 50000))
