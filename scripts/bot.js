@@ -38,8 +38,8 @@ const bot = async () => {
       }
       try {
         await channelCreateMessage(channelPost)
-      } catch {
-        console.log('Discord failed')
+      } catch (e) {
+        console.log('Discord failed', e)
       }
       try {
         await postMessage(channelPost)
