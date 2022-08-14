@@ -39,7 +39,10 @@ const bot = async () => {
       try {
         await channelCreateMessage(channelPost)
       } catch (e) {
-        console.log('Discord failed', e)
+        console.log('Discord failed')
+        console.log(e.response.status);
+        console.log(e.response.headers);
+        console.log(e.response.data);
       }
       try {
         await postMessage(channelPost)
