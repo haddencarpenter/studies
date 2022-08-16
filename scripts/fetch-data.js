@@ -109,7 +109,7 @@ const script = async () => {
       }
     }
     const symbol = coinData.symbol.toLowerCase()
-    await new Promise((res) => setTimeout(res, 1200))
+    await new Promise((res) => setTimeout(res, 6000))
 
     let platforms;
     if (hasPlatforms(coinData.platforms)) {
@@ -212,7 +212,7 @@ const script = async () => {
       for (let { route, inverse, coinGecko, quoteSymbol } of ohlcEndPoints) {
         let ohlcData = {}
         if (coinGecko) {
-          await new Promise((res) => setTimeout(res, 1200))
+          await new Promise((res) => setTimeout(res, 6000))
           let response
           try {
             response = await coinGeckoAPI.get(route)
