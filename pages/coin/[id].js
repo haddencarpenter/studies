@@ -6,7 +6,6 @@ import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import { Prisma } from '@prisma/client'
 import prisma from '../../lib/prisma'
 import ReactMarkdown from 'react-markdown'
-import ReactDom from 'react-dom'
 
 import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
