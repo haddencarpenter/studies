@@ -17,6 +17,7 @@ import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 import convertToDailySignals from '../utils/convertToDailySignals';
+import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getCategories } from '../utils/categories';
 import globalData from '../lib/globalData';
 import classnames from 'classnames';
@@ -39,6 +40,7 @@ export async function getStaticProps() {
       marketCap: true,
       marketCapRank: true,
       categories: true,
+      tickers: true,
       ohlcs: {
         select: {
           closeTime: true,
@@ -66,6 +68,8 @@ export async function getStaticProps() {
   }
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
+    const exchanges = convertTickersToExchanges(coinData.tickers)
+    delete coinData.tickers
 
     return {
       ...coinData,
@@ -74,7 +78,8 @@ export async function getStaticProps() {
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
-      ohlcs
+      ohlcs,
+      exchanges
     }
   })
   let categories = await getCategories()
