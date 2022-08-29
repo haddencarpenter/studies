@@ -7,3 +7,4 @@ markets.json
 dist/**
 # Sentry
 .sentryclirc
+.DS_Store

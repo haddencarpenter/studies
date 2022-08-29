@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
 import { Prisma } from '@prisma/client'
 import prisma from '../../lib/prisma'
+import ReactMarkdown from 'react-markdown'
 
 import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
@@ -243,7 +244,7 @@ export default function Coin(coin) {
           </Card.Grid>
           {coin.description ? (
             <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionDescription)}>
-                {coin.description}
+                <ReactMarkdown>{coin.description}</ReactMarkdown>
             </Card.Grid>
           ) : <></>}
           {coin.platforms.length ? (
