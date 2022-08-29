@@ -1,4 +1,4 @@
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout, Alert } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout, Alert, Tabs } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
@@ -27,6 +27,7 @@ import indexStyles from '../styles/index.module.less'
 const { Title, Paragraph, Text } = Typography;
 const { Option, OptGroup } = Select;
 const { Content } = Layout;
+const { TabPane } = Tabs;
 
 export async function getStaticProps() {
   const appData = await globalData();
@@ -460,7 +461,7 @@ export default function Home({ coinsData, categories }) {
               icon={<SlidersOutlined />}
               className={indexStyles.allFiltersButton}
             >
-              All Filters
+              Configure
             </Button>
           </Col>
         </Row>
@@ -468,7 +469,7 @@ export default function Home({ coinsData, categories }) {
       </Card>
       <Modal
         visible={filterModalVisible}
-        title="Filters"
+        title="Configure search"
         onCancel={() => setFilterModalVisible(false)}
         footer={[
           <Button
@@ -478,7 +479,7 @@ export default function Home({ coinsData, categories }) {
             type="primary"
             icon={<CheckCircleOutlined />}
           >
-            Apply Filters
+            Apply Settings
           </Button>,
           <Button
             key="reset"
@@ -488,124 +489,129 @@ export default function Home({ coinsData, categories }) {
             type="primary"
             icon={<CloseCircleOutlined />}
           >
-            Reset Filters
+            Reset Settings
           </Button>
         ]}
       >
-        <Row className={indexStyles.row} justify="space-between">
-          <Col>
-            <span>Show weekly trends</span>
-          </Col>
-          <Col>
-            <Switch checked={formState.weeklySignals} onChange={(checked) => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: checked })} />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Text type="secondary">Weekly trends update each Monday at 00:00 UTC.</Text>
-          </Col>
-        </Row>
-        <Divider />
-        <Row className={indexStyles.row} gutter={16}>
-          <Col span={12} className="gutter-row">
-            <label htmlFor="atr-periods">ATR periods</label>
-            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
-          </Col>
-          <Col span={12} className="gutter-row">
-            <label htmlFor="multiplier">Multiplier</label>
-            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col>
-            <div>Market Cap</div>
-          </Col>
-        </Row>
-        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
-          <Col className="gutter-row" xs={10} md={11}>
-            <Input
-              className={classnames(indexStyles.modalInput)}
-              size="large"
-              onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: e.target.value })}
-              value={formState.marketCapMin}
-              placeholder="$1"
-              aria-label="Market Cap Min"
-            />
-          </Col>
-          <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
-            <Text type="secondary">TO</Text>
-          </Col>
-          <Col className="gutter-row" xs={11} md={11}>
-            <Input
-              className={classnames(indexStyles.modalInput)}
-              size="large"
-              onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: e.target.value })}
-              value={formState.marketCapMax}
-              placeholder="$100,000"
-              aria-label="Market Cap Max"
-            />
-          </Col>
-        </Row>
-        <Row justify="space-between">
-          <Col>
-            <Button size={buttonSize} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
-          </Col>
-          <Col>
-            <Button size={buttonSize} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
-          </Col>
-          <Col>
-            <Button size={buttonSize} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
-          </Col>
-          <Col>
-            <Button size={buttonSize} onClick={setPredefinedMarketCap4}>$10B+</Button>
-          </Col>
-        </Row>
-        <Divider />
-        <Row>
-          <Col>
-            <div>Trend Streak</div>
-          </Col>
-        </Row>
-        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
-          <Col className="gutter-row" xs={10} md={11}>
-            <Input
-              className={indexStyles.modalInput}
-              size="large"
-              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
-              value={formState.trendLengthMin}
-              placeholder="1"
-              aria-label="Trend Length Min"
-            />
-          </Col>
-          <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
-            <Text type="secondary">TO</Text>
-          </Col>
-          <Col className="gutter-row" xs={11} md={11}>
-            <Input
-              className={indexStyles.modalInput}
-              size="large"
-              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
-              value={formState.trendLengthMax}
-              placeholder="50"
-              aria-label="Trend Length Max"
-            />
-          </Col>
-        </Row>
-        <Row justify="space-between">
-          <Col>
-            <Button size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
-          </Col>
-          <Col>
-            <Button size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
-          </Col>
-          <Col>
-            <Button size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
-          </Col>
-          <Col>
-            <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
-          </Col>
-        </Row>
+        <Tabs defaultActiveKey="filters">
+          <TabPane tab="Filters" key="filters">
+            <Row className={indexStyles.row} gutter={16}>
+              <Col span={12} className="gutter-row">
+                <label htmlFor="atr-periods">ATR periods</label>
+                <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
+              </Col>
+              <Col span={12} className="gutter-row">
+                <label htmlFor="multiplier">Multiplier</label>
+                <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
+              </Col>
+            </Row>
+            <Divider />
+            <Row>
+              <Col>
+                <div>Market Cap</div>
+              </Col>
+            </Row>
+            <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+              <Col className="gutter-row" xs={10} md={11}>
+                <Input
+                  className={classnames(indexStyles.modalInput)}
+                  size="large"
+                  onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: e.target.value })}
+                  value={formState.marketCapMin}
+                  placeholder="$1"
+                  aria-label="Market Cap Min"
+                />
+              </Col>
+              <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
+                <Text type="secondary">TO</Text>
+              </Col>
+              <Col className="gutter-row" xs={11} md={11}>
+                <Input
+                  className={classnames(indexStyles.modalInput)}
+                  size="large"
+                  onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: e.target.value })}
+                  value={formState.marketCapMax}
+                  placeholder="$100,000"
+                  aria-label="Market Cap Max"
+                />
+              </Col>
+            </Row>
+            <Row justify="space-between">
+              <Col>
+                <Button size={buttonSize} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
+              </Col>
+              <Col>
+                <Button size={buttonSize} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
+              </Col>
+              <Col>
+                <Button size={buttonSize} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
+              </Col>
+              <Col>
+                <Button size={buttonSize} onClick={setPredefinedMarketCap4}>$10B+</Button>
+              </Col>
+            </Row>
+            <Divider />
+            <Row>
+              <Col>
+                <div>Trend Streak</div>
+              </Col>
+            </Row>
+            <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+              <Col className="gutter-row" xs={10} md={11}>
+                <Input
+                  className={indexStyles.modalInput}
+                  size="large"
+                  onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
+                  value={formState.trendLengthMin}
+                  placeholder="1"
+                  aria-label="Trend Length Min"
+                />
+              </Col>
+              <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
+                <Text type="secondary">TO</Text>
+              </Col>
+              <Col className="gutter-row" xs={11} md={11}>
+                <Input
+                  className={indexStyles.modalInput}
+                  size="large"
+                  onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
+                  value={formState.trendLengthMax}
+                  placeholder="50"
+                  aria-label="Trend Length Max"
+                />
+              </Col>
+            </Row>
+            <Row justify="space-between">
+              <Col>
+                <Button size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
+              </Col>
+              <Col>
+                <Button size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
+              </Col>
+              <Col>
+                <Button size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
+              </Col>
+              <Col>
+                <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
+              </Col>
+            </Row>
+          </TabPane>
+          <TabPane tab="Columns" key="columns">
+            <Row className={indexStyles.row} justify="space-between">
+              <Col>
+                <span>Show weekly trends</span>
+              </Col>
+              <Col>
+                <Switch checked={formState.weeklySignals} onChange={(checked) => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: checked })} />
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Text type="secondary">Weekly trends update each Monday at 00:00 UTC.</Text>
+              </Col>
+            </Row>
+          </TabPane>
+        </Tabs>
       </Modal>
       <Row className={indexStyles.tableRow}>
         <HomePageTable
