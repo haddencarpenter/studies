@@ -4,6 +4,8 @@ import { VList } from 'virtuallist-antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useMemo } from 'react';
+import intersection from 'lodash/intersection'
+import isEmpty from 'lodash/isEmpty'
 
 import UpTag from './UpTag'
 import DownTag from './DownTag'
@@ -12,7 +14,6 @@ import useBreakPoint from '../hooks/useBreakPoint'
 import useIsHoverable from '../hooks/useIsHoverable';
 import getTrends from '../utils/getTrends'
 import { signals } from '../utils/variables'
-import classNames from 'classnames';
 
 import indexTableStyles from '../styles/indexTable.module.less';
 
@@ -31,6 +32,7 @@ const HomePageTable = ({
     multiplier,
     showWeeklySignals,
     showExchanges,
+    exchanges,
   }) => {
 
   const router = useRouter()
@@ -58,10 +60,13 @@ const HomePageTable = ({
     const coinNameLower = coinData.name.toLowerCase()
     const matchesPortfolio = portfolio === '' || portfolioFilter.some((coinName) => coinNameLower.includes(coinName) || coinSymbolLower.includes(coinName))
     const matchesCategory = category === defaultCategory || coinData.categories.includes(category)
+    const exchangeNames = coinData.exchanges.map(exchangeData => exchangeData[0])
+    const matchesExchanges = isEmpty(exchanges) || Boolean(intersection(exchanges, exchangeNames).length)
     return coinData.marketCap <= max &&
            coinData.marketCap >= min &&
            matchesPortfolio &&
-           matchesCategory
+           matchesCategory &&
+           matchesExchanges
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
     if (showWeeklySignals) {

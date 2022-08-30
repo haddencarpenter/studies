@@ -9,6 +9,7 @@ import isFinite from 'lodash/isFinite'
 import isEqual from 'lodash/isEqual'
 import isNil from 'lodash/isNil'
 import pickBy from 'lodash/pickBy'
+import uniq from 'lodash/uniq'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
 
@@ -102,6 +103,7 @@ export default function Home({ coinsData, categories }) {
       trendType: signals.all,
       weeklySignals: false,
       showExchanges: false,
+      exchanges: [],
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
@@ -147,6 +149,11 @@ export default function Home({ coinsData, categories }) {
         return {
           ...state,
           showExchanges: action.payload
+        }
+      case 'SET_EXCHANGES':
+        return {
+          ...state,
+          exchanges: action.payload
         }
       case 'SET_MARKET_CAP_MIN':
         let newMarketCapMin
@@ -237,10 +244,15 @@ export default function Home({ coinsData, categories }) {
   useEffect(() => {
     if (router.isReady) {
       const changedParams = pickBy(formState, (value, key) => {
-        return value !== router.query[key]
+        if (key === 'exchanges') {
+          const oldExchanges = Array.isArray(router.query[key]) ? router.query[key] : [router.query[key]]
+          return !isEqual(value, oldExchanges)
+        } else {
+          return value !== router.query[key]
+        }
       })
       const changedParamsThatAreDefault = Object.keys(changedParams).filter((key) => {
-        return changedParams[key] === defaultFormState[key]
+        return isEqual(changedParams[key], defaultFormState[key])
       })
       if (Object.keys(changedParams).length > 0) {
         let query = {
@@ -264,6 +276,10 @@ export default function Home({ coinsData, categories }) {
     if (!router.isReady) { return; }
 
     setPortfolioInputValue(router.query.portfolio)
+    let exchanges
+    if (router.query.exchanges) {
+      exchanges = Array.isArray(router.query.exchanges) ? router.query.exchanges : [router.query.exchanges]
+    }
     formDispatch({
       type: 'SET_FROM_ROUTE_PARAMS',
       payload: {
@@ -272,6 +288,7 @@ export default function Home({ coinsData, categories }) {
         trendType: router.query.trendType,
         weeklySignals: router.query.weeklySignals,
         showExchanges: router.query.showExchanges,
+        exchanges,
         marketCapMin: router.query.marketCapMin,
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,
@@ -350,6 +367,12 @@ export default function Home({ coinsData, categories }) {
     ].includes(category)
   })
   const restCategories = categories.filter(category => !priorityCategories.includes(category))
+  const allExchangeNames = useMemo(() => {
+    const exchangeData = coinsData.flatMap((coin) => coin.exchanges)
+    const exchangeNames = uniq(exchangeData.map(exchange => exchange[0]))
+
+    return exchangeNames.sort()
+  }, [coinsData])
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = Number(formState.marketCapMin) !== Number(defaultFormState.marketCapMin) ||
@@ -360,13 +383,15 @@ export default function Home({ coinsData, categories }) {
     const multiplierFilterApplied = formState.multiplier !== defaultMultiplier
     const showWeeklySignalsFilterApplied = formState.weeklySignals !== defaultFormState.weeklySignals
     const showExchangesFilterApplied = formState.showExchanges !== defaultFormState.showExchanges
+    const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
       atrPeriodsFilterApplied ||
       multiplierFilterApplied ||
       showWeeklySignalsFilterApplied ||
-      showExchangesFilterApplied
+      showExchangesFilterApplied ||
+      exchangesFilterApplied
 
     if (!advancedFiltersApplied || !screens.sm) {
       return null
@@ -402,7 +427,10 @@ export default function Home({ coinsData, categories }) {
             <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: defaultFormState.weeklySignals })}>Weekly trends</Tag>
           )}
           {formState.showExchanges && (
-            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_SHOW_EXCHANGES', payload: defaultFormState.showExchanges })}>Exchanges</Tag>
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_SHOW_EXCHANGES', payload: defaultFormState.showExchanges })}>Show Exchanges</Tag>
+          )}
+          {formState.exchanges && (
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
           )}
         </Col>
       </Row>
@@ -607,6 +635,27 @@ export default function Home({ coinsData, categories }) {
                 <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
               </Col>
             </Row>
+            <Divider />
+            <Row>
+              <Col>
+                <div>Exchanges</div>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24}>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Select exchanges"
+                  className={indexStyles.modalSelect}
+                  size="large"
+                  value={formState.exchanges}
+                  onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
+                >
+                  {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+                </Select>
+              </Col>
+            </Row>
           </TabPane>
           <TabPane tab="Columns" key="columns">
             <Row className={indexStyles.row} justify="space-between">
@@ -650,6 +699,7 @@ export default function Home({ coinsData, categories }) {
           multiplier={formState.multiplier}
           showWeeklySignals={formState.weeklySignals}
           showExchanges={formState.showExchanges}
+          exchanges={formState.exchanges}
         />
       </Row>
     </Content>
