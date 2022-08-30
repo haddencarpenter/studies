@@ -149,6 +149,13 @@ export default function Coin(coin) {
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${dailySignal.toUpperCase()} | Daily Crypto Screener`
   const ogTitle = `${coin.name} | ${dailySignal.toUpperCase()} | ${dateFormatter.format(new Date())} | Coinrotator`
   const metaDescription = `Coinrotator issues a daily trend for ${coin.name}. A coin screener that captures strong momentum in both directions!`
+  const interpolatedCoinDescription = coin.description
+    .replaceAll('{{ath}}', preciseCurrencyFormatter.format(coin.ath))
+    .replaceAll('{{atl}}', preciseCurrencyFormatter.format(coin.atl))
+    .replaceAll('{{marketcap}}', currencyFormatter.format(coin.marketCap))
+    .replaceAll('{{fdv}}', currencyFormatter.format(coin.fullyDilutedValuation))
+    .replaceAll('{{launchprice}}', currencyFormatter.format(coin.launch_price))
+    .replaceAll('{{currentprice}}', currencyFormatter.format(coin.current_price))
 
   const renderRoi = useCallback((multiple) => {
     if (multiple === null || multiple === 1 ) { return null }
@@ -244,7 +251,7 @@ export default function Coin(coin) {
           </Card.Grid>
           {coin.description ? (
             <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionDescription)}>
-                <ReactMarkdown>{coin.description}</ReactMarkdown>
+                <ReactMarkdown>{interpolatedCoinDescription}</ReactMarkdown>
             </Card.Grid>
           ) : <></>}
           {coin.platforms.length ? (
