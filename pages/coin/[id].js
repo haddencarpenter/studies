@@ -155,7 +155,7 @@ export default function Coin(coin) {
     .replaceAll('{{marketcap}}', currencyFormatter.format(coin.marketCap))
     .replaceAll('{{fdv}}', currencyFormatter.format(coin.fullyDilutedValuation))
     .replaceAll('{{launchprice}}', currencyFormatter.format(coin.launch_price))
-    .replaceAll('{{currentprice}}', currencyFormatter.format(coin.current_price))
+    .replaceAll('{{currentprice}}', currencyFormatter.format(coin.currentPrice))
 
   const renderRoi = useCallback((multiple) => {
     if (multiple === null || multiple === 1 ) { return null }
