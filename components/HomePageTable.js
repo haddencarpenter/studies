@@ -33,6 +33,7 @@ const HomePageTable = ({
     showWeeklySignals,
     showExchanges,
     exchanges,
+    showDerivatives
   }) => {
 
   const router = useRouter()
@@ -123,6 +124,7 @@ const HomePageTable = ({
         name: coinData.name
       },
       exchanges: coinData.exchanges,
+      derivatives: coinData.derivatives,
       marketCap: coinData.marketCap,
       dailySuperSuperTrend: coinData.dailySuperSuperTrend,
       weeklySuperSuperTrend: coinData.weeklySuperSuperTrend,
@@ -284,6 +286,20 @@ const HomePageTable = ({
         return <>
           {exchanges.map((exchange) => {
             return <Tag key={exchange[0]}>{exchange[0]}</Tag>
+          })}
+        </>;
+      }
+    })
+  }
+
+  if (showDerivatives) {
+    columns.push({
+      title: 'Derivatives',
+      dataIndex: 'derivatives',
+      render: (derivatives) => {
+        return <>
+          {derivatives.map((derivative) => {
+            return <Tag key={derivative}>{derivative}</Tag>
           })}
         </>;
       }
