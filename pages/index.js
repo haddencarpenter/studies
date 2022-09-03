@@ -441,7 +441,7 @@ export default function Home({ coinsData, categories }) {
             <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
           )}
           {!isEmpty(formState.derivatives) && (
-            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative exchanges: {formState.derivatives.join(", ")}</Tag>
+            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative markets: {formState.derivatives.join(", ")}</Tag>
           )}
         </Col>
       </Row>
@@ -670,7 +670,7 @@ export default function Home({ coinsData, categories }) {
             <Divider />
             <Row>
               <Col>
-                <div>Derivative exchanges</div>
+                <div>Derivative markets</div>
               </Col>
             </Row>
             <Row>
