@@ -117,7 +117,10 @@ const HomePageTable = ({
   })
 
   const tableData = displayedCoinData.map((coinData) => {
-    const shownDerivatives = coinData.derivatives.filter(derivative => derivatives.includes(derivative.market))
+    let shownDerivatives = coinData.derivatives
+    if (!isEmpty(derivatives)) {
+      shownDerivatives = coinData.derivatives.filter(derivative => derivatives.includes(derivative.market))
+    }
     return {
       key: `${coinData.id}-${coinData.name}`,
       coinData: {
