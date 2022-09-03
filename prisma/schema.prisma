@@ -70,3 +70,10 @@ model CoinTime {
   marketCap BigInt
   volume BigInt
 }
+
+model Exchange {
+  id String @db.VarChar(255) @id
+  name String
+  image String
+  url String
+}
