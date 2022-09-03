@@ -13,7 +13,7 @@ import HodlTag from './HodlTag'
 import useBreakPoint from '../hooks/useBreakPoint'
 import useIsHoverable from '../hooks/useIsHoverable';
 import getTrends from '../utils/getTrends'
-import { signals } from '../utils/variables'
+import { signals, preferredExchanges } from '../utils/variables'
 
 import indexTableStyles from '../styles/indexTable.module.less';
 
@@ -121,6 +121,8 @@ const HomePageTable = ({
     if (!isEmpty(derivatives)) {
       shownDerivatives = coinData.derivatives.filter(derivative => derivatives.includes(derivative.market))
     }
+    shownDerivatives = shownDerivatives.sort((derivative) => preferredExchanges.includes(derivative.market) ? -1 : 1)
+    const shownExchanges = coinData.exchanges.sort((exchange) => preferredExchanges.includes(exchange[0]) ? -1 : 1)
     return {
       key: `${coinData.id}-${coinData.name}`,
       coinData: {
@@ -129,7 +131,7 @@ const HomePageTable = ({
         images: coinData.images,
         name: coinData.name
       },
-      exchanges: coinData.exchanges,
+      exchanges: shownExchanges,
       derivatives: shownDerivatives,
       marketCap: coinData.marketCap,
       dailySuperSuperTrend: coinData.dailySuperSuperTrend,
