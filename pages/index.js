@@ -105,7 +105,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
       category: 'all',
       portfolio: '',
       trendType: signals.all,
-      weeklySignals: false,
       exchanges: [],
       derivatives: [],
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
@@ -143,11 +142,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
         return {
           ...state,
           trendType: action.payload
-        }
-      case 'SET_WEEKLY_SIGNALS':
-        return {
-          ...state,
-          weeklySignals: action.payload
         }
       case 'SET_EXCHANGES':
         return {
@@ -293,7 +287,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
         category: router.query.category,
         portfolio: router.query.portfolio,
         trendType: router.query.trendType,
-        weeklySignals: router.query.weeklySignals,
         exchanges,
         derivatives,
         marketCapMin: router.query.marketCapMin,
@@ -394,7 +387,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
     const atrPeriodsFilterApplied = formState.atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = formState.multiplier !== defaultMultiplier
-    const showWeeklySignalsFilterApplied = formState.weeklySignals !== defaultFormState.weeklySignals
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const advancedFiltersApplied =
@@ -402,7 +394,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
       trendLengthFilterApplied ||
       atrPeriodsFilterApplied ||
       multiplierFilterApplied ||
-      showWeeklySignalsFilterApplied ||
       exchangesFilterApplied ||
       derivativesFilterApplied
 
@@ -435,9 +426,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
           )}
           {multiplierFilterApplied && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_MULTIPLIER', payload: defaultFormState.multiplier })}>Multiplier: {formState.multiplier}</Tag>
-          )}
-          {formState.weeklySignals && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: defaultFormState.weeklySignals })}>Weekly trends</Tag>
           )}
           {!isEmpty(formState.exchanges) && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
@@ -546,167 +534,148 @@ export default function Home({ coinsData, categories, exchangeData }) {
           </Button>
         ]}
       >
-        <Tabs defaultActiveKey="filters">
-          <TabPane tab="Filters" key="filters">
-            <Row className={indexStyles.row} gutter={16}>
-              <Col span={12} className="gutter-row">
-                <label htmlFor="atr-periods">ATR periods</label>
-                <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
-              </Col>
-              <Col span={12} className="gutter-row">
-                <label htmlFor="multiplier">Multiplier</label>
-                <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col>
-                <div>Market Cap</div>
-              </Col>
-            </Row>
-            <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
-              <Col className="gutter-row" xs={10} md={11}>
-                <Input
-                  className={classnames(indexStyles.modalInput)}
-                  size="large"
-                  onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: e.target.value })}
-                  value={formState.marketCapMin}
-                  placeholder="$1"
-                  aria-label="Market Cap Min"
-                />
-              </Col>
-              <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
-                <Text type="secondary">TO</Text>
-              </Col>
-              <Col className="gutter-row" xs={11} md={11}>
-                <Input
-                  className={classnames(indexStyles.modalInput)}
-                  size="large"
-                  onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: e.target.value })}
-                  value={formState.marketCapMax}
-                  placeholder="$100,000"
-                  aria-label="Market Cap Max"
-                />
-              </Col>
-            </Row>
-            <Row justify="space-between">
-              <Col>
-                <Button size={buttonSize} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
-              </Col>
-              <Col>
-                <Button size={buttonSize} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
-              </Col>
-              <Col>
-                <Button size={buttonSize} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
-              </Col>
-              <Col>
-                <Button size={buttonSize} onClick={setPredefinedMarketCap4}>$10B+</Button>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col>
-                <div>Trend Streak</div>
-              </Col>
-            </Row>
-            <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
-              <Col className="gutter-row" xs={10} md={11}>
-                <Input
-                  className={indexStyles.modalInput}
-                  size="large"
-                  onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
-                  value={formState.trendLengthMin}
-                  placeholder="1"
-                  aria-label="Trend Length Min"
-                />
-              </Col>
-              <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
-                <Text type="secondary">TO</Text>
-              </Col>
-              <Col className="gutter-row" xs={11} md={11}>
-                <Input
-                  className={indexStyles.modalInput}
-                  size="large"
-                  onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
-                  value={formState.trendLengthMax}
-                  placeholder="50"
-                  aria-label="Trend Length Max"
-                />
-              </Col>
-            </Row>
-            <Row justify="space-between">
-              <Col>
-                <Button size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
-              </Col>
-              <Col>
-                <Button size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
-              </Col>
-              <Col>
-                <Button size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
-              </Col>
-              <Col>
-                <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col>
-                <div>Exchanges</div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24}>
-                <Select
-                  mode="multiple"
-                  allowClear
-                  placeholder="Select exchanges"
-                  className={indexStyles.modalSelect}
-                  size="large"
-                  value={formState.exchanges}
-                  onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
-                >
-                  {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
-                </Select>
-              </Col>
-            </Row>
-            <Divider />
-            <Row>
-              <Col>
-                <div>Derivative markets</div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24}>
-                <Select
-                  mode="multiple"
-                  allowClear
-                  placeholder="Select derivative exchanges"
-                  className={indexStyles.modalSelect}
-                  size="large"
-                  value={formState.derivatives}
-                  onChange={(exchanges) => { formDispatch({ type: 'SET_DERIVATIVES', payload: exchanges }) }}
-                >
-                  {allDerivativeExchanges.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
-                </Select>
-              </Col>
-            </Row>
-          </TabPane>
-          <TabPane tab="Columns" key="columns">
-            <Row className={indexStyles.row} justify="space-between">
-              <Col>
-                <span>Show weekly trends</span>
-              </Col>
-              <Col>
-                <Switch checked={formState.weeklySignals} onChange={(checked) => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: checked })} />
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <Text type="secondary">Weekly trends update each Monday at 00:00 UTC.</Text>
-              </Col>
-            </Row>
-          </TabPane>
-        </Tabs>
+        <Row className={indexStyles.row} gutter={16}>
+          <Col span={12} className="gutter-row">
+            <label htmlFor="atr-periods">ATR periods</label>
+            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
+          </Col>
+          <Col span={12} className="gutter-row">
+            <label htmlFor="multiplier">Multiplier</label>
+            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div>Market Cap</div>
+          </Col>
+        </Row>
+        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+          <Col className="gutter-row" xs={10} md={11}>
+            <Input
+              className={classnames(indexStyles.modalInput)}
+              size="large"
+              onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: e.target.value })}
+              value={formState.marketCapMin}
+              placeholder="$1"
+              aria-label="Market Cap Min"
+            />
+          </Col>
+          <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
+            <Text type="secondary">TO</Text>
+          </Col>
+          <Col className="gutter-row" xs={11} md={11}>
+            <Input
+              className={classnames(indexStyles.modalInput)}
+              size="large"
+              onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: e.target.value })}
+              value={formState.marketCapMax}
+              placeholder="$100,000"
+              aria-label="Market Cap Max"
+            />
+          </Col>
+        </Row>
+        <Row justify="space-between">
+          <Col>
+            <Button size={buttonSize} onClick={setPredefinedMarketCap1}>$0-$100M</Button>
+          </Col>
+          <Col>
+            <Button size={buttonSize} onClick={setPredefinedMarketCap2}>$100M-$1B</Button>
+          </Col>
+          <Col>
+            <Button size={buttonSize} onClick={setPredefinedMarketCap3}>$1B-$10B</Button>
+          </Col>
+          <Col>
+            <Button size={buttonSize} onClick={setPredefinedMarketCap4}>$10B+</Button>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div>Trend Streak</div>
+          </Col>
+        </Row>
+        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+          <Col className="gutter-row" xs={10} md={11}>
+            <Input
+              className={indexStyles.modalInput}
+              size="large"
+              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
+              value={formState.trendLengthMin}
+              placeholder="1"
+              aria-label="Trend Length Min"
+            />
+          </Col>
+          <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
+            <Text type="secondary">TO</Text>
+          </Col>
+          <Col className="gutter-row" xs={11} md={11}>
+            <Input
+              className={indexStyles.modalInput}
+              size="large"
+              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
+              value={formState.trendLengthMax}
+              placeholder="50"
+              aria-label="Trend Length Max"
+            />
+          </Col>
+        </Row>
+        <Row justify="space-between">
+          <Col>
+            <Button size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
+          </Col>
+          <Col>
+            <Button size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
+          </Col>
+          <Col>
+            <Button size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
+          </Col>
+          <Col>
+            <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div>Exchanges</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select exchanges"
+              className={indexStyles.modalSelect}
+              size="large"
+              value={formState.exchanges}
+              onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
+            >
+              {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+            </Select>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <div>Derivative markets</div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select derivative exchanges"
+              className={indexStyles.modalSelect}
+              size="large"
+              value={formState.derivatives}
+              onChange={(exchanges) => { formDispatch({ type: 'SET_DERIVATIVES', payload: exchanges }) }}
+            >
+              {allDerivativeExchanges.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+            </Select>
+          </Col>
+        </Row>
       </Modal>
       <Row className={indexStyles.tableRow}>
         <HomePageTable
@@ -723,7 +692,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
           defaultCategory={defaultFormState.category}
           atrPeriods={formState.atrPeriods}
           multiplier={formState.multiplier}
-          showWeeklySignals={formState.weeklySignals}
           exchanges={formState.exchanges}
           derivatives={formState.derivatives}
         />

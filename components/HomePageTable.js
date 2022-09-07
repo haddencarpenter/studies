@@ -32,7 +32,6 @@ const HomePageTable = ({
     defaultCategory,
     atrPeriods,
     multiplier,
-    showWeeklySignals,
     exchanges,
     derivatives,
   }) => {
@@ -74,20 +73,15 @@ const HomePageTable = ({
            matchesDerivatives
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
-    if (showWeeklySignals) {
-      const [weeklyTrends, weeklySuperSuperTrend] = weeklySuperTrends[coinData.id]
-      coinData = {
-        ...coinData,
-        weeklyTrends,
-        weeklySuperSuperTrend,
-      }
-    }
+    const [weeklyTrends, weeklySuperSuperTrend] = weeklySuperTrends[coinData.id]
     const [dailyTrends, dailySuperSuperTrend] = superTrends[coinData.id]
 
     return {
       ...coinData,
       dailyTrends,
       dailySuperSuperTrend,
+      weeklyTrends,
+      weeklySuperSuperTrend,
     }
   })
   displayedCoinData = displayedCoinData.filter((coinData) => {
@@ -152,6 +146,7 @@ const HomePageTable = ({
   let columns = [
     {
       title: 'Coin',
+      width: 200,
       dataIndex: 'coinData',
       fixed: screens.lg ? null : 'left',
       sorter: (a, b) => a.coinData.name.localeCompare(b.coinData.name),
@@ -169,9 +164,9 @@ const HomePageTable = ({
       }
     },
     {
-      width: 120,
+      width: 150,
       title: <span className={indexTableStyles.columnTitle}>
-        <span>{showWeeklySignals ? 'Daily ' : ''}Trend</span>
+        <span>Trend (24h)</span>
         <Tooltip
             placement={'right'}
             trigger={isHoverable ? 'hover' : 'click'}
@@ -225,13 +220,19 @@ const HomePageTable = ({
           </>
         )
       }
-    }
-  ];
-
-  if (showWeeklySignals) {
-    columns.push({
-      width: 120,
-      title: 'Weekly Trend',
+    },
+    {
+      width: 150,
+      title: <span className={indexTableStyles.columnTitle}>
+        <span>Trend (7d)</span>
+        <Tooltip
+            placement={'right'}
+            trigger={isHoverable ? 'hover' : 'click'}
+            title="CoinRotator trend signals are based on SuperTrend and a proprietary sorting algorithm. Possible values include UP, DOWN and HODL. They are updated once daily at 7AM UTC. NFA."
+        >
+          <QuestionCircleFilled className={indexTableStyles.columnTooltip} />
+        </Tooltip>
+      </span>,
       dataIndex: 'weeklySuperSuperTrend',
       sorter: {
         compare: (a, b) => {
@@ -271,8 +272,8 @@ const HomePageTable = ({
           </>
         )
       }
-    })
-  }
+    }
+  ];
 
   columns.push(
   {
