@@ -298,7 +298,7 @@ const HomePageTable = ({
       e.stopPropagation();
     }}),
     render: (exchanges, data) => {
-      return <>
+      return <span title="Click for more exchanges">
         {exchanges.map((exchange) => {
           const matchingExchange = exchangeData.find(ex => ex.name === exchange[0])
           const onTagClick = (e) => {
@@ -316,7 +316,7 @@ const HomePageTable = ({
             className={classnames(indexTableStyles.clickableTag, indexTableStyles.image)}
           />
         })}
-      </>;
+      </span>;
     }
   },
   {
@@ -328,7 +328,7 @@ const HomePageTable = ({
       e.stopPropagation();
     }}),
     render: (derivatives, data) => {
-      return <>
+      return <span title="Click for more derivatives">
         {derivatives.map((derivative) => {
           const onTagClick = (e) => {
             // e.stopPropagation()
@@ -340,7 +340,7 @@ const HomePageTable = ({
             className={indexTableStyles.clickableTag}
           >{derivative.symbol}</Tag>
         })}
-      </>;
+      </span>;
     }
   }
   )
