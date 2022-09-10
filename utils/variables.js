@@ -9,3 +9,15 @@ export const signals = {
 
 export const defaultAtrPeriods = 5
 export const defaultMultiplier = 1.5
+
+export const preferredExchanges = [
+  'Binance',
+  'OKX',
+  'FTX',
+  'Coinbase Exchange',
+  'KuCoin',
+  'Gate.io',
+  'Huobi Global',
+  'Kraken',
+  'Bitfinex'
+]

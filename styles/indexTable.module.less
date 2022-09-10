@@ -22,13 +22,13 @@
   cursor: pointer;
 }
 
+.image {
+    width: 16px;
+    height: 16px;
+}
+
 .coin {
     color: @cr-black;
-
-    .image {
-        width: 16px;
-        height: 16px;
-    }
 
     .name {
         font-weight: bold;
@@ -46,21 +46,13 @@
     align-items: center;
 }
 
-.columnTooltip {
-  margin-left: 15px;
-  margin-right: 5px;
+.unclickableCell {
+  cursor: initial;
+}
 
-  svg {
-    width: 10px;
-  }
-
-  path {
-    fill: @cr-icon-fill;
-
-    &:hover {
-        fill: @cr-icon-fill-hover;
-    }
-  }
+.clickableTag {
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .tag {

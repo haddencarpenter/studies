@@ -1,9 +1,12 @@
-import { Table, Tooltip } from 'antd'
+import { Table, Tooltip, Tag } from 'antd'
 import { QuestionCircleFilled } from '@ant-design/icons';
 import { VList } from 'virtuallist-antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useMemo } from 'react';
+import intersection from 'lodash/intersection'
+import isEmpty from 'lodash/isEmpty'
+import classnames from 'classnames'
 
 import UpTag from './UpTag'
 import DownTag from './DownTag'
@@ -11,13 +14,14 @@ import HodlTag from './HodlTag'
 import useBreakPoint from '../hooks/useBreakPoint'
 import useIsHoverable from '../hooks/useIsHoverable';
 import getTrends from '../utils/getTrends'
-import { signals } from '../utils/variables'
-import classNames from 'classnames';
+import { signals, preferredExchanges } from '../utils/variables'
 
 import indexTableStyles from '../styles/indexTable.module.less';
+import baseStyles from '../styles/base.module.less'
 
 const HomePageTable = ({
     coinsData,
+    exchangeData,
     marketCapMin,
     marketCapMax,
     trendLengthMin,
@@ -29,7 +33,8 @@ const HomePageTable = ({
     defaultCategory,
     atrPeriods,
     multiplier,
-    showWeeklySignals,
+    exchanges,
+    derivatives,
   }) => {
 
   const router = useRouter()
@@ -57,26 +62,27 @@ const HomePageTable = ({
     const coinNameLower = coinData.name.toLowerCase()
     const matchesPortfolio = portfolio === '' || portfolioFilter.some((coinName) => coinNameLower.includes(coinName) || coinSymbolLower.includes(coinName))
     const matchesCategory = category === defaultCategory || coinData.categories.includes(category)
+    const exchangeNames = coinData.exchanges.map(exchangeData => exchangeData[0])
+    const matchesExchanges = isEmpty(exchanges) || Boolean(intersection(exchanges, exchangeNames).length)
+    const derivativeNames = coinData.derivatives.map(derivative => derivative.market)
+    const matchesDerivatives = isEmpty(derivatives) || Boolean(intersection(derivatives, derivativeNames).length)
     return coinData.marketCap <= max &&
            coinData.marketCap >= min &&
            matchesPortfolio &&
-           matchesCategory
+           matchesCategory &&
+           matchesExchanges &&
+           matchesDerivatives
   })
   displayedCoinData = displayedCoinData.map((coinData) => {
-    if (showWeeklySignals) {
-      const [weeklyTrends, weeklySuperSuperTrend] = weeklySuperTrends[coinData.id]
-      coinData = {
-        ...coinData,
-        weeklyTrends,
-        weeklySuperSuperTrend,
-      }
-    }
+    const [weeklyTrends, weeklySuperSuperTrend] = weeklySuperTrends[coinData.id]
     const [dailyTrends, dailySuperSuperTrend] = superTrends[coinData.id]
 
     return {
       ...coinData,
       dailyTrends,
       dailySuperSuperTrend,
+      weeklyTrends,
+      weeklySuperSuperTrend,
     }
   })
   displayedCoinData = displayedCoinData.filter((coinData) => {
@@ -108,6 +114,13 @@ const HomePageTable = ({
   })
 
   const tableData = displayedCoinData.map((coinData) => {
+    let shownDerivatives = coinData.derivatives
+    if (!isEmpty(derivatives)) {
+      shownDerivatives = coinData.derivatives.filter(derivative => derivatives.includes(derivative.market))
+    }
+    shownDerivatives = shownDerivatives.sort((derivative) => preferredExchanges.includes(derivative.market) ? -1 : 1)
+    let shownExchanges = coinData.exchanges.sort((exchange) => preferredExchanges.includes(exchange[0]) ? -1 : 1)
+    shownExchanges = shownExchanges.slice(0, 5)
     return {
       key: `${coinData.id}-${coinData.name}`,
       coinData: {
@@ -116,8 +129,8 @@ const HomePageTable = ({
         images: coinData.images,
         name: coinData.name
       },
-      dailyChange: coinData.dailyChange,
-      weeklyChange: coinData.weeklyChange,
+      exchanges: shownExchanges,
+      derivatives: shownDerivatives,
       marketCap: coinData.marketCap,
       dailySuperSuperTrend: coinData.dailySuperSuperTrend,
       weeklySuperSuperTrend: coinData.weeklySuperSuperTrend,
@@ -127,7 +140,7 @@ const HomePageTable = ({
   const screens = useBreakPoint();
   const numberFormatter = new Intl.NumberFormat([], {
     notation: 'compact',
-    compactDisplay: 'long',
+    compactDisplay: 'short',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })
@@ -135,6 +148,7 @@ const HomePageTable = ({
   let columns = [
     {
       title: 'Coin',
+      width: 200,
       dataIndex: 'coinData',
       fixed: screens.lg ? null : 'left',
       sorter: (a, b) => a.coinData.name.localeCompare(b.coinData.name),
@@ -152,15 +166,15 @@ const HomePageTable = ({
       }
     },
     {
-      width: 120,
+      width: 100,
       title: <span className={indexTableStyles.columnTitle}>
-        <span>{showWeeklySignals ? 'Daily ' : ''}Trend</span>
+        <span>Trend (24h)</span>
         <Tooltip
             placement={'right'}
             trigger={isHoverable ? 'hover' : 'click'}
             title="CoinRotator trend signals are based on SuperTrend and a proprietary sorting algorithm. Possible values include UP, DOWN and HODL. They are updated once daily at 7AM UTC. NFA."
         >
-          <QuestionCircleFilled className={indexTableStyles.columnTooltip} />
+          <QuestionCircleFilled className={baseStyles.tooltipIcon} />
         </Tooltip>
       </span>,
       dataIndex: 'dailySuperSuperTrend',
@@ -208,13 +222,19 @@ const HomePageTable = ({
           </>
         )
       }
-    }
-  ];
-
-  if (showWeeklySignals) {
-    columns.push({
-      width: 120,
-      title: 'Weekly Trend',
+    },
+    {
+      width: 100,
+      title: <span className={indexTableStyles.columnTitle}>
+        <span>Trend (7d)</span>
+        <Tooltip
+            placement={'right'}
+            trigger={isHoverable ? 'hover' : 'click'}
+            title="CoinRotator trend signals are based on SuperTrend and a proprietary sorting algorithm. Possible values include UP, DOWN and HODL. They are updated once daily at 7AM UTC. NFA."
+        >
+          <QuestionCircleFilled className={baseStyles.tooltipIcon} />
+        </Tooltip>
+      </span>,
       dataIndex: 'weeklySuperSuperTrend',
       sorter: {
         compare: (a, b) => {
@@ -254,13 +274,14 @@ const HomePageTable = ({
           </>
         )
       }
-    })
-  }
+    }
+  ];
 
-  columns.push({
+  columns.push(
+  {
     title: 'Market Cap',
     dataIndex: 'marketCap',
-    width: 150,
+    width: 90,
     sorter: (a, b) => Number(a.marketCap) - Number(b.marketCap),
     render: (marketCap) => {
       return (
@@ -269,7 +290,71 @@ const HomePageTable = ({
         </>
       )
     }
-  })
+  },
+  {
+    title: <span className={indexTableStyles.columnTitle}>
+      <span>Exchanges</span>
+      <Tooltip
+          placement={'right'}
+          trigger={isHoverable ? 'hover' : 'click'}
+          title="All the exchanges this coin is traded on"
+      >
+        <QuestionCircleFilled className={baseStyles.tooltipIcon} />
+      </Tooltip>
+    </span>,
+    dataIndex: 'exchanges',
+    width: 120,
+    className: indexTableStyles.unclickableCell,
+    onCell: () => ({ onClick: (e) => {
+      e.stopPropagation();
+    }}),
+    render: (exchanges, data) => {
+      return <span title="Top 5 exchanges. Click to see more.">
+        {exchanges.map((exchange) => {
+          const matchingExchange = exchangeData.find(ex => ex.name === exchange[0])
+          const onTagClick = (e) => {
+            e.stopPropagation()
+            router.push(`/coin/${data.coinData.id}#markets`)
+          }
+          // eslint-disable-next-line @next/next/no-img-element
+          return <img
+            src={matchingExchange.image}
+            alt={exchange[0]}
+            title={exchange[0]}
+            loading="lazy"
+            key={exchange[0]}
+            onClick={onTagClick}
+            className={classnames(indexTableStyles.clickableTag, indexTableStyles.image)}
+          />
+        })}
+      </span>;
+    }
+  },
+  {
+    title: 'Derivatives',
+    dataIndex: 'derivatives',
+    width: 250,
+    className: indexTableStyles.unclickableCell,
+    onCell: () => ({ onClick: (e) => {
+      e.stopPropagation();
+    }}),
+    render: (derivatives, data) => {
+      return <span title="Top derivatives. Click to see more.">
+        {derivatives.map((derivative) => {
+          const onTagClick = (e) => {
+            // e.stopPropagation()
+            router.push(`/coin/${data.coinData.id}#markets`)
+          }
+          return <Tag
+            key={derivative.symbol}
+            onClick={onTagClick}
+            className={indexTableStyles.clickableTag}
+          >{derivative.symbol}</Tag>
+        })}
+      </span>;
+    }
+  }
+  )
 
   // The table rows are 56px high.
   const tableHeight = 9 * 56;
