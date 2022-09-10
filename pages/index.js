@@ -1,27 +1,31 @@
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Switch, Layout, Alert } from 'antd'
-import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined } from '@ant-design/icons'
+import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Alert, Tooltip } from 'antd'
+import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
 import prisma from '../lib/prisma'
 
 import debounce from 'lodash/debounce'
 import isFinite from 'lodash/isFinite'
+import isEmpty from 'lodash/isEmpty'
 import isEqual from 'lodash/isEqual'
 import isNil from 'lodash/isNil'
 import pickBy from 'lodash/pickBy'
+import uniq from 'lodash/uniq'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
+import classnames from 'classnames';
 
 import HomePageTable from '../components/HomePageTable';
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
 import convertToDailySignals from '../utils/convertToDailySignals';
+import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getCategories } from '../utils/categories';
 import globalData from '../lib/globalData';
-import classnames from 'classnames';
 
 import indexStyles from '../styles/index.module.less'
+import baseStyles from '../styles/base.module.less'
 
 const { Title, Paragraph, Text } = Typography;
 const { Option, OptGroup } = Select;
@@ -39,6 +43,8 @@ export async function getStaticProps() {
       marketCap: true,
       marketCapRank: true,
       categories: true,
+      tickers: true,
+      derivatives: true,
       ohlcs: {
         select: {
           closeTime: true,
@@ -66,6 +72,8 @@ export async function getStaticProps() {
   }
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
+    const exchanges = convertTickersToExchanges(coinData.tickers)
+    delete coinData.tickers
 
     return {
       ...coinData,
@@ -74,27 +82,31 @@ export async function getStaticProps() {
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
-      ohlcs
+      ohlcs,
+      exchanges
     }
   })
+  const exchangeData = await prisma.exchange.findMany()
   let categories = await getCategories()
   return {
     props: {
       coinsData,
       categories,
+      exchangeData,
       appData
     }
   }
 }
 
-export default function Home({ coinsData, categories }) {
+export default function Home({ coinsData, categories, exchangeData }) {
   const router = useRouter()
   const defaultFormState = useMemo(() =>
   ({
       category: 'all',
       portfolio: '',
       trendType: signals.all,
-      weeklySignals: false,
+      exchanges: [],
+      derivatives: [],
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
@@ -131,10 +143,15 @@ export default function Home({ coinsData, categories }) {
           ...state,
           trendType: action.payload
         }
-      case 'SET_WEEKLY_SIGNALS':
+      case 'SET_EXCHANGES':
         return {
           ...state,
-          weeklySignals: action.payload
+          exchanges: action.payload
+        }
+      case 'SET_DERIVATIVES':
+        return {
+          ...state,
+          derivatives: action.payload
         }
       case 'SET_MARKET_CAP_MIN':
         let newMarketCapMin
@@ -225,10 +242,15 @@ export default function Home({ coinsData, categories }) {
   useEffect(() => {
     if (router.isReady) {
       const changedParams = pickBy(formState, (value, key) => {
-        return value !== router.query[key]
+        if (key === 'exchanges' || key === 'derivatives') {
+          const oldArray = Array.isArray(router.query[key]) ? router.query[key] : [router.query[key]]
+          return !isEqual(value, oldArray)
+        } else {
+          return value !== router.query[key]
+        }
       })
       const changedParamsThatAreDefault = Object.keys(changedParams).filter((key) => {
-        return changedParams[key] === defaultFormState[key]
+        return isEqual(changedParams[key], defaultFormState[key])
       })
       if (Object.keys(changedParams).length > 0) {
         let query = {
@@ -252,13 +274,21 @@ export default function Home({ coinsData, categories }) {
     if (!router.isReady) { return; }
 
     setPortfolioInputValue(router.query.portfolio)
+    let exchanges, derivatives
+    if (router.query.exchanges) {
+      exchanges = Array.isArray(router.query.exchanges) ? router.query.exchanges : [router.query.exchanges]
+    }
+    if (router.query.derivatives) {
+      derivatives = Array.isArray(router.query.derivatives) ? router.query.derivatives : [router.query.derivatives]
+    }
     formDispatch({
       type: 'SET_FROM_ROUTE_PARAMS',
       payload: {
         category: router.query.category,
         portfolio: router.query.portfolio,
         trendType: router.query.trendType,
-        weeklySignals: router.query.weeklySignals,
+        exchanges,
+        derivatives,
         marketCapMin: router.query.marketCapMin,
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,
@@ -337,6 +367,18 @@ export default function Home({ coinsData, categories }) {
     ].includes(category)
   })
   const restCategories = categories.filter(category => !priorityCategories.includes(category))
+  const allExchangeNames = useMemo(() => {
+    const exchangeData = coinsData.flatMap((coin) => coin.exchanges)
+    const exchangeNames = uniq(exchangeData.map(exchange => exchange[0]))
+
+    return exchangeNames.sort()
+  }, [coinsData])
+  const allDerivativeExchanges = useMemo(() => {
+    const derivativesData = coinsData.flatMap((coin) => coin.derivatives)
+    const derivativeExchangeNames = uniq(derivativesData.map(derivative => derivative.market))
+
+    return derivativeExchangeNames.sort()
+  }, [coinsData])
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = Number(formState.marketCapMin) !== Number(defaultFormState.marketCapMin) ||
@@ -345,15 +387,17 @@ export default function Home({ coinsData, categories }) {
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
     const atrPeriodsFilterApplied = formState.atrPeriods !== defaultAtrPeriods
     const multiplierFilterApplied = formState.multiplier !== defaultMultiplier
-    const showWeeklySignalsFilterApplied = formState.weeklySignals !== defaultFormState.weeklySignals
+    const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
+    const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
       atrPeriodsFilterApplied ||
       multiplierFilterApplied ||
-      showWeeklySignalsFilterApplied
+      exchangesFilterApplied ||
+      derivativesFilterApplied
 
-    if (!advancedFiltersApplied || !screens.sm) {
+    if (!advancedFiltersApplied) {
       return null
     }
 
@@ -366,25 +410,28 @@ export default function Home({ coinsData, categories }) {
       <Row key="applied-filters">
         <Col span={24}>
           {marketCapFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => {
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: defaultFormState.marketCapMin })
               formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: defaultFormState.marketCapMax })
             }}>Market Cap: {formatter.format(formState.marketCapMin)} - {formatter.format(formState.marketCapMax)}</Tag>
           )}
           {trendLengthFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => {
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: defaultFormState.trendLengthMin })
               formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: defaultFormState.trendLengthMax })
             }}>Trend Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
           )}
           {atrPeriodsFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_ATR_PERIODS', payload: defaultFormState.atrPeriods })}>ATR periods: {formState.atrPeriods}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_ATR_PERIODS', payload: defaultFormState.atrPeriods })}>ATR periods: {formState.atrPeriods}</Tag>
           )}
           {multiplierFilterApplied && (
-            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_MULTIPLIER', payload: defaultFormState.multiplier })}>Multiplier: {formState.multiplier}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_MULTIPLIER', payload: defaultFormState.multiplier })}>Multiplier: {formState.multiplier}</Tag>
           )}
-          {formState.weeklySignals && (
-            <Tag color="geekblue" closable onClose={() => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: defaultFormState.weeklySignals })}>Weekly trends</Tag>
+          {!isEmpty(formState.exchanges) && (
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
+          )}
+          {!isEmpty(formState.derivatives) && (
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative markets: {formState.derivatives.join(", ")}</Tag>
           )}
         </Col>
       </Row>
@@ -455,7 +502,7 @@ export default function Home({ coinsData, categories }) {
               icon={<SlidersOutlined />}
               className={indexStyles.allFiltersButton}
             >
-              All Filters
+              Configure
             </Button>
           </Col>
         </Row>
@@ -463,7 +510,7 @@ export default function Home({ coinsData, categories }) {
       </Card>
       <Modal
         visible={filterModalVisible}
-        title="Filters"
+        title="Configure search"
         onCancel={() => setFilterModalVisible(false)}
         footer={[
           <Button
@@ -473,7 +520,7 @@ export default function Home({ coinsData, categories }) {
             type="primary"
             icon={<CheckCircleOutlined />}
           >
-            Apply Filters
+            Apply Settings
           </Button>,
           <Button
             key="reset"
@@ -483,24 +530,10 @@ export default function Home({ coinsData, categories }) {
             type="primary"
             icon={<CloseCircleOutlined />}
           >
-            Reset Filters
+            Reset Settings
           </Button>
         ]}
       >
-        <Row className={indexStyles.row} justify="space-between">
-          <Col>
-            <span>Show weekly trends</span>
-          </Col>
-          <Col>
-            <Switch checked={formState.weeklySignals} onChange={(checked) => formDispatch({ type: 'SET_WEEKLY_SIGNALS', payload: checked })} />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Text type="secondary">Weekly trends update each Monday at 00:00 UTC.</Text>
-          </Col>
-        </Row>
-        <Divider />
         <Row className={indexStyles.row} gutter={16}>
           <Col span={12} className="gutter-row">
             <label htmlFor="atr-periods">ATR periods</label>
@@ -601,10 +634,71 @@ export default function Home({ coinsData, categories }) {
             <Button size="large" onClick={setPredefinedTrendLength4}>20+</Button>
           </Col>
         </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <span>
+              <span>Exchanges</span>
+              <Tooltip
+                placement={'right'}
+                trigger={isHoverable ? 'hover' : 'click'}
+                title="Select your exchanges to see a complete list of coins for each trend condition."
+              >
+                <QuestionCircleFilled className={baseStyles.tooltipIcon} />
+              </Tooltip>
+            </span>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select exchanges"
+              className={indexStyles.modalSelect}
+              size="large"
+              value={formState.exchanges}
+              onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
+            >
+              {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+            </Select>
+          </Col>
+        </Row>
+        <Divider />
+        <Row>
+          <Col>
+            <span>
+              <span>Derivative markets</span>
+              <Tooltip
+                placement={'right'}
+                trigger={isHoverable ? 'hover' : 'click'}
+                title="Select your derivatives markets to see their trend condition."
+              >
+                <QuestionCircleFilled className={baseStyles.tooltipIcon} />
+              </Tooltip>
+            </span>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Select derivative exchanges"
+              className={indexStyles.modalSelect}
+              size="large"
+              value={formState.derivatives}
+              onChange={(exchanges) => { formDispatch({ type: 'SET_DERIVATIVES', payload: exchanges }) }}
+            >
+              {allDerivativeExchanges.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+            </Select>
+          </Col>
+        </Row>
       </Modal>
       <Row className={indexStyles.tableRow}>
         <HomePageTable
           coinsData={coinsData}
+          exchangeData={exchangeData}
           marketCapMax={formState.marketCapMax}
           marketCapMin={formState.marketCapMin}
           trendLengthMin={formState.trendLengthMin}
@@ -616,7 +710,8 @@ export default function Home({ coinsData, categories }) {
           defaultCategory={defaultFormState.category}
           atrPeriods={formState.atrPeriods}
           multiplier={formState.multiplier}
-          showWeeklySignals={formState.weeklySignals}
+          exchanges={formState.exchanges}
+          derivatives={formState.derivatives}
         />
       </Row>
     </Content>

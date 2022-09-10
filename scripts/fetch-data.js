@@ -3,9 +3,11 @@ import * as rax from 'retry-axios'
 import * as AxiosLogger from 'axios-logger'
 import dotenv from 'dotenv';
 import subDays from 'date-fns/subDays'
+import groupBy from 'lodash/groupBy'
 import pickBy from 'lodash/pickBy'
 import isNil from 'lodash/isNil'
 import union from 'lodash/union'
+import uniqBy from 'lodash/uniqBy'
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 
@@ -274,6 +276,37 @@ const script = async () => {
     }
 
     await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
+  }
+
+  const derivativesData = (await coinGeckoAPI.get('derivatives')).data
+  let perpetualDerivatives = derivativesData.filter(derivate => derivate.contract_type === 'perpetual')
+  perpetualDerivatives = uniqBy(perpetualDerivatives, 'symbol')
+  const derivativesByCoin = groupBy(perpetualDerivatives, 'index_id')
+
+  for (const [coinId, derivatives] of Object.entries(derivativesByCoin)) {
+    const derivativesCoinData = derivatives.map(derivative => {
+      const derivateMarket = derivative.market
+        .replace(/\(?Futures\)?/, '')
+        .trim()
+      return {
+        symbol: derivative.symbol,
+        market: derivateMarket
+      }
+    })
+
+    const coinToUpdate = await prisma.coin.findFirst({
+      where : {
+        symbol: coinId.toLowerCase()
+      }
+    })
+    if (coinToUpdate) {
+      await prisma.coin.update({
+        where: { id: coinToUpdate.id },
+        data: {
+          derivatives: derivativesCoinData
+        },
+      })
+    }
   }
 
   if (process.env.NODE_ENV === 'production') {
