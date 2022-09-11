@@ -172,7 +172,7 @@ export default function Coin(coin) {
 
     const roi = round((multiple - 1) * 100, 2);
     return <span className={roi > 0 ? coinStyles.greenRoi : coinStyles.redRoi}>{numberFormatter.format(roi)}%</span>
-  }, [])
+  }, [numberFormatter])
 
   return (
     <>

@@ -298,6 +298,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
       }
     })
   }, [router.isReady, router.query])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const setPortfolioDebounced = useCallback(debounce((portfolio) => {
     formDispatch({ type: 'SET_PORTFOLIO', payload: portfolio })
   }, 400), [])
