@@ -85,22 +85,22 @@ const HomePageTable = ({
       weeklySuperSuperTrend,
     }
   })
-  displayedCoinData = displayedCoinData.filter((coinData) => {
-    let min = parseInt(trendLengthMin)
-    min = isFinite(min) ? min : 0
-    let max = parseInt(trendLengthMax)
-    max = isFinite(max) ? max : Number.POSITIVE_INFINITY
+  // displayedCoinData = displayedCoinData.filter((coinData) => {
+  //   let min = parseInt(trendLengthMin)
+  //   min = isFinite(min) ? min : 0
+  //   let max = parseInt(trendLengthMax)
+  //   max = isFinite(max) ? max : Number.POSITIVE_INFINITY
 
-    const trendValues = Object.values(coinData.dailyTrends)
-    const trends = trendValues.filter(trend => trend[0].length)
-    if (trends.length === 0) {
-      return false;
-    }
+  //   const trendValues = Object.values(coinData.dailyTrends)
+  //   const trends = trendValues.filter(trend => trend[0].length)
+  //   if (trends.length === 0) {
+  //     return false;
+  //   }
 
-    return trends
-      .map(trend => trend[1])
-      .every(trendLength => trendLength >= min && trendLength <= max)
-  })
+  //   return trends
+  //     .map(trend => trend[1])
+  //     .every(trendLength => trendLength >= min && trendLength <= max)
+  // })
   displayedCoinData = displayedCoinData.filter((coinData) => {
     if (trendType === signals.all) {
       return true
@@ -311,14 +311,15 @@ const HomePageTable = ({
     render: (exchanges, data) => {
       return <span title="Top 5 exchanges. Click to see more.">
         {exchanges.map((exchange) => {
-          const matchingExchange = exchangeData.find(ex => ex.name === exchange[0])
+          let matchingExchange = exchangeData.find(ex => ex.name === exchange[0])
+          const matchingExchangeImage = matchingExchange?.image || "/favicon-16x16.png"
           const onTagClick = (e) => {
             e.stopPropagation()
             router.push(`/coin/${data.coinData.id}#markets`)
           }
           // eslint-disable-next-line @next/next/no-img-element
           return <img
-            src={matchingExchange.image}
+            src={matchingExchangeImage}
             alt={exchange[0]}
             title={exchange[0]}
             loading="lazy"
