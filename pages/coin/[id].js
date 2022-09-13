@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
 import round from 'lodash/round';
+import take from 'lodash/take';
 import { useCallback, useEffect } from 'react';
 
 import UpTag from '../../components/UpTag'
@@ -180,10 +181,15 @@ export default function Coin(coin) {
   const preventCopy = (event) => {
     let selection = window.getSelection().toString();
     selection = selection.split(' ').map((piece) => {
-      if (Math.random() * 100 < 8) {
+      if (Math.random() * 100 < 5) {
         let interference = window.location.href
-        if (Math.random() * 100 < 30) {
+        const moreRandom = Math.random() * 100
+        if (moreRandom < 25) {
           interference = Math.random().toString(36).slice(2)
+        } else if (moreRandom < 50) {
+          interference = take([';', '.', '?', '\,'], 1)[0]
+        } else if (moreRandom < 75) {
+          interference = `I shall never copy/paste from CoinRotator (${window.location.href}) without attribution`
         }
         piece = `${piece} ${interference} `
       }
