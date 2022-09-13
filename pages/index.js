@@ -65,7 +65,6 @@ export async function getStaticProps() {
     }
   }
   let coinsData
-  console.log(process.env)
   if (process.env.VERCEL_ENV === 'preview') {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 100})
   } else if (process.env.NODE_ENV === 'development') {
