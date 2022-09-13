@@ -163,7 +163,7 @@ export default function Coin(coin) {
     .replaceAll('{{percentagefromath}}', numberFormatter.format(percentageFromAth))
     .replaceAll('{{percentagefromatl}}', numberFormatter.format(percentageFromAtl))
     .replaceAll('{{circulatingsupply}}', currencyFormatter.format(coin.circulatingSupply))
-    .replaceAll('{{percentagecirculatingsupply}}', numberFormatter.format(coin.circulatingSupplyPercentage))
+    .replaceAll('{{percentagecirculatingsupply}}', numberFormatter.format(circulatingSupplyPercentage))
     .replaceAll('{{totalsupply}}', numberFormatter.format(coin.totalSupply))
     .replaceAll('{{percentageappreciationtoath}}', numberFormatter.format(priceAppreciationToAthPercentage))
     .replaceAll('{{ranking}}', coin.marketCapRank)
@@ -565,6 +565,7 @@ export async function getStaticProps({ params }) {
     'launch_roi_usd',
     'launch_roi_eth',
     'launch_roi_btc',
+    'currentPrice'
   ])
   return {
     props: {
