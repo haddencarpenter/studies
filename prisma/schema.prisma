@@ -17,7 +17,7 @@ model Coin {
   name     String
   categories     String[]
   images Json
-  description String
+  description String?
   homepage String
   twitter String
   twitterFollowers Int?
