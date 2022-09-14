@@ -181,15 +181,13 @@ export default function Coin(coin) {
   const preventCopy = (event) => {
     let selection = window.getSelection().toString();
     selection = selection.split(' ').map((piece) => {
-      if (Math.random() * 100 < 5) {
+      if (Math.random() * 100 < 6) {
         let interference = window.location.href
         const moreRandom = Math.random() * 100
-        if (moreRandom < 25) {
+        if (moreRandom < 20) {
           interference = Math.random().toString(36).slice(2)
-        } else if (moreRandom < 50) {
+        } else if (moreRandom < 40) {
           interference = take([';', '.', '?', '\,'], 1)[0]
-        } else if (moreRandom < 75) {
-          interference = `I shall never copy/paste from CoinRotator (${window.location.href}) without attribution`
         }
         piece = `${piece} ${interference} `
       }
