@@ -163,7 +163,7 @@ export default function Coin(coin) {
     .replaceAll('{{currentprice}}', currencyFormatter.format(coin.currentPrice))
     .replaceAll('{{percentagefromath}}', `${numberFormatter.format(percentageFromAth)}%`)
     .replaceAll('{{percentagefromatl}}', `${numberFormatter.format(percentageFromAtl)}%`)
-    .replaceAll('{{circulatingsupply}}', currencyFormatter.format(coin.circulatingSupply))
+    .replaceAll('{{circulatingsupply}}', numberFormatter.format(coin.circulatingSupply))
     .replaceAll('{{percentagecirculatingsupply}}', `${numberFormatter.format(circulatingSupplyPercentage)}%`)
     .replaceAll('{{totalsupply}}', numberFormatter.format(coin.totalSupply))
     .replaceAll('{{percentageappreciationtoath}}', `${numberFormatter.format(priceAppreciationToAthPercentage)}%`)
