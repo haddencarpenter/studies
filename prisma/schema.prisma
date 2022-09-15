@@ -52,7 +52,7 @@ model Coin {
   lunrPercentageChange24h Decimal?
   lunrPercentageChange1h Decimal?
   lunrMarketCap Decimal?
-  lunrGalaxyScore Int?
+  lunrGalaxyScore Decimal?
   lunrGalaxyScorePrevious Decimal?
   lunrSocialScore Decimal?
   lunrAverageSentiment Decimal?
