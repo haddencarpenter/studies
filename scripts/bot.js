@@ -56,7 +56,7 @@ const bot = async () => {
     for (const [superSuperTrend, trendData] of Object.entries(groupedTrends)) {
       const fileName = `${format(new Date(), 'MM-dd-yyyy')} ${superSuperTrend} Trends.txt`
       const documentText = trendData
-        .map(coin => `Binance:${coin.symbol.toUpperCase()}USDT`)
+        .map(coin => `${coin.symbol.toUpperCase()}USDT`)
         .join(`\n`)
       sendDocument(fileName, Readable.from(documentText))
       await new Promise((res) => setTimeout(res, 1000))

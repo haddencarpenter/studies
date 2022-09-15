@@ -10,7 +10,6 @@
     "fetch-data": "parcel build scripts/fetch-data.js --no-source-maps",
     "fetch-exchanges": "parcel build scripts/fetch-exchanges.js --no-source-maps",
     "bot": "parcel build scripts/bot.js --no-source-maps",
-    "fetch-roi": "parcel build scripts/fetch-roi.js --no-source-maps",
     "dropstab": "parcel build scripts/dropstab.js --no-source-maps",
     "start": "next start",
     "lint": "next lint"
@@ -37,7 +36,7 @@
     "next-with-less": "^2.0.5",
     "parcel": "^2.3.2",
     "prisma": "^3.10.0",
-    "puppeteer": "^13.6.0",
+    "puppeteer": "^17.1.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-markdown": "^8.0.3",

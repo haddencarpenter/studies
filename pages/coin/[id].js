@@ -10,7 +10,8 @@ import ReactMarkdown from 'react-markdown'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
 import round from 'lodash/round';
-import { useCallback } from 'react';
+import take from 'lodash/take';
+import { useCallback, useEffect } from 'react';
 
 import UpTag from '../../components/UpTag'
 import PlatformSelect from '../../components/PlatformSelect';
@@ -139,8 +140,8 @@ export default function Coin(coin) {
   if (coin.circulatingSupply && coin.totalSupply) {
     circulatingSupplyPercentage = round(coin.circulatingSupply / coin.totalSupply * 100, 2)
   }
-  const percentageFromAth = (coin.currentPrice / coin.ath) * 100
-  const percentageFromAtl = (coin.currentPrice / coin.atl) * 100
+  const percentageFromAth = (coin.ath - coin.currentPrice) / coin.ath * 100
+  const percentageFromAtl = (coin.atl - coin.currentPrice) / coin.atl * 100
   const priceAppreciationToAthPercentage = (coin.ath / coin.currentPrice) * 100
   const notation = screens.sm ? 'standard' : 'compact'
   const dateFormatter = new Intl.DateTimeFormat([], { dateStyle: 'medium' })
@@ -148,6 +149,7 @@ export default function Coin(coin) {
   const preciseCurrencyFormatter = new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'symbol', maximumFractionDigits: 20, notation })
   const numberFormatter = new Intl.NumberFormat([], { notation })
   const compactNumberFormatter = new Intl.NumberFormat([], { notation: 'compact' })
+  const today = new Date()
 
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${dailySignal.toUpperCase()} | Daily Crypto Screener`
   const ogTitle = `${coin.name} | ${dailySignal.toUpperCase()} | ${dateFormatter.format(new Date())} | Coinrotator`
@@ -159,13 +161,17 @@ export default function Coin(coin) {
     .replaceAll('{{fdv}}', currencyFormatter.format(coin.fullyDilutedValuation))
     .replaceAll('{{launchprice}}', currencyFormatter.format(coin.launch_price))
     .replaceAll('{{currentprice}}', currencyFormatter.format(coin.currentPrice))
-    .replaceAll('{{percentagefromath}}', numberFormatter.format(percentageFromAth))
-    .replaceAll('{{percentagefromatl}}', numberFormatter.format(percentageFromAtl))
-    .replaceAll('{{circulatingsupply}}', currencyFormatter.format(coin.circulatingSupply))
-    .replaceAll('{{percentagecirculatingsupply}}', numberFormatter.format(coin.circulatingSupplyPercentage))
+    .replaceAll('{{percentagefromath}}', `${numberFormatter.format(percentageFromAth)}%`)
+    .replaceAll('{{percentagefromatl}}', `${numberFormatter.format(percentageFromAtl)}%`)
+    .replaceAll('{{circulatingsupply}}', numberFormatter.format(coin.circulatingSupply))
+    .replaceAll('{{percentagecirculatingsupply}}', `${numberFormatter.format(circulatingSupplyPercentage)}%`)
     .replaceAll('{{totalsupply}}', numberFormatter.format(coin.totalSupply))
-    .replaceAll('{{percentageappreciationtoath}}', numberFormatter.format(priceAppreciationToAthPercentage))
+    .replaceAll('{{maxsupply}}', numberFormatter.format(coin.maxSupply))
+    .replaceAll('{{percentageappreciationtoath}}', `${numberFormatter.format(priceAppreciationToAthPercentage)}%`)
     .replaceAll('{{ranking}}', coin.marketCapRank)
+    .replaceAll('{{day}}', today.getDate())
+    .replaceAll('{{month}}', new Intl.DateTimeFormat([], { month: 'long' }).format(today))
+    .replaceAll('{{year}}', today.getFullYear())
 
   const renderRoi = useCallback((multiple) => {
     if (multiple === null || multiple === 1 ) { return null }
@@ -173,6 +179,34 @@ export default function Coin(coin) {
     const roi = round((multiple - 1) * 100, 2);
     return <span className={roi > 0 ? coinStyles.greenRoi : coinStyles.redRoi}>{numberFormatter.format(roi)}%</span>
   }, [numberFormatter])
+  const preventCopy = (event) => {
+    let selection = window.getSelection().toString();
+    selection = selection.split(' ').map((piece) => {
+      if (Math.random() * 100 < 6) {
+        let interference = window.location.href
+        const moreRandom = Math.random() * 100
+        if (moreRandom < 20) {
+          interference = Math.random().toString(36).slice(2)
+        } else if (moreRandom < 40) {
+          interference = take([';', '.', '?', '\,'], 1)[0]
+        }
+        piece = `${piece} ${interference} `
+      }
+      return piece;
+    }).join(' ')
+
+    selection = `${selection}\nCopyright ${new Date().getFullYear()} CoinRotator. All rights reserved`
+    selection = `${selection}\nThe source of this text is ${window.location.href}`
+
+    event.clipboardData.setData('text/plain', selection);
+    event.preventDefault();
+  }
+  useEffect(() => {
+    document.addEventListener('copy', preventCopy)
+    return () => {
+      document.removeEventListener('copy', preventCopy)
+    }
+  }, [])
 
   return (
     <>
@@ -330,6 +364,12 @@ export default function Coin(coin) {
               <div className={coinStyles.data}>
                 <Title level={3} className={coinStyles.label}>Total Supply</Title>
                 <div className={coinStyles.value}>{numberFormatter.format(coin.totalSupply)}</div>
+              </div>
+            ) : <></>}
+            { coin.maxSupply && coin.maxSupply !== coin.totalSupply ? (
+              <div className={coinStyles.data}>
+                <Title level={3} className={coinStyles.label}>Max Supply</Title>
+                <div className={coinStyles.value}>{numberFormatter.format(coin.maxSupply)}</div>
               </div>
             ) : <></>}
           </Card.Grid>
@@ -551,6 +591,7 @@ export async function getStaticProps({ params }) {
     'fullyDilutedValuation',
     'circulatingSupply',
     'totalSupply',
+    'maxSupply',
     'tickers',
     'twitter',
     'twitterFollowers',
@@ -561,6 +602,7 @@ export async function getStaticProps({ params }) {
     'launch_roi_usd',
     'launch_roi_eth',
     'launch_roi_btc',
+    'currentPrice'
   ])
   return {
     props: {
@@ -570,10 +612,12 @@ export async function getStaticProps({ params }) {
       fullyDilutedValuation: Number(coinData.fullyDilutedValuation),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
+      maxSupply: Number(coinData.maxSupply),
       launch_price: Number(coinData.launch_price),
       launch_roi_usd: Number(coinData.launch_roi_usd),
       launch_roi_eth: Number(coinData.launch_roi_eth),
       launch_roi_btc: Number(coinData.launch_roi_btc),
+      currentPrice: Number(coinData.currentPrice),
       platforms,
       chainsData,
       dailyTrends,
