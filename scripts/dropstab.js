@@ -24,7 +24,6 @@ const fetchCoinData = async (url, coin, page) => {
     const icoSection = icoAndRoiSection?.lastChild
 
     if (roiSection || icoSection) {
-      // TODO: Handle only one section
       const currencySections = Array.from(roiSection.querySelectorAll('div'))
       const [usdRoi, btcRoi, ethRoi] = currencySections.map((currencySection) => {
         const roi = Number(currencySection.firstChild.innerText.replace('x', ''))
@@ -48,7 +47,6 @@ const fetchCoinData = async (url, coin, page) => {
   launch_date_end = Date.parse(launch_date_end);
   launch_date_end = isNaN(launch_date_end) ? null : new Date(launch_date_end);
 
-  console.log(coin.id, launch_price, launch_date_start, launch_date_end, launch_roi_btc, launch_roi_eth, launch_roi_usd)
   await prisma.coin.update({
     where: {
       id: coin.id
@@ -94,13 +92,12 @@ const getDropsTabData = async (browser) => {
     data.push(...pageData)
 
     const nextPage = await page.$('[aria-label="Next page"]');
-    // if (nextPage) {
-    //   currentPage++;
-    //   await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
-    // } else {
-    //   hasNextPage = false
-    // }
-    hasNextPage = false
+    if (nextPage) {
+      currentPage++;
+      await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
+    } else {
+      hasNextPage = false
+    }
   }
 
   await page.close();
