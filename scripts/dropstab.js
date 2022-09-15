@@ -18,29 +18,48 @@ const fetchCoinData = async (url, coin, page) => {
   console.log('Fetch launch data for', coin.symbol);
   await page.goto(url, {waitUntil: 'domcontentloaded'});
 
-  const hasRoi = await page.evaluate(() => window.find("ROI since ICO"));
-  if (!hasRoi) { return; }
+  let [launch_roi_usd, launch_roi_btc, launch_roi_eth, launch_price, launch_date_start, launch_date_end] = await page.evaluate(async () => {
+    const icoAndRoiSection = Array.from(document.querySelectorAll('h3'))?.find((h3 => h3.innerText.includes("ROI since ICO")))?.nextSibling
+    const roiSection = icoAndRoiSection?.firstChild
+    const icoSection = icoAndRoiSection?.lastChild
 
-  let price = await page.$eval('[aria-label="Price Statistics"] div:nth-child(2) dd', (element) => element.innerText);
-  price = price.replace('$', '').replace(',', '').trim();
+    if (roiSection || icoSection) {
+      // TODO: Handle only one section
+      const currencySections = Array.from(roiSection.querySelectorAll('div'))
+      const [usdRoi, btcRoi, ethRoi] = currencySections.map((currencySection) => {
+        const roi = Number(currencySection.firstChild.innerText.replace('x', ''))
+        return isNaN(roi) ? null : roi
+      })
 
-  if (isNaN(price)) {
-    price = null;
-  }
+      const [, launchPriceSection, launchDateSection] = Array.from(icoSection.querySelectorAll('div'))
+      let launchPrice = launchPriceSection.lastChild.innerText.replace('$', '').replace(',', '').trim();
+      if (isNaN(launchPrice)) { launchPrice = null }
 
-  const launchDates = await page.$eval('[aria-label="Price Statistics"] div:nth-child(3) dd', (element) => element.innerText);
-  let [launchDateStart, launchDateEnd] = launchDates.split(' - ');
-  launchDateStart = new Date(Date.parse(launchDateStart));
-  launchDateEnd = new Date(Date.parse(launchDateEnd));
+      const [launchDateStart, launchDateEnd] = launchDateSection.lastChild.innerText.split(' - ')
 
+      return [usdRoi, btcRoi, ethRoi, launchPrice, launchDateStart, launchDateEnd]
+    } else {
+      return [null, null, null, null, null, null]
+    }
+  })
+
+  launch_date_start = Date.parse(launch_date_start);
+  launch_date_start = isNaN(launch_date_start) ? null : new Date(launch_date_start);
+  launch_date_end = Date.parse(launch_date_end);
+  launch_date_end = isNaN(launch_date_end) ? null : new Date(launch_date_end);
+
+  console.log(coin.id, launch_price, launch_date_start, launch_date_end, launch_roi_btc, launch_roi_eth, launch_roi_usd)
   await prisma.coin.update({
     where: {
       id: coin.id
     },
     data: {
-      launch_price: price,
-      launch_date_start: launchDateStart,
-      launch_date_end: launchDateEnd
+      launch_price,
+      launch_date_start,
+      launch_date_end,
+      launch_roi_usd,
+      launch_roi_btc,
+      launch_roi_eth
     }
   })
 }
@@ -75,12 +94,13 @@ const getDropsTabData = async (browser) => {
     data.push(...pageData)
 
     const nextPage = await page.$('[aria-label="Next page"]');
-    if (nextPage) {
-      currentPage++;
-      await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
-    } else {
-      hasNextPage = false
-    }
+    // if (nextPage) {
+    //   currentPage++;
+    //   await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
+    // } else {
+    //   hasNextPage = false
+    // }
+    hasNextPage = false
   }
 
   await page.close();
