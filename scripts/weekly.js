@@ -106,14 +106,9 @@ const getDropsTabData = async (browser) => {
 }
 
 const dropsTab = async () => {
-  let browser;
-  const transaction = Sentry.startTransaction({
-    op: "Fetch ROI",
-    name: "Fetch ROI Transaction",
-  });
+  let browser
   try {
     browser = await puppeteer.launch();
-
     const dropsTabData = await getDropsTabData(browser);
 
     const page = await browser.newPage();
@@ -123,14 +118,27 @@ const dropsTab = async () => {
         await fetchCoinData(dropsData.url, coin, page);
       }
     }
+  } catch(e) {
+    throw(e)
+  } finally {
+    browser?.close();
+  }
+}
+
+const weekly = async () => {
+  const transaction = Sentry.startTransaction({
+    op: "Weekly",
+    name: "Weekly",
+  });
+  try {
+    await dropsTab()
   } catch (error) {
     console.log(error)
     Sentry.captureException(error);
     throw(error)
   } finally {
-    browser?.close();
     transaction.finish();
   }
 }
 
-dropsTab()
+weekly()
