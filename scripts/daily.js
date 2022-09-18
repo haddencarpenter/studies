@@ -19,15 +19,230 @@ import { Prisma } from '@prisma/client'
 import { hasPlatforms } from '../utils/coingecko';
 
 dotenv.config();
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+});
 
 const fetchOhlcDays = 30
 const excludedSymbols = ['usdt', 'dai', 'ust', 'weth', 'wbtc', 'usdc', 'busd', 'ceth', 'steth', 'cdai', 'cusdc', 'tusd', 'hbtc', 'renbtc', 'seth', 'xsushi', 'cvxcrv', 'husd', 'usdp', 'cusdt', 'lusd', 'usdn', 'sbtc', 'vai', 'xsgd', 'rsr', 'fei', 'frax', 'tribe', 'gusd', 'usdx', 'eurt', 'tryb', 'itl', 'usds', 'xchf', 'xaur', 'eosdt', 'dgx', 'bitcny', 'idrt', 'ousd', 'usdk', 'rsv', 'musd', 'qc', 'dgd', 'eurs', 'susd', 'sai', 'cusd', 'alusd', 'seur', 'ethbull', 'eeur', 'eth2x-fli', 'instadapp-wbtc']
 const excludedTokens = ['thorchain-erc20']
 const noRankError = 'no-rank-error'
+// We have to potentially try to get OHLC data from all of these markets, since some of them might only recently have listed a pair
+const marketPriority = ['binance', 'bitfinex', 'huobi', 'ftx'].reverse()
 
-const script = async () => {
-  const categories = await getCategoriesByCoin();
+const fetchCoinDataCoingecko = async (coinId, categories) => {
+  let coinData
+  try {
+    coinData = (await coinGecko.get(`/coins/${coinId}`)).data
+    if (isNil(coinData.market_data.market_cap_rank)) {
+      throw(noRankError)
+    }
+  } catch (e) {
+    if (e === noRankError || e.response.status === 404) {
+      // CoinGecko doesn't know this coin, so we assume it got delisted
+      await prisma.ohlc.deleteMany({
+        where: {
+          coinId,
+        },
+      })
+      await prisma.coinTime.deleteMany({
+        where: {
+          coinId,
+        },
+      })
+      await prisma.coin.delete({
+        where: {
+          id: coinId,
+        },
+      })
+      return false
+    } else {
+      console.log(e.response?.status);
+      console.log(e.response?.headers);
+      console.log(e.response?.data);
+      throw(e)
+    }
+  }
+  const symbol = coinData.symbol.toLowerCase()
+  await new Promise((res) => setTimeout(res, 6000))
 
+  let platforms;
+  if (hasPlatforms(coinData.platforms)) {
+    platforms = pickBy(coinData.platforms, contract => contract.length)
+    if (!Object.keys(platforms).length) {
+      platforms = Prisma.DbNull
+    }
+  } else {
+    platforms = Prisma.DbNull
+  }
+
+  const dailyChange = coinData.market_data.price_change_percentage_24h || undefined
+  const weeklyChange = coinData.market_data.price_change_percentage_7d || undefined
+  const marketCap = Math.ceil(coinData.market_data.market_cap.usd)
+  const volume = Math.ceil(coinData.market_data.total_volume.usd)
+  const dbCoinData = {
+    symbol,
+    name: coinData.name,
+    defaultPlatform: coinData.asset_platform_id,
+    platforms,
+    images: coinData.image,
+    description: coinData.description.en,
+    homepage: coinData.links.homepage[0],
+    twitter: coinData.links.twitter_screen_name || '',
+    twitterFollowers: coinData.community_data.twitter_followers,
+    ath: coinData.market_data.ath.usd,
+    atl: coinData.market_data.atl.usd,
+    marketCap,
+    marketCapRank: coinData.market_data.market_cap_rank,
+    fullyDilutedValuation: coinData.market_data.fully_diluted_valuation.usd,
+    currentPrice: coinData.market_data.current_price?.usd,
+    circulatingSupply: coinData.market_data.circulating_supply,
+    totalSupply: coinData.market_data.total_supply,
+    maxSupply: coinData.market_data.max_supply,
+    tickers: coinData.tickers,
+    categories: categories[`${symbol}-${coinData.name}`],
+    dailyChange: dailyChange,
+    weeklyChange: weeklyChange,
+  }
+
+  await prisma.coin.upsert({
+    where: { id: coinId },
+    create: {
+      id: coinId,
+      ...dbCoinData
+    },
+    update: dbCoinData,
+  })
+
+  await prisma.coinTime.create({
+    data: {
+      coinId,
+      date: new Date(),
+      marketCap,
+      volume,
+    }
+  })
+
+  return [true, symbol]
+}
+
+const fetchOhlcData = async (coinId, symbol, cryptowatchMarkets) => {
+  const cryptoWatchAfterParam = Math.round((subDays(new Date(), fetchOhlcDays)).valueOf() / 1000)
+  const ohlcPerQuoteSymbolEndpoints = quoteSymbols.map((quoteSymbol) => {
+    if(symbol === quoteSymbol) {
+      return []
+    }
+
+    let matchingMarkets = cryptowatchMarkets.filter((market) => {
+      const realQuoteSymbol = quoteSymbol === 'usd' ? 'usdt' : quoteSymbol
+      if (market.pair === `${symbol}${realQuoteSymbol}`) {
+        market.inverse = false
+        return true
+      } else if (market.pair === `${realQuoteSymbol}${symbol}`) {
+        market.inverse = true
+        return true
+      } else {
+        return false
+      }
+    })
+
+    matchingMarkets = matchingMarkets.sort((a, b) => marketPriority.indexOf(b.exchange) - marketPriority.indexOf(a.exchange))
+
+    const endPoints = matchingMarkets.map((market) => {
+      return {
+        inverse: market.inverse,
+        route: `https://api.cryptowat.ch/markets/${market.exchange}/${market.pair}/ohlc?periods=14400&after=${cryptoWatchAfterParam}`,
+        quoteSymbol
+      }
+    })
+
+    endPoints.push({
+      coinGecko: true,
+      route: `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=${quoteSymbol}&days=${fetchOhlcDays}`,
+      quoteSymbol
+    })
+
+    return endPoints
+  })
+  let ohlcs = []
+  const now = new Date()
+  for (let ohlcEndPoints of ohlcPerQuoteSymbolEndpoints) {
+    if (!ohlcEndPoints.length) {
+      continue
+    }
+    for (let { route, inverse, coinGecko, quoteSymbol } of ohlcEndPoints) {
+      let ohlcData = {}
+      if (coinGecko) {
+        await new Promise((res) => setTimeout(res, 6000))
+        let response
+        try {
+          response = await coinGecko.get(route)
+        } catch(e) {
+          console.log(e.response?.status);
+          console.log(e.response?.headers);
+          console.log(e.response?.data);
+          throw(e);
+        }
+        ohlcData = response.data.map((frame) => {
+          const closeTime = new Date(frame[0])
+          return {
+            closeTime,
+            open: frame[1],
+            high: frame[2],
+            low: frame[3],
+            close: frame[4],
+            coinId,
+            quoteSymbol
+          }
+        })
+        ohlcData = ohlcData.filter((ohlc) => ohlc.closeTime < now)
+        ohlcs = [...ohlcs, ...ohlcData]
+      } else {
+        const response = await cryptowatch.get(route)
+        ohlcData = response.data.result['14400']
+        // Sometimes cryptowatch can't give us all the OHLC data, because a coin just recently got listed on an exchange
+        if (ohlcData.length < fetchOhlcDays * 6) {
+          continue
+        }
+        ohlcData = ohlcData.map((frame) => {
+          const ohlcCloseTimeUnix = new Date(frame[0] * 1000)
+          return {
+            closeTime: ohlcCloseTimeUnix,
+            open: frame[1],
+            high: frame[2],
+            low: frame[3],
+            close: frame[4],
+            coinId: coinId,
+            quoteSymbol
+          }
+        })
+        if (inverse) {
+          ohlcData = ohlcData.map((ohlc) => {
+            return {
+              ...ohlc,
+              open: 1 / ohlc.open,
+              high: 1 / ohlc.high,
+              low: 1 / ohlc.low,
+              close: 1 / ohlc.close,
+            }
+          })
+        }
+        ohlcData = ohlcData.filter((ohlc) => new Date(ohlc.closeTime) < now)
+        ohlcs = [...ohlcs, ...ohlcData]
+        break
+      }
+    }
+  }
+
+  await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
+}
+
+const fetchCoinDataAndOhlcs = async () => {
   const coinMarketsPage1 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250')
   const coinMarketsPage2 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250&page=2')
   const coinMarketsPage3 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250&page=3')
@@ -50,214 +265,18 @@ const script = async () => {
   const cryptowatchMarketsResponse = await cryptowatch.get('/markets')
   let cryptowatchMarkets = cryptowatchMarketsResponse.data.result
   cryptowatchMarkets = cryptowatchMarkets.filter(market => market.active)
-
-  // We have to potentially try to get OHLC data from all of these markets, since some of them might only recently have listed a pair
-  let marketPriority = ['binance', 'bitfinex', 'huobi', 'ftx']
-  marketPriority.reverse()
+  const categories = await getCategoriesByCoin();
 
   for (let coinId of coinIds) {
-    let coinData
-    try {
-      coinData = (await coinGecko.get(`/coins/${coinId}`)).data
-      if (isNil(coinData.market_data.market_cap_rank)) {
-        throw(noRankError)
-      }
-    } catch (e) {
-      if (e === noRankError || e.response.status === 404) {
-        // CoinGecko doesn't know this coin, so we assume it got delisted
-        await prisma.ohlc.deleteMany({
-          where: {
-            coinId,
-          },
-        })
-        await prisma.coinTime.deleteMany({
-          where: {
-            coinId,
-          },
-        })
-        await prisma.coin.delete({
-          where: {
-            id: coinId,
-          },
-        })
-        continue
-      } else {
-        console.log(e.response?.status);
-        console.log(e.response?.headers);
-        console.log(e.response?.data);
-        throw(e)
-      }
+    const [coinExists, symbol] = await fetchCoinDataCoingecko(coinId, categories);
+    if (!coinExists) {
+      continue;
     }
-    const symbol = coinData.symbol.toLowerCase()
-    await new Promise((res) => setTimeout(res, 6000))
-
-    let platforms;
-    if (hasPlatforms(coinData.platforms)) {
-      platforms = pickBy(coinData.platforms, contract => contract.length)
-      if (!Object.keys(platforms).length) {
-        platforms = Prisma.DbNull
-      }
-    } else {
-      platforms = Prisma.DbNull
-    }
-
-    const dailyChange = coinData.market_data.price_change_percentage_24h || undefined
-    const weeklyChange = coinData.market_data.price_change_percentage_7d || undefined
-    const marketCap = Math.ceil(coinData.market_data.market_cap.usd)
-    const volume = Math.ceil(coinData.market_data.total_volume.usd)
-    const dbCoinData = {
-      symbol,
-      name: coinData.name,
-      defaultPlatform: coinData.asset_platform_id,
-      platforms,
-      images: coinData.image,
-      description: coinData.description.en,
-      homepage: coinData.links.homepage[0],
-      twitter: coinData.links.twitter_screen_name || '',
-      twitterFollowers: coinData.community_data.twitter_followers,
-      ath: coinData.market_data.ath.usd,
-      atl: coinData.market_data.atl.usd,
-      marketCap,
-      marketCapRank: coinData.market_data.market_cap_rank,
-      fullyDilutedValuation: coinData.market_data.fully_diluted_valuation.usd,
-      currentPrice: coinData.market_data.current_price?.usd,
-      circulatingSupply: coinData.market_data.circulating_supply,
-      totalSupply: coinData.market_data.total_supply,
-      maxSupply: coinData.market_data.max_supply,
-      tickers: coinData.tickers,
-      categories: categories[`${symbol}-${coinData.name}`],
-      dailyChange: dailyChange,
-      weeklyChange: weeklyChange,
-    }
-
-    await prisma.coin.upsert({
-      where: { id: coinId },
-      create: {
-        id: coinId,
-        ...dbCoinData
-      },
-      update: dbCoinData,
-    })
-
-    await prisma.coinTime.create({
-      data: {
-        coinId,
-        date: new Date(),
-        marketCap,
-        volume,
-      }
-    })
-
-    let cryptoWatchAfterParam = Math.round((subDays(new Date(), fetchOhlcDays)).valueOf() / 1000)
-    const ohlcPerQuoteSymbolEndpoints = quoteSymbols.map((quoteSymbol) => {
-      if(symbol === quoteSymbol) {
-        return []
-      }
-
-      let matchingMarkets = cryptowatchMarkets.filter((market) => {
-        const realQuoteSymbol = quoteSymbol === 'usd' ? 'usdt' : quoteSymbol
-        if (market.pair === `${symbol}${realQuoteSymbol}`) {
-          market.inverse = false
-          return true
-        } else if (market.pair === `${realQuoteSymbol}${symbol}`) {
-          market.inverse = true
-          return true
-        } else {
-          return false
-      }
-      })
-
-      matchingMarkets = matchingMarkets.sort((a, b) => marketPriority.indexOf(b.exchange) - marketPriority.indexOf(a.exchange))
-
-      const endPoints = matchingMarkets.map((market) => {
-        return {
-          inverse: market.inverse,
-          route: `https://api.cryptowat.ch/markets/${market.exchange}/${market.pair}/ohlc?periods=14400&after=${cryptoWatchAfterParam}`,
-          quoteSymbol
-        }
-      })
-
-      endPoints.push({
-        coinGecko: true,
-        route: `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=${quoteSymbol}&days=${fetchOhlcDays}`,
-        quoteSymbol
-      })
-
-      return endPoints
-    })
-    let ohlcs = []
-    const now = new Date()
-    for (let ohlcEndPoints of ohlcPerQuoteSymbolEndpoints) {
-      if (!ohlcEndPoints.length) {
-        continue
-      }
-      for (let { route, inverse, coinGecko, quoteSymbol } of ohlcEndPoints) {
-        let ohlcData = {}
-        if (coinGecko) {
-          await new Promise((res) => setTimeout(res, 6000))
-          let response
-          try {
-            response = await coinGecko.get(route)
-          } catch(e) {
-            console.log(e.response?.status);
-            console.log(e.response?.headers);
-            console.log(e.response?.data);
-            throw(e);
-          }
-          ohlcData = response.data.map((frame) => {
-            const closeTime = new Date(frame[0])
-            return {
-              closeTime,
-              open: frame[1],
-              high: frame[2],
-              low: frame[3],
-              close: frame[4],
-              coinId: coinId,
-              quoteSymbol
-            }
-          })
-          ohlcData = ohlcData.filter((ohlc) => ohlc.closeTime < now)
-          ohlcs = [...ohlcs, ...ohlcData]
-        } else {
-          const response = await cryptowatch.get(route)
-          ohlcData = response.data.result['14400']
-          // Sometimes cryptowatch can't give us all the OHLC data, because a coin just recently got listed on an exchange
-          if (ohlcData.length < fetchOhlcDays * 6) {
-            continue
-          }
-          ohlcData = ohlcData.map((frame) => {
-            const ohlcCloseTimeUnix = new Date(frame[0] * 1000)
-            return {
-              closeTime: ohlcCloseTimeUnix,
-              open: frame[1],
-              high: frame[2],
-              low: frame[3],
-              close: frame[4],
-              coinId: coinId,
-              quoteSymbol
-            }
-          })
-          if (inverse) {
-            ohlcData = ohlcData.map((ohlc) => {
-              return {
-                ...ohlc,
-                open: 1 / ohlc.open,
-                high: 1 / ohlc.high,
-                low: 1 / ohlc.low,
-                close: 1 / ohlc.close,
-              }
-            })
-          }
-          ohlcData = ohlcData.filter((ohlc) => new Date(ohlc.closeTime) < now)
-          ohlcs = [...ohlcs, ...ohlcData]
-          break
-        }
-      }
-    }
-
-    await prisma.ohlc.createMany({ data: ohlcs, skipDuplicates: true })
+    await fetchOhlcData(coinId, symbol, cryptowatchMarkets);
   }
+}
 
+const fetchDerivativesData = async() => {
   const derivativesData = (await coinGecko.get('derivatives')).data
   let perpetualDerivatives = derivativesData.filter(derivate => derivate.contract_type === 'perpetual')
   perpetualDerivatives = uniqBy(perpetualDerivatives, 'symbol')
@@ -288,7 +307,9 @@ const script = async () => {
       })
     }
   }
+}
 
+const fetchLunrData = async() => {
   const lunrCoins = (await getAllCoins()).data?.data || []
   for (const lunrCoin of lunrCoins) {
     const matchingDbCoin = await prisma.coin.findFirst({
@@ -323,29 +344,22 @@ const script = async () => {
       })
     }
   }
-
-  if (process.env.NODE_ENV === 'production') {
-    await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/ZzMCeSY4lD')
-  }
 }
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 1.0,
-});
-const transaction = Sentry.startTransaction({
-  op: "Datafetch",
-  name: `Datafetch ${new Date()}`,
-});
-
-setTimeout(() => {
+setTimeout(async () => {
+  const transaction = Sentry.startTransaction({
+    op: "Datafetch",
+    name: `Datafetch ${new Date()}`,
+  });
   try {
-    script();
+    await fetchCoinDataAndOhlcs();
+    await fetchDerivativesData();
+    await fetchLunrData();
+    if (process.env.NODE_ENV === 'production') {
+      await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/ZzMCeSY4lD')
+    }
   } catch (e) {
+    console.log(e)
     Sentry.captureException(e);
   } finally {
     transaction.finish();
