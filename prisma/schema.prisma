@@ -63,6 +63,25 @@ model Coin {
   lunrAltRank Decimal?
   lunrAltRankPrevious Decimal?
   lunrCategories String[]
+  coinpaprikaId String?   @db.VarChar(255)
+  coinpaprikaName String?
+  coinpaprikaRank Int?
+  coinpaprikaActive Boolean?
+  coinpaprikaTags Json?
+  coinpaprikaTeam Json?
+  coinpaprikaDescription String?
+  coinpaprikaMessage String?
+  coinpaprikaOpenSource Boolean?
+  coinpaprikaHardwarewallet Boolean?
+  coinpaprikaLaunchDateStart String?
+  coinpaprikaDevelopmentStatus String?
+  coinpaprikaProofType String?
+  coinpaprikaOrgStructure String?
+  coinpaprikaHashAlgorithm String?
+  coinpaprikaContracts Json?
+  coinpaprikaLinks Json?
+  coinpaprikaLinksExtended Json?
+  coinpaprikaWhitepaper Json?
 
   @@index([marketCapRank])
 }

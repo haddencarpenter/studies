@@ -78,7 +78,25 @@ const fetchCoinpaprikaData = async () => {
           id: matchingCoin.id
         },
         data: {
-
+          coinpaprikaId: coinPaprikaCoinData.id,
+          coinpaprikaName: coinPaprikaCoinData.name,
+          coinpaprikaRank: coinPaprikaCoinData.rank,
+          coinpaprikaActive: coinPaprikaCoinData.is_active,
+          coinpaprikaTags: coinPaprikaCoinData.tags,
+          coinpaprikaTeam: coinPaprikaCoinData.team,
+          coinpaprikaDescription: coinPaprikaCoinData.description,
+          coinpaprikaMessage: coinPaprikaCoinData.message,
+          coinpaprikaOpenSource: coinPaprikaCoinData.open_source,
+          coinpaprikaHardwarewallet: coinPaprikaCoinData.hardware_wallet,
+          coinpaprikaLaunchDateStart: coinPaprikaCoinData.started_at,
+          coinpaprikaDevelopmentStatus: coinPaprikaCoinData.development_status,
+          coinpaprikaProofType: coinPaprikaCoinData.proof_type,
+          coinpaprikaOrgStructure: coinPaprikaCoinData.org_structure,
+          coinpaprikaHashAlgorithm: coinPaprikaCoinData.hash_algorithm,
+          coinpaprikaContracts: coinPaprikaCoinData.contracts,
+          coinpaprikaLinks: coinPaprikaCoinData.links,
+          coinpaprikaLinksExtended: coinPaprikaCoinData.links_extended,
+          coinpaprikaWhitepaper: coinPaprikaCoinData.whitepaper
         }
       })
     }
@@ -95,6 +113,7 @@ setTimeout(async () => {
     await fetchExchanges()
   } catch (e) {
     Sentry.captureException(e);
+    console.log(e)
   } finally {
     transaction.finish();
   }
