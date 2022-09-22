@@ -23,6 +23,7 @@ import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getCategories } from '../utils/categories';
 import globalData from '../lib/globalData';
+import getTrends from '../utils/getTrends'
 
 import indexStyles from '../styles/index.module.less'
 import baseStyles from '../styles/base.module.less'
@@ -65,26 +66,33 @@ export async function getStaticProps() {
     }
   }
   let coinsData
-  if (process.env.VERCEL_ENV === 'preview') {
-    coinsData = await prisma.coin.findMany({...coinQuery, take: 100})
-  } else if (process.env.NODE_ENV === 'development') {
-    coinsData = await prisma.coin.findMany({...coinQuery, take: 20})
-  } else {
+  // if (process.env.VERCEL_ENV === 'preview') {
+  //   coinsData = await prisma.coin.findMany({...coinQuery, take: 100})
+  // } else if (process.env.NODE_ENV === 'development') {
+    // coinsData = await prisma.coin.findMany({...coinQuery, take: 20})
+  // } else {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
-  }
+  // }
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
+    const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
+    const [weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
+    delete coinData.ohlcs
+
     const exchanges = convertTickersToExchanges(coinData.tickers)
     delete coinData.tickers
 
     return {
       ...coinData,
+      dailyTrends,
+      dailySuperSuperTrend,
+      weeklyTrends,
+      weeklySuperSuperTrend,
       ath: Number(coinData.ath),
       atl: Number(coinData.atl),
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
       circulatingSupply: Number(coinData.circulatingSupply),
       totalSupply: Number(coinData.totalSupply),
-      ohlcs,
       exchanges
     }
   })
@@ -113,8 +121,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
       trendLengthMax: '',
-      atrPeriods: defaultAtrPeriods,
-      multiplier: defaultMultiplier,
     })
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
@@ -215,26 +221,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
           ...state,
           trendLengthMax: trendLengthMax
         }
-      case 'SET_ATR_PERIODS':
-        const newAtrPeriods = parseFloat(action.payload)
-        if (!isFinite(newAtrPeriods)) {
-          return state;
-        }
-
-        return {
-          ...state,
-          atrPeriods: newAtrPeriods
-        }
-      case 'SET_MULTIPLIER':
-        const newMultiplier = parseFloat(action.payload)
-        if (!isFinite(newMultiplier)) {
-          return state;
-        }
-
-        return {
-          ...state,
-          multiplier: newMultiplier
-        }
       case 'RESET':
         return defaultFormState;
       default:
@@ -295,8 +281,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,
         trendLengthMax: router.query.trendLengthMax,
-        atrPeriods: router.query.atrPeriods,
-        multiplier: router.query.multiplier,
       }
     })
   }, [router.isReady, router.query])
@@ -388,15 +372,11 @@ export default function Home({ coinsData, categories, exchangeData }) {
                                    Number(formState.marketCapMax) !== Number(defaultFormState.marketCapMax)
     const trendLengthFilterApplied = Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
-    const atrPeriodsFilterApplied = formState.atrPeriods !== defaultAtrPeriods
-    const multiplierFilterApplied = formState.multiplier !== defaultMultiplier
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
-      atrPeriodsFilterApplied ||
-      multiplierFilterApplied ||
       exchangesFilterApplied ||
       derivativesFilterApplied
 
@@ -423,12 +403,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
               formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: defaultFormState.trendLengthMin })
               formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: defaultFormState.trendLengthMax })
             }}>Trend Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
-          )}
-          {atrPeriodsFilterApplied && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_ATR_PERIODS', payload: defaultFormState.atrPeriods })}>ATR periods: {formState.atrPeriods}</Tag>
-          )}
-          {multiplierFilterApplied && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_MULTIPLIER', payload: defaultFormState.multiplier })}>Multiplier: {formState.multiplier}</Tag>
           )}
           {!isEmpty(formState.exchanges) && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
@@ -537,17 +511,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
           </Button>
         ]}
       >
-        <Row className={indexStyles.row} gutter={16}>
-          <Col span={12} className="gutter-row">
-            <label htmlFor="atr-periods">ATR periods</label>
-            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_ATR_PERIODS', payload: e.target.value })} value={formState.atrPeriods} id="atr-periods"></Input>
-          </Col>
-          <Col span={12} className="gutter-row">
-            <label htmlFor="multiplier">Multiplier</label>
-            <Input size="large" onChange={(e) => formDispatch({ type: 'SET_MULTIPLIER', payload: e.target.value })} value={formState.multiplier} id="multiplier"></Input>
-          </Col>
-        </Row>
-        <Divider />
         <Row>
           <Col>
             <div>Market Cap</div>
@@ -711,8 +674,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
           category={formState.category}
           trendType={formState.trendType}
           defaultCategory={defaultFormState.category}
-          atrPeriods={formState.atrPeriods}
-          multiplier={formState.multiplier}
           exchanges={formState.exchanges}
           derivatives={formState.derivatives}
         />
