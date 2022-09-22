@@ -2,6 +2,7 @@ import axios from 'axios'
 import dotenv from 'dotenv';
 import subDays from 'date-fns/subDays'
 import levenshtein from 'js-levenshtein';
+import chunk from 'lodash/chunk'
 import groupBy from 'lodash/groupBy'
 import pickBy from 'lodash/pickBy'
 import minBy from 'lodash/minBy';
@@ -129,7 +130,7 @@ const fetchCoinDataCoingecko = async (coinId, categories) => {
     }
   })
 
-  return [true, symbol]
+  return [true, symbol, coinId]
 }
 
 const fetchOhlcData = async (coinId, symbol, cryptowatchMarkets) => {
@@ -257,21 +258,33 @@ const fetchCoinDataAndOhlcs = async () => {
   })
   databaseCoinIds = databaseCoinIds.map(({ id }) => id)
   coinIds = union(coinIds, databaseCoinIds)
-  // if (process.env.NODE_ENV == "development") {
-  //   coinIds = coinIds.slice(0, 3)
-  // }
+  if (process.env.NODE_ENV == "development") {
+    coinIds = coinIds.slice(0, 10)
+  }
+  const chunkedCoinIds = chunk(coinIds, 5)
+  const categories = await getCategoriesByCoin();
+
+  const coinsToFetchOhlcsFor = []
+  for (let chunk of chunkedCoinIds) {
+    const responses = await Promise.all(chunk.map(coinId => fetchCoinDataCoingecko(coinId, categories)))
+
+    for (const [coinExists, symbol, coinId] of responses) {
+      if (coinExists) {
+        coinsToFetchOhlcsFor.push({
+          coinId,
+          symbol
+        })
+      }
+    }
+  }
 
   const cryptowatchMarketsResponse = await cryptowatch.get('/markets')
   let cryptowatchMarkets = cryptowatchMarketsResponse.data.result
   cryptowatchMarkets = cryptowatchMarkets.filter(market => market.active)
-  const categories = await getCategoriesByCoin();
+  const chunkedOhlcRequests = chunk(coinsToFetchOhlcsFor, 5)
 
-  for (let coinId of coinIds) {
-    const [coinExists, symbol] = await fetchCoinDataCoingecko(coinId, categories);
-    if (!coinExists) {
-      continue;
-    }
-    await fetchOhlcData(coinId, symbol, cryptowatchMarkets);
+  for (let chunk of chunkedOhlcRequests) {
+    await Promise.all(chunk.map(({ coinId, symbol }) => fetchOhlcData(coinId, symbol, cryptowatchMarkets)))
   }
 }
 
