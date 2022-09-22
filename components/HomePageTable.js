@@ -13,7 +13,7 @@ import DownTag from './DownTag'
 import HodlTag from './HodlTag'
 import useBreakPoint from '../hooks/useBreakPoint'
 import useIsHoverable from '../hooks/useIsHoverable';
-import { signals, preferredExchanges } from '../utils/variables'
+import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
 
 import indexTableStyles from '../styles/indexTable.module.less';
 import baseStyles from '../styles/base.module.less'
@@ -37,6 +37,17 @@ const HomePageTable = ({
 
   const router = useRouter()
   const isHoverable = useIsHoverable()
+
+  if (superTrendFlavor === SUPERTREND_FLAVOR.universal) {
+    coinsData = coinsData.map((coinData) => {
+      coinData.dailyTrends = coinData.dailyUniversalTrends
+      coinData.dailySuperSuperTrend = coinData.dailyUniversalSuperSuperTrend
+      coinData.weeklyTrends = coinData.weeklyUniversalTrends
+      coinData.weeklySuperSuperTrend = coinData.weeklyUniversalSuperSuperTrend
+
+      return coinData
+    })
+  }
   let displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY

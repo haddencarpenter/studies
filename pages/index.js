@@ -18,7 +18,7 @@ import classnames from 'classnames';
 import HomePageTable from '../components/HomePageTable';
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
-import { signals, defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
+import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getCategories } from '../utils/categories';
@@ -31,10 +31,6 @@ import baseStyles from '../styles/base.module.less'
 const { Title, Paragraph, Text } = Typography;
 const { Option, OptGroup } = Select;
 const { Content } = Layout;
-const SUPERTREND_FLAVOR = {
-  'coinrotator': 'coinrotator',
-  'universal': 'universal',
-}
 
 export async function getStaticProps() {
   const appData = await globalData();
@@ -79,6 +75,8 @@ export async function getStaticProps() {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
     const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
     const [weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
+    const [dailyUniversalTrends, dailyUniversalSuperSuperTrend] = getTrends(ohlcs, 10, 3, false)
+    const [weeklyUniversalTrends, weeklyUniversalSuperSuperTrend] = getTrends(ohlcs, 10, 3, true)
     delete coinData.ohlcs
 
     const exchanges = convertTickersToExchanges(coinData.tickers)
@@ -90,6 +88,10 @@ export async function getStaticProps() {
       dailySuperSuperTrend,
       weeklyTrends,
       weeklySuperSuperTrend,
+      dailyUniversalTrends,
+      dailyUniversalSuperSuperTrend,
+      weeklyUniversalTrends,
+      weeklyUniversalSuperSuperTrend,
       ath: Number(coinData.ath),
       atl: Number(coinData.atl),
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
