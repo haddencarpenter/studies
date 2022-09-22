@@ -1,4 +1,4 @@
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Alert, Tooltip } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Alert, Tooltip, Radio } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
@@ -31,6 +31,10 @@ import baseStyles from '../styles/base.module.less'
 const { Title, Paragraph, Text } = Typography;
 const { Option, OptGroup } = Select;
 const { Content } = Layout;
+const SUPERTREND_FLAVOR = {
+  'coinrotator': 'coinrotator',
+  'universal': 'universal',
+}
 
 export async function getStaticProps() {
   const appData = await globalData();
@@ -66,13 +70,11 @@ export async function getStaticProps() {
     }
   }
   let coinsData
-  // if (process.env.VERCEL_ENV === 'preview') {
-  //   coinsData = await prisma.coin.findMany({...coinQuery, take: 100})
-  // } else if (process.env.NODE_ENV === 'development') {
-    // coinsData = await prisma.coin.findMany({...coinQuery, take: 20})
-  // } else {
+  if (process.env.NODE_ENV === 'development') {
+    coinsData = await prisma.coin.findMany({...coinQuery, take: 20})
+  } else {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
-  // }
+  }
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
     const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
@@ -121,6 +123,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
       trendLengthMax: '',
+      superTrendFlavor: SUPERTREND_FLAVOR.coinrotator
     })
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
@@ -160,6 +163,11 @@ export default function Home({ coinsData, categories, exchangeData }) {
         return {
           ...state,
           derivatives: action.payload
+        }
+      case 'SET_SUPERTREND_FLAVOR':
+        return {
+          ...state,
+          superTrendFlavor: action.payload
         }
       case 'SET_MARKET_CAP_MIN':
         let newMarketCapMin
@@ -281,6 +289,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,
         trendLengthMax: router.query.trendLengthMax,
+        superTrendFlavor: router.query.superTrendFlavor,
       }
     })
   }, [router.isReady, router.query])
@@ -374,11 +383,13 @@ export default function Home({ coinsData, categories, exchangeData }) {
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
+    const superTrendFlavorFilterApplied = !isEqual(formState.superTrendFlavor, defaultFormState.superTrendFlavor)
     const advancedFiltersApplied =
       marketCapFilterApplied ||
       trendLengthFilterApplied ||
       exchangesFilterApplied ||
-      derivativesFilterApplied
+      derivativesFilterApplied ||
+      superTrendFlavorFilterApplied
 
     if (!advancedFiltersApplied) {
       return null
@@ -409,6 +420,9 @@ export default function Home({ coinsData, categories, exchangeData }) {
           )}
           {!isEmpty(formState.derivatives) && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative markets: {formState.derivatives.join(", ")}</Tag>
+          )}
+          {superTrendFlavorFilterApplied && (
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_SUPERTREND_FLAVOR', payload: defaultFormState.superTrendFlavor })}>Supertrend flavor: {formState.superTrendFlavor}</Tag>
           )}
         </Col>
       </Row>
@@ -511,6 +525,21 @@ export default function Home({ coinsData, categories, exchangeData }) {
           </Button>
         ]}
       >
+        <Row>
+          <Col>
+            <div>SuperTrend flavor</div>
+          </Col>
+          <Col className={indexStyles.modalInput}>
+            <Radio.Group
+              onChange={(e) => formDispatch({ type: 'SET_SUPERTREND_FLAVOR', payload: e.target.value })}
+              value={formState.superTrendFlavor}
+            >
+              <Radio value={SUPERTREND_FLAVOR.coinrotator}>CoinRotator</Radio>
+              <Radio value={SUPERTREND_FLAVOR.universal}>Universal</Radio>
+            </Radio.Group>
+          </Col>
+        </Row>
+        <Divider />
         <Row>
           <Col>
             <div>Market Cap</div>
@@ -676,6 +705,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
           defaultCategory={defaultFormState.category}
           exchanges={formState.exchanges}
           derivatives={formState.derivatives}
+          superTrendFlavor={formState.superTrendFlavor}
         />
       </Row>
     </Content>

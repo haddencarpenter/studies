@@ -30,10 +30,9 @@ const HomePageTable = ({
     portfolioFilter,
     category,
     defaultCategory,
-    atrPeriods,
-    multiplier,
     exchanges,
     derivatives,
+    superTrendFlavor
   }) => {
 
   const router = useRouter()
