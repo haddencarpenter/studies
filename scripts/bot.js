@@ -1,5 +1,4 @@
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
+import { init, startTransaction, captureException } from '@sentry/node';
 import format from 'date-fns/format'
 import groupBy from 'lodash/groupBy';
 import { Readable } from 'stream';
@@ -9,7 +8,7 @@ import { channelCreateMessage } from '../lib/discord'
 import { postMessage, sendDocument } from '../lib/telegram'
 import getFreshSignals from '../utils/getFreshSignals';
 
-Sentry.init({
+init({
   dsn: process.env.SENTRY_DSN,
 
   // Set tracesSampleRate to 1.0 to capture 100%
@@ -19,7 +18,7 @@ Sentry.init({
 });
 
 const bot = async () => {
-  const transaction = Sentry.startTransaction({
+  const transaction = startTransaction({
     op: "Bot",
     name: "Bot Transaction",
   });
@@ -63,7 +62,7 @@ const bot = async () => {
     }
   } catch (error) {
     console.log(error)
-    Sentry.captureException(error);
+    captureException(error);
     throw(error)
   } finally {
     transaction.finish();

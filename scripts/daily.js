@@ -9,8 +9,7 @@ import minBy from 'lodash/minBy';
 import isNil from 'lodash/isNil'
 import union from 'lodash/union'
 import uniqBy from 'lodash/uniqBy'
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
+import { init, withScope, captureMessage, startTransaction, captureException } from '@sentry/node';
 
 import { quoteSymbols } from '../utils/variables'
 import { getCategoriesByCoin } from '../utils/categories'
@@ -22,7 +21,7 @@ import { Prisma } from '@prisma/client'
 import { hasPlatforms } from '../utils/coingecko';
 
 dotenv.config();
-Sentry.init({
+init({
   dsn: process.env.SENTRY_DSN,
 
   // Set tracesSampleRate to 1.0 to capture 100%
@@ -335,10 +334,10 @@ const fetchLunrData = async() => {
     } else if (matchingCoins.length > 1) {
       const closestCoin = minBy(matchingCoins, (coin) => levenshtein(coin.name, lunrCoin.n));
 
-      Sentry.withScope(scope => {
+      withScope(scope => {
         scope.setLevel('warning');
         scope.setExtra('symbol', lunrCoin.s);
-        Sentry.captureMessage(`Lunr: Detected the right coin via levenshtein distance: ${closestCoin.name} (${lunrCoin.s})`);
+        captureMessage(`Lunr: Detected the right coin via levenshtein distance: ${closestCoin.name} (${lunrCoin.s})`);
       });
       console.log('Found multiple coins', matchingCoins)
       console.log('Picked', closestCoin, ' for ', lunrCoin.s, lunrCoin.n)
@@ -376,7 +375,7 @@ const fetchLunrData = async() => {
 }
 
 setTimeout(async () => {
-  const transaction = Sentry.startTransaction({
+  const transaction = startTransaction({
     op: "Datafetch",
     name: `Datafetch ${new Date()}`,
   });
@@ -389,7 +388,7 @@ setTimeout(async () => {
     }
   } catch (e) {
     console.log(e)
-    Sentry.captureException(e);
+    captureException(e);
   } finally {
     transaction.finish();
   }

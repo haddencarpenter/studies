@@ -1,11 +1,10 @@
-import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
+import { init, startTransaction, captureException } from '@sentry/node';
 import puppeteer from 'puppeteer';
 
 import prisma from '../lib/prisma'
 import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab';
 
-Sentry.init({
+init({
   dsn: process.env.SENTRY_DSN,
 
   // Set tracesSampleRate to 1.0 to capture 100%
@@ -126,7 +125,7 @@ const dropsTab = async () => {
 }
 
 const weekly = async () => {
-  const transaction = Sentry.startTransaction({
+  const transaction = startTransaction({
     op: "Weekly",
     name: "Weekly",
   });
@@ -134,7 +133,7 @@ const weekly = async () => {
     await dropsTab()
   } catch (error) {
     console.log(error)
-    Sentry.captureException(error);
+    captureException(error);
     throw(error)
   } finally {
     transaction.finish();

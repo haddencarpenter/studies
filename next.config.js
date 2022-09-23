@@ -1,6 +1,9 @@
 const withLess = require("next-with-less");
 const { withSuperjson } = require('next-superjson')
 const { withSentryConfig } = require('@sentry/nextjs');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 let moduleExports = {
   lessLoaderOptions: {
@@ -28,5 +31,6 @@ moduleExports = withSentryConfig(moduleExports, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 })
+moduleExports = withBundleAnalyzer(moduleExports)
 
 module.exports = moduleExports;

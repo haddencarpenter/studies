@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node';
+import { withScope, captureMessage } from '@sentry/node';
 import levenshtein from 'js-levenshtein';
 import minBy from 'lodash/minBy';
 
@@ -36,10 +36,10 @@ const findMatchingCoinDropstab = async (symbol, name) => {
     if (matchingCoinsBySymbol.length > 1) {
       const closestCoin = minBy(matchingCoinsBySymbol, (coin) => levenshtein(coin.name, name));
 
-      Sentry.withScope(scope => {
+      withScope(scope => {
         scope.setLevel('warning');
         scope.setExtra('symbol', symbol);
-        Sentry.captureMessage(`Detected the right coin via levenshtein distance: ${closestCoin.name} (${symbol})`);
+        captureMessage(`Detected the right coin via levenshtein distance: ${closestCoin.name} (${symbol})`);
       });
       matchingCoin = closestCoin;
     } else {
