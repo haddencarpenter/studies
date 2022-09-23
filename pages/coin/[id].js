@@ -11,7 +11,7 @@ import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
 import round from 'lodash/round';
 import take from 'lodash/take';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import UpTag from '../../components/UpTag'
 import PlatformSelect from '../../components/PlatformSelect';
@@ -179,6 +179,7 @@ export default function Coin(coin) {
     const roi = round((multiple - 1) * 100, 2);
     return <span className={roi > 0 ? coinStyles.greenRoi : coinStyles.redRoi}>{numberFormatter.format(roi)}%</span>
   }, [numberFormatter])
+  const [showChart, setShowChart] = useState(false)
   const preventCopy = (event) => {
     let selection = window.getSelection().toString();
     selection = selection.split(' ').map((piece) => {
@@ -202,6 +203,7 @@ export default function Coin(coin) {
     event.preventDefault();
   }
   useEffect(() => {
+    setShowChart(true)
     document.addEventListener('copy', preventCopy)
     return () => {
       document.removeEventListener('copy', preventCopy)
@@ -486,14 +488,16 @@ export default function Coin(coin) {
             ) : <></>
           }
           <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionChart)}>
-            <AdvancedRealTimeChart
-              autosize
-              interval="D"
-              symbol={`${coin.symbol.toUpperCase()}USDT`}
-              hide_side_toolbar={!screens.sm}
-              container_id={coinStyles.chart}
-            >
-            </AdvancedRealTimeChart>
+            { showChart ?
+              <AdvancedRealTimeChart
+                autosize
+                interval="D"
+                symbol={`${coin.symbol.toUpperCase()}USDT`}
+                hide_side_toolbar={!screens.sm}
+                container_id={coinStyles.chart}
+              /> :
+              <></>
+            }
           </Card.Grid>
         </Card>
         <Title
