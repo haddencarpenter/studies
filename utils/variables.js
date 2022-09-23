@@ -126,6 +126,6 @@ export const proxyList = [
 ]
 
 export const SUPERTREND_FLAVOR = {
-  'coinrotator': 'coinrotator',
-  'universal': 'universal',
+  'coinrotator': 'CoinRotator',
+  'classic': 'Classic',
 }

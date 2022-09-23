@@ -38,12 +38,12 @@ const HomePageTable = ({
   const router = useRouter()
   const isHoverable = useIsHoverable()
 
-  if (superTrendFlavor === SUPERTREND_FLAVOR.universal) {
+  if (superTrendFlavor === SUPERTREND_FLAVOR.classic) {
     coinsData = coinsData.map((coinData) => {
-      coinData.dailyTrends = coinData.dailyUniversalTrends
-      coinData.dailySuperSuperTrend = coinData.dailyUniversalSuperSuperTrend
-      coinData.weeklyTrends = coinData.weeklyUniversalTrends
-      coinData.weeklySuperSuperTrend = coinData.weeklyUniversalSuperSuperTrend
+      coinData.dailyTrends = coinData.dailyClassicTrends
+      coinData.dailySuperSuperTrend = coinData.dailyClassicSuperSuperTrend
+      coinData.weeklyTrends = coinData.weeklyClassicTrends
+      coinData.weeklySuperSuperTrend = coinData.weeklyClassicSuperSuperTrend
 
       return coinData
     })

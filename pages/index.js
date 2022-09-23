@@ -75,8 +75,8 @@ export async function getStaticProps() {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
     const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
     const [weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
-    const [dailyUniversalTrends, dailyUniversalSuperSuperTrend] = getTrends(ohlcs, 10, 3, false)
-    const [weeklyUniversalTrends, weeklyUniversalSuperSuperTrend] = getTrends(ohlcs, 10, 3, true)
+    const [dailyClassicTrends, dailyClassicSuperSuperTrend] = getTrends(ohlcs, 10, 3, false)
+    const [weeklyClassicTrends, weeklyClassicSuperSuperTrend] = getTrends(ohlcs, 10, 3, true)
     delete coinData.ohlcs
 
     const exchanges = convertTickersToExchanges(coinData.tickers)
@@ -88,10 +88,10 @@ export async function getStaticProps() {
       dailySuperSuperTrend,
       weeklyTrends,
       weeklySuperSuperTrend,
-      dailyUniversalTrends,
-      dailyUniversalSuperSuperTrend,
-      weeklyUniversalTrends,
-      weeklyUniversalSuperSuperTrend,
+      dailyClassicTrends,
+      dailyClassicSuperSuperTrend,
+      weeklyClassicTrends,
+      weeklyClassicSuperSuperTrend,
       ath: Number(coinData.ath),
       atl: Number(coinData.atl),
       fullyDilutedValue: Number(coinData.fullyDilutedValue),
@@ -537,7 +537,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
               value={formState.superTrendFlavor}
             >
               <Radio value={SUPERTREND_FLAVOR.coinrotator}>CoinRotator</Radio>
-              <Radio value={SUPERTREND_FLAVOR.universal}>Universal</Radio>
+              <Radio value={SUPERTREND_FLAVOR.classic}>Classic</Radio>
             </Radio.Group>
           </Col>
         </Row>
