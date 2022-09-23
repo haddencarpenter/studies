@@ -529,7 +529,14 @@ export default function Home({ coinsData, categories, exchangeData }) {
       >
         <Row>
           <Col>
-            <div>SuperTrend flavor</div>
+            <span>SuperTrend Flavor</span>
+            <Tooltip
+                placement={'right'}
+                trigger={isHoverable ? 'hover' : 'click'}
+                title="CoinRotator: ATR=5 Multiplier=1.5 Classic: ATR=10 Multiplier=3"
+            >
+              <QuestionCircleFilled className={baseStyles.tooltipIcon} />
+            </Tooltip>
           </Col>
           <Col className={indexStyles.modalInput}>
             <Radio.Group
