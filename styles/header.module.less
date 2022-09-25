@@ -1,7 +1,7 @@
 @import './variables.module.less';
 
 .header {
-  background: @white;
+  background: var(--cr-primary-bg);
   padding: 0;
   position: static;
   width: 100%;
@@ -9,6 +9,9 @@
   height: 60px;
 
   ul {
+    background: var(--cr-primary-bg);
+    color: var(--cr-primary-text);
+    border-bottom: 1px solid var(--cr-primary-border) !important;
     li {
       flex-grow: unset !important;
       padding: 0 24px !important;

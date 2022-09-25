@@ -42,6 +42,10 @@
 
 .sectionHeader {
   width: 100%;
+
+  h1 {
+    color: var(--cr-secondary-text) !important;
+  }
 }
 
 .sectionDailyTrend {
@@ -91,8 +95,8 @@
   }
 
   blockquote {
-    border-left: 4px solid rgba(@cr-black, .08);
-    background: rgba(@cr-black, .02);
+    border-left: 4px solid rgba(var(--cr-primary-text), .08);
+    background: rgba(var(--cr-primary-text), .02);
     padding: 12px;
     margin-bottom: 16px;
 
@@ -113,6 +117,7 @@
     font-size: 20px;
     line-height: 28px;
     margin-bottom: 0;
+    color: var(--cr-secondary-text) !important;
   }
 }
 
@@ -169,7 +174,7 @@
 }
 
 .value {
-  color: @cr-black;
+  color: var(--cr-primary-text);
   line-height: 24px;
   font-weight: bold;
 }
@@ -261,6 +266,7 @@
   margin: 1em 0 0.5em !important;
   text-align: center;
   text-align: left;
+  color: var(--cr-secondary-text) !important;
 }
 
 .marketTable table {

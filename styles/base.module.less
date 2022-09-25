@@ -34,10 +34,12 @@
   font-size: 30px !important;
   line-height: 38px !important;
   margin-bottom: 12px !important;
+  color: var(--cr-primary-text) !important;
 }
 
 .subtitle {
   margin-bottom: 48px !important;
+  color: var(--cr-primary-text) !important;
 
   @media (max-width: @screen-md) {
       margin-bottom: 32px !important;
@@ -48,6 +50,7 @@
   font-size: 16px !important;
   line-height: 24px !important;
   margin-bottom: 24px !important;
+  color: var(--cr-primary-text) !important;
 
   @media (max-width: @screen-md) {
     margin-bottom: 16px !important;
@@ -82,4 +85,9 @@
         fill: @cr-icon-fill-hover;
     }
   }
+}
+
+.card {
+  background-color: var(--cr-primary-bg);
+  color: var(--cr-primary-text);
 }

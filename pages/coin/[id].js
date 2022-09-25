@@ -230,7 +230,7 @@ export default function Coin(coin) {
           <Breadcrumb.Item><Link href="/"><a>Home</a></Link></Breadcrumb.Item>
           <Breadcrumb.Item><Link href={`/coin/${coin.id}`}><a>{coin.name}</a></Link></Breadcrumb.Item>
         </Breadcrumb>
-        <Card>
+        <Card className={baseStyles.card}>
           <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionHeader, coinStyles.sectionFlex)}>
             <Space>
               {/* eslint-disable-next-line @next/next/no-img-element */}

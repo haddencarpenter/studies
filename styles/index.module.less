@@ -31,6 +31,7 @@
   &:extend(.title);
 
   text-align: center;
+  color: var(--cr-primary-text) !important;
 }
 
 .subtitle {
@@ -46,7 +47,7 @@
 
   span {
     font-weight: 600;
-    color: @cr-black !important;
+    color: var(--cr-primary-text) !important;
   }
 }
 
@@ -54,6 +55,8 @@
 .filters {
   width: 100%;
   margin-bottom: 32px;
+  background-color: var(--cr-primary-bg);
+  border: 1px solid var(--cr-primary-border);
 
   .row {
     width: 100%;
@@ -63,6 +66,11 @@
     @media screen and (max-width: @screen-md) {
       margin-bottom: 12px;
     }
+
+    label {
+      color: var(--cr-primary-text);
+    }
+
   }
 
   .select {

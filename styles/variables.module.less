@@ -7,20 +7,32 @@
 // COLORS – ANT OVERRIDES
 @primary-color: @geekblue-6;
 @primary-color-hover: @geekblue-5;
+@text-color-secondary: #ACACAC; // remove override in dark mode
 
 // COLORS – COINROTATOR
-@cr-white: @background-color-light;
-@cr-black: @text-color;
+
+@cr-primary-text: @white;
 
 @cr-primary-color: @geekblue-6;
-@cr-success-color: @green-6; 
-@cr-error-color: @red-6; 
+@cr-success-color: @green-6;
+@cr-error-color: @red-6;
 
 @cr-link-hover-color: @primary-color-hover;
 @cr-icon-fill: @disabled-color;
 @cr-icon-fill-hover: @text-color;
 
-// MEDIA QUERIES 
+// DARK MODE COLORS
+
+@cr-gray-1: #141414;
+@cr-gray-2: #1D1D1D;
+@cr-gray-3: #262626;
+@cr-gray-4: #303030;
+@cr-gray-5: #434343;
+@cr-gray-8: #ACACAC;
+@cr-gray-9: #DBDBDB;
+@cr-gold-1: #2B2111;
+
+// MEDIA QUERIES
 @screen-xl: 1440px;
 @screen-lg: 900px;
 @screen-md: 600px;
@@ -28,8 +40,8 @@
 
 // EXPORTS
 :export {
-  white: @cr-white;
-  black: @cr-black;
+  white: @white;
+  black: @black;
   primaryColor: @cr-primary-color;
   successColor: @cr-success-color;
   errorColor: @cr-error-color;

@@ -448,6 +448,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
               value={portfolioInputValue}
               onChange={(e) => setPortfolioInputValue(e.target.value)}
               size="large"
+              className={indexStyles.input}
             />
           </Col>
           <Col xs={24} md={6} className={indexStyles.col}>

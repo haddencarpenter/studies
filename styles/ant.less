@@ -4,7 +4,7 @@
 // BODY SETUP
 
 body {
-  background: @cr-white;
+  background: var(--cr-secondary-bg);
 }
 
 #__next {
@@ -38,4 +38,30 @@ body {
 
 .ant-tooltip .ant-tooltip-arrow-content, .ant-tooltip .ant-tooltip-inner {
   background-color: black !important;
+}
+
+:root[data-theme="theme-light"] {
+  --cr-primary-bg: @white;
+  --cr-secondary-bg: rgba(@white, .45);
+  --cr-tertiary-bg: @white;
+  --cr-quartery-bg: @white;
+  --cr-primary-text: @black;
+  --cr-secondary-text: @black;
+  --cr-mode-bg: transparent;
+  --cr-primary-border: @border-color-split;
+
+}
+:root[data-theme="theme-dark"] {
+  --cr-primary-bg: @cr-gray-3;
+  --cr-secondary-bg: @cr-gray-2;
+  --cr-tertiary-bg: @cr-gray-1;
+  --cr-quartery-bg: @cr-gray-4;
+  --cr-primary-text: @white;
+  --cr-secondary-text: @cr-gray-9;
+  --cr-mode-bg: @cr-gold-1;
+  --cr-primary-border: @cr-gray-4;
+}
+
+.ant-breadcrumb-link > a, .ant-breadcrumb-link {
+  color: var(--cr-secondary-text) !important;
 }

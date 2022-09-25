@@ -266,9 +266,9 @@ const HomePageTable = ({
     sorter: (a, b) => Number(a.marketCap) - Number(b.marketCap),
     render: (marketCap) => {
       return (
-        <>
+        <div className={indexTableStyles.value}>
           {numberFormatter.format(Number(marketCap))}
-        </>
+        </div>
       )
     }
   },
