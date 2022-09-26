@@ -236,7 +236,7 @@ export default function Coin(coin) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
               <Title className={coinStyles.title}>{coin.name}</Title>
-              <Tag>{coin.symbol.toUpperCase()}</Tag>
+              <Tag className={coinStyles.coinTag}>{coin.symbol.toUpperCase()}</Tag>
             </Space>
           </Card.Grid>
           <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionDailyTrend, coinStyles.sectionFlex)}>
@@ -260,7 +260,7 @@ export default function Coin(coin) {
                   return (
                     <Tag key={trendKey}>
                       <span className={coinStyles.trendKey}>{trendKey.toUpperCase()}:&nbsp;</span>
-                      {trendText}
+                      <span className={coinStyles.trendText}>{trendText}</span>
                     </Tag>
                   )
                 })}
@@ -288,7 +288,7 @@ export default function Coin(coin) {
                   return (
                     <Tag key={trendKey}>
                       <span className={coinStyles.trendKey}>{trendKey.toUpperCase()}:&nbsp;</span>
-                      {trendText}
+                      <span className={coinStyles.trendText}>{trendText}</span>
                     </Tag>
                   )
                 })}
@@ -513,6 +513,7 @@ export default function Coin(coin) {
           pagination={{ position: ['none', 'none'], pageSize: 1000 }}
           bordered
           className={coinStyles.marketTable}
+          rowClassName={coinStyles.marketTableRow}
         />
       </Content>
     </>

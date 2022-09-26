@@ -13,6 +13,9 @@
   margin-right: 0 !important;
   line-height: 20px !important;
   padding: 2px 4px !important;
+  background-color: var(--cr-tertiary-bg);
+  border: 1px solid var(--cr-primary-border);
+  border-radius: 2px;
 
   @media screen and (max-width: @screen-md) {
     font-size: 10px;
@@ -23,17 +26,22 @@
   color: @text-color-secondary;
 }
 
+.trendText {
+  color: var(--cr-primary-text);
+}
+
 .signalExplainer path {
-  fill: @cr-icon-fill;
+  fill: @text-color-secondary;
 
   &:hover {
-    fill: @cr-icon-fill-hover;
+    fill: var(--cr-primary-text);
   }
 }
 
 .section {
   padding: 16px;
   min-height: 64px;
+  box-shadow: 1px 0 0 0 var(--cr-primary-border), 0 1px 0 0 var(--cr-primary-border), 1px 1px 0 0 var(--cr-primary-border), 1px 0 0 0 var(--cr-primary-border) inset, 0 1px 0 0 var(--cr-primary-border) inset !important;
 }
 
 .sectionFlex {
@@ -271,6 +279,36 @@
 
 .marketTable table {
   table-layout: fixed !important;
+
+  background-color: var(--cr-secondary-bg);
+  border-left: 1px solid var(--cr-primary-border) !important;
+  border-top: 1px solid var(--cr-primary-border) !important;
+  border-radius: 2px;
+
+  thead tr th {
+    font-weight: bold;
+    background-color: var(--cr-tertiary-bg) !important;
+    color: var(--cr-primary-text);
+    user-select: none;
+    border-right: 1px solid var(--cr-primary-border) !important;
+    border-bottom: 0px solid var(--cr-primary-border) !important;
+  }
+
+  tbody tr td {
+    border-right: 1px solid var(--cr-primary-border) !important;
+    border-bottom: 1px solid var(--cr-primary-border) !important;
+    background-color: var(--cr-secondary-bg);
+  }
+}
+
+.marketTable > div > div > div > div {
+  border-left: 1px solid var(--cr-primary-border) !important;
+  background-color: var(--cr-secondary-bg);
+  color: var(--cr-primary-text);
+}
+
+.marketTableRow:hover {
+  color: var(--cr-primary-bg);
 }
 
 .marketSpace {
@@ -290,4 +328,9 @@
 
 .marketTrustScoreNegative {
   background: @cr-error-color;
+}
+
+.coinTag {
+  color: var(--cr-primary-text);
+  background: var(--cr-secondary-bg);
 }
