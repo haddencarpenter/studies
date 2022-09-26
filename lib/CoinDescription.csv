@@ -421,7 +421,7 @@ The hybrid XDPoS has several advantages over existing public or private blockcha
 
 ## What is the XDC Coin?
 
-The XDC token is the underlying utility coin that powers the XDC hybrid blockchain. XDC coins are needed to pay transaction fees as well as act as settlement mechanisms for Decentralised Applications (DApps) running on the XDC Network. For users running a KYC masternode, XDC can be staked for XDC’s block production rewards. The current price of the XDC token is {{currentprice}} and it has a circulating supply of {{circulatingsupply}} out of a max supply of {{}}. The current market cap sits at {{marketcap}}.
+The XDC token is the underlying utility coin that powers the XDC hybrid blockchain. XDC coins are needed to pay transaction fees as well as act as settlement mechanisms for Decentralised Applications (DApps) running on the XDC Network. For users running a KYC masternode, XDC can be staked for XDC’s block production rewards. The current price of the XDC token is {{currentprice}} and it has a circulating supply of {{circulatingsupply}} out of a max supply of 37,782,047,825. The current market cap sits at {{marketcap}}.
 
 ## Who is the Team Behind the XDC Network?
 
