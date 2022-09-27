@@ -8,7 +8,7 @@ import useDarkMode from '../hooks/usedarkmode';
 
 const Header = () => {
   const { Header: AntHeader } = Layout;
-  const [darkMode, setDarkMode] = useDarkMode()
+  const [darkMode, setDarkMode] = useDarkMode();
 
   return (
     <AntHeader className={headerStyles.header}>
