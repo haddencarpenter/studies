@@ -11,7 +11,7 @@ import endOfYesterday from 'date-fns/endOfYesterday';
 import pick from 'lodash/pick';
 import round from 'lodash/round';
 import take from 'lodash/take';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 
 import UpTag from '../../components/UpTag'
 import PlatformSelect from '../../components/PlatformSelect';
@@ -32,6 +32,7 @@ import classnames from 'classnames';
 import baseStyles from '../../styles/base.module.less'
 import coinStyles from '../../styles/coin.module.less'
 import variableStyles from '../../styles/variables.module.less'
+import { DarkModeContext } from '../_app';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -84,6 +85,7 @@ export default function Coin(coin) {
 
   const screens = useBreakPoint();
   const isHoverable = useIsHoverable();
+  const [darkMode] = useContext(DarkModeContext);
   const isServer = typeof window === 'undefined';
 
   const columns = []
@@ -495,6 +497,7 @@ export default function Coin(coin) {
                 symbol={`${coin.symbol.toUpperCase()}USDT`}
                 hide_side_toolbar={!screens.sm}
                 container_id={coinStyles.chart}
+                theme={darkMode ? "dark" : "light"}
               /> :
               <></>
             }
