@@ -1647,7 +1647,7 @@ The aforementioned modified PoS is merged with distributed ledger technology DAG
 
 ### Byzantine Fault Tolerance
 
-Finally, Byzantine Fault Tolerance architecture is applied to the protocol. This ensures that even if up to ⅓ of the network becomes compromised by bad faith actors, the blockchain can still operate security and produce an immutable and proven transaction history.
+Finally, Byzantine Fault Tolerance architecture is applied to the protocol. This ensures that even if up to ⅓ of the network becomes compromised by bad faith actors, the blockchain can still operate securely and produce an immutable and proven transaction history.
 
 ### Aleph Zero Framework Built with Substrate Stack
 
@@ -1708,7 +1708,7 @@ Nominators can vouch for validators by delegating their staked tokens. The minim
 
 ## Aleph Zero Price Prediction
 
-Looking at the price chart for $AZERO we can see it reached an all-time high of {{ath}}, with a current price at {{currentprice}} which marks a {{percentagefromath}} drawdown, which has been seen throughout the larger crypto market. The marketcap is {{marketcap}} with a circulating supply of {{circulatingsupply}} which represents {{percentagecirculatingsupply}}. For comparison, a smart contract layer 1 such as [Solana](https://coinrotator.app/?portfolio=sol), with 1.5x the supply reached an all-time high of $259, which gives an indication of what price action is possible if the chain was to gain traction. Although this is strictly not investment advice and is more to highlight a potential outcome.
+Looking at the price chart for $AZERO we can see it reached an all-time high of $3.11, with a current price at {{currentprice}} which marks a significant drawdown, which has been seen throughout the larger crypto market. For comparison, a smart contract layer 1 such as [Solana](https://coinrotator.app/?portfolio=sol), with 1.5x the supply reached an all-time high of $259, which gives an indication of what price action is possible if the chain was to gain traction. Although this is strictly not investment advice and is more to highlight a potential outcome.
 
 ## Future Releases from The Aleph Zero Foundation
 
