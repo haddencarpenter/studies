@@ -285,7 +285,7 @@ export async function getStaticProps({ params }) {
   const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   const chainsData = await getChainsData();
   const exchanges = await prisma.exchange.findMany()
-  coinData.tickers = coinData.tickers.map((ticker, index) => {
+  coinData.tickers = coinData.tickers.map((ticker) => {
     const baseSymbol = ticker.base.toUpperCase()
     const quoteSymbol = ticker.target.toUpperCase()
     const exchangeName = ticker.market.name
@@ -294,7 +294,7 @@ export async function getStaticProps({ params }) {
       matchingExchange = minBy(exchanges, (exchange) => levenshtein(exchange.name, exchangeName))
     }
     return {
-      index: index + 1,
+      key: `${baseSymbol}/${quoteSymbol}${exchangeName}`,
       name: exchangeName,
       tradeLink: ticker.trade_url,
       volume: ticker.volume,
@@ -303,6 +303,23 @@ export async function getStaticProps({ params }) {
       trustScore: ticker.trust_score,
       centralized: matchingExchange?.centralized
     }
+  })
+  coinData.derivatives.forEach((derivative) => {
+    const marketName = derivative['market']
+    let matchingMarket = exchanges.find((exchange) => exchange.name === marketName)
+    if (!matchingMarket) {
+      matchingMarket = minBy(exchanges, (exchange) => { levenshtein(exchange.name, marketName) })
+    }
+    coinData.tickers.push({
+      key: `derivative${derivative['symbol']}${marketName}`,
+      name: marketName,
+      tradeLink: matchingMarket?.url,
+      volume: null,
+      baseSymbol: null,
+      pair: derivative['symbol'],
+      trustScore: null,
+      derivative: true
+    })
   })
 
   coinData = pick(coinData, [

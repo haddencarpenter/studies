@@ -24,14 +24,13 @@ const TradeTab = ({ coin, screens }) => {
       tableData = coin.tickers;
       break;
     case EXCHANGE_FILTER.spot:
-      tableData = coin.tickers.filter(ticker => ticker.centralized);
+      tableData = coin.tickers.filter(ticker => ticker.centralized && !ticker.derivative);
       break;
     case EXCHANGE_FILTER.dex:
-      tableData = coin.tickers.filter(ticker => !ticker.centralized);
+      tableData = coin.tickers.filter(ticker => !ticker.centralized && !ticker.derivative);
       break;
     case EXCHANGE_FILTER.derivatives:
-      // TODO:
-      tableData = coin.tickers;
+      tableData = coin.tickers.filter(ticker => ticker.derivative);
       break;
   }
 
@@ -69,12 +68,13 @@ const TradeTab = ({ coin, screens }) => {
       dataIndex: 'volume',
       sorter: (a, b) => a.volume - b.volume,
       sortOrder: 'descend',
-      render: (volume) => currencyFormatter.format(volume)
+      render: (volume) => volume ? currencyFormatter.format(volume) : null
     })
     columns.push({
       title: 'Trust score',
       dataIndex: 'trustScore',
       render: (trustScore) => {
+        if (trustScore === null) { return null; }
         const good = trustScore === 'green'
         const classNames = {
           [coinStyles.marketTrustScore]: true,
@@ -99,6 +99,7 @@ const TradeTab = ({ coin, screens }) => {
         optionType="button"
         onChange={(e) => setExchangeFilter(e.target.value) }
         value={exchangeFilter}
+        className={coinStyles.marketFilter}
       >
         {Object.keys(EXCHANGE_FILTER).map((filterKey) => {
           const value = EXCHANGE_FILTER[filterKey]
