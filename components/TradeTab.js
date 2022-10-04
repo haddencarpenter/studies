@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { Table, Space, Button, Typography } from 'antd';
+import { Card, Table, Space, Button, Typography } from 'antd';
 
 import coinStyles from '../styles/coin.module.less';
 import cleanupExchangeLink from '../utils/cleanupExchangeLink';
@@ -76,7 +76,7 @@ const TradeTab = ({ coin, screens }) => {
   }
 
   return (
-    <>
+    <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionTrade)}>
       <Title
           level={2}
           id="markets"
@@ -91,7 +91,7 @@ const TradeTab = ({ coin, screens }) => {
           bordered
           className={coinStyles.marketTable}
         />
-    </>
+    </Card.Grid>
   )
 }
 
