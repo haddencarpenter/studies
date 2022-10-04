@@ -78,19 +78,19 @@ const TradeTab = ({ coin, screens }) => {
   return (
     <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionTrade)}>
       <Title
-          level={2}
-          id="markets"
-          className={classnames(coinStyles.title, coinStyles.marketTitle)}
-        >
-          {coin.symbol.toUpperCase()} Markets
-        </Title>
-        <Table
-          columns={columns}
-          dataSource={tableData}
-          pagination={{ position: ['none', 'none'], pageSize: 1000 }}
-          bordered
-          className={coinStyles.marketTable}
-        />
+        level={3}
+        id="markets"
+        className={classnames(coinStyles.title, coinStyles.marketTitle)}
+      >
+        {coin.symbol.toUpperCase()} Markets
+      </Title>
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        pagination={{ position: ['none', 'none'], pageSize: 1000 }}
+        bordered
+        className={coinStyles.marketTable}
+      />
     </Card.Grid>
   )
 }
