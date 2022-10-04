@@ -6,7 +6,7 @@ import minBy from 'lodash/minBy';
 import levenshtein from 'js-levenshtein';
 
 import prisma from '../lib/prisma'
-import coinGecko from '../lib/coinGecko';
+import coinGecko, { getExchange } from '../lib/coinGecko';
 import { getCoin, getCoins } from '../lib/coinpaprika'
 
 dotenv.config();
@@ -26,6 +26,10 @@ const fetchExchanges = async () => {
     await new Promise((res) => setTimeout(res, 6000))
     let exchangeData = (await coinGecko.get(`/exchanges/${exchange.id}`)).data
     exchangeData = pick(exchangeData, ['name', 'image', 'url'])
+
+    const exchangeDetailData = (await getExchange(exchange.id)).data
+
+    exchangeData.centralized = Boolean(exchangeDetailData['centralized'])
 
     await prisma.exchange.upsert({
       where: { id: exchange.id },
