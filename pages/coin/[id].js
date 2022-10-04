@@ -2,12 +2,13 @@ import { InfoCircleFilled } from '@ant-design/icons';
 import { Breadcrumb, Card, Layout, Space, Tag, Tooltip, Typography } from 'antd';
 import Link from 'next/link'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { Prisma } from '@prisma/client'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import minBy from 'lodash/minBy';
 import pick from 'lodash/pick';
 import take from 'lodash/take';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import levenshtein from 'js-levenshtein';
 
 import prisma from '../../lib/prisma'
@@ -75,7 +76,26 @@ export default function Coin(coin) {
   const ogTitle = `${coin.name} | ${dailySignal.toUpperCase()} | ${dateFormatter.format(new Date())} | Coinrotator`
   const metaDescription = `Coinrotator issues a daily trend for ${coin.name}. A coin screener that captures strong momentum in both directions!`
 
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(TABS.tokenomics)
+  useEffect(() => {
+    if (router.isReady) {
+      let routerTab = router.query.tab
+      if (!Object.values(TABS).indexOf(routerTab)) {
+        routerTab = TABS.tokenomics
+      }
+      setActiveTab(routerTab)
+    }
+  }, [router])
+  const clickTab = useCallback((activeTab) => {
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        tab: activeTab
+      }
+    }, null, { shallow: true })
+  }, [router])
   let ActiveTabComponent;
   switch (activeTab) {
     case TABS.tokenomics:
@@ -209,10 +229,10 @@ export default function Coin(coin) {
               <Card.Grid
                 hoverable={false}
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => clickTab(tab)}
                 className={classnames(coinStyles.tab, { [coinStyles.active]: tab === activeTab })}
               >
-                <Title level={2} className={classnames(coinStyles.tabTitle, { [coinStyles.activeTitle]: tab === activeTab })}>{tab}</Title>
+                <Title id={tab} level={2} className={classnames(coinStyles.tabTitle, { [coinStyles.activeTitle]: tab === activeTab })}>{tab}</Title>
               </Card.Grid>
             );
           })}
