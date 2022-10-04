@@ -3,13 +3,14 @@ import { Breadcrumb, Card, Layout, Space, Tag, Tooltip, Typography } from 'antd'
 import Link from 'next/link'
 import Head from 'next/head'
 import { Prisma } from '@prisma/client'
-import prisma from '../../lib/prisma'
-
 import endOfYesterday from 'date-fns/endOfYesterday';
+import minBy from 'lodash/minBy';
 import pick from 'lodash/pick';
 import take from 'lodash/take';
 import { useEffect, useState } from 'react';
+import levenshtein from 'js-levenshtein';
 
+import prisma from '../../lib/prisma'
 import UpTag from '../../components/UpTag';
 import DownTag from '../../components/DownTag';
 import HodlTag from '../../components/HodlTag';
@@ -283,6 +284,26 @@ export async function getStaticProps({ params }) {
 
   const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   const chainsData = await getChainsData();
+  const exchanges = await prisma.exchange.findMany()
+  coinData.tickers = coinData.tickers.map((ticker, index) => {
+    const baseSymbol = ticker.base.toUpperCase()
+    const quoteSymbol = ticker.target.toUpperCase()
+    const exchangeName = ticker.market.name
+    let matchingExchange = exchanges.find((exchange) => exchange.name === exchangeName)
+    if (!matchingExchange) {
+      matchingExchange = minBy(exchanges, (exchange) => levenshtein(exchange.name, exchangeName))
+    }
+    return {
+      index: index + 1,
+      name: exchangeName,
+      tradeLink: ticker.trade_url,
+      volume: ticker.volume,
+      baseSymbol: baseSymbol,
+      pair: `${baseSymbol}/${quoteSymbol}`,
+      trustScore: ticker.trust_score,
+      centralized: matchingExchange?.centralized
+    }
+  })
 
   coinData = pick(coinData, [
     'id',

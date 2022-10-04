@@ -1,30 +1,41 @@
 import classnames from 'classnames';
-import { Card, Table, Space, Button, Typography } from 'antd';
+import { Card, Table, Space, Button, Radio, Typography } from 'antd';
+import { useState } from 'react';
 
 import coinStyles from '../styles/coin.module.less';
 import cleanupExchangeLink from '../utils/cleanupExchangeLink';
 
 const { Title } = Typography;
+const EXCHANGE_FILTER = {
+  'all': 'All',
+  'spot': 'Spot',
+  'dex': 'DEX',
+  'derivatives': 'Derivatives'
+}
 
 const TradeTab = ({ coin, screens }) => {
+  const [exchangeFilter, setExchangeFilter] = useState(EXCHANGE_FILTER.all)
   const notation = screens.sm ? 'standard' : 'compact'
   const currencyFormatter = new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'symbol', notation })
-  const tableData = coin.tickers.map((ticker, index) => {
-    const baseSymbol = ticker.base.toUpperCase()
-    const quoteSymbol = ticker.target.toUpperCase()
-    return {
-      index: index + 1,
-      name: ticker.market.name,
-      tradeLink: ticker.trade_url,
-      volume: ticker.volume,
-      baseSymbol: baseSymbol,
-      pair: `${baseSymbol}/${quoteSymbol}`,
-      trustScore: ticker.trust_score,
-    }
-  })
+
+  let tableData;
+  switch(exchangeFilter) {
+    case EXCHANGE_FILTER.all:
+      tableData = coin.tickers;
+      break;
+    case EXCHANGE_FILTER.spot:
+      tableData = coin.tickers.filter(ticker => ticker.centralized);
+      break;
+    case EXCHANGE_FILTER.dex:
+      tableData = coin.tickers.filter(ticker => !ticker.centralized);
+      break;
+    case EXCHANGE_FILTER.derivatives:
+      // TODO:
+      tableData = coin.tickers;
+      break;
+  }
 
   const isServer = typeof window === 'undefined';
-
   const columns = []
   const exchangeColumn = {
     title: 'Exchange',
@@ -84,6 +95,21 @@ const TradeTab = ({ coin, screens }) => {
       >
         {coin.symbol.toUpperCase()} Markets
       </Title>
+      <Radio.Group
+        optionType="button"
+        onChange={(e) => setExchangeFilter(e.target.value) }
+        value={exchangeFilter}
+      >
+        {Object.keys(EXCHANGE_FILTER).map((filterKey) => {
+          const value = EXCHANGE_FILTER[filterKey]
+          return (
+            <Radio.Button
+              key={filterKey}
+              value={value}
+            >{value}</Radio.Button>
+          )
+        })}
+      </Radio.Group>
       <Table
         columns={columns}
         dataSource={tableData}
