@@ -68,9 +68,6 @@ const TokenomicsTab = ({ coin, screens }) => {
         ) : <></>}
       </Space>
     </Card.Grid>
-    <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionTokenomicsHeader)}>
-      <Title level={2}>{coin.name} Tokenomics</Title>
-    </Card.Grid>
     <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionData, coinStyles.sectionDataC1)}>
       { coin.marketCap ? (
         <div className={coinStyles.data}>
