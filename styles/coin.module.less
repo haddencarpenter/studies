@@ -48,11 +48,29 @@
   display: flex;
 }
 
+.sectionParent {
+  min-height: 35vh;
+
+  @media screen and (max-width: @screen-sm) {
+    min-height: unset;
+  }
+}
+
 .sectionHeader {
   width: 100%;
 
   h1 {
     color: var(--cr-secondary-text) !important;
+  }
+}
+
+.sectionsDailyAndWeekly {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+
+  @media screen and (max-width: @screen-lg) {
+    flex-direction: column;
   }
 }
 
@@ -74,6 +92,43 @@
   }
 }
 
+.tab {
+  width: calc(100% / 3);
+  text-align: center;
+  cursor: pointer;
+  box-shadow: none;
+  border: 1px solid var(--cr-primary-border);
+
+  &.active {
+    background-color: var(--cr-secondary-bg);
+    cursor: auto;
+  }
+
+  &.noRightBorder {
+    border-right: 0;
+  }
+
+  &.noLeftBorder {
+    border-left: 0;
+  }
+
+  @media screen and (max-width: @screen-sm) {
+    padding: 20px;
+  }
+}
+
+.tabTitle {
+  font-size: 14px !important;
+  font-weight: bold;
+  color: var(--cr-tertiary-text) !important;
+  margin-bottom: 0 !important;
+  user-select: none;
+
+  &.activeTitle {
+    color: var(--cr-primary-color) !important;
+  }
+}
+
 .sectionDescription {
   width: 100%;
   padding-right: 32px;
@@ -89,7 +144,7 @@
   }
 
   p {
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
 
   img {
@@ -98,9 +153,9 @@
     margin-bottom: 16px;
 
     @media screen and (max-width: @screen-lg) {
-    width: 100%;
-    height: auto;
-  }
+      width: 100%;
+      height: auto;
+    }
   }
 
   blockquote {
@@ -119,24 +174,18 @@
   }
 }
 
-.sectionTokenomicsHeader {
-  width: 100%;
-
-  h2 {
-    font-size: 20px;
-    line-height: 28px;
-    margin-bottom: 0;
-    color: var(--cr-secondary-text) !important;
-  }
-}
-
 .sectionContract {
+  border-top: 0 !important;
+  box-shadow: 1px 0 0 0 var(--cr-primary-border), 0 0px 0 0 var(--cr-primary-border), 1px 0px 0 0 var(--cr-primary-border), 1px 0 0 0 var(--cr-primary-border) inset, 0 0px 0 0 var(--cr-primary-border) inset !important;
+
   @media screen and (max-width: @screen-lg) {
-    width: 100%;
+    width: 100% !important;
   }
 }
 
 .sectionOnline {
+  box-shadow: 1px 0 0 0 var(--cr-primary-border), 0 0px 0 0 var(--cr-primary-border), 1px 0px 0 0 var(--cr-primary-border), 1px 0 0 0 var(--cr-primary-border) inset, 0 0px 0 0 var(--cr-primary-border) inset !important;
+
   @media screen and (max-width: @screen-md) {
     width: 100%;
   }
@@ -167,7 +216,6 @@
 .sectionData {
   min-height: 288px;
   width: 25%;
-
 
   @media screen and (max-width: @screen-sm) {
     width: 100% !important;
@@ -276,11 +324,21 @@
 
 // Market
 
+.sectionTrade {
+  width: 100%;
+  padding: 0;
+}
+
 .marketTitle {
-  margin: 1em 0 0.5em !important;
+  margin: 1em 1em 0.5em !important;
   text-align: center;
   text-align: left;
   color: var(--cr-secondary-text) !important;
+}
+
+.marketFilter {
+  display: block;
+  margin: 22px;
 }
 
 .marketTable table {

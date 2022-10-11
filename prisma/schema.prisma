@@ -116,4 +116,5 @@ model Exchange {
   name String
   image String
   url String
+  centralized Boolean @default(false)
 }
