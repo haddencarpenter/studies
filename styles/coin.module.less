@@ -223,6 +223,12 @@
   }
 }
 
+:root[data-theme="theme-dark"] {
+  .sectionData :global(.ant-tag) {
+    background-color: @cr-gray-4;
+  }
+}
+
 .data {
   margin-bottom: 16px;
 }
@@ -414,5 +420,9 @@
 :root[data-theme="theme-dark"] {
   #chart + div > a > span {
     color: var(--cr-primary-color) !important;
+  }
+
+  .coinTag {
+    border: 1px solid @cr-gray-5;
   }
 }
