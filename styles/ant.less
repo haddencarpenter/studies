@@ -94,6 +94,41 @@ body {
   border: none;
 }
 
+.ant-modal {
+  div, input {
+    background-color: var(--cr-secondary-bg) !important;
+    color: var(--cr-secondary-text) !important;
+  }
+
+  input {
+    border: 1px solid var(--cr-secondary-border);
+  }
+
+  .ant-modal-header, .ant-modal-body, .ant-modal-footer {
+    border: 1px solid var(--cr-secondary-border) !important;
+  }
+
+  .ant-modal-header {
+    border-bottom: 0 !important;
+  }
+
+  .ant-modal-footer {
+    border-top: 0 !important;
+  }
+
+  .ant-modal-close {
+    path  {
+      fill: var(--cr-primary-text);
+    }
+
+    &:hover {
+      path  {
+        fill: var(--cr-secondary-text);
+      }
+    }
+  }
+}
+
 .ant-tag {
   border-color: transparent;
   background-color: var(--cr-tertiary-bg);
