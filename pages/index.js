@@ -130,6 +130,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
+  const [marketHealthModalVisible, setMarketHealthModalVisible] = useState(false)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_FROM_ROUTE_PARAMS':
@@ -437,7 +438,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
       {/* <Alert message={<span>Win 100 USDT. Please answer our <b>super brief</b> CoinRotator <a href='https://docs.google.com/forms/d/e/1FAIpQLSdaAbzeWl0wUMSnE3RZZEyX-MxqE9XOnVSCyWXg3Gcpv-rzdg/viewform' target='_blank' rel='noreferrer'>survey</a>.</span>} type="info" closable className={indexStyles.message}/> */}
       <Title className={indexStyles.title}>Search For The Most Profitable Coins</Title>
       <Paragraph className={indexStyles.subtitle} type="secondary"><span>CoinRotator</span> tracks price trends for the top 1,000 cryptocurrencies, all updated daily on a single dashboard. Instantly check the coin screener for each market using our proprietary version of the Supertrend.</Paragraph>
-      <Button type="primary" className={indexStyles.marketHealthButton}>Market Health</Button>
+      <Button type="primary" className={indexStyles.marketHealthButton} onClick={() => setMarketHealthModalVisible(true)}>Market Health</Button>
       <Card className={indexStyles.filters}>
         <Row className={indexStyles.row} type="flex" gutter={16}>
           <Col xs={24} md={6} className={indexStyles.col}>
@@ -711,6 +712,14 @@ export default function Home({ coinsData, categories, exchangeData }) {
             </Select>
           </Col>
         </Row>
+      </Modal>
+      <Modal
+        visible={marketHealthModalVisible}
+        title="Market Health"
+        onCancel={() => setMarketHealthModalVisible(false)}
+        footer={null}
+      >
+
       </Modal>
       <Row className={indexStyles.tableRow}>
         <HomePageTable
