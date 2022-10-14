@@ -728,15 +728,15 @@ export default function Home({ coinsData, categories, exchangeData }) {
             [
               {
                 trend: signals.buy,
-                amount: 18
+                amount: coinsData.filter(coin => coin.dailySuperSuperTrend === signals.buy).length
               },
               {
                 trend: signals.hodl,
-                amount: 10
+                amount: coinsData.filter(coin => coin.dailySuperSuperTrend === signals.hodl).length
               },
               {
                 trend: signals.sell,
-                amount: 22
+                amount: coinsData.filter(coin => coin.dailySuperSuperTrend === signals.sell).length
               },
             ]
           }
