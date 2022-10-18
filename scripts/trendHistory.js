@@ -55,7 +55,10 @@ const compileTrendHistory = async () => {
     let reverseEthTrends = trends.eth?.reverse() || [];
     let reverseBtcTrends = trends.btc?.reverse() || [];
 
-    for (let i = 0, date = startOfDay(new Date()); reverseBtcTrends[i] !== '' && reverseEthTrends[i] !== '' && reverseUsdTrends[i] !== ''; i++, date = startOfDay(subDays(date, 1))) {
+    for (let i = 0, date = startOfDay(new Date());
+         reverseBtcTrends[i] !== '' && reverseEthTrends[i] !== '' && reverseUsdTrends[i] !== '';
+         i++, date = startOfDay(subDays(date, 1))
+        ) {
       const superSupertrend = supersupertrend({
         eth: reverseEthTrends[i] || 0,
         btc: reverseBtcTrends[i] || 0,
@@ -65,8 +68,8 @@ const compileTrendHistory = async () => {
         date,
         superSupertrend
       })
-      const dayAlreadyStored = trendDays.find((existingDay) => existingDay.getTime() === date.getTime())
-      if (!dayAlreadyStored) {
+      const dayStored = trendDays.find(existingDay => existingDay.getTime() === date.getTime())
+      if (!dayStored) {
         trendDays.push(date);
       }
     }
@@ -75,24 +78,15 @@ const compileTrendHistory = async () => {
   }
   const trendReportFile = await fs.open('./supertrends.csv', 'a+');
   for (let date of trendDays) {
-    const upCoins = coinsData.filter((coin) => {
-      return coin.dailySuperSuperTrends.find((dailyTrend) => {
-        return dailyTrend.date.getTime() === date.getTime() &&
-               dailyTrend.superSupertrend === signals.buy
-      })
-    })
-    const hodlCoins = coinsData.filter((coin) => {
-      return coin.dailySuperSuperTrends.find((dailyTrend) => {
-        return dailyTrend.date.getTime() === date.getTime() &&
-               dailyTrend.superSupertrend === signals.hodl
-      })
-    })
-    const downCoins = coinsData.filter((coin) => {
-      return coin.dailySuperSuperTrends.find((dailyTrend) => {
-        return dailyTrend.date.getTime() === date.getTime() &&
-               dailyTrend.superSupertrend === signals.sell
-      })
-    })
+    const currentDateTrends = coinsData.filter((coin) => coin.dailySuperSuperTrends.find((dailyTrend) =>
+      dailyTrend.date.getTime() === date.getTime()))
+
+    const upCoins = currentDateTrends.filter((coin) =>
+      coin.dailySuperSuperTrends.find((dailyTrend) => dailyTrend.superSupertrend === signals.buy))
+    const hodlCoins = currentDateTrends.filter((coin) =>
+      coin.dailySuperSuperTrends.find((dailyTrend) => dailyTrend.superSupertrend === signals.hodl))
+    const downCoins = currentDateTrends.filter((coin) =>
+      coin.dailySuperSuperTrends.find((dailyTrend) => dailyTrend.superSupertrend === signals.sell))
 
     const data = [
       format(date, 'yyyy-MM-dd'),
