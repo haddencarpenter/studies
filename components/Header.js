@@ -1,6 +1,7 @@
 import { Layout, Menu } from 'antd'
 
 import Logo from './Logo'
+import Search from './Search'
 
 import headerStyles from '../styles/header.module.less'
 import DarkModeSwitch from './DarkModeSwitch';
@@ -16,6 +17,9 @@ const Header = () => {
       <Menu mode="horizontal">
         <Menu.Item key="logo" className={headerStyles.logo} data-id="logo">
           <Logo />
+        </Menu.Item>
+        <Menu.Item key="search" className={headerStyles.search}>
+          <Search />
         </Menu.Item>
         <Menu.Item key="dark-mode" className={headerStyles.darkModeSwitchItem}><DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} /></Menu.Item>
       </Menu>

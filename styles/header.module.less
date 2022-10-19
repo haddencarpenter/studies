@@ -14,7 +14,6 @@
     border-bottom: 1px solid var(--cr-primary-border) !important;
     li {
       flex-grow: unset !important;
-      padding: 0 24px !important;
 
       @media (max-width: @screen-sm) {
         padding: 0 16px !important;
@@ -24,6 +23,7 @@
 }
 
 .logo {
+  padding: 0 24px !important;
   flex-grow: 1;
 
   &:hover {
@@ -36,14 +36,22 @@
   }
 }
 
-.darkModeSwitchItem {
+.search {
+  margin-left: auto;
+  padding-right: 0 !important;
+}
+
+.darkModeSwitchItem, .search {
   display: flex !important;
   align-items: center !important;
-  margin-left: auto;
   user-select: none;
 }
 
-.darkModeSwitchItem::after {
+.darkModeSwitchItem {
+  padding-left: 16px !important;
+}
+
+.darkModeSwitchItem::after, .search::after {
   display: none;
 }
 
