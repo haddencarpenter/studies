@@ -14,10 +14,6 @@
     border-bottom: 1px solid var(--cr-primary-border) !important;
     li {
       flex-grow: unset !important;
-
-      @media (max-width: @screen-sm) {
-        padding: 0 16px !important;
-      }
     }
   }
 }
@@ -39,6 +35,10 @@
 .search {
   margin-left: auto;
   padding-right: 0 !important;
+
+  @media (max-width: @screen-sm) {
+    padding-left: 0 !important;
+  }
 }
 
 .darkModeSwitchItem, .search {
@@ -48,7 +48,7 @@
 }
 
 .darkModeSwitchItem {
-  padding-left: 16px !important;
+  padding: 0 16px !important;
 }
 
 .darkModeSwitchItem::after, .search::after {
