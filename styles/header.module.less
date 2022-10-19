@@ -56,15 +56,13 @@
 }
 
 .darkModeSwitch {
-  box-sizing: border-box;
   flex-direction: row;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 6px 8px;
-  width: 77px;
   height: 34px;
-  background: var(--cr-primary-bg);
+  background: var(--cr-tertiary-bg);
   border-radius: 2px;
   border: 1px solid var(--cr-secondary-border);
   color: var(--cr-primary-text);
@@ -78,5 +76,10 @@
   img[alt="sun"] {
     border-radius: 2px;
     padding: 2px;
+    background-color: #2B2111;
+  }
+
+  img[alt="moon"] {
+    background-color: @geekblue-1;
   }
  }
