@@ -25,10 +25,10 @@ const bot = async () => {
     name: "Bot Transaction",
   });
   try {
-    const coinsData = await getFreshSignals();
+    const [dailyFreshSignals, weeklyFreshSignals] = await getFreshSignals();
     const today = new Date();
-    const trimmedCoinsData = coinsData.slice(0, 20)
-    for (const coin of trimmedCoinsData) {
+    const trimmedDailyFreshSignals = dailyFreshSignals.slice(0, 20)
+    for (const coin of trimmedDailyFreshSignals) {
       const symbol = coin.symbol.toUpperCase()
       const tweetPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.todaySuperSuperTrend} today! Find out more at coinrotator.app/coin/${coin.id} #CoinRotator $${symbol} @${coin.twitter}`
       const channelPost = `${coin.name} (${symbol}) changed from ${coin.yesterdaySuperSuperTrend} to ${coin.todaySuperSuperTrend} today! Find out more at https://coinrotator.app/coin/${coin.id}`
@@ -54,22 +54,24 @@ const bot = async () => {
       await new Promise((res) => setTimeout(res, 1000))
     }
     await new Promise((res) => setTimeout(res, 50000))
-    const dailyGroupedTrends = groupBy(coinsData, 'todaySuperSuperTrend')
+    const dailyGroupedTrends = groupBy(dailyFreshSignals, 'todaySuperSuperTrend')
     for (const [todaySuperSuperTrend, dailyTrendData] of Object.entries(dailyGroupedTrends)) {
       const fileName = `${format(today, 'MM-dd-yyyy')} ${todaySuperSuperTrend} Trends.txt`
       const documentText = dailyTrendData
         .map(coin => `${coin.symbol.toUpperCase()}USDT`)
         .join(`\n`)
+      console.log(documentText)
       sendDocument(fileName, Readable.from(documentText))
       await new Promise((res) => setTimeout(res, 1000))
     }
     if (isMonday(today)) {
-      const weekGroupedTrends = groupBy(coinsData, 'weekSuperSuperTrend')
+      const weekGroupedTrends = groupBy(weeklyFreshSignals, 'weekSuperSuperTrend')
       for (const [weekSuperSuperTrend, weekTrendData] of Object.entries(weekGroupedTrends)) {
         const fileName = `Weekly ${weekSuperSuperTrend} Trends.txt`
         const documentText = weekTrendData
           .map(coin => `${coin.symbol.toUpperCase()}USDT`)
           .join(`\n`)
+        console.log('weekly signals', documentText)
         sendDocument(fileName, Readable.from(documentText))
         await new Promise((res) => setTimeout(res, 1000))
       }

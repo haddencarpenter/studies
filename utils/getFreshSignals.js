@@ -54,10 +54,11 @@ const getFreshSignals = async () => {
     coin.weekSuperSuperTrend = weekSuperSuperTrend
     coin.lastWeekSuperSuperTrend = lastWeekSuperSuperTrend
   }
-  coinsData = coinsData.filter((coinData) => coinData.superSuperTrend !== coinData.yesterdaySuperSuperTrend);
   coinsData = coinsData.sort((a, b) => Number(b.marketCap - a.marketCap))
+  const dailyFreshSignals = coinsData.filter((coinData) => coinData.todaySuperSuperTrend !== coinData.yesterdaySuperSuperTrend);
+  const weeklyFreshSignals = coinsData.filter((coinData) => coinData.weekSuperSuperTrend !== coinData.lastWeekSuperSuperTrend);
 
-  return coinsData
+  return [dailyFreshSignals, weeklyFreshSignals]
 }
 
 export default getFreshSignals
