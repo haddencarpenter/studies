@@ -50,7 +50,6 @@ const Search = ({ categories, coins }) => {
   return (
     <Select
       showSearch
-      open
       value={null}
       ref={selectRef}
       placeholder="Search"
