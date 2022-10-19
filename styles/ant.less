@@ -89,9 +89,24 @@ body {
   color: var(--cr-secondary-text) !important;
 }
 
+.ant-btn {
+  border: 1px solid var(--cr-secondary-border);
+  background-color: var(--cr-tertiary-bg);
+  color: var(--cr-primary-text);
+
+  &:hover, &:focus {
+    background-color: var(--cr-tertiary-bg);
+  }
+}
+
 .ant-btn-primary {
   background: var(--cr-primary-color);
   border: none;
+  color: white;
+
+  &:hover, &:focus {
+    background-color: var(--cr-primary-color);
+  }
 }
 
 .ant-modal {
