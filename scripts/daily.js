@@ -9,7 +9,7 @@ import minBy from 'lodash/minBy';
 import isNil from 'lodash/isNil'
 import union from 'lodash/union'
 import uniqBy from 'lodash/uniqBy'
-import { init, withScope, captureMessage, startTransaction, captureException } from '@sentry/node';
+import { init, startTransaction, captureException } from '@sentry/node';
 import * as Tracing from '@sentry/tracing'
 
 import { quoteSymbols } from '../utils/variables'
@@ -340,12 +340,6 @@ const fetchLunrData = async() => {
       matchingCoin = matchingCoins[0]
     } else if (matchingCoins.length > 1) {
       const closestCoin = minBy(matchingCoins, (coin) => levenshtein(coin.name, lunrCoin.n));
-
-      withScope(scope => {
-        scope.setLevel('warning');
-        scope.setExtra('symbol', lunrCoin.s);
-        captureMessage(`Lunr: Detected the right coin via levenshtein distance: ${closestCoin.name} (${lunrCoin.s})`);
-      });
       console.log('Found multiple coins', matchingCoins)
       console.log('Picked', closestCoin, ' for ', lunrCoin.s, lunrCoin.n)
       matchingCoin = closestCoin;
