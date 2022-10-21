@@ -18,11 +18,9 @@ const Header = ({ categories, coins, renderSearch }) => {
         <Menu.Item key="logo" className={headerStyles.logo} data-id="logo">
           <Logo />
         </Menu.Item>
-        { renderSearch ? (
-          <Menu.Item key="search" className={headerStyles.search}>
-            <Search categories={categories} coins={coins} />
-          </Menu.Item>
-        ) : <></>}
+        <Menu.Item key="search" className={headerStyles.search}>
+          { renderSearch ? (<Search categories={categories} coins={coins} />) : <></>}
+        </Menu.Item>
         <Menu.Item key="dark-mode" className={headerStyles.darkModeSwitchItem}><DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} /></Menu.Item>
       </Menu>
     </AntHeader>
