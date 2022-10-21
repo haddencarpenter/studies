@@ -15,7 +15,7 @@ import prisma from '../../lib/prisma'
 import UpTag from '../../components/UpTag';
 import DownTag from '../../components/DownTag';
 import HodlTag from '../../components/HodlTag';
-import TokenomicsTab from '../../components/TokenomicsTab';
+import PriceDataTab from '../../components/PriceDataTab';
 import AnalyticsTab from '../../components/AnalysisTab';
 import TradeTab from '../../components/TradeTab';
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables';
@@ -35,7 +35,7 @@ import coinStyles from '../../styles/coin.module.less'
 const { Content } = Layout;
 const { Title } = Typography;
 const TABS = {
-  'tokenomics': 'Tokenomics',
+  'pricedata': 'Price Data',
   'analysis': 'Analysis',
   'trade': 'Trade'
 }
@@ -77,12 +77,12 @@ export default function Coin(coin) {
   const metaDescription = `Coinrotator issues a daily trend for ${coin.name}. A coin screener that captures strong momentum in both directions!`
 
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState(TABS.tokenomics)
+  const [activeTab, setActiveTab] = useState(TABS.pricedata)
   useEffect(() => {
     if (router.isReady) {
       let routerTab = router.query.tab
       if (Object.values(TABS).indexOf(routerTab) === -1) {
-        routerTab = TABS.tokenomics
+        routerTab = TABS.pricedata
       }
       setActiveTab(routerTab)
     }
@@ -98,8 +98,8 @@ export default function Coin(coin) {
   }, [router])
   let ActiveTabComponent;
   switch (activeTab) {
-    case TABS.tokenomics:
-      ActiveTabComponent = TokenomicsTab;
+    case TABS.pricedata:
+      ActiveTabComponent = PriceDataTab;
       break;
     case TABS.analysis:
       ActiveTabComponent = AnalyticsTab;
@@ -232,7 +232,7 @@ export default function Coin(coin) {
                 onClick={() => clickTab(tab)}
                 className={classnames(coinStyles.tab, {
                   [coinStyles.active]: tab === activeTab,
-                  [coinStyles.noRightBorder]: tab === TABS.tokenomics,
+                  [coinStyles.noRightBorder]: tab === TABS.pricedata,
                   [coinStyles.noLeftBorder]: tab === TABS.trade
                 })}
               >
