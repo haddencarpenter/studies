@@ -13,7 +13,7 @@ import { DarkModeContext } from '../pages/_app';
 
 const { Title } = Typography;
 
-const TokenomicsTab = ({ coin, screens }) => {
+const PriceDataTab = ({ coin, screens }) => {
   const [darkMode] = useContext(DarkModeContext);
   const [showChart, setShowChart] = useState(false)
   useEffect(() => {
@@ -248,4 +248,4 @@ const TokenomicsTab = ({ coin, screens }) => {
   </>;
 }
 
-export default TokenomicsTab;
+export default PriceDataTab;

@@ -1,4 +1,4 @@
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Alert, Tooltip, Radio } from 'antd'
+import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
 import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { Bar } from '@ant-design/plots';
 import { useRouter } from 'next/router'
@@ -21,7 +21,6 @@ import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
-import { getCategories } from '../utils/categories';
 import prisma from '../lib/prisma'
 import globalData from '../lib/globalData';
 import getTrends from '../utils/getTrends'
@@ -103,18 +102,16 @@ export async function getStaticProps() {
     }
   })
   const exchangeData = await prisma.exchange.findMany()
-  let categories = await getCategories()
   return {
     props: {
       coinsData,
-      categories,
       exchangeData,
       appData
     }
   }
 }
 
-export default function Home({ coinsData, categories, exchangeData }) {
+export default function Home({ coinsData, appData, exchangeData }) {
   const router = useRouter()
   const [darkMode] = useContext(DarkModeContext);
   const screens = useBreakPoint();
@@ -355,6 +352,7 @@ export default function Home({ coinsData, categories, exchangeData }) {
   }, [])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
+  const categories = appData.categories
   const priorityCategories = categories.filter((category) => {
     return [
       'Avalanche Ecosystem',
@@ -454,7 +452,6 @@ export default function Home({ coinsData, categories, exchangeData }) {
               value={portfolioInputValue}
               onChange={(e) => setPortfolioInputValue(e.target.value)}
               size="large"
-              className={indexStyles.input}
             />
           </Col>
           <Col xs={24} md={6} className={indexStyles.col}>
@@ -465,12 +462,11 @@ export default function Home({ coinsData, categories, exchangeData }) {
               onChange={(newTrendType) => { formDispatch({ type: 'SET_TREND_TYPE', payload: newTrendType }) }}
               id="signal"
               className={indexStyles.select}
-              dropdownClassName={indexStyles.dropdown}
             >
-              <Option className={indexStyles.dropdownOption} value={signals.all}>All</Option>
-              <Option className={indexStyles.dropdownOption}  value={signals.buy}>UP</Option>
-              <Option className={indexStyles.dropdownOption}  value={signals.hodl}>HODL</Option>
-              <Option className={indexStyles.dropdownOption}  value={signals.sell}>DOWN</Option>
+              <Option value={signals.all}>All</Option>
+              <Option value={signals.buy}>UP</Option>
+              <Option value={signals.hodl}>HODL</Option>
+              <Option value={signals.sell}>DOWN</Option>
             </Select>
           </Col>
           <Col xs={24} md={6} className={indexStyles.col}>
@@ -482,17 +478,16 @@ export default function Home({ coinsData, categories, exchangeData }) {
               onChange={(newCategory) => formDispatch({ type: 'SET_CATEGORY', payload: newCategory })}
               id="category"
               className={indexStyles.select}
-              dropdownClassName={indexStyles.dropdown}
             >
-              <Option className={indexStyles.dropdownOption} value={defaultFormState.category} key="all">All</Option>
+              <Option value={defaultFormState.category} key="all">All</Option>
               <OptGroup label="Popular categories">
                 {
-                  priorityCategories.map((category) => <Option className={indexStyles.dropdownOption} value={category} key={category}>{category}</Option>)
+                  priorityCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
                 }
               </OptGroup>
               <OptGroup label="Other categories">
                 {
-                  restCategories.map((category) => <Option className={indexStyles.dropdownOption} value={category} key={category}>{category}</Option>)
+                  restCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
                 }
               </OptGroup>
             </Select>
@@ -678,9 +673,8 @@ export default function Home({ coinsData, categories, exchangeData }) {
               size="large"
               value={formState.exchanges}
               onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
-              dropdownClassName={indexStyles.dropdown}
             >
-              {allExchangeNames.map(exchangeName => <Option className={indexStyles.dropdownOption} key={exchangeName}>{exchangeName}</Option>)}
+              {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
             </Select>
           </Col>
         </Row>
@@ -709,9 +703,8 @@ export default function Home({ coinsData, categories, exchangeData }) {
               size="large"
               value={formState.derivatives}
               onChange={(exchanges) => { formDispatch({ type: 'SET_DERIVATIVES', payload: exchanges }) }}
-              dropdownClassName={indexStyles.dropdown}
             >
-              {allDerivativeExchanges.map(exchangeName => <Option className={indexStyles.dropdownOption} key={exchangeName}>{exchangeName}</Option>)}
+              {allDerivativeExchanges.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
             </Select>
           </Col>
         </Row>
