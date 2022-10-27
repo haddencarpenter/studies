@@ -39,14 +39,16 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
           position: "left",
           style: {
             fill: '#ffffff',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            fontFamily: variableStyles.fontFamily
           }
         }
       )}
       xAxis={({
         label: {
           style: {
-            fill: darkMode ? 'white' : variableStyles.crGray4
+            fill: darkMode ? 'white' : variableStyles.crGray4,
+            fontFamily: variableStyles.fontFamily
           }
         },
         line: {
@@ -72,7 +74,8 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
       yAxis={({
         label: {
           style: {
-            fill:  darkMode ? 'white' : variableStyles.crGray4
+            fill:  darkMode ? 'white' : variableStyles.crGray4,
+            fontFamily: variableStyles.fontFamily
           }
         },
         line: {
