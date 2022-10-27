@@ -9,7 +9,6 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
   const amountDownTrends = coinsData.filter(coin => coin.dailySuperSuperTrend === signals.sell).length
 
   const totalUpAndDownTrends = amountUpTrends + amountHodlTrends + amountDownTrends
-  const bearExtremeMax = totalUpAndDownTrends * 0.2
   const bullExtremeMin = totalUpAndDownTrends * 0.8
 
   return (
@@ -95,16 +94,6 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
         }
       }}
       annotations={[
-        {
-          type: 'region',
-          start: ['min', 0],
-          end: ['max', bearExtremeMax],
-          style: {
-            fill: '#ffeeec',
-            fillOpacity: 1,
-            opacity: 1
-          }
-        },
         {
           type: 'region',
           start: ['min', bullExtremeMin],
