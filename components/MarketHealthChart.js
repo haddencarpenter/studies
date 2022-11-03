@@ -11,6 +11,8 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
   const totalUpAndDownTrends = amountUpTrends + amountHodlTrends + amountDownTrends
   const bullExtremeMin = totalUpAndDownTrends * 0.8
 
+  const dateFormatter = new Intl.DateTimeFormat([], { dateStyle: 'medium' })
+
   return (
     <Bar
       data={
@@ -44,6 +46,9 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
         }
       )}
       xAxis={({
+        title: {
+          text: `Market Health Trend ${dateFormatter.format(new Date())}`
+        },
         label: {
           style: {
             fill: darkMode ? 'white' : variableStyles.crGray4,
@@ -71,6 +76,9 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
         max: totalUpAndDownTrends
       })}
       yAxis={({
+        title: {
+          text: 'Trends'
+        },
         label: {
           style: {
             fill:  darkMode ? 'white' : variableStyles.crGray4,
