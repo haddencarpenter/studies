@@ -53,7 +53,7 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
         },
         line: {
           style: {
-            stroke: darkMode ? variableStyles.crGray4 : '#fafafa',
+            stroke: darkMode ? variableStyles.crGray4 : variableStyles.crGray9,
           }
         },
         grid: {
