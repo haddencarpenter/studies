@@ -47,7 +47,7 @@ const MarketHealthChart = ({ coinsData, screens, darkMode }) => {
       )}
       xAxis={({
         title: {
-          text: `Market Health Trend ${dateFormatter.format(new Date())}`
+          text: dateFormatter.format(new Date())
         },
         label: {
           style: {
