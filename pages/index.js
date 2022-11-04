@@ -1,5 +1,5 @@
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
-import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
+import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled, InfoCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useMemo, useState, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 import debounce from 'lodash/debounce'
@@ -710,7 +710,19 @@ export default function Home({ coinsData, appData, exchangeData }) {
       </Modal>
       <Modal
         visible={marketHealthModalVisible}
-        title="Market Health"
+        title={
+          <>
+            <span>Market Health Trend</span>
+            <Tooltip
+              placement={screens.sm ? 'bottom' : 'bottomRight'}
+              overlayClassName={baseStyles.tooltipIcon}
+              trigger={isHoverable ? 'hover' : 'click'}
+              title="Market Health measures extremes of the 1000+ altcoins. Too many Up or DownTrends, the market will likely soon reverse. If not at an extreme, the trends are considered healthy."
+            >
+              <InfoCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.icon)} />
+            </Tooltip>
+          </>
+        }
         onCancel={() => setMarketHealthModalVisible(false)}
         footer={null}
         width={screens.lg ? 783 : 400}
