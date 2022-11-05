@@ -717,7 +717,7 @@ export default function Home({ coinsData, appData, exchangeData }) {
               placement={screens.sm ? 'bottom' : 'bottomRight'}
               overlayClassName={baseStyles.tooltipIcon}
               trigger={isHoverable ? 'hover' : 'click'}
-              title="Market Health measures extremes of the 1000+ altcoins. Too many Up or DownTrends, the market will likely soon reverse. If not at an extreme, the trends are considered healthy."
+              title="Market Health measures extremes of the 1000+ top coins by marketcap. If you see too many Uptrends or DownTrends, the market will likely soon reverse."
             >
               <InfoCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.icon)} />
             </Tooltip>
