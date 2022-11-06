@@ -1,9 +1,7 @@
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
-import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
+import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled, InfoCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
-import prisma from '../lib/prisma'
-
+import { useMemo, useState, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
 import debounce from 'lodash/debounce'
 import isFinite from 'lodash/isFinite'
 import isEmpty from 'lodash/isEmpty'
@@ -15,12 +13,15 @@ import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
 import classnames from 'classnames';
 
+import { DarkModeContext } from './_app';
 import HomePageTable from '../components/HomePageTable';
+import MarketHealthChart from '../components/MarketHealthChart';
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
+import prisma from '../lib/prisma'
 import globalData from '../lib/globalData';
 import getTrends from '../utils/getTrends'
 
@@ -111,6 +112,8 @@ export async function getStaticProps() {
 
 export default function Home({ coinsData, appData, exchangeData }) {
   const router = useRouter()
+  const [darkMode] = useContext(DarkModeContext);
+  const screens = useBreakPoint();
   const defaultFormState = useMemo(() =>
   ({
       category: 'all',
@@ -127,6 +130,7 @@ export default function Home({ coinsData, appData, exchangeData }) {
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
+  const [marketHealthModalVisible, setMarketHealthModalVisible] = useState(false)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_FROM_ROUTE_PARAMS':
@@ -298,7 +302,6 @@ export default function Home({ coinsData, appData, exchangeData }) {
   }, 400), [])
   useEffect(() => setPortfolioDebounced(portfolioInputValue), [portfolioInputValue, setPortfolioDebounced])
 
-  const screens = useBreakPoint();
   const isHoverable = useIsHoverable();
   const inputRef = useRef(null)
   useEffect(() => {
@@ -435,6 +438,7 @@ export default function Home({ coinsData, appData, exchangeData }) {
       {/* <Alert message={<span>Win 100 USDT. Please answer our <b>super brief</b> CoinRotator <a href='https://docs.google.com/forms/d/e/1FAIpQLSdaAbzeWl0wUMSnE3RZZEyX-MxqE9XOnVSCyWXg3Gcpv-rzdg/viewform' target='_blank' rel='noreferrer'>survey</a>.</span>} type="info" closable className={indexStyles.message}/> */}
       <Title className={indexStyles.title}>Search For The Most Profitable Coins</Title>
       <Paragraph className={indexStyles.subtitle} type="secondary"><span>CoinRotator</span> tracks price trends for the top 1,000 cryptocurrencies, all updated daily on a single dashboard. Instantly check the coin screener for each market using our proprietary version of the Supertrend.</Paragraph>
+      <Button type="primary" className={indexStyles.marketHealthButton} onClick={() => setMarketHealthModalVisible(true)}>Market Health</Button>
       <Card className={indexStyles.filters}>
         <Row className={indexStyles.row} type="flex" gutter={16}>
           <Col xs={24} md={6} className={indexStyles.col}>
@@ -703,6 +707,31 @@ export default function Home({ coinsData, appData, exchangeData }) {
             </Select>
           </Col>
         </Row>
+      </Modal>
+      <Modal
+        visible={marketHealthModalVisible}
+        title={
+          <>
+            <span>Market Health Trend</span>
+            <Tooltip
+              placement={screens.sm ? 'bottom' : 'bottomRight'}
+              overlayClassName={baseStyles.tooltipIcon}
+              trigger={isHoverable ? 'hover' : 'click'}
+              title="Market Health measures extremes of the 1000+ top coins by marketcap. If you see too many Uptrends or DownTrends, the market will likely soon reverse."
+            >
+              <InfoCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.icon)} />
+            </Tooltip>
+          </>
+        }
+        onCancel={() => setMarketHealthModalVisible(false)}
+        footer={null}
+        width={screens.lg ? 783 : 400}
+      >
+        <MarketHealthChart
+          coinsData={coinsData}
+          screens={screens}
+          darkMode={darkMode}
+        />
       </Modal>
       <Row className={indexStyles.tableRow}>
         <HomePageTable

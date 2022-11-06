@@ -11,10 +11,12 @@
     "weekly": "parcel build scripts/weekly.js --no-source-maps",
     "monthly": "parcel build scripts/monthly.js --no-source-maps",
     "bot": "parcel build scripts/bot.js --no-source-maps",
+    "trendHistory": "parcel build scripts/trendHistory.js --no-source-maps",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@ant-design/plots": "^1.2.2",
     "@metamask/detect-provider": "^1.2.0",
     "@next/bundle-analyzer": "^12.3.1",
     "@prisma/client": "^3.10.0",
