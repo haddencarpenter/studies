@@ -1,5 +1,5 @@
-import clone from 'lodash/clone';
-import chunk from 'lodash/chunk';
+import clone from 'lodash/clone.js';
+import chunk from 'lodash/chunk.js';
 
 export default function convertToWeeklySignals(ohlcs) {
   let weeklyOhcls = clone(ohlcs).reverse();

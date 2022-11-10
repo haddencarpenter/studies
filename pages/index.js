@@ -18,12 +18,12 @@ import HomePageTable from '../components/HomePageTable';
 import MarketHealthChart from '../components/MarketHealthChart';
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
-import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables'
+import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
-import prisma from '../lib/prisma'
+import prisma from '../lib/prisma.mjs'
 import globalData from '../lib/globalData';
-import getTrends from '../utils/getTrends'
+import getTrends from '../utils/getTrends.mjs'
 
 import indexStyles from '../styles/index.module.less'
 import baseStyles from '../styles/base.module.less'

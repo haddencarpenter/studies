@@ -1,13 +1,13 @@
 import dotenv from 'dotenv';
 import { init, withScope, captureMessage, startTransaction, captureException } from '@sentry/node';
 import * as Tracing from '@sentry/tracing'
-import pick from 'lodash/pick'
-import minBy from 'lodash/minBy';
+import pick from 'lodash/pick.js'
+import minBy from 'lodash/minBy.js';
 import levenshtein from 'js-levenshtein';
 
-import prisma from '../lib/prisma'
-import coinGecko, { getExchange } from '../lib/coinGecko';
-import { getCoin, getCoins } from '../lib/coinpaprika'
+import prisma from '../lib/prisma.mjs'
+import coinGecko, { getExchange } from '../lib/coinGecko.mjs';
+import { getCoin, getCoins } from '../lib/coinpaprika.mjs'
 
 dotenv.config();
 init({

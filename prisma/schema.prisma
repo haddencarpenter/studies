@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["extendedIndexes"]
 }
 
@@ -12,109 +9,109 @@ datasource db {
 }
 
 model Coin {
-  id       String   @db.VarChar(255) @id
-  symbol     String
-  name     String
-  categories     String[]
-  images Json
-  description String?
-  homepage String?
-  twitter String?
-  twitterFollowers Int?
-  ath Decimal
-  atl Decimal
-  marketCap BigInt
-  marketCapRank Int?
-  fullyDilutedValuation Decimal?
-  circulatingSupply Decimal
-  totalSupply Decimal?
-  ohlcs Ohlc[]
-  coinTimes CoinTime[]
-  tickers Json
-  defaultPlatform String?
-  platforms Json?
-  dailyChange Decimal @default(0.0)
-  weeklyChange Decimal @default(0.0)
-  launch_price Decimal?
-  launch_date_start DateTime?
-  launch_date_end DateTime?
-  launch_roi_usd Decimal?
-  launch_roi_eth Decimal?
-  launch_roi_btc Decimal?
-  derivatives Json?
-  currentPrice Decimal?
-  maxSupply Decimal?
-  lunrInternalId Int?
-  lunrSymbol String?
-  lunrName String?
-  lunrCurrentPrice Decimal?
-  lunrVolume Decimal?
-  lunrPercentageChange24h Decimal?
-  lunrPercentageChange1h Decimal?
-  lunrMarketCap Decimal?
-  lunrGalaxyScore Decimal?
-  lunrGalaxyScorePrevious Decimal?
-  lunrSocialScore Decimal?
-  lunrAverageSentiment Decimal?
-  lunrSocialVolume Decimal?
-  lunrSocialContributors Int?
-  lunrSocialDominance Decimal?
-  lunrMarketDominance Decimal?
-  lunrAltRank Decimal?
-  lunrAltRankPrevious Decimal?
-  lunrCategories String[]
-  coinpaprikaId String?   @db.VarChar(255)
-  coinpaprikaName String?
-  coinpaprikaRank Int?
-  coinpaprikaActive Boolean?
-  coinpaprikaTags Json?
-  coinpaprikaTeam Json?
-  coinpaprikaDescription String?
-  coinpaprikaMessage String?
-  coinpaprikaOpenSource Boolean?
-  coinpaprikaHardwarewallet Boolean?
-  coinpaprikaLaunchDateStart String?
+  id                           String     @id @db.VarChar(255)
+  symbol                       String
+  name                         String
+  categories                   String[]
+  ath                          Decimal
+  atl                          Decimal
+  description                  String?
+  homepage                     String?
+  images                       Json
+  twitter                      String?
+  circulatingSupply            Decimal
+  fullyDilutedValuation        Decimal?
+  marketCapRank                Int?
+  twitterFollowers             Int?
+  marketCap                    BigInt
+  tickers                      Json
+  totalSupply                  Decimal?
+  platforms                    Json?
+  defaultPlatform              String?
+  dailyChange                  Decimal    @default(0.0)
+  weeklyChange                 Decimal    @default(0.0)
+  launch_date_end              DateTime?
+  launch_date_start            DateTime?
+  launch_price                 Decimal?
+  launch_roi_btc               Decimal?
+  launch_roi_eth               Decimal?
+  launch_roi_usd               Decimal?
+  derivatives                  Json?
+  currentPrice                 Decimal?
+  maxSupply                    Decimal?
+  lunrAltRank                  Decimal?
+  lunrAltRankPrevious          Decimal?
+  lunrAverageSentiment         Decimal?
+  lunrCategories               String[]
+  lunrCurrentPrice             Decimal?
+  lunrGalaxyScore              Decimal?
+  lunrGalaxyScorePrevious      Decimal?
+  lunrInternalId               Int?
+  lunrMarketCap                Decimal?
+  lunrMarketDominance          Decimal?
+  lunrName                     String?
+  lunrPercentageChange1h       Decimal?
+  lunrPercentageChange24h      Decimal?
+  lunrSocialContributors       Int?
+  lunrSocialDominance          Decimal?
+  lunrSocialScore              Decimal?
+  lunrSocialVolume             Decimal?
+  lunrSymbol                   String?
+  lunrVolume                   Decimal?
+  coinpaprikaActive            Boolean?
+  coinpaprikaContracts         Json?
+  coinpaprikaDescription       String?
   coinpaprikaDevelopmentStatus String?
-  coinpaprikaProofType String?
-  coinpaprikaOrgStructure String?
-  coinpaprikaHashAlgorithm String?
-  coinpaprikaContracts Json?
-  coinpaprikaLinks Json?
-  coinpaprikaLinksExtended Json?
-  coinpaprikaWhitepaper Json?
+  coinpaprikaHardwarewallet    Boolean?
+  coinpaprikaHashAlgorithm     String?
+  coinpaprikaId                String?    @db.VarChar(255)
+  coinpaprikaLaunchDateStart   String?
+  coinpaprikaLinks             Json?
+  coinpaprikaLinksExtended     Json?
+  coinpaprikaMessage           String?
+  coinpaprikaName              String?
+  coinpaprikaOpenSource        Boolean?
+  coinpaprikaOrgStructure      String?
+  coinpaprikaProofType         String?
+  coinpaprikaRank              Int?
+  coinpaprikaTeam              Json?
+  coinpaprikaWhitepaper        Json?
+  coinpaprikaTags              Json?
+  coinTimes                    CoinTime[]
+  ohlcs                        Ohlc[]
 
   @@index([marketCapRank])
 }
 
 model Ohlc {
-  id Int @id @default(autoincrement())
-  closeTime DateTime
-  open Decimal
-  high Decimal
-  low Decimal
-  close Decimal
-  coinId String @db.VarChar(255)
-  coin Coin @relation(fields: [coinId], references: [id])
+  id          Int      @id @default(autoincrement())
+  open        Decimal
+  high        Decimal
+  low         Decimal
+  close       Decimal
+  coinId      String   @db.VarChar(255)
+  closeTime   DateTime
   quoteSymbol String
+  coin        Coin     @relation(fields: [coinId], references: [id])
 
-  @@index([coinId, quoteSymbol])
-  @@index([closeTime(sort: Desc)])
   @@unique([coinId, quoteSymbol, closeTime])
+  @@index([closeTime(sort: Desc)])
+  @@index([coinId, quoteSymbol])
 }
 
 model CoinTime {
-  id Int @id @default(autoincrement())
-  coinId String @db.VarChar(255)
-  coin Coin @relation(fields: [coinId], references: [id])
-  date DateTime @db.Date()
+  id        Int      @id @default(autoincrement())
+  coinId    String   @db.VarChar(255)
+  date      DateTime @db.Date
   marketCap BigInt
-  volume BigInt
+  volume    BigInt
+  coin      Coin     @relation(fields: [coinId], references: [id])
 }
 
 model Exchange {
-  id String @db.VarChar(255) @id
-  name String
-  image String
-  url String
-  centralized Boolean @default(false)
+  id          String   @id @db.VarChar(255)
+  name        String
+  image       String
+  url         String
+  centralized Boolean? @default(false)
 }

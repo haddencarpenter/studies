@@ -1,25 +1,25 @@
 import axios from 'axios'
 import dotenv from 'dotenv';
-import subDays from 'date-fns/subDays'
+import subDays from 'date-fns/subDays/index.js'
 import levenshtein from 'js-levenshtein';
-import chunk from 'lodash/chunk'
-import groupBy from 'lodash/groupBy'
-import pickBy from 'lodash/pickBy'
-import minBy from 'lodash/minBy';
-import isNil from 'lodash/isNil'
-import union from 'lodash/union'
-import uniqBy from 'lodash/uniqBy'
+import chunk from 'lodash/chunk.js'
+import groupBy from 'lodash/groupBy.js'
+import pickBy from 'lodash/pickBy.js'
+import minBy from 'lodash/minBy.js';
+import isNil from 'lodash/isNil.js'
+import union from 'lodash/union.js'
+import uniqBy from 'lodash/uniqBy.js'
 import { init, startTransaction, captureException } from '@sentry/node';
 import * as Tracing from '@sentry/tracing'
 
-import { quoteSymbols } from '../utils/variables'
-import { getCategoriesByCoin } from '../utils/categories'
-import prisma from '../lib/prisma'
-import coinGecko, { getOhlc, getCoin } from '../lib/coinGecko'
-import cryptowatch from '../lib/cryptowatch'
-import { getAllCoins } from '../lib/lunr'
+import { quoteSymbols } from '../utils/variables.mjs'
+import { getCategoriesByCoin } from '../utils/categories.mjs'
+import prisma from '../lib/prisma.mjs'
+import coinGecko, { getOhlc, getCoin } from '../lib/coinGecko.mjs'
+import cryptowatch from '../lib/cryptowatch.mjs'
+import { getAllCoins } from '../lib/lunr.mjs'
 import { Prisma } from '@prisma/client'
-import { hasPlatforms } from '../utils/coingecko';
+import { hasPlatforms } from '../utils/coingecko.mjs';
 
 dotenv.config();
 init({

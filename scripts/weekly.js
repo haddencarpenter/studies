@@ -2,8 +2,8 @@ import { init, startTransaction, captureException } from '@sentry/node';
 import * as Tracing from '@sentry/tracing'
 import puppeteer from 'puppeteer';
 
-import prisma from '../lib/prisma'
-import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab';
+import prisma from '../lib/prisma.mjs'
+import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab.mjs';
 
 init({
   dsn: process.env.SENTRY_DSN,

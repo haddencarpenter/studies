@@ -1,7 +1,7 @@
-import groupBy from 'lodash/groupBy'
-import minBy from 'lodash/minBy'
-import maxBy from 'lodash/maxBy'
-import subSeconds from 'date-fns/subSeconds'
+import groupBy from 'lodash/groupBy.js'
+import minBy from 'lodash/minBy.js'
+import maxBy from 'lodash/maxBy.js'
+import subSeconds from 'date-fns/subSeconds/index.js'
 
 export default function convertToDailySignals(ohlcs) {
   ohlcs = groupBy(ohlcs, 'quoteSymbol')

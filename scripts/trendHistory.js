@@ -1,17 +1,17 @@
 import dotenv from 'dotenv';
-import endOfYesterday from 'date-fns/endOfYesterday';
-import subDays from 'date-fns/subDays'
-import format from 'date-fns/format'
-import startOfDay from 'date-fns/startOfDay'
-import mapValues from 'lodash/mapValues'
+import endOfYesterday from 'date-fns/endOfYesterday.j';
+import subDays from 'date-fns/subDays.js'
+import format from 'date-fns/format.js'
+import startOfDay from 'date-fns/startOfDay.js'
+import mapValues from 'lodash/mapValues.js'
 import { promises as fs } from 'fs';
 
-import prisma from '../lib/prisma'
-import supertrend from '../utils/supertrend'
-import convertToDailySignals from '../utils/convertToDailySignals';
-import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables'
-import supersupertrend from '../utils/supersupertrend';
-import { signals } from '../utils/variables';
+import prisma from '../lib/prisma.mjs'
+import supertrend from '../utils/supertrend.mjs'
+import convertToDailySignals from '../utils/convertToDailySignals.mjs';
+import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables.mjs'
+import supersupertrend from '../utils/supersupertrend.mjs';
+import { signals } from '../utils/variables.mjs';
 
 dotenv.config();
 

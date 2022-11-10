@@ -1,5 +1,5 @@
 import csv from 'csvtojson'
-import uniq from 'lodash/uniq'
+import uniq from 'lodash/uniq.js'
 
 const parseCategories = async () => {
   const categories = await csv().fromFile('lib/DropsTabCategories.csv');

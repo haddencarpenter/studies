@@ -1,14 +1,14 @@
 import { init, startTransaction, captureException } from '@sentry/node';
 import * as Tracing from '@sentry/tracing'
-import format from 'date-fns/format'
-import isMonday from 'date-fns/isMonday'
-import groupBy from 'lodash/groupBy';
+import format from 'date-fns/format.js'
+import isMonday from 'date-fns/isMonday.js'
+import groupBy from 'lodash/groupBy.js';
 import { Readable } from 'stream';
 
-import { tweet } from '../lib/twitter'
-import { channelCreateMessage } from '../lib/discord'
-import { postMessage, sendDocument } from '../lib/telegram'
-import getFreshSignals from '../utils/getFreshSignals';
+import { tweet } from '../lib/twitter.mjs'
+import { channelCreateMessage } from '../lib/discord.mjs'
+import { postMessage, sendDocument } from '../lib/telegram.mjs'
+import getFreshSignals from '../utils/getFreshSignals.mjs';
 
 init({
   dsn: process.env.SENTRY_DSN,

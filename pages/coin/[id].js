@@ -11,18 +11,18 @@ import take from 'lodash/take';
 import { useCallback, useEffect, useState } from 'react';
 import levenshtein from 'js-levenshtein';
 
-import prisma from '../../lib/prisma'
+import prisma from '../../lib/prisma.mjs'
 import UpTag from '../../components/UpTag';
 import DownTag from '../../components/DownTag';
 import HodlTag from '../../components/HodlTag';
 import PriceDataTab from '../../components/PriceDataTab';
 import AnalyticsTab from '../../components/AnalysisTab';
 import TradeTab from '../../components/TradeTab';
-import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables';
-import getTrends from '../../utils/getTrends';
+import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables.mjs';
+import getTrends from '../../utils/getTrends.mjs';
 import getChainsData from '../../utils/getChainsData';
 import getPlatformData from '../../utils/getPlatformData';
-import convertToDailySignals from '../../utils/convertToDailySignals';
+import convertToDailySignals from '../../utils/convertToDailySignals.mjs';
 import { getDescriptionByCoin } from '../../utils/coinDescriptions';
 import useBreakPoint from '../../hooks/useBreakPoint';
 import useIsHoverable from '../../hooks/useIsHoverable';

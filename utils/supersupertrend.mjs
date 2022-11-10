@@ -1,4 +1,4 @@
-import { signals } from './variables'
+import { signals } from './variables.mjs'
 
 // Input:
 // {

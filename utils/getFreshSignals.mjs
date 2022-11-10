@@ -1,10 +1,10 @@
-import endOfYesterday from 'date-fns/endOfYesterday';
-import isSameDay from 'date-fns/isSameDay';
+import endOfYesterday from 'date-fns/endOfYesterday/index.js';
+import isSameDay from 'date-fns/isSameDay/index.js';
 
-import prisma from '../lib/prisma'
-import convertToDailySignals from './convertToDailySignals';
-import getTrends from './getTrends';
-import { defaultAtrPeriods, defaultMultiplier } from './variables'
+import prisma from '../lib/prisma.mjs'
+import convertToDailySignals from './convertToDailySignals.mjs';
+import getTrends from './getTrends.mjs';
+import { defaultAtrPeriods, defaultMultiplier } from './variables.mjs'
 
 const getFreshSignals = async () => {
   const excludedSymbols = ['usdd', 'ustc']

@@ -1,9 +1,9 @@
 import { withScope, captureMessage } from '@sentry/node';
 import levenshtein from 'js-levenshtein';
-import minBy from 'lodash/minBy';
+import minBy from 'lodash/minBy.js';
 
-import prisma from '../lib/prisma'
-import isDropstabDiscrepancy from './isDropstabDiscrepancy';
+import prisma from '../lib/prisma.mjs'
+import isDropstabDiscrepancy from './isDropstabDiscrepancy.mjs';
 
 const findMatchingCoinDropstab = async (symbol, name) => {
   symbol = symbol.toLowerCase();

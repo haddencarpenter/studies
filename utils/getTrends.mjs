@@ -1,8 +1,8 @@
-import mapValues from 'lodash/mapValues'
+import mapValues from 'lodash/mapValues.js'
 
-import supertrend from './supertrend'
-import convertToWeeklySignals from './convertToWeeklySignals'
-import supersupertrend from './supersupertrend';
+import supertrend from './supertrend.mjs'
+import convertToWeeklySignals from './convertToWeeklySignals.mjs'
+import supersupertrend from './supersupertrend.mjs';
 
 export default function getTrends(ohlcs, atrPeriods, multiplier, showWeeklySignals, skipLastWeek) {
   const trends = mapValues(ohlcs, (ohlcs) => {
