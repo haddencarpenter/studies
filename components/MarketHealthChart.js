@@ -45,6 +45,13 @@ const MarketHealthChart = ({ historicDailySuperSuperTrends, screens, darkMode })
         title: {
           text: 'Trends'
         },
+        grid: {
+          line: {
+            style: {
+              stroke: darkMode ? variableStyles.crGray4 : variableStyles.crGray9,
+            }
+          }
+        },
         label: {
           style: {
             fill:  darkMode ? 'white' : variableStyles.crGray4,
