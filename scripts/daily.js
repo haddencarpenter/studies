@@ -274,13 +274,17 @@ const fetchCoinDataAndOhlcs = async () => {
   for (let chunk of chunkedCoinIds) {
     const responses = await Promise.all(chunk.map(coinId => fetchCoinDataCoingecko(coinId, categories)))
 
-    for (const [coinExists, symbol, coinId] of responses) {
-      if (coinExists) {
-        coinsToFetchOhlcsFor.push({
-          coinId,
-          symbol
-        })
+    try {
+      for (const [coinExists, symbol, coinId] of responses) {
+        if (coinExists) {
+          coinsToFetchOhlcsFor.push({
+            coinId,
+            symbol
+          })
+        }
       }
+    } catch(e) {
+      console.log(e, typeof responses, responses)
     }
   }
 
