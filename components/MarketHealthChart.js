@@ -4,9 +4,6 @@ import variableStyles from '../styles/variables.module.less'
 import { signals } from '../utils/variables'
 
 const MarketHealthChart = ({ historicDailySuperSuperTrends, screens, darkMode }) => {
-
-  // TODO: Add extremes
-
   return (
     <Line
       data={historicDailySuperSuperTrends}

@@ -86,6 +86,7 @@ export async function getStaticProps() {
     }
     date = subDays(date, 1)
   }
+  historicDailySuperSuperTrends = historicDailySuperSuperTrends.reverse()
   coinsData = coinsData.map((coinData) => {
     for (let i = 0, date = yesterday; i < 30; i++) {
       const dateOhlcs = coinData.ohlcs.filter(ohlc => ohlc.closeTime.getTime() <= date.getTime())
