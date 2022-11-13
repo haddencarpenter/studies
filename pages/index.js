@@ -742,6 +742,7 @@ export default function Home({ coinsData, historicDailySuperSuperTrends, appData
       </Modal>
       <Modal
         open={marketHealthModalVisible}
+        centered
         title={
           <>
             <span>Market Health Trend</span>
