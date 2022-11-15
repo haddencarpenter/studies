@@ -8,6 +8,7 @@ import levenshtein from 'js-levenshtein';
 import prisma from '../lib/prisma.mjs'
 import coinGecko, { getExchange } from '../lib/coinGecko.mjs';
 import { getCoin, getCoins } from '../lib/coinpaprika.mjs'
+import { excludedExchanges } from '../utils/variables.mjs';
 
 dotenv.config();
 init({
@@ -18,7 +19,6 @@ init({
   // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 });
-const excludedExchanges = ['ftx', 'ftx_us', 'ftx_spot', 'ftx_tr']
 
 const fetchExchanges = async () => {
   const exchangesData = (await coinGecko.get('/exchanges/list')).data

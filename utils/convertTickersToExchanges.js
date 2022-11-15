@@ -1,7 +1,10 @@
 import groupBy from 'lodash/groupBy'
 import sumBy from 'lodash/sumBy'
 
+import { excludedExchanges } from './variables.mjs'
+
 export default function convertTickersToExchanges(tickers) {
+  tickers = tickers.filter(ticker => !excludedExchanges.includes(ticker.market?.identifier))
   let exchanges = groupBy(tickers, 'market.name')
 
   Object.keys(exchanges).forEach((key) => {

@@ -129,3 +129,5 @@ export const SUPERTREND_FLAVOR = {
   'coinrotator': 'CoinRotator',
   'classic': 'Classic',
 }
+
+export const excludedExchanges = ['ftx', 'ftx_us', 'ftx_spot', 'ftx_tr']
