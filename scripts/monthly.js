@@ -8,6 +8,7 @@ import levenshtein from 'js-levenshtein';
 import prisma from '../lib/prisma.mjs'
 import coinGecko, { getExchange } from '../lib/coinGecko.mjs';
 import { getCoin, getCoins } from '../lib/coinpaprika.mjs'
+import { excludedExchanges } from '../utils/variables.mjs';
 
 dotenv.config();
 init({
@@ -23,21 +24,21 @@ const fetchExchanges = async () => {
   const exchangesData = (await coinGecko.get('/exchanges/list')).data
 
   for (const exchange of exchangesData) {
-    await new Promise((res) => setTimeout(res, 6000))
-    let exchangeData = (await coinGecko.get(`/exchanges/${exchange.id}`)).data
-    exchangeData = pick(exchangeData, ['name', 'image', 'url'])
-
+    if (excludedExchanges.includes(exchange.id)) {
+      continue;
+    }
     const exchangeDetailData = (await getExchange(exchange.id)).data
 
-    exchangeData.centralized = Boolean(exchangeDetailData['centralized'])
+    let dbExchangeData = pick(exchangeDetailData, ['name', 'image', 'url', 'centralized'])
+    dbExchangeData.centralized = Boolean(dbExchangeData.centralized)
 
     await prisma.exchange.upsert({
       where: { id: exchange.id },
       create: {
         id: exchange.id,
-        ...exchangeData
+        ...dbExchangeData
       },
-      update: exchangeData,
+      update: dbExchangeData,
     })
   }
 }
