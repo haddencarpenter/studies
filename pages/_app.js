@@ -53,18 +53,19 @@ function MyApp({ Component, pageProps }) {
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
           <link rel="canonical" href={currentUrl} />
         </Head>
-        <Layout.Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={value => setCollapsed(value)}
-          collapsedWidth={56}
-          width={240}
-          theme={darkMode ? 'dark' : 'light'}
-          trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          className={classnames(baseStyles.sidebar, { [baseStyles.collapsed]: collapsed })}
-        >
-          {/* TODO: Only show sider for desktop, show stuff hidden in hamburger mobile menu */}
-        </Layout.Sider>
+        { screens.md && (
+          <Layout.Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={value => setCollapsed(value)}
+            collapsedWidth={56}
+            width={240}
+            theme={darkMode ? 'dark' : 'light'}
+            trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            className={classnames(baseStyles.sidebar, { [baseStyles.collapsed]: collapsed })}
+          >
+          </Layout.Sider>
+        )}
         <Layout className={baseStyles.innerLayout}>
           <Header categories={categories} coins={coins} renderSearch={screens.sm}/>
           <SubHeader categories={categories} coins={coins} render={!screens.sm}/>
