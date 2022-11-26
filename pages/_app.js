@@ -3,13 +3,11 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import Script from 'next/script'
 import { Layout } from 'antd'
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons'
-import classnames from 'classnames'
+import { createContext } from "react"
 
 import Footer from '../components/Footer'
 import Header from '../components/Header'
-import SubHeader from '../components/SubHeader'
-import { useState, createContext } from "react"
+import Sider from '../components/Sider'
 import useDarkMode from "../hooks/usedarkmode"
 import useBreakPoint from "../hooks/useBreakPoint"
 import baseStyles from "../styles/base.module.less"
@@ -20,7 +18,6 @@ function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const darkMode = useDarkMode();
   const screens = useBreakPoint();
-  const [collapsed, setCollapsed] = useState(false);
 
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${router.asPath}`
   pageProps.currentUrl = currentUrl
@@ -53,22 +50,9 @@ function MyApp({ Component, pageProps }) {
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
           <link rel="canonical" href={currentUrl} />
         </Head>
-        { screens.md && (
-          <Layout.Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={value => setCollapsed(value)}
-            collapsedWidth={56}
-            width={240}
-            theme={darkMode ? 'dark' : 'light'}
-            trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            className={classnames(baseStyles.sidebar, { [baseStyles.collapsed]: collapsed })}
-          >
-          </Layout.Sider>
-        )}
+        { screens.md && <Sider categories={categories} coins={coins} /> }
         <Layout className={baseStyles.innerLayout}>
-          <Header categories={categories} coins={coins} renderSearch={screens.sm}/>
-          <SubHeader categories={categories} coins={coins} render={!screens.sm}/>
+          <Header categories={categories} coins={coins} screens={screens}/>
           <Component {...pageProps} />
           <Footer topCoins={topCoins} topCategories={topCategories} />
         </Layout>
