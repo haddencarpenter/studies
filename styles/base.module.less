@@ -25,6 +25,31 @@
   background: var(--cr-secondary-bg);
 }
 
+.sidebar {
+  background: var(--cr-secondary-bg);
+
+  :global(.ant-layout-sider-trigger) {
+    top: 0;
+    bottom: unset;
+    text-align: right;
+    padding-right: 8px;
+    height: 30px;
+    line-height: 30px;
+    background: unset;
+
+    svg {
+      height: 15px;
+      width: 17px;
+      fill: @cr-gray-7;
+    }
+  }
+
+  &.collapsed :global(.ant-layout-sider-trigger) {
+    text-align: center;
+    padding-right: unset;
+  }
+}
+
 .breadcrumbs {
   margin-bottom: 48px;
 

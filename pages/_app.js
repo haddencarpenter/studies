@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import Script from 'next/script'
 import { Layout } from 'antd'
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons'
+import classnames from 'classnames'
 
 import Footer from '../components/Footer'
 import Header from '../components/Header'
@@ -60,6 +61,7 @@ function MyApp({ Component, pageProps }) {
           width={240}
           theme={darkMode ? 'dark' : 'light'}
           trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          className={classnames(baseStyles.sidebar, { [baseStyles.collapsed]: collapsed })}
         >
           {/* TODO: Only show sider for desktop, show stuff hidden in hamburger mobile menu */}
         </Layout.Sider>
