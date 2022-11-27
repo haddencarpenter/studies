@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { useState } from 'react'
 
 import Search from './Search'
-import baseStyles from "../styles/base.module.less"
+import styles from "../styles/sider.module.less"
 
 const Sider = ({ categories, coins }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -16,7 +16,7 @@ const Sider = ({ categories, coins }) => {
       collapsedWidth={56}
       width={240}
       trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-      className={classnames(baseStyles.sidebar, { [baseStyles.collapsed]: collapsed })}
+      className={classnames(styles.sidebar, { [styles.collapsed]: collapsed })}
     >
       <Search categories={categories} coins={coins} />
     </Layout.Sider>

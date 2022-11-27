@@ -1,0 +1,27 @@
+@import './variables.module.less';
+
+.sidebar {
+  background: var(--cr-secondary-bg);
+  padding: 16px 12px 0 12px;
+
+  :global(.ant-layout-sider-trigger) {
+    top: 0;
+    bottom: unset;
+    text-align: right;
+    padding-right: 8px;
+    height: 30px;
+    line-height: 30px;
+    background: unset;
+
+    svg {
+      height: 15px;
+      width: 17px;
+      fill: @cr-gray-7;
+    }
+  }
+
+  &.collapsed :global(.ant-layout-sider-trigger) {
+    text-align: center;
+    padding-right: unset;
+  }
+}
