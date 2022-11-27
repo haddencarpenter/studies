@@ -1,14 +1,18 @@
-import { Layout, Menu } from 'antd'
+import { Layout, Space } from 'antd'
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons'
 import classnames from 'classnames'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 
 import Logo from './Logo'
 import Search from './Search'
+import DarkModeSwitch from './DarkModeSwitch'
+import { DarkModeContext } from '../pages/_app'
 import styles from "../styles/sider.module.less"
 
 const Sider = ({ categories, coins }) => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [darkMode, setDarkMode] = useContext(DarkModeContext)
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
     <Layout.Sider
       collapsible
@@ -20,7 +24,10 @@ const Sider = ({ categories, coins }) => {
       className={classnames(styles.sidebar, { [styles.collapsed]: collapsed })}
     >
       <Logo className={styles.logo}/>
-      <Search categories={categories} coins={coins} />
+      <Space size={12}>
+        <Search categories={categories} coins={coins} />
+        <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />
+      </Space>
     </Layout.Sider>
   );
 }

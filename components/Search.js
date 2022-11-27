@@ -61,9 +61,12 @@ const Search = ({ categories, coins }) => {
       }}
       value={null}
       ref={selectRef}
-      placeholder="Search"
+      placeholder={<>
+        <SearchOutlined className={searchStyles.placeholderMagnifier} />
+        <span className={searchStyles.placeholderText}>Search</span>
+      </>}
       className={searchStyles.search}
-      suffixIcon={isOpen ? <CloseOutlined /> : <SearchOutlined />}
+      suffixIcon={null}
       onDropdownVisibleChange={() => setIsOpen(!isOpen)}
       onSelect={(value, target) => {
         if (target['data-type'] === 'coin') {

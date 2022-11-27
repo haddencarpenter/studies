@@ -1,7 +1,7 @@
 @import './variables.module.less';
 
 .search {
-  width: 200px;
+  width: 169px;
 
   @media (max-width: @screen-sm) {
     width: 100%;
@@ -10,10 +10,15 @@
   :global(.ant-select-selector) {
     height: 34px !important;
   }
+}
 
-  :global(.anticon-search) {
-    pointer-events: none !important;
-  }
+.placeholderMagnifier {
+  color: var(--cr-secondary-text);
+  margin-right: 3px;
+}
+
+.placeholderText {
+  color: @cr-gray-7;
 }
 
 .coinOption {
