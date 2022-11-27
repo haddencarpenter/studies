@@ -21,7 +21,7 @@ function MyApp({ Component, pageProps }) {
 
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${router.asPath}`
   pageProps.currentUrl = currentUrl
-  const {topCoins, topCategories, categories, coins} = pageProps.appData
+  const {topCategories, categories, coins} = pageProps.appData
   const googleAnalytics = process.env.NODE_ENV === 'production' ? (
     <>
       <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
@@ -54,7 +54,7 @@ function MyApp({ Component, pageProps }) {
         <Layout className={baseStyles.innerLayout}>
           <Header categories={categories} coins={coins} screens={screens}/>
           <Component {...pageProps} />
-          <Footer topCoins={topCoins} topCategories={topCategories} />
+          <Footer topCategories={topCategories} />
         </Layout>
       </Layout>
     </DarkModeContext.Provider>

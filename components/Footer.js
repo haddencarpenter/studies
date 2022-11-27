@@ -6,7 +6,7 @@ import useBreakPoint from '../hooks/useBreakPoint'
 
 import footerStyles from '../styles/footer.module.less'
 
-const Footer = ({ topCoins, topCategories }) => {
+const Footer = ({ topCategories }) => {
   const { Footer: AntFooter } = Layout;
   const { Text, Paragraph, Link: LinkText } = Typography;
 
@@ -19,21 +19,6 @@ const Footer = ({ topCoins, topCategories }) => {
 
   const verticalDivider = <Divider type="vertical" className={footerStyles.verticalDivider} />
   const horizontalDivider = <Divider className={footerStyles.horizontalDivider} />
-
-  const topCoinsBlock = <>
-    <Space direction="vertical" size={12}>
-      <Text type="secondary" strong>Top Coins</Text>
-      {topCoins.map(coin =>
-      (
-        <Link href={`/coin/${coin.id}`} key={coin.id} passHref>
-          <LinkText>
-            {coin.name}
-          </LinkText>
-        </Link>
-      )
-      )}
-    </Space>
-  </>
 
   const topCategoriesBlock = <>
     <Space direction="vertical" size={12}>
@@ -107,9 +92,6 @@ const Footer = ({ topCoins, topCategories }) => {
           {verticalDivider}
         </Col>
         <Col span={4}>
-          {topCoinsBlock}
-        </Col>
-        <Col span={4}>
           {topCategoriesBlock}
         </Col>
         <Col span={4}>
@@ -130,9 +112,6 @@ const Footer = ({ topCoins, topCategories }) => {
           <Col span={24}>{horizontalDivider}</Col>
         </Row>
         <Row gutter={16}>
-          <Col span={6}>
-            {topCoinsBlock}
-          </Col>
           <Col span={6}>
             {topCategoriesBlock}
           </Col>
@@ -155,9 +134,6 @@ const Footer = ({ topCoins, topCategories }) => {
           <Col span={24}>{horizontalDivider}</Col>
         </Row>
         <Row gutter={10}>
-          <Col span={12}>
-            {topCoinsBlock}
-          </Col>
           <Col span={12}>
             {topCategoriesBlock}
           </Col>
@@ -182,9 +158,6 @@ const Footer = ({ topCoins, topCategories }) => {
           <Col span={24}>{horizontalDivider}</Col>
         </Row>
         <Row gutter={10}>
-          <Col span={12}>
-            {topCoinsBlock}
-          </Col>
           <Col span={12}>
             {topCategoriesBlock}
           </Col>
