@@ -23,7 +23,7 @@ const Sider = ({ categories, coins }) => {
       trigger={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
       className={classnames(styles.sidebar, { [styles.collapsed]: collapsed })}
     >
-      <Logo className={styles.logo}/>
+      <Logo className={styles.logo} showText={!collapsed} />
       <Space size={12}>
         <Search categories={categories} coins={coins} collapsed={collapsed} />
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}

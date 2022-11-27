@@ -3,7 +3,7 @@ import classnames from 'classnames'
 
 import logoStyles from '../styles/logo.module.less'
 
-const Logo = ({ className = '' }) => {
+const Logo = ({ className = '', showText = true }) => {
   return (
     <span className={classnames(logoStyles.logo, className)}>
       <Link href="/" key="img">
@@ -12,11 +12,15 @@ const Logo = ({ className = '' }) => {
           <img src="/coin.svg" alt="Logo" height={24} width={24} className={logoStyles.svg}/>
         </a>
       </Link>
-      <Link href="/" key="title">
-        <a>
-          <span className={logoStyles.text}><b>Coin</b>Rotator</span>
-        </a>
-      </Link>
+      { showText ? (
+        <Link href="/" key="title">
+          <a>
+            <span className={logoStyles.text}><b>Coin</b>Rotator</span>
+          </a>
+        </Link>
+      )
+        : <></>
+      }
     </span>
   );
 }
