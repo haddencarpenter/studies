@@ -110,8 +110,20 @@ const Sider = ({ topCategories, categories, coins }) => {
         key: 'youtube',
         children: [
           {
-            label: 'Bitcoin',
-            key: 'bitcoin'
+            label: <a href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Basic Tutorial</a>,
+            key: 'tutorial',
+            icon: <VideoCameraFilled className={styles.gray} />
+          }
+        ]
+      },
+      {
+        label: 'Medium',
+        key: 'medium',
+        children: [
+          {
+            label: <a href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Find profitable Altcoins</a>,
+            key: 'profitable-altcoins',
+            icon: <ReadFilled className={styles.gray} />
           }
         ]
       }
