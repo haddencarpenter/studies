@@ -27,7 +27,7 @@ const TABS = {
   'screener': 'Screener',
   'resources': 'Resources'
 }
-const Sider = ({ categories, coins }) => {
+const Sider = ({ topCategories, categories, coins }) => {
   const [darkMode, setDarkMode] = useContext(DarkModeContext)
   const [collapsed, setCollapsed] = useState(false)
   const [tab, setTab] = useState(TABS.screener)
@@ -40,7 +40,7 @@ const Sider = ({ categories, coins }) => {
         children: [
           {
             label: 'Watchlist',
-            key: 'watchlist',
+            key: 'watch-list',
             icon: <StarFilled className={styles.sunsetOrange} />
           },
           {
@@ -50,22 +50,22 @@ const Sider = ({ categories, coins }) => {
           },
           {
             label: 'Market Health',
-            key: 'markethealth',
+            key: 'market-health',
             icon: <HeartFilled className={styles.dustRed} />
           },
           {
             label: 'Top Coins',
-            key: 'topcoins',
+            key: 'top-coins',
             icon: <RiseOutlined className={styles.geekBlue} />
           },
           {
             label: 'Gainers & Losers',
-            key: 'gainersandlosers',
+            key: 'gainers-and-losers',
             icon: <LineChartOutlined className={styles.goldenPurple} />
           },
           {
             label: 'New Pairs',
-            key: 'newpairs',
+            key: 'new-pairs',
             icon: <AlertFilled className={styles.daybreakBlue} />
           },
         ]
@@ -73,12 +73,12 @@ const Sider = ({ categories, coins }) => {
       {
         label: 'Top Categories',
         key: 'topcategories',
-        children: [
-          {
-            label: 'Bitcoin',
-            key: 'bitcoin'
+        children: topCategories.map((category) => {
+          return {
+            label: category,
+            key: category
           }
-        ]
+        })
       }
     ]
   } else {
@@ -99,7 +99,7 @@ const Sider = ({ categories, coins }) => {
           },
           {
             label: 'Terms & Conditions',
-            key: 'termsandconditions',
+            key: 'terms',
             icon: <ContainerFilled className={styles.polarGreen} />
           }
         ]
@@ -154,7 +154,6 @@ const Sider = ({ categories, coins }) => {
         mode="inline"
         openKeys={['data', 'topcategories', 'about', 'youtube']}
         items={menuItems}
-        expandIcon={null}
         className={styles.menu}
         inlineIndent={0}
       />
