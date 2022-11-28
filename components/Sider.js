@@ -1,5 +1,19 @@
 import { Layout, Space, Radio, Menu } from 'antd'
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons'
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  StarFilled,
+  UpCircleFilled,
+  HeartFilled,
+  RiseOutlined,
+  LineChartOutlined,
+  AlertFilled,
+  TeamOutlined,
+  QuestionCircleFilled,
+  ContainerFilled,
+  VideoCameraFilled,
+  ReadFilled
+} from '@ant-design/icons'
 import classnames from 'classnames'
 import { useState, useContext } from 'react'
 
@@ -26,8 +40,34 @@ const Sider = ({ categories, coins }) => {
         children: [
           {
             label: 'Watchlist',
-            key: 'watchlist'
-          }
+            key: 'watchlist',
+            icon: <StarFilled className={styles.sunsetOrange} />
+          },
+          {
+            label: 'Trends',
+            key: 'trends',
+            icon: <UpCircleFilled className={styles.polarGreen} />
+          },
+          {
+            label: 'Market Health',
+            key: 'markethealth',
+            icon: <HeartFilled className={styles.dustRed} />
+          },
+          {
+            label: 'Top Coins',
+            key: 'topcoins',
+            icon: <RiseOutlined className={styles.geekBlue} />
+          },
+          {
+            label: 'Gainers & Losers',
+            key: 'gainersandlosers',
+            icon: <LineChartOutlined className={styles.goldenPurple} />
+          },
+          {
+            label: 'New Pairs',
+            key: 'newpairs',
+            icon: <AlertFilled className={styles.daybreakBlue} />
+          },
         ]
       },
       {
@@ -42,7 +82,39 @@ const Sider = ({ categories, coins }) => {
       }
     ]
   } else {
-    menuItems = []
+    menuItems = [
+      {
+        label: 'About',
+        key: 'about',
+        children: [
+          {
+            label: 'Team',
+            key: 'team',
+            icon: <TeamOutlined className={styles.geekBlue} />
+          },
+          {
+            label: 'FAQ',
+            key: 'faq',
+            icon: <QuestionCircleFilled className={styles.sunsetOrange} />
+          },
+          {
+            label: 'Terms & Conditions',
+            key: 'termsandconditions',
+            icon: <ContainerFilled className={styles.polarGreen} />
+          }
+        ]
+      },
+      {
+        label: 'YouTube',
+        key: 'youtube',
+        children: [
+          {
+            label: 'Bitcoin',
+            key: 'bitcoin'
+          }
+        ]
+      }
+    ]
   }
 
   return (
@@ -75,13 +147,16 @@ const Sider = ({ categories, coins }) => {
         ]}
         optionType="button"
         buttonStyle="solid"
+        className={styles.tabs}
       />
       <Menu
         theme={darkMode ? 'dark' : 'light'}
         mode="inline"
-        openKeys={['data', 'topcategories']}
+        openKeys={['data', 'topcategories', 'about', 'youtube']}
         items={menuItems}
         expandIcon={null}
+        className={styles.menu}
+        inlineIndent={0}
       />
       <div className={styles.footer}>
         Funded by <a href="https://gamblersarea.com/" target="_blank" rel="noreferrer">GamblersArea</a>
