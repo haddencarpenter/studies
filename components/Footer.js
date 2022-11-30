@@ -1,4 +1,5 @@
 import { Layout, Typography, Row, Col } from 'antd'
+import { Client } from 'react-hydration-provider'
 
 import useBreakPoint from '../hooks/useBreakPoint'
 import footerStyles from '../styles/footer.module.less'
@@ -53,7 +54,9 @@ const Footer = () => {
   return (
     <AntFooter className={footerStyles.wrapper}>
       <div className={footerStyles.footerPrimary}>
-        {grid}
+        <Client>
+          {grid}
+        </Client>
       </div>
     </AntFooter>
   );
