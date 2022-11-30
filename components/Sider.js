@@ -40,8 +40,8 @@ const Sider = ({ topCategories, categories, coins }) => {
         key: 'data',
         children: [
           {
-            label: <Link href="watch-list">Watchlist</Link>,
-            key: 'watch-list',
+            label: <Link href="watchlist">Watchlist</Link>,
+            key: 'watchlist',
             icon: <StarFilled className={styles.sunsetOrange} />
           },
           {
