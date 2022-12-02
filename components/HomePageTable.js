@@ -45,7 +45,7 @@ const HomePageTable = ({
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
-  const toggleCoin = useCallback((e, coinId) => {
+  const toggleCoin = useCallback((coinId) => {
     if (watchlistCoins.includes(coinId)) {
       const newWatchlistCoins = watchlistCoins.filter(coin => coin !== coinId)
       setWatchlistCoins(newWatchlistCoins)
@@ -161,27 +161,29 @@ const HomePageTable = ({
       title: 'Coin',
       width: 200,
       dataIndex: 'coinData',
-      onCell: () => ({ onClick: (e) => {
-        console.log('on cell click name')
-        e.stopPropagation();
-      }}),
       fixed: hydrated ? (screens.lg ? null : 'left') : null,
       sorter: (a, b) => a.coinData.name.localeCompare(b.coinData.name),
       render: (coinData) => {
         const isCoinWatched = watchlistCoins.includes(coinData.id)
         return (
-          (<Link href={`/coin/${coinData.id}`} className={indexTableStyles.coin} passHref>
-            <StarFilled className={classnames(indexTableStyles.star, { [indexTableStyles.active] : isCoinWatched })} onClick={(e) => toggleCoin(e, coinData.id)} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coinData.images.small} alt={coinData.name} className={indexTableStyles.image} loading="lazy"/>
-            <span className={indexTableStyles.name}>{coinData.name}</span>
-            <span className={indexTableStyles.symbol}>{coinData.symbol}</span>
-          </Link>)
+          <span>
+            <StarFilled
+              className={classnames(indexTableStyles.star, { [indexTableStyles.active] : isCoinWatched })}
+              onClick={() => toggleCoin(coinData.id)}
+            />
+            <Link href={`/coin/${coinData.id}`} className={indexTableStyles.coin} passHref>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={coinData.images.small} alt={coinData.name} className={indexTableStyles.image} loading="lazy"/>
+              <span className={indexTableStyles.name}>{coinData.name}</span>
+              <span className={indexTableStyles.symbol}>{coinData.symbol}</span>
+            </Link>
+          </span>
         );
       }
     },
     {
       width: 100,
+      onCell: (data) => ({ onClick: () => router.push(`/coin/${data.coinData.id}`) }),
       title: <span className={indexTableStyles.columnTitle}>
         <span>Trend (24h)</span>
         <Tooltip
@@ -241,6 +243,7 @@ const HomePageTable = ({
     },
     {
       width: 100,
+      onCell: (data) => ({ onClick: () => router.push(`/coin/${data.coinData.id}`) }),
       title: <span className={indexTableStyles.columnTitle}>
         <span>Trend (7d)</span>
         <Tooltip
@@ -297,6 +300,7 @@ const HomePageTable = ({
   {
     title: 'Market Cap',
     dataIndex: 'marketCap',
+    onCell: (data) => ({ onClick: () => router.push(`/coin/${data.coinData.id}`) }),
     width: 90,
     sorter: (a, b) => Number(a.marketCap) - Number(b.marketCap),
     render: (marketCap) => {
@@ -322,9 +326,6 @@ const HomePageTable = ({
     dataIndex: 'exchanges',
     width: 120,
     className: indexTableStyles.unclickableCell,
-    onCell: () => ({ onClick: (e) => {
-      e.stopPropagation();
-    }}),
     render: (exchanges, data) => {
       return <span title="Top 5 exchanges. Click to see more.">
         {exchanges.map((exchange) => {
@@ -351,9 +352,6 @@ const HomePageTable = ({
     dataIndex: 'derivatives',
     width: 250,
     className: indexTableStyles.unclickableCell,
-    onCell: () => ({ onClick: (e) => {
-      e.stopPropagation();
-    }}),
     render: (derivatives, data) => {
       return <span title="Top derivatives. Click to see more.">
         {derivatives.map((derivative) => {
@@ -383,10 +381,6 @@ const HomePageTable = ({
     <Table
       columns={columns}
       dataSource={tableData}
-      onRow={(coin) => ({ onClick: () => {
-        console.log('on row')
-        router.push(`/coin/${coin.coinData.id}`);
-      }}) }
       rowClassName={indexTableStyles.row}
       pagination={{ position: ['none', 'none'], pageSize: 1000 }}
       bordered

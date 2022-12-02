@@ -3,7 +3,7 @@ function getLocalStorage() {
 }
 
 function setLocalStorage(watchlist) {
-  localStorage.setItem('watchlist', JSON.stringify(watchlist))
+  localStorage.setItem('watchlist', JSON.stringify(watchlist, ['coins']))
 }
 
 export function getWatchListCoins() {
