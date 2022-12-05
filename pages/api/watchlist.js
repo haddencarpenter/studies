@@ -1,7 +1,12 @@
+import isEmpty from 'lodash/isEmpty'
+
 import prisma from '../../lib/prisma'
 
 const handler = async (req, res) => {
-  const requestedCoins = req.query['coins[]']
+  let requestedCoins = req.query['coins[]']
+  if (isEmpty(requestedCoins)) {
+    requestedCoins = ['thisisneverevereverevergonnabeavalidcoinid']
+  }
   if (req.method !== 'GET' || !requestedCoins instanceof Array) {
     res.status(400)
   } else {

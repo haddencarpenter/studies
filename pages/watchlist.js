@@ -32,18 +32,24 @@ export default function WatchList() {
     if (!watchlistCoins?.length) {
       watchlistCoins = getWatchListCoins()
     }
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        watchlist: watchlistCoins
-      }
-    }, null, { shallow: true })
 
     const fetchData = async () => {
-      const coins = (await axios.get('/api/watchlist', { params: { coins: watchlistCoins } })).data.coins;
+      let coins = (await axios.get('/api/watchlist', { params: { coins: watchlistCoins } })).data.coins;
+      coins = coins.map(coin => {
+        return {
+          ...coin,
+          key: coin.id,
+        }
+      })
 
       setWatchlist(coins)
+      router.push({
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          watchlist: watchlistCoins
+        }
+      }, null, { shallow: true })
       setLoading(false)
     }
 
