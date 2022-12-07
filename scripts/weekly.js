@@ -94,7 +94,7 @@ const getDropsTabData = async (browser) => {
       const data = [];
       for (const element of elements) {
         const url = element.querySelector('a').href;
-        const symbolElement = element.querySelector('.uppercase')
+        const symbolElement = element.querySelector('a div div:nth-child(3) div')
         const symbol = symbolElement.innerText;
         const name = symbolElement.nextSibling.innerText;
         data.push({
@@ -132,6 +132,7 @@ const dropsTab = async () => {
     const page = await browser.newPage();
     for (const dropsData of dropsTabData) {
       const coin = await findMatchingCoinDropstab(dropsData.symbol, dropsData.name);
+      console.log('Matching dropstab coin with database', dropsData.symbol, dropsData.name, coin, dropsData.url)
       if (coin) {
         await fetchCoinData(dropsData.url, coin, page);
       }
