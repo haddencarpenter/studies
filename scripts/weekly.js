@@ -18,11 +18,20 @@ const fetchCoinData = async (url, coin, page) => {
   console.log('Fetch launch data for', coin.symbol);
   await page.goto(url, {waitUntil: 'domcontentloaded'});
 
-  let [launch_roi_usd, launch_roi_btc, launch_roi_eth, launch_price, launch_date_start, launch_date_end] = await page.evaluate(() => {
+  let [
+    launch_roi_usd,
+    launch_roi_btc,
+    launch_roi_eth,
+    launch_price,
+    launch_date_start,
+    launch_date_end,
+    categories
+  ] = await page.evaluate(() => {
     const icoAndRoiSection = Array.from(document.querySelectorAll('h3'))?.find((h3 => h3.innerText.includes("ROI since ICO")))?.nextSibling
     const roiSection = icoAndRoiSection?.firstChild
     const icoSection = icoAndRoiSection?.lastChild
 
+    let data = [null, null, null, null, null, null]
     if (roiSection || icoSection) {
       const currencySections = Array.from(roiSection.querySelectorAll('div'))
       const rois = currencySections.map((currencySection) => {
@@ -41,11 +50,12 @@ const fetchCoinData = async (url, coin, page) => {
 
       const launchDate = launchDateSection.lastChild.innerText.split(' - ')
 
-      return [usdRoi, btcRoi, ethRoi, launchPrice, launchDate[0], launchDate[1]]
-    } else {
-      return [null, null, null, null, null, null]
+      data = [usdRoi, btcRoi, ethRoi, launchPrice, launchDate[0], launchDate[1]]
     }
-  })
+    const tags = Array.from(document.querySelector('ul[aria-label="Tags"]')?.querySelectorAll('li') || []).map(x => x.innerText)
+    data.push(tags)
+    return data
+  });
 
   launch_date_start = Date.parse(launch_date_start);
   launch_date_start = isNaN(launch_date_start) ? null : new Date(launch_date_start);
@@ -62,7 +72,8 @@ const fetchCoinData = async (url, coin, page) => {
       launch_date_end,
       launch_roi_usd,
       launch_roi_btc,
-      launch_roi_eth
+      launch_roi_eth,
+      categories
     }
   })
 }
@@ -77,7 +88,7 @@ const getDropsTabData = async (browser) => {
 
   while (hasNextPage) {
     console.log('Scraping page #', currentPage);
-    const pageData = await page.$$eval('table tbody td:nth-child(3)', (elements) => {
+    const pageData = await page.$$eval('table tbody td:nth-child(2)', (elements) => {
       const data = [];
       for (const element of elements) {
         const url = element.querySelector('a').href;
