@@ -329,7 +329,6 @@ export async function getStaticProps({ params }) {
       volume: ticker.volume,
       baseSymbol: baseSymbol,
       pair: `${baseSymbol}/${quoteSymbol}`,
-      trustScore: ticker.trust_score,
       centralized: matchingExchange?.centralized
     }
   })
@@ -347,7 +346,6 @@ export async function getStaticProps({ params }) {
       volume: null,
       baseSymbol: null,
       pair: derivative['symbol'],
-      trustScore: null,
       derivative: true
     })
   })
