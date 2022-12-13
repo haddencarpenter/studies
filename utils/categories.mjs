@@ -6,18 +6,26 @@ import flatMap from 'lodash/fp/flatMap.js'
 import prisma from '../lib/prisma.mjs'
 
 let overrides
-export async function overrideCoinCategories(name, symbol, categories) {
+
+export async function getCategoryOverrides() {
   overrides ||= await csv().fromFile('lib/CategoryOverride.csv');
+
+  return overrides
+}
+
+export async function overrideCoinCategories(name, symbol, categories) {
+  await getCategoryOverrides();
 
   const matchingOverrides = overrides.filter((coin) => {
     return coin.CoinSymbol.toLowerCase() === symbol.toLowerCase() && coin.CoinName.toLowerCase() === name.toLowerCase()
   })
 
   for (const override of matchingOverrides) {
+    const overrideCategory = override.Category
     if (override.addORremove === 'remove') {
-      categories = categories.filter((category) => category !== override.Category)
-    } else {
-      categories.push(override.Category)
+      categories = categories.filter((category) => category !== overrideCategory)
+    } else if (override.addORremove === 'add' && !categories.includes(overrideCategory)) {
+      categories.push(overrideCategory)
     }
   }
 
