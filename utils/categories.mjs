@@ -6,8 +6,15 @@ import flatMap from 'lodash/fp/flatMap.js'
 import prisma from '../lib/prisma.mjs'
 
 let overrides
-export async function overrideCoinCategories(name, symbol, categories) {
+
+export async function getCategoryOverrides() {
   overrides ||= await csv().fromFile('lib/CategoryOverride.csv');
+
+  return overrides
+}
+
+export async function overrideCoinCategories(name, symbol, categories) {
+  await getCategoryOverrides();
 
   const matchingOverrides = overrides.filter((coin) => {
     return coin.CoinSymbol.toLowerCase() === symbol.toLowerCase() && coin.CoinName.toLowerCase() === name.toLowerCase()
