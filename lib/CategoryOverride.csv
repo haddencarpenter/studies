@@ -1,2 +1,24 @@
 Category,CoinSymbol,CoinName,addORremove
 "Proof of Stake",ETH,Ethereum,add
+"Proof of Stake",BNB,Build and Build,add
+"Proof of Stake",ADA,Cardano,add
+"Proof of Stake",DOT,Polkadot,add
+"Proof of Stake",MATIC,Polygon,add
+"Proof of Stake",BTS,Bitshares,add
+"Proof of Stake",TRX,Tron,add
+"Proof of Stake",AVAX,Avalanche,add
+"Proof of Stake",ALGO,Algorand,add
+"Proof of Stake",XTZ,Tezos,add
+"Proof of Stake",EOS,Eos,add
+"Proof of Stake",HBAR,Hedera Hashgraph,add
+"Proof of Stake",DCR,Decred,add
+"Proof of Stake",ROSE,Oasis,add
+"Proof of Stake",QTUM,Quantum,add
+"Proof of Stake",10SET,Tenset,add
+"Proof of Stake",LUNA,Luna2,add
+"Proof of Stake",WAVES,Waves,add
+"Proof of Stake",ONE,Harmony One,add
+"Proof of Stake",ICX,Icon,add
+"Proof of Stake",ONT,Ontology,add
+"Proof of Stake",HIVE,Hive token,add
+"Proof of Stake",LSK,Lisk,add
