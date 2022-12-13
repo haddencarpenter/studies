@@ -92,20 +92,6 @@ const TradeTab = ({ coin, screens }) => {
       sortOrder: 'descend',
       render: (volume) => volume ? currencyFormatter.format(volume) : null
     })
-    columns.push({
-      title: 'Trust score',
-      dataIndex: 'trustScore',
-      render: (trustScore) => {
-        if (trustScore === null) { return null; }
-        const good = trustScore === 'green'
-        const classNames = {
-          [coinStyles.marketTrustScore]: true,
-          [coinStyles.marketTrustScorePositive]: good,
-          [coinStyles.marketTrustScoreNegative]: !good,
-        }
-        return <div className={classnames(classNames)} />
-      }
-    })
   }
 
   return (
