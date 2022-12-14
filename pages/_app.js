@@ -53,7 +53,7 @@ function MyApp({ Component, pageProps }) {
             <link rel="canonical" href={currentUrl} />
           </Head>
           <Client>
-            { screens.md && <Sider topCategories={topCategories} categories={categories} coins={coins} /> }
+            { screens.lg && <Sider topCategories={topCategories} categories={categories} coins={coins} /> }
           </Client>
           <Layout className={baseStyles.innerLayout}>
             <Client>
