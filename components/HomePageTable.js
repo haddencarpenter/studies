@@ -1,5 +1,5 @@
 import { Table, Tooltip, Tag } from 'antd'
-import { QuestionCircleFilled, StarFilled } from '@ant-design/icons';
+import { QuestionCircleFilled } from '@ant-design/icons';
 import { VList } from 'virtuallist-antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ import HodlTag from './HodlTag'
 import useBreakPoint from '../hooks/useBreakPoint'
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
+import WatchlistStar from '../components/WatchlistStar';
 
 import indexTableStyles from '../styles/indexTable.module.less';
 import baseStyles from '../styles/base.module.less'
@@ -167,10 +168,7 @@ const HomePageTable = ({
         const isCoinWatched = watchlistCoins.includes(coinData.id)
         return (
           <span>
-            <StarFilled
-              className={classnames(indexTableStyles.star, { [indexTableStyles.active] : isCoinWatched })}
-              onClick={() => toggleCoin(coinData.id)}
-            />
+            <WatchlistStar active={isCoinWatched} onClick={() => toggleCoin(coinData.id)} />
             <Link href={`/coin/${coinData.id}`} className={indexTableStyles.coin} passHref>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coinData.images.small} alt={coinData.name} className={indexTableStyles.image} loading="lazy"/>

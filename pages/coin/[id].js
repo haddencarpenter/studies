@@ -1,6 +1,5 @@
 import { InfoCircleFilled } from '@ant-design/icons';
 import { Card, Layout, Space, Tag, Tooltip, Typography } from 'antd';
-import Link from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Prisma } from '@prisma/client'
@@ -18,12 +17,14 @@ import PriceDataTab from '../../components/PriceDataTab';
 import AnalyticsTab from '../../components/AnalysisTab';
 import TradeTab from '../../components/TradeTab';
 import PageHeader from '../../components/PageHeader';
+import WatchlistStar from '../../components/WatchlistStar';
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables.mjs';
 import getTrends from '../../utils/getTrends.mjs';
 import getChainsData from '../../utils/getChainsData';
 import getPlatformData from '../../utils/getPlatformData';
 import convertToDailySignals from '../../utils/convertToDailySignals.mjs';
 import { getDescriptionByCoin } from '../../utils/coinDescriptions';
+import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../../utils/watchlist.js';
 import useBreakPoint from '../../hooks/useBreakPoint';
 import useIsHoverable from '../../hooks/useIsHoverable';
 import globalData from '../../lib/globalData';
@@ -77,6 +78,21 @@ export default function Coin(coin) {
   const metaDescription = `Coinrotator issues a daily trend for ${coin.name}. A coin screener that captures strong momentum in both directions!`
 
   const router = useRouter();
+  const [isWatched, setIsWatched] = useState(false);
+  useEffect(() => {
+    const watchlistCoins = getWatchListCoins()
+    if (watchlistCoins.indexOf(coin.id) !== -1) {
+      setIsWatched(true)
+    }
+  }, [coin.id])
+  const toggleWatched = useCallback(() => {
+    if (isWatched) {
+      removeFromWatchList(coin.id)
+    } else {
+      addToWatchList(coin.id)
+    }
+    setIsWatched(!isWatched)
+  }, [coin.id, isWatched])
   const [activeTab, setActiveTab] = useState(TABS.pricedata)
   useEffect(() => {
     if (router.isReady) {
@@ -126,6 +142,7 @@ export default function Coin(coin) {
     <PageHeader
       title={coin.name}
       prefix={<>
+        <WatchlistStar active={isWatched} onClick={toggleWatched} />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
       </>}
