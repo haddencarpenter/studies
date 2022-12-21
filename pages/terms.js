@@ -1,4 +1,4 @@
-import { Breadcrumb, Typography, Layout } from 'antd';
+import { Typography, Layout } from 'antd';
 import Link from 'next/link'
 
 import baseStyles from '../styles/base.module.less'
@@ -14,10 +14,6 @@ export default function Terms() {
     <>
       <PageHeader title="Terms and Conditions" />
       <Content className={baseStyles.container}>
-        <Breadcrumb className={baseStyles.breadcrumbs}>
-          <Breadcrumb.Item><Link href="/" className={baseStyles.homeBreadCrumb}>Home</Link></Breadcrumb.Item>
-          <Breadcrumb.Item>Terms</Breadcrumb.Item>
-        </Breadcrumb>
         <Title className={tcStyles.title}><span className={tcStyles.bold}>CoinRotator&nbsp;</span>Terms of Use</Title>
         <Paragraph className={tcStyles.paragraph}>These Terms of Use (the &quot;Terms&quot;) govern your access to and use of this website, CoinRotator (the &quot;Website&quot;), and associated content, software and applications (collectively, the &quot;Service&quot;). These Terms also include our Privacy Policy, which is located at <Link href="https://CoinRotator/terms" className={tcStyles.terms}>CoinRotator/terms</Link>.</Paragraph>
         <Paragraph className={tcStyles.paragraph}>The Service is administered and maintained by CoinRotator. The terms &quot;we&quot;, &quot;us&quot; and &quot;our&quot; also refer to CoinRotator. The term &quot;you&quot; refers to the person visiting this Website.</Paragraph>

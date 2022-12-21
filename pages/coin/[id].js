@@ -1,5 +1,5 @@
 import { InfoCircleFilled } from '@ant-design/icons';
-import { Breadcrumb, Card, Layout, Space, Tag, Tooltip, Typography } from 'antd';
+import { Card, Layout, Space, Tag, Tooltip, Typography } from 'antd';
 import Link from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -133,10 +133,6 @@ export default function Coin(coin) {
       postfix={coinTag}
     />
     <Content className={baseStyles.container}>
-      <Breadcrumb className={baseStyles.breadcrumbs}>
-        <Breadcrumb.Item><Link href="/" className={baseStyles.homeBreadCrumb}>Home</Link></Breadcrumb.Item>
-        <Breadcrumb.Item><Link href={`/coin/${coin.id}`}>{coin.name}</Link></Breadcrumb.Item>
-      </Breadcrumb>
       <Card className={classnames(baseStyles.card, coinStyles.sectionParent)}>
         <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionHeader, coinStyles.sectionFlex)}>
           <Space>

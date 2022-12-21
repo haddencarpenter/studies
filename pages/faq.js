@@ -1,4 +1,4 @@
-import { Breadcrumb, Typography, Collapse, Layout } from 'antd';
+import { Typography, Collapse, Layout } from 'antd';
 import Link from 'next/link'
 
 import baseStyles from '../styles/base.module.less';
@@ -19,10 +19,6 @@ export default function Faq() {
     <>
       <PageHeader title="FAQ" />
       <Content className={baseStyles.container}>
-        <Breadcrumb className={baseStyles.breadcrumbs}>
-          <Breadcrumb.Item><Link href="/" className={baseStyles.homeBreadCrumb}>Home</Link></Breadcrumb.Item>
-          <Breadcrumb.Item>FAQ</Breadcrumb.Item>
-        </Breadcrumb>
         <Title className={baseStyles.title}>FAQ</Title>
         <Paragraph type="secondary" className={baseStyles.subTitle}>Find answers to your frequently asked questions here.</Paragraph>
         <Collapse className={baseStyles.collapse} defaultActiveKey={['0']} accordion>
