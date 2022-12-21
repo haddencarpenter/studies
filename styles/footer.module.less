@@ -1,12 +1,21 @@
 @import './variables.module.less';
 
-.wrapper {
-  padding: 0;
+.container {
+  padding: 8px 16px;
   background: inherit;
   border-top: 1px solid @divider-color;
+  overflow-x: auto;
+
+  color: #8C8C8C;
+  line-height: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+
+  @media (max-width: @screen-md) {
+    padding: 6px 16px;
+  }
 }
 
-// Primary
-.footerPrimary {
-  background: var(--cr-primary-bg);
+.item {
+  color: @cr-gray-3;
 }

@@ -1,55 +1,20 @@
-import { Layout, Row, Col } from 'antd'
-import { Client } from 'react-hydration-provider'
+import { Layout, Space } from 'antd'
 
-import useBreakPoint from '../hooks/useBreakPoint'
 import footerStyles from '../styles/footer.module.less'
 
 const Footer = () => {
   const { Footer: AntFooter } = Layout;
 
-  const screens = useBreakPoint();
-  let grid;
-
-  if (screens.xl) {
-    grid = (
-      <Row gutter={32}>
-        <Col span={6}>
-        </Col>
-      </Row>
-    )
-  } else if (screens.lg) {
-    grid = (
-      <>
-        <Row>
-          <Col span={24}></Col>
-        </Row>
-      </>
-    )
-  } else if (screens.md) {
-    grid = (
-      <span>
-        <Row>
-          <Col span={24}></Col>
-        </Row>
-      </span>
-    )
-  } else {
-    grid = (
-      <span>
-        <Row>
-          <Col span={24}></Col>
-        </Row>
-      </span>
-    )
-  }
-
   return (
-    <AntFooter className={footerStyles.wrapper}>
-      <div className={footerStyles.footerPrimary}>
-        <Client>
-          {grid}
-        </Client>
-      </div>
+    <AntFooter className={footerStyles.container}>
+      <Space size={16}>
+        <span>Total UP Trend: <span className={footerStyles.item}>{1}</span></span>
+        <span>Total DOWN Trend: <span className={footerStyles.item}>{1}</span></span>
+        <span>Total HODL Trend: <span className={footerStyles.item}>{1}</span></span>
+        <span>Longest signal streak UP: <span className={footerStyles.item}>{1}</span></span>
+        <span>Longest signal streak DOWN: <span className={footerStyles.item}>{1}</span></span>
+        <span>Longest signal streak HODL: <span className={footerStyles.item}>{1}</span></span>
+      </Space>
     </AntFooter>
   );
 }
