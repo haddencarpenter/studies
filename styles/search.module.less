@@ -1,6 +1,28 @@
 @import './variables.module.less';
 
-.search {
+.modal {
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.searchIcon {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+
+  width: 28px;
+  height: 28px;
+
+  background: #FFFFFF;
+
+  border: 1px solid #D9D9D9;
+  border-radius: 2px;
+}
+
+.searchBar {
   width: 169px;
 
   @media (max-width: @screen-sm) {

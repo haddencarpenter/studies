@@ -25,7 +25,7 @@ const Header = ({ categories, coins, screens }) => {
     menuItems.push({
       key: 'search',
       className: headerStyles.search,
-      label: <Search categories={categories} coins={coins} />
+      label: <Search categories={categories} coins={coins} collapsed />
     })
   }
 
