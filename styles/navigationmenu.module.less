@@ -1,0 +1,106 @@
+@import './variables.module.less';
+
+.menu {
+  font-size: 14px;
+  border-right: none;
+  max-height: 784px;
+  overflow-y: auto;
+
+  :global(.ant-menu-submenu-title) {
+    cursor: auto;
+    border-top: 1px solid #F0F0F0;
+    margin-bottom: 0;
+
+    :global(.ant-menu-title-content) {
+      font-size: 12px !important;
+      line-height: 22px !important;
+      color: #8C8C8C;
+    }
+  }
+
+  :global(.ant-menu-sub) {
+    background: var(--cr-primary-bg) !important;
+  }
+
+  :global(.ant-menu-submenu-arrow) {
+    display: none;
+  }
+
+  :global([role=menuitem]) {
+    padding-left: 12px !important;
+    font-weight: bold;
+    color: var(--cr-secondary-text);
+
+    &:hover {
+      color: var(--cr-secondary-text);
+    }
+  }
+
+  :global(.anticon) {
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 2px;
+
+    svg {
+      height: 15px;
+      vertical-align: -3px;
+    }
+  }
+
+  .sunsetOrange {
+    background: #FFE7BA;
+
+    svg {
+      fill: #FA8C16;
+    }
+  }
+
+  .polarGreen {
+    background: #D9F7BE;
+
+    svg {
+      fill: #52C41A;
+    }
+  }
+
+  .dustRed {
+    background: #FFCCC7;
+
+    svg {
+      fill: #F5222D;
+    }
+  }
+
+  .geekBlue {
+    background: #D6E4FF;
+
+    svg {
+      fill: #2F54EB;
+    }
+  }
+
+  .goldenPurple {
+    background: #EFDBFF;
+
+    svg {
+      fill: #722ED1;
+    }
+  }
+
+  .daybreakBlue {
+    background: #BAE7FF;
+
+    svg {
+      fill: #1890FF;
+    }
+  }
+
+  .gray {
+    background: #F0F0F0;
+
+    svg {
+      fill: #8C8C8C;
+    }
+  }
+}
