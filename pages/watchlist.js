@@ -7,9 +7,9 @@ import axios from 'axios'
 
 import { getWatchListCoins } from '../utils/watchlist'
 import globalData from '../lib/globalData';
-
 import styles from '../styles/watchlist.module.less'
 import indexTableStyles from '../styles/indexTable.module.less'
+import PageHeader from '../components/PageHeader'
 
 const { Content } = Layout;
 
@@ -76,19 +76,22 @@ export default function WatchList() {
   ]
 
   return (
-    <Content className={styles.container}>
-      <Row className={styles.table}>
-        <Col span={24}>
-          <Client>
-            <Table
-              columns={columns}
-              dataSource={watchlist}
-              pagination={false}
-              loading={loading}
-            />
-          </Client>
-        </Col>
-      </Row>
-    </Content>
+    <>
+      <PageHeader title="Watchlist" />
+      <Content className={styles.container}>
+        <Row className={styles.table}>
+          <Col span={24}>
+            <Client>
+              <Table
+                columns={columns}
+                dataSource={watchlist}
+                pagination={false}
+                loading={loading}
+              />
+            </Client>
+          </Col>
+        </Row>
+      </Content>
+    </>
   );
 }

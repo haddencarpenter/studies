@@ -17,6 +17,7 @@ import HodlTag from '../../components/HodlTag';
 import PriceDataTab from '../../components/PriceDataTab';
 import AnalyticsTab from '../../components/AnalysisTab';
 import TradeTab from '../../components/TradeTab';
+import PageHeader from '../../components/PageHeader';
 import { defaultAtrPeriods, defaultMultiplier, signals } from '../../utils/variables.mjs';
 import getTrends from '../../utils/getTrends.mjs';
 import getChainsData from '../../utils/getChainsData';
@@ -107,6 +108,7 @@ export default function Coin(coin) {
       ActiveTabComponent = TradeTab;
       break;
   }
+  const coinTag = <Tag className={coinStyles.coinTag}>{coin.symbol.toUpperCase()}</Tag>
 
   return <>
     <Head>
@@ -122,6 +124,14 @@ export default function Coin(coin) {
       <meta property="og:image:height" content="250" />
       <meta property="og:image:type" content="image/png" />
     </Head>
+    <PageHeader
+      title={coin.name}
+      prefix={<>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
+      </>}
+      postfix={coinTag}
+    />
     <Content className={baseStyles.container}>
       <Breadcrumb className={baseStyles.breadcrumbs}>
         <Breadcrumb.Item><Link href="/" className={baseStyles.homeBreadCrumb}>Home</Link></Breadcrumb.Item>
@@ -133,7 +143,7 @@ export default function Coin(coin) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={coin.images.small} width={24} height={24} alt={`${coin.name} logo`} />
             <Title className={coinStyles.title}>{coin.name}</Title>
-            <Tag className={coinStyles.coinTag}>{coin.symbol.toUpperCase()}</Tag>
+            {coinTag}
           </Space>
         </Card.Grid>
         <div className={coinStyles.sectionsDailyAndWeekly}>
