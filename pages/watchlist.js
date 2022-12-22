@@ -6,6 +6,7 @@ import { Client, useHydrated } from 'react-hydration-provider'
 import axios from 'axios'
 
 import globalData from '../lib/globalData'
+import prisma from '../lib/prisma.mjs'
 import { getWatchListCoins } from '../utils/watchlist'
 import PageHeader from '../components/PageHeader'
 import useIsHoverable from '../hooks/useIsHoverable'

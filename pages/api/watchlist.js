@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
 
-import prisma from '../../lib/prisma'
+import prisma from '../../lib/prisma.mjs'
 import convertToDailySignals from '../../utils/convertToDailySignals.mjs'
 import convertTickersToExchanges from '../../utils/convertTickersToExchanges.js'
 import { defaultAtrPeriods, defaultMultiplier } from '../../utils/variables.mjs'
