@@ -23,32 +23,32 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
       key: 'screenertools',
       children: [
         {
-          label: <Link href="watchlist">Watchlist</Link>,
+          label: <Link href="/watchlist">Watchlist</Link>,
           key: 'watchlist',
           icon: <StarFilled className={styles.sunsetOrange} />
         },
         {
-          label: <Link href="trends">Trends</Link>,
+          label: <Link href="/">Trends</Link>,
           key: 'trends',
           icon: <UpCircleFilled className={styles.polarGreen} />
         },
         {
-          label: <Link href="market-health">Market Health</Link>,
+          label: <Link href="/market-health">Market Health</Link>,
           key: 'market-health',
           icon: <HeartFilled className={styles.dustRed} />
         },
         {
-          label: <Link href="top-coins">Top Coins</Link>,
+          label: <Link href="/top-coins">Top Coins</Link>,
           key: 'top-coins',
           icon: <RiseOutlined className={styles.geekBlue} />
         },
         {
-          label: <Link href="gainers-and-losers">Gainers & Losers</Link>,
+          label: <Link href="/gainers-and-losers">Gainers & Losers</Link>,
           key: 'gainers-and-losers',
           icon: <LineChartOutlined className={styles.goldenPurple} />
         },
         {
-          label: <Link href="new-pairs">New Pairs</Link>,
+          label: <Link href="/new-pairs">New Pairs</Link>,
           key: 'new-pairs',
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
