@@ -13,10 +13,12 @@ import {
   ReadFilled
 } from '@ant-design/icons'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import styles from "../styles/navigationmenu.module.less"
 
 const NavigationMenu = ({ collapsed = false , topCategories }) => {
+  const router = useRouter()
   let menuItems = [
     {
       label: 'Screener Tools',
@@ -24,32 +26,32 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
       children: [
         {
           label: <Link href="/watchlist">Watchlist</Link>,
-          key: 'watchlist',
+          key: '/watchlist',
           icon: <StarFilled className={styles.sunsetOrange} />
         },
         {
           label: <Link href="/">Trends</Link>,
-          key: 'trends',
+          key: '/',
           icon: <UpCircleFilled className={styles.polarGreen} />
         },
         {
           label: <Link href="/market-health">Market Health</Link>,
-          key: 'market-health',
+          key: '/market-health',
           icon: <HeartFilled className={styles.dustRed} />
         },
         {
           label: <Link href="/top-coins">Top Coins</Link>,
-          key: 'top-coins',
+          key: '/top-coins',
           icon: <RiseOutlined className={styles.geekBlue} />
         },
         {
           label: <Link href="/gainers-and-losers">Gainers & Losers</Link>,
-          key: 'gainers-and-losers',
+          key: '/gainers-and-losers',
           icon: <LineChartOutlined className={styles.goldenPurple} />
         },
         {
           label: <Link href="/new-pairs">New Pairs</Link>,
-          key: 'new-pairs',
+          key: '/new-pairs',
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
       ]
@@ -76,7 +78,7 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
       children: topCategories.map((category) => {
         return {
           label: <Link href={`/?category=${category}`}>{category}</Link>,
-          key: category
+          key: `/${category}`
         }
       })
     },
@@ -86,17 +88,17 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
       children: [
         {
           label: <Link href="/team">Team</Link>,
-          key: 'team',
+          key: '/team',
           icon: <TeamOutlined className={styles.geekBlue} />
         },
         {
           label: <Link href="/faq">FAQ</Link>,
-          key: 'faq',
+          key: '/faq',
           icon: <QuestionCircleFilled className={styles.sunsetOrange} />
         },
         {
           label: <Link href="/terms">Terms & Conditions</Link>,
-          key: 'terms',
+          key: '/terms',
           icon: <ContainerFilled className={styles.polarGreen} />
         }
       ]
@@ -106,51 +108,66 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
     menuItems = [
       {
         label: 'Watchlist',
-        icon: <Link href="watchlist"><StarFilled className={styles.sunsetOrange} /></Link>,
-        key: 'watchlist',
+        icon: <Link href="/watchlist"><StarFilled className={styles.sunsetOrange} /></Link>,
+        key: '/watchlist',
       },
       {
         label: 'Trends',
-        icon: <Link href="trends"><UpCircleFilled className={styles.polarGreen} /></Link>,
-        key: 'trends'
+        icon: <Link href="/"><UpCircleFilled className={styles.polarGreen} /></Link>,
+        key: '/'
       },
       {
         label: 'Market Health',
-        icon: <Link href="market-health"><HeartFilled className={styles.dustRed} /></Link>,
-        key: 'market-health',
+        icon: <Link href="/market-health"><HeartFilled className={styles.dustRed} /></Link>,
+        key: '/market-health',
       },
       {
         label: 'Top Coins',
-        icon: <Link href="top-coins"><RiseOutlined className={styles.geekBlue} /></Link>,
-        key: 'top-coins'
+        icon: <Link href="/top-coins"><RiseOutlined className={styles.geekBlue} /></Link>,
+        key: '/top-coins'
       },
       {
         label: 'Gainser and Losers',
-        icon: <Link href="gainers-and-losers"><LineChartOutlined className={styles.goldenPurple} /></Link>,
-        key: 'gainers-and-losers'
+        icon: <Link href="/gainers-and-losers"><LineChartOutlined className={styles.goldenPurple} /></Link>,
+        key: '/gainers-and-losers'
       },
       {
         label: 'New Pairs',
-        icon: <Link href="new-pairs"><AlertFilled className={styles.daybreakBlue} /></Link>,
-        key: 'new-pairs'
+        icon: <Link href="/new-pairs"><AlertFilled className={styles.daybreakBlue} /></Link>,
+        key: '/new-pairs'
       },
       {
         label: 'Team',
-        icon: <Link href="team"><TeamOutlined className={styles.geekBlue} /></Link>,
-        key: 'team'
+        icon: <Link href="/team"><TeamOutlined className={styles.geekBlue} /></Link>,
+        key: '/team'
       },
       {
         label: 'FAQ',
-        icon: <Link href="faq"><QuestionCircleFilled className={styles.sunsetOrange} /></Link>,
-        key: 'faq'
+        icon: <Link href="/faq"><QuestionCircleFilled className={styles.sunsetOrange} /></Link>,
+        key: '/faq'
       },
       {
         label: 'Terms & Conditions',
-        icon: <Link href="terms"><ContainerFilled className={styles.polarGreen} /></Link>,
-        key: 'terms'
+        icon: <Link href="/terms"><ContainerFilled className={styles.polarGreen} /></Link>,
+        key: '/terms'
       }
     ]
   }
+  let selectedKey = null
+  for (const item of menuItems) {
+    if (item.children) {
+      for (const child of item.children) {
+        if (child.key === router.pathname) {
+          selectedKey = child.key
+        }
+      }
+    } else {
+      if (item.key === router.pathname) {
+        selectedKey = item.key
+      }
+    }
+  }
+
   return (
     <Menu
       mode="inline"
@@ -158,6 +175,7 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
       items={menuItems}
       className={styles.menu}
       inlineIndent={0}
+      selectedKeys={[selectedKey]}
     />
   );
 }
