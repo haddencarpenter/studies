@@ -1,4 +1,4 @@
-import { Layout } from 'antd';
+import { Layout, Card } from 'antd';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import { useContext } from 'react'
 import subDays from 'date-fns/subDays';
@@ -25,11 +25,13 @@ export default function MarketHealth({ historicDailySuperSuperTrends }) {
     <>
       <PageHeader title="Market Health" />
       <Content className={baseStyles.container}>
-        <MarketHealthChart
-          historicDailySuperSuperTrends={historicDailySuperSuperTrends}
-          screens={screens}
-          darkMode={darkMode}
-        />
+        <Card>
+          <MarketHealthChart
+            historicDailySuperSuperTrends={historicDailySuperSuperTrends}
+            screens={screens}
+            darkMode={darkMode}
+          />
+        </Card>
       </Content>
     </>
   );
