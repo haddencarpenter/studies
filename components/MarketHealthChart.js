@@ -7,9 +7,6 @@ const MarketHealthChart = ({ historicDailySuperSuperTrends, screens, darkMode })
   return (
     <Line
       data={historicDailySuperSuperTrends}
-      autoFit={false}
-      height={200}
-      width={screens.lg ? 700 : 327}
       seriesField={'trend'}
       xField="date"
       yField="amount"

@@ -1,7 +1,7 @@
 import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
-import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled, InfoCircleFilled } from '@ant-design/icons'
+import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-import { useMemo, useState, useCallback, useContext, useEffect, useReducer, useRef } from 'react'
+import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
 import debounce from 'lodash/debounce'
 import isFinite from 'lodash/isFinite'
 import isEmpty from 'lodash/isEmpty'
@@ -9,16 +9,12 @@ import isEqual from 'lodash/isEqual'
 import isNil from 'lodash/isNil'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import isEqualDate from 'date-fns/isEqual';
 import endOfYesterday from 'date-fns/endOfYesterday';
-import subDays from 'date-fns/subDays';
 import subWeeks from 'date-fns/subWeeks';
 import classnames from 'classnames';
 
-import { DarkModeContext } from './_app';
 import HomePageTable from '../components/HomePageTable';
 import PageHeader from '../components/PageHeader';
-import MarketHealthChart from '../components/MarketHealthChart';
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, defaultAtrPeriods, defaultMultiplier, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
@@ -75,31 +71,7 @@ export async function getStaticProps() {
   } else {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
   }
-  let historicDailySuperSuperTrends = []
-  const dateFormatter = new Intl.DateTimeFormat([], { month: 'short', day: 'numeric' })
-  for (let i = 0, date = yesterday; i < 30; i++) {
-    for (const trend of [signals.buy, signals.hodl, signals.sell]) {
-      historicDailySuperSuperTrends.push({
-        date,
-        amount: 0,
-        trend
-      })
-    }
-    date = subDays(date, 1)
-  }
-  historicDailySuperSuperTrends = historicDailySuperSuperTrends.reverse()
   coinsData = coinsData.map((coinData) => {
-    for (let i = 0, date = yesterday; i < 30; i++) {
-      const dateOhlcs = coinData.ohlcs.filter(ohlc => ohlc.closeTime.getTime() <= date.getTime())
-      const dateDailyOhlcs = convertToDailySignals(dateOhlcs)
-      const [_dailyTrends, dateSuperSuperTrend] = getTrends(dateDailyOhlcs, defaultAtrPeriods, defaultMultiplier, false)
-      const historicIndex = historicDailySuperSuperTrends.findIndex((historicDataPoint) => {
-        return isEqualDate(historicDataPoint.date, date) && historicDataPoint.trend === dateSuperSuperTrend
-      })
-      historicDailySuperSuperTrends[historicIndex].amount++
-
-      date = subDays(date, 1)
-    }
     const ohlcs = convertToDailySignals(coinData.ohlcs)
     const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
     const [weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
@@ -128,25 +100,18 @@ export async function getStaticProps() {
       exchanges
     }
   })
-  historicDailySuperSuperTrends = historicDailySuperSuperTrends.map((historicalDataPoint) => {
-    historicalDataPoint.date = dateFormatter.format(historicalDataPoint.date)
-
-    return historicalDataPoint
-  })
   const exchangeData = await prisma.exchange.findMany()
   return {
     props: {
       coinsData,
-      historicDailySuperSuperTrends,
       exchangeData,
       appData
     }
   }
 }
 
-export default function Home({ coinsData, historicDailySuperSuperTrends, appData, exchangeData }) {
+export default function Home({ coinsData, appData, exchangeData }) {
   const router = useRouter()
-  const [darkMode] = useContext(DarkModeContext);
   const screens = useBreakPoint();
   const defaultFormState = useMemo(() =>
   ({
@@ -750,11 +715,6 @@ export default function Home({ coinsData, historicDailySuperSuperTrends, appData
             </Col>
           </Row>
         </Modal>
-        {/* <MarketHealthChart
-          historicDailySuperSuperTrends={historicDailySuperSuperTrends}
-          screens={screens}
-          darkMode={darkMode}
-        /> */}
         <Row className={indexStyles.tableRow}>
           <HomePageTable
             coinsData={coinsData}
