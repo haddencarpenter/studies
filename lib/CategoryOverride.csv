@@ -32,3 +32,20 @@ Category,CoinSymbol,CoinName,addORremove
 "Fractionalized NFT",NFT,APENFT,add
 "Fractionalized NFT",NFTX,NFTX,add
 "AI",PHB,Phoenix Global,add
+"NFT Finance",JPEG,JPEG'd,add
+"NFT Finance",X2Y2,X2Y2,add
+"NFT Finance",MAGIC,Magic,add
+"Curve Ecosystem",CRV,Curve DAO,add
+"Curve Ecosystem",CVX,Convex Finance,add
+"Curve Ecosystem",FXS,Frax Share,add
+"Curve Ecosystem",AURA,Aura Finance,add
+"Curve Ecosystem",BTRFLY,Redacted,add
+"LSD Tokens",LDO,Lido Dao,add
+"LSD Tokens",RPL,Rocket Pool,add
+"LSD Tokens",FXS,Frax Share,add
+"LSD Tokens",SSV,SSV Network,add
+"Optimism Ecosystem",OP,Optimism,add
+"Optimism Ecosystem",VELO,Velo,add
+"Optimism Ecosystem",LYRA,Lyra Finance,add
+"Optimism Ecosystem",SNX,Synthetic Network,add
+
