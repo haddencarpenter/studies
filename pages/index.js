@@ -1,5 +1,5 @@
-import { Typography, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
-import { CloseCircleOutlined, SlidersOutlined, CheckCircleOutlined, QuestionCircleFilled } from '@ant-design/icons'
+import { Typography, Space, Card, Row, Col, Input, Button, Select, Tag, Modal, Divider, Layout, Tooltip, Radio } from 'antd'
+import { SlidersOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useMemo, useState, useCallback, useEffect, useReducer, useRef } from 'react'
 import debounce from 'lodash/debounce'
@@ -129,7 +129,6 @@ export default function Home({ coinsData, appData, exchangeData }) {
   , [coinsData])
   const [portfolioInputValue, setPortfolioInputValue] = useState(defaultFormState.portfolio)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
-  const [marketHealthModalVisible, setMarketHealthModalVisible] = useState(false)
   const [formState, formDispatch] = useReducer((state, action) => {
     switch (action.type) {
       case 'SET_FROM_ROUTE_PARAMS':
@@ -442,8 +441,8 @@ export default function Home({ coinsData, appData, exchangeData }) {
         {/* For quick alerts: */}
         {/* <Alert message={<span>Win 100 USDT. Please answer our <b>super brief</b> CoinRotator <a href='https://docs.google.com/forms/d/e/1FAIpQLSdaAbzeWl0wUMSnE3RZZEyX-MxqE9XOnVSCyWXg3Gcpv-rzdg/viewform' target='_blank' rel='noreferrer'>survey</a>.</span>} type="info" closable className={indexStyles.message}/> */}
         <Card className={indexStyles.filters}>
-          <Row className={indexStyles.row} type="flex" gutter={16}>
-            <Col xs={24} md={6} className={indexStyles.col}>
+          <Row className={indexStyles.row} type="flex" gutter={16} justify="space-between">
+            <Col xs={24} md={12} className={indexStyles.col} >
               <Input
                 ref={inputRef}
                 placeholder="Bitcoin, ETH, Polygon..."
@@ -453,14 +452,14 @@ export default function Home({ coinsData, appData, exchangeData }) {
                 size="large"
               />
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={24} md={12}>
               <Button
                 size="large"
                 onClick={() => setFilterModalVisible(true)}
                 icon={<SlidersOutlined />}
                 className={indexStyles.allFiltersButton}
               >
-                Configure
+                Customize
               </Button>
             </Col>
           </Row>
@@ -468,32 +467,28 @@ export default function Home({ coinsData, appData, exchangeData }) {
         </Card>
         <Modal
           open={filterModalVisible}
-          title="Configure search"
+          title="Customize"
           onCancel={() => setFilterModalVisible(false)}
           className={indexStyles.configModal}
-          footer={[
-            <Button
-              key="apply"
-              onClick={() => setFilterModalVisible(false)}
-              size="large"
-              type="primary"
-              className={indexStyles.applyFilters}
-              icon={<CheckCircleOutlined />}
-            >
-              Apply Settings
-            </Button>,
-            <Button
-              key="reset"
-              onClick={() => formDispatch({ type: 'RESET' })}
-              size="large"
-              danger
-              type="primary"
-              className={indexStyles.resetFilters}
-              icon={<CloseCircleOutlined />}
-            >
-              Reset Settings
-            </Button>
-          ]}
+          footer={
+            <Space className={indexStyles.configModalButtons}>
+              <Button
+                key="reset"
+                onClick={() => formDispatch({ type: 'RESET' })}
+                size="large"
+              >
+                Reset
+              </Button>
+              <Button
+                key="apply"
+                onClick={() => setFilterModalVisible(false)}
+                size="large"
+                type="primary"
+              >
+                Apply
+              </Button>
+            </Space>
+          }
         >
           <Row>
             <Col>
