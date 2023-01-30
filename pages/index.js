@@ -382,18 +382,20 @@ export default function Home({ coinsData, appData, exchangeData }) {
                                    Number(formState.marketCapMax) !== Number(defaultFormState.marketCapMax)
     const trendLengthFilterApplied = Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
+    const trendTypeFilterApplied = !isEqual(formState.trendType, defaultFormState.trendType)
+    const categoryFilterApplied = !isEqual(formState.category, defaultFormState.category)
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const superTrendFlavorFilterApplied = !isEqual(formState.superTrendFlavor, defaultFormState.superTrendFlavor)
-    const advancedFiltersApplied =
-      marketCapFilterApplied ||
-      trendLengthFilterApplied ||
-      exchangesFilterApplied ||
-      derivativesFilterApplied ||
-      superTrendFlavorFilterApplied
 
-    if (!advancedFiltersApplied) {
-      return null
+    if (!marketCapFilterApplied &&
+        !trendLengthFilterApplied &&
+        !trendTypeFilterApplied &&
+        !categoryFilterApplied &&
+        !exchangesFilterApplied &&
+        !derivativesFilterApplied &&
+        !superTrendFlavorFilterApplied) {
+      return null;
     }
 
     const formatter = new Intl.NumberFormat([], {
@@ -404,6 +406,12 @@ export default function Home({ coinsData, appData, exchangeData }) {
       <Divider key="divider"/>,
       <Row key="applied-filters">
         <Col span={24}>
+          {trendTypeFilterApplied && (
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_TREND_TYPE', payload: defaultFormState.trendType })}>Trend: {formState.trendType}</Tag>
+          )}
+          {categoryFilterApplied && (
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_CATEGORY', payload: defaultFormState.category })}>Category: {formState.category}</Tag>
+          )}
           {marketCapFilterApplied && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: defaultFormState.marketCapMin })
