@@ -87,6 +87,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
     return exchangeNames.sort()
   }, [coinsData])
   const showMarketCap = !hiddenFilters?.includes('marketCap')
+  const showCategory = !hiddenFilters?.includes('category')
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = showMarketCap && (
@@ -96,7 +97,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
     const trendLengthFilterApplied = Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
                                      Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
     const trendTypeFilterApplied = !isEqual(formState.trendType, defaultFormState.trendType)
-    const categoryFilterApplied = !isEqual(formState.category, defaultFormState.category)
+    const categoryFilterApplied = showCategory && !isEqual(formState.category, defaultFormState.category)
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const superTrendFlavorFilterApplied = !isEqual(formState.superTrendFlavor, defaultFormState.superTrendFlavor)
@@ -232,11 +233,15 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
           <Col className="gutter-row" span={12}>
             <span>Trend</span>
           </Col>
-          <Col className="gutter-row" span={12}>
-            <span>Category</span>
-          </Col>
+          {
+            showCategory ? (
+              <Col className="gutter-row" span={12}>
+                <span>Category</span>
+              </Col>
+            ) : <></>
+          }
         </Row>
-        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+        <Row className={indexStyles.modalRow} align="middle" gutter={{ xs: 2, md: 16 }}>
           <Col className="gutter-row" span={12} >
             <Select
               size="large"
@@ -250,27 +255,31 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
               <Option value={signals.sell}>DOWN</Option>
             </Select>
           </Col>
-          <Col className="gutter-row" span={12}>
-            <Select
-              showSearch
-              size="large"
-              value={formState.category}
-              onChange={(newCategory) => formDispatch({ type: 'SET_CATEGORY', payload: newCategory })}
-              className={indexStyles.select}
-            >
-              <Option value={defaultFormState.category} key="all">All</Option>
-              <OptGroup label="Popular categories">
-                {
-                  priorityCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
-                }
-              </OptGroup>
-              <OptGroup label="Other categories">
-                {
-                  restCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
-                }
-              </OptGroup>
-            </Select>
-          </Col>
+          {
+            showCategory ? (
+              <Col className="gutter-row" span={12}>
+                <Select
+                  showSearch
+                  size="large"
+                  value={formState.category}
+                  onChange={(newCategory) => formDispatch({ type: 'SET_CATEGORY', payload: newCategory })}
+                  className={indexStyles.select}
+                >
+                  <Option value={defaultFormState.category} key="all">All</Option>
+                  <OptGroup label="Popular categories">
+                    {
+                      priorityCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
+                    }
+                  </OptGroup>
+                  <OptGroup label="Other categories">
+                    {
+                      restCategories.map((category) => <Option value={category} key={category}>{category}</Option>)
+                    }
+                  </OptGroup>
+                </Select>
+              </Col>
+            ) : <></>
+          }
         </Row>
         {
           showMarketCap ? (

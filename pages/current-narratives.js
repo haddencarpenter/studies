@@ -4,22 +4,22 @@ import subWeeks from 'date-fns/subWeeks';
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
-import globalData from '../lib/globalData';
 import PageHeader from '../components/PageHeader'
 import TableFilters from '../components/TableFilters'
 import CoinTable from '../components/CoinTable';
-import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables.mjs'
+import useTableFilters from '../hooks/useTableFilters';
+import globalData from '../lib/globalData';
+import prisma from "../lib/prisma.mjs";
+import { defaultAtrPeriods, defaultMultiplier, currentNarratives } from '../utils/variables.mjs'
 import convertToDailySignals from '../utils/convertToDailySignals';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import getTrends from '../utils/getTrends.mjs'
-import useTableFilters from '../hooks/useTableFilters';
-import prisma from "../lib/prisma.mjs";
 
 export default function CurrentNarratives({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
-      <PageHeader title="Low market cap coins" />
+      <PageHeader title="Current Narratives" />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}
@@ -29,7 +29,7 @@ export default function CurrentNarratives({ coinsData, appData, exchangeData }) 
           formDispatch={formDispatch}
           defaultFormState={defaultFormState}
           setPortfolioInputValue={setPortfolioInputValue}
-          hiddenFilters={['marketCap']}
+          hiddenFilters={['category']}
         />
         <Row className={indexStyles.tableRow}>
           <CoinTable
@@ -87,8 +87,8 @@ export async function getStaticProps() {
       }
     },
     where: {
-      marketCap: {
-        lte: 100000000
+      categories: {
+        hasSome: currentNarratives
       }
     }
   }

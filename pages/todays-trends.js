@@ -19,7 +19,7 @@ export default function TodaysTrends({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
-      <PageHeader title="Low market cap coins" />
+      <PageHeader title="Today's Trends" />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}
