@@ -32,27 +32,27 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
           icon: <StarFilled className={styles.sunsetOrange} />
         },
         {
-          label: <Link href="/">Trends</Link>,
+          label: <Link href="/" prefetch={false}>Trends</Link>,
           key: '/',
           icon: <UpCircleFilled className={styles.polarGreen} />
         },
         {
-          label: <Link href="/market-health">Market Health</Link>,
+          label: <Link href="/market-health" prefetch={false}>Market Health</Link>,
           key: '/market-health',
           icon: <HeartFilled className={styles.dustRed} />
         },
         {
-          label: <Link href="/current-narratives">Current narratives</Link>,
+          label: <Link href="/current-narratives" prefetch={false}>Current narratives</Link>,
           key: '/current-narratives',
           icon: <PlayCircleOutlined className={styles.geekBlue} />
         },
         {
-          label: <Link href="/low-market-cap">Low market cap</Link>,
+          label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
           key: '/low-market-cap',
           icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
         },
         {
-          label: <Link href="/fresh-trends">Fresh Trends</Link>,
+          label: <Link href="/fresh-trends" prefetch={false}>Fresh Trends</Link>,
           key: '/fresh-trends',
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
