@@ -25,7 +25,6 @@ const HomePageTable = ({
     trendLengthMax,
     trendType,
     portfolio,
-    portfolioFilter,
     category,
     defaultCategory,
     exchanges,
@@ -40,6 +39,11 @@ const HomePageTable = ({
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
+  const portfolioFilter = portfolio
+    .replace(/\s/g, '')
+    .split(',')
+    .map((coinName) => coinName.toLowerCase())
+    .filter((coinName) => coinName.length)
   const toggleCoin = useCallback((coinId) => {
     if (watchlistCoins.includes(coinId)) {
       const newWatchlistCoins = watchlistCoins.filter(coin => coin !== coinId)
