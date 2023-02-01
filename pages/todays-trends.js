@@ -14,7 +14,7 @@ import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import getTrends from '../utils/getTrends.mjs'
 import useTableFilters from '../hooks/useTableFilters';
 
-export default function FreshTrends({ coinsData, appData, exchangeData }) {
+export default function TodaysTrends({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
