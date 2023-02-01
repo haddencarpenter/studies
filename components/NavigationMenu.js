@@ -74,16 +74,16 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
         }
       ]
     },
-    // {
-    //   label: 'Top Categories',
-    //   key: 'topcategories',
-    //   children: topCategories.map((category) => {
-    //     return {
-    //       label: <Link href={`/?category=${category}`}>{category}</Link>,
-    //       key: `/${category}`
-    //     }
-    //   })
-    // },
+    {
+      label: 'Top Categories',
+      key: 'topcategories',
+      children: topCategories.map((category) => {
+        return {
+          label: <Link href={`/category/${category}`} prefetch={false}>{category}</Link>,
+          key: `/${category}`
+        }
+      })
+    },
     {
       label: 'About',
       key: 'about',
