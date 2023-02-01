@@ -30,7 +30,7 @@ export default function TodaysTrends({ coinsData, appData, exchangeData }) {
           formDispatch={formDispatch}
           defaultFormState={defaultFormState}
           setPortfolioInputValue={setPortfolioInputValue}
-          hiddenFilters={['marketCap']}
+          hiddenFilters={['trendLength']}
         />
         <Row className={indexStyles.tableRow}>
           <CoinTable

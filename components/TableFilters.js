@@ -88,14 +88,17 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   }, [coinsData])
   const showMarketCap = !hiddenFilters?.includes('marketCap')
   const showCategory = !hiddenFilters?.includes('category')
+  const showTrendLength = !hiddenFilters?.includes('trendLength')
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = showMarketCap && (
                                     Number(formState.marketCapMin) !== Number(defaultFormState.marketCapMin) ||
                                     Number(formState.marketCapMax) !== Number(defaultFormState.marketCapMax)
     )
-    const trendLengthFilterApplied = Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
-                                     Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
+    const trendLengthFilterApplied = showTrendLength && (
+                                    Number(formState.trendLengthMin) !== Number(defaultFormState.trendLengthMin) ||
+                                    Number(formState.trendLengthMax) !== Number(defaultFormState.trendLengthMax)
+    )
     const trendTypeFilterApplied = !isEqual(formState.trendType, defaultFormState.trendType)
     const categoryFilterApplied = showCategory && !isEqual(formState.category, defaultFormState.category)
     const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
@@ -332,51 +335,57 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
             </>
           ) : <></>
         }
-        <Divider className={indexStyles.divider} />
-        <Row>
-          <Col>
-            <div>Trend Streak</div>
-          </Col>
-        </Row>
-        <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
-          <Col className="gutter-row" xs={10} md={11}>
-            <Input
-              className={indexStyles.modalInput}
-              size="large"
-              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
-              value={formState.trendLengthMin}
-              placeholder="1"
-              aria-label="Trend Length Min"
-            />
-          </Col>
-          <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
-            <Text type="secondary">TO</Text>
-          </Col>
-          <Col className="gutter-row" xs={11} md={11}>
-            <Input
-              className={indexStyles.modalInput}
-              size="large"
-              onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
-              value={formState.trendLengthMax}
-              placeholder="50"
-              aria-label="Trend Length Max"
-            />
-          </Col>
-        </Row>
-        <Row justify="space-between">
-          <Col>
-            <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
-          </Col>
-          <Col>
-            <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
-          </Col>
-          <Col>
-            <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
-          </Col>
-          <Col>
-            <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength4}>20+</Button>
-          </Col>
-        </Row>
+        {
+          showTrendLength ? (
+            <>
+              <Divider className={indexStyles.divider} />
+              <Row>
+                <Col>
+                  <div>Trend Streak</div>
+                </Col>
+              </Row>
+              <Row className={indexStyles.modalRow} justify="center" align="middle" gutter={{ xs: 2, md: 16 }}>
+                <Col className="gutter-row" xs={10} md={11}>
+                  <Input
+                    className={indexStyles.modalInput}
+                    size="large"
+                    onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: e.target.value }) }}
+                    value={formState.trendLengthMin}
+                    placeholder="1"
+                    aria-label="Trend Length Min"
+                  />
+                </Col>
+                <Col className={classnames('gutter-row', indexStyles.modalRangeLabel)} xs={3} md={2}>
+                  <Text type="secondary">TO</Text>
+                </Col>
+                <Col className="gutter-row" xs={11} md={11}>
+                  <Input
+                    className={indexStyles.modalInput}
+                    size="large"
+                    onChange={(e) => { formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: e.target.value }) }}
+                    value={formState.trendLengthMax}
+                    placeholder="50"
+                    aria-label="Trend Length Max"
+                  />
+                </Col>
+              </Row>
+              <Row justify="space-between">
+                <Col>
+                  <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength1}>1-5</Button>
+                </Col>
+                <Col>
+                  <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength2}>5-10</Button>
+                </Col>
+                <Col>
+                  <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength3}>10-20</Button>
+                </Col>
+                <Col>
+                  <Button className={indexStyles.modalInputButton} size="large" onClick={setPredefinedTrendLength4}>20+</Button>
+                </Col>
+              </Row>
+            </>
+          ) : <></>
+        }
         <Divider className={indexStyles.divider} />
         <Row>
           <Col>
