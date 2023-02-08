@@ -158,8 +158,8 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   return (
     <>
       <Card className={indexStyles.filters}>
-        <Row className={indexStyles.row} type="flex" gutter={16} justify="space-between">
-          <Col xs={24} md={12} className={indexStyles.col} >
+        <Row className={indexStyles.row} type="flex" gutter={16}>
+          <Col xs={24} md={8} className={indexStyles.col}>
             <Input
               ref={inputRef}
               placeholder="Bitcoin, ETH, Polygon..."
@@ -169,7 +169,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
               size="large"
             />
           </Col>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={6}>
             <Button
               size="large"
               onClick={() => setFilterModalVisible(true)}
