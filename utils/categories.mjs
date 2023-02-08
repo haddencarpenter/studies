@@ -46,11 +46,12 @@ export async function getCategories() {
   )(categories)
   categories = categories.sort((a, b) => a.localeCompare(b))
   categories = categories.map((categoryName) => {
-    const description = categoryDescriptions.find((cat) => cat.CategoryName === categoryName)?.CategoryDescription
+    const matchingCategory = categoryDescriptions.find((cat) => cat.CategoryName === categoryName)
     return {
       name: categoryName,
       slug: slugify(categoryName, { lower: true }),
-      description
+      description: matchingCategory?.CategoryDescription,
+      metaDescription: matchingCategory?.CategroyMetaDescription
     }
   })
 

@@ -24,9 +24,9 @@ export default function Category({ coinsData, appData, exchangeData, category, c
     <>
       <Head>
         <title key="title">{metaTitle}</title>
-        <meta name="description" key="description" content={category.description}/>
+        <meta name="description" key="description" content={category.metaDescription}/>
         <meta property="og:title" content={metaTitle} />
-        <meta property="og:description" content={category.description} />
+        <meta property="og:description" content={category.metaDescription} />
         <meta property="og:url" content={currentUrl} />
         <meta property="og:type" content="app" />
         <meta property="og:locale" content="en_US" />
