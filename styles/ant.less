@@ -51,7 +51,7 @@ body {
   --cr-tertiary-text: @black;
   --cr-mode-bg: transparent;
   --cr-primary-border: @border-color-split;
-  --cr-secondary-border: @border-color-base;
+  --cr-secondary-border: #D9D9D9;
   --cr-success-color: @green-6;
   --cr-error-color: @red-6;
   --cr-primary-color: @geekblue-6;
@@ -112,10 +112,12 @@ body {
 .ant-input-affix-wrapper {
   border: 1px solid var(--cr-secondary-border) !important;
   color: var(--cr-primary-text);
+  border-radius: 2px;
+  background-color: var(--cr-tertiary-bg);
 
   input {
-    background-color: var(--cr-tertiary-bg) !important;
     color: var(--cr-primary-text);
+    background-color: var(--cr-tertiary-bg);
   }
 }
 
