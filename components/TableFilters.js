@@ -120,35 +120,35 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
       maximumFractionDigits: 2,
     })
     return ([
-      <Divider key="divider"/>,
-      <Row key="applied-filters">
-        <Col span={24}>
+      <Divider key="divider" className={indexStyles.filterDivider} />,
+      <Row key="applied-filters" className={indexStyles.row}>
+        <Col span={24} className={indexStyles.appliedFilterCol}>
           {trendTypeFilterApplied && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_TREND_TYPE', payload: defaultFormState.trendType })}>Trend: {formState.trendType}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_TREND_TYPE', payload: defaultFormState.trendType })}>Trend: <span className={indexStyles.appliedFilterTagValue}>{formState.trendType}</span></Tag>
           )}
           {categoryFilterApplied && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_CATEGORY', payload: defaultFormState.category })}>Category: {formState.category}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_CATEGORY', payload: defaultFormState.category })}>Category: <span className={indexStyles.appliedFilterTagValue}>{formState.category}</span></Tag>
           )}
           {marketCapFilterApplied && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: defaultFormState.marketCapMin })
               formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: defaultFormState.marketCapMax })
-            }}>Market Cap: {formatter.format(formState.marketCapMin)} - {formatter.format(formState.marketCapMax)}</Tag>
+            }}>Market Cap: <span className={indexStyles.appliedFilterTagValue}>{formatter.format(formState.marketCapMin)} - {formatter.format(formState.marketCapMax)}</span></Tag>
           )}
           {trendLengthFilterApplied && (
             <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => {
               formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: defaultFormState.trendLengthMin })
               formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: defaultFormState.trendLengthMax })
-            }}>Trend Streak: {formState.trendLengthMin} - {formState.trendLengthMax}</Tag>
+            }}>Trend Streak: <span className={indexStyles.appliedFilterTagValue}>{formState.trendLengthMin} - {formState.trendLengthMax}</span></Tag>
           )}
           {!isEmpty(formState.exchanges) && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: {formState.exchanges.join(", ")}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_EXCHANGES', payload: defaultFormState.exchanges })}>Exchanges: <span className={indexStyles.appliedFilterTagValue}>{formState.exchanges.join(", ")}</span></Tag>
           )}
           {!isEmpty(formState.derivatives) && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative markets: {formState.derivatives.join(", ")}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_DERIVATIVES', payload: defaultFormState.derivatives })}>Derivative markets: <span className={indexStyles.appliedFilterTagValue}>{formState.derivatives.join(", ")}</span></Tag>
           )}
           {superTrendFlavorFilterApplied && (
-            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_SUPERTREND_FLAVOR', payload: defaultFormState.superTrendFlavor })}>SuperTrend Flavor: {formState.superTrendFlavor}</Tag>
+            <Tag className={indexStyles.appliedFilterTag} color="geekblue" closable onClose={() => formDispatch({ type: 'SET_SUPERTREND_FLAVOR', payload: defaultFormState.superTrendFlavor })}>SuperTrend Flavor: <span className={indexStyles.appliedFilterTagValue}>{formState.superTrendFlavor}</span></Tag>
           )}
         </Col>
       </Row>
@@ -158,7 +158,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   return (
     <>
       <Card className={indexStyles.filters}>
-        <Row className={indexStyles.row} type="flex" gutter={16}>
+        <Row className={indexStyles.row} type="flex">
           <Col xs={24} md={8} className={indexStyles.col}>
             <Input
               ref={inputRef}

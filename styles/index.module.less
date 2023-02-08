@@ -40,9 +40,22 @@
   background-color: var(--cr-primary-bg);
   border: 1px solid var(--cr-primary-border);
 
+  :global(.ant-card-body) {
+    padding: 0;
+  }
+
   .row {
     width: 100%;
     margin-left: 0 !important;
+    padding: 16px;
+  }
+
+  .filterDivider {
+    margin: 0;
+  }
+
+  .appliedFilterCol {
+    line-height: 40px;
   }
 
   .col {
@@ -73,8 +86,23 @@
   justify-content: space-between;
 }
 
-.appliedFilterTag:not(:last-child) {
-  margin-bottom: 10px;
+.appliedFilterTag {
+  margin-right: 16px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid var(--cr-primary-color);
+  background: var(--cr-quintiary-bg);
+  color: var(--cr-secondary-text);
+
+  :global(.anticon-close) {
+    color: var(--cr-primary-color);
+    margin-left: 4px !important;
+    vertical-align: initial;
+  }
+}
+
+.appliedFilterTagValue {
+  color: var(--cr-primary-color);
 }
 
 .modalRow {
