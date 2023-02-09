@@ -75,20 +75,20 @@ export default function Faq() {
 
 CoinRotator gets data from popular APIs such as CoinGecko, CoinPaprika, CryptoWatch and some as yet to be revealed sources. As we scale, we will begin running nodes to specific chains to enhance our data and charting options. At some point we will offer our won API solutions, so stay tuned.
         </Panel>
-<Panel header="Is there a CoinRotator app?" key="11">
+<Panel header="Is there a CoinRotator app?" key="12">
 No, we are looking into the possibility though.
     </Panel>
-<Panel header="Does CoinRotator have Telegram bots?" key="12">
+<Panel header="Does CoinRotator have Telegram bots?" key="13">
 
 Yes! CoinRotator Daily Trend Alerts Bot https://t.me/+JvnH0f34vMw0ZTY8
     </Panel>
-<Panel header="Does CoinRotator have Discord bots?" key="13">
+<Panel header="Does CoinRotator have Discord bots?" key="14">
 
 Yes! We have a Discord bot as well. If this link has expired, please message us directly on twitter @coinrotatorapp
 The discord has the Daily Trend Alerts as well as the 4hr signals sorted by sector.
 
     </Panel>
-<Panel header="Token Listing Questions" key="13">
+<Panel header="Token Listing Questions" key="15">
 All tokens are listed on CoinRotator automatically as soon as they are added to a liquidity pool and have at least one transaction. You can use the search bar to search for any particular token by its name, symbol, or address, as well as a pair address.
 
 How do I update information about a token, such as description and social links?
@@ -109,23 +109,7 @@ All tokens that have been in the top 1500 marketcap on CoinGecko in the past two
 
 
     </Panel>
-How do I update information about a token, such as description and social links?
-
-CoinRotator automatically looks for token information from external token lists, such as CoinGecko&apos;s. Once a token is present on such a list, all of its information will be displayed on CoinRotator automatically. If we have missed something for your favorite project, you can always reach out to us @coinrotatorapp
-
-How does CoinRotator calculate a token&apos;s FDV and Market Cap?
-
-CoinRotator uses the following formula to calculate fully diluted valuation for any given token:
-
-FDV = (total supply - burned supply) * price
-
-In most cases, FDV will be the same as market cap, but there can be exceptions. For tokens that don&apos;t burn supply that isn&apos;t in circulation, CoinRotator will look for self-reported circulating supply from CoinGecko, and automatically use that amount to calculate market cap instead.
-
-Token Listing Issues
-
-All tokens that have been in the top 1500 marketcap on CoinGecko in the past two years are automatically tracked in the CoinRotator database and are updated through our provider&apos;s APIs. However, some new projects may not self-report their market cap or FDV to CoinGecko, in which case CoinRotator may mistakenly omit these projects from its screener.
-
-<Panel header="How to Add a Dex Listing?" key="13">
+<Panel header="How to Add a Dex Listing?" key="16">
 
 For supported chains and protocols, CoinRotator will track all DEXes automatically, regardless of whether they are listed or not.
 
@@ -138,7 +122,7 @@ The DEX has an active community and user base.
 
    </Panel>
 
-<Panel header="CoinRotator Advertising" key="13">
+<Panel header="CoinRotator Advertising" key="17">
 
 All advertising-related inquiries are managed by a third party team, which is the premier advertising network in the cryptocurrency market, they serve as our only authorized representative.
 
