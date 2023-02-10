@@ -469,9 +469,9 @@ export default function Home({ coinsData, historicDailySuperSuperTrends, appData
     <Content className={indexStyles.container}>
       {/* For quick alerts */}
       {/* <Alert message={<span>Win 100 USDT. Please answer our <b>super brief</b> CoinRotator <a href='https://docs.google.com/forms/d/e/1FAIpQLSdaAbzeWl0wUMSnE3RZZEyX-MxqE9XOnVSCyWXg3Gcpv-rzdg/viewform' target='_blank' rel='noreferrer'>survey</a>.</span>} type="info" closable className={indexStyles.message}/> */}
-      <Title className={indexStyles.title}>Uncover Early Crypto Trends with the Profitable <span>CoinRotator</span> Coin Screener</Title>
+      <Title className={indexStyles.title}>CoinRotator: Crypto&apos;s Best Coin Screener</Title>
       <Paragraph className={indexStyles.subtitle} type="secondary">
-        Stay Ahead of the Crowd with Daily Updates and Proprietary Supertrend Analysis for Top 1,000 Cryptocurrencies</Paragraph>
+        Stay Ahead of the Trend with Daily Updates and Analysis for the Top 1000+ markets</Paragraph>
       <Button type="primary" className={indexStyles.marketHealthButton} onClick={() => setMarketHealthModalVisible(true)}>Market Health</Button>
       <Card className={indexStyles.filters}>
         <Row className={indexStyles.row} type="flex" gutter={16}>
