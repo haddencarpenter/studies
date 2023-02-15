@@ -77,6 +77,7 @@ const Search = ({ categories, coins, collapsed }) => {
           allowClear
           getPopupContainer={() => searchRef.current}
           showSearch
+          open
           className={searchStyles.searchSelect}
           popupClassName={searchStyles.searchResults}
           filterOption={(input, option) => {
