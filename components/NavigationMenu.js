@@ -10,14 +10,15 @@ import {
   QuestionCircleFilled,
   ContainerFilled,
   VideoCameraFilled,
-  PlayCircleOutlined,
   VerticalAlignBottomOutlined,
   ReadFilled
 } from '@ant-design/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import slugify from 'slugify'
 
 import styles from "../styles/navigationmenu.module.less"
+import { currentNarratives } from '../utils/variables.mjs'
 
 const NavigationMenu = ({ collapsed = false , topCategories }) => {
   const router = useRouter()
@@ -47,16 +48,24 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
         {
-          label: <Link href="/current-narratives" prefetch={false}>Current narratives</Link>,
-          key: '/current-narratives',
-          icon: <PlayCircleOutlined className={styles.geekBlue} />
-        },
-        {
           label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
           key: '/low-market-cap',
           icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
         }
       ]
+    },
+    {
+      label: 'Current narratives',
+      key: 'currentnarratives',
+      children: currentNarratives.map((category) => {
+        const slug = slugify(category, { lower: true })
+        return (
+          {
+            label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
+            key: `narrative-${slug}`,
+          }
+        )
+      })
     },
     {
       label: 'Tutorials',
@@ -173,7 +182,7 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
   return (
     <Menu
       mode="inline"
-      openKeys={['screenertools', 'topcategories', 'tutorials', 'about']}
+      openKeys={['screenertools', 'currentnarratives', 'preselects', 'topcategories', 'tutorials', 'about']}
       items={menuItems}
       className={styles.menu}
       inlineIndent={0}
