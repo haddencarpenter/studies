@@ -11,6 +11,7 @@ import {
   ContainerFilled,
   VideoCameraFilled,
   VerticalAlignBottomOutlined,
+  SwapOutlined,
   ReadFilled
 } from '@ant-design/icons'
 import Link from 'next/link'
@@ -41,16 +42,6 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
           label: <Link href="/market-health" prefetch={false}>Market Health</Link>,
           key: '/market-health',
           icon: <HeartFilled className={styles.dustRed} />
-        },
-        {
-          label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
-          key: '/todays-trends',
-          icon: <AlertFilled className={styles.daybreakBlue} />
-        },
-        {
-          label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
-          key: '/low-market-cap',
-          icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
         }
       ]
     },
@@ -64,9 +55,40 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
             label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
             key: `narrative-${slug}`,
           }
-        )
-      })
-    },
+          )
+        })
+      },
+      {
+        label: 'Preselects',
+        key: 'preselects',
+        children: [
+          {
+            label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
+            key: '/todays-trends',
+            icon: <AlertFilled className={styles.daybreakBlue} />
+          },
+          {
+            label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
+            key: '/low-market-cap',
+            icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
+          },
+          {
+            label: <Link href="/binance-screener" prefetch={false}>Binance screener</Link>,
+            key: '/binance-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/kucoin-screener" prefetch={false}>Kucoin screener</Link>,
+            key: '/kucoin-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/solana-screener" prefetch={false}>Solana screener</Link>,
+            key: '/solana-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          }
+        ]
+      },
     {
       label: 'Tutorials',
       key: 'tutorials',

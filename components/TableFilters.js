@@ -89,6 +89,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   const showMarketCap = !hiddenFilters?.includes('marketCap')
   const showCategory = !hiddenFilters?.includes('category')
   const showTrendLength = !hiddenFilters?.includes('trendLength')
+  const showExchanges = !hiddenFilters?.includes('exchanges')
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = showMarketCap && (
@@ -101,7 +102,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
     )
     const trendTypeFilterApplied = !isEqual(formState.trendType, defaultFormState.trendType)
     const categoryFilterApplied = showCategory && !isEqual(formState.category, defaultFormState.category)
-    const exchangesFilterApplied = !isEqual(formState.exchanges, defaultFormState.exchanges)
+    const exchangesFilterApplied = showExchanges && !isEqual(formState.exchanges, defaultFormState.exchanges)
     const derivativesFilterApplied = !isEqual(formState.derivatives, defaultFormState.derivatives)
     const superTrendFlavorFilterApplied = !isEqual(formState.superTrendFlavor, defaultFormState.superTrendFlavor)
 
@@ -384,21 +385,27 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
             </>
           ) : <></>
         }
-        <Divider className={indexStyles.divider} />
-        <Row className={indexStyles.modalHeaderRow}>
-          <Col>
-            <span>
-              <span>Exchanges</span>
-              <Tooltip
-                placement={'right'}
-                trigger={isHoverable ? 'hover' : 'click'}
-                title="Select your exchanges to see a complete list of coins for each trend condition."
-              >
-                <QuestionCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.tooltipIconBig, baseStyles.icon)} />
-              </Tooltip>
-            </span>
-          </Col>
-        </Row>
+        {
+          showExchanges ? (
+            <>
+              <Divider className={indexStyles.divider} />
+              <Row className={indexStyles.modalHeaderRow}>
+                <Col>
+                  <span>
+                    <span>Exchanges</span>
+                    <Tooltip
+                      placement={'right'}
+                      trigger={isHoverable ? 'hover' : 'click'}
+                      title="Select your exchanges to see a complete list of coins for each trend condition."
+                    >
+                      <QuestionCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.tooltipIconBig, baseStyles.icon)} />
+                    </Tooltip>
+                  </span>
+                </Col>
+              </Row>
+            </>
+          ) : <></>
+        }
         <Row>
           <Col span={24}>
             <Select
