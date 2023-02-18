@@ -20,7 +20,7 @@
   width: 28px;
   height: 28px;
 
-  background: #FFFFFF;
+  background: var(--cr-primary-bg);
 
   border: 1px solid #D9D9D9;
   border-radius: 2px;
@@ -39,8 +39,14 @@
 }
 
 .placeholderMagnifier {
+  height: 16px;
+  width: 16px;
   color: var(--cr-secondary-text);
-  margin-right: 3px;
+
+  svg {
+    height: 16px;
+    width: 16px;
+  }
 }
 
 .placeholderText {
