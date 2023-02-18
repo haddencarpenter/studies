@@ -19,18 +19,6 @@ const Funders = () => {
             </defs>
           </svg>
         </a>
-        <a href="https://kick.com/" target="_blank" rel="noreferrer">
-          <svg fill="none" viewBox="0 0 55 18" xmlns="http://www.w3.org/2000/svg" className={styles.kick}>
-            <g clipPath="url(#a)">
-            <path d="m0.5 0h5.7857v4h1.9285v-2h1.9286v-2h5.7857v6h-1.9286v2h-1.9286v2h1.9286v2h1.9286v6h-5.7857v-2h-1.9286v-2h-1.9285v4h-5.7857v-18zm38.571 0h5.7857v4h1.9286v-2h1.9286v-2h5.7857v6h-1.9286v2h-1.9285v2h1.9285v2h1.9286v6h-5.7857v-2h-1.9286v-2h-1.9286v4h-5.7857v-18zm-21.214 0h5.7858v18h-5.7858v-18zm13.5 0h-3.8571v2h-1.9286v14h1.9286v2h9.6429v-6h-5.7858v-6h5.7858v-6h-5.7858z" clipRule="evenodd" fill="#8C8C8C" fillRule="evenodd"/>
-            </g>
-            <defs>
-            <clipPath id="a">
-            <rect transform="translate(.5)" width="54" height="18" fill="#fff"/>
-            </clipPath>
-            </defs>
-          </svg>
-        </a>
       </Space>
     </>
   );
