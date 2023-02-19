@@ -17,6 +17,7 @@ const NavigationModal = ({ topCategories }) => {
       <Modal
         open={navigationVisible}
         onCancel={() => setNavigationVisible(false)}
+        className={navigationStyles.modal}
         footer={null}
       >
         <NavigationMenu topCategories={topCategories} />
