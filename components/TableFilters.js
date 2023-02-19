@@ -168,6 +168,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
               value={portfolioInputValue}
               onChange={(e) => setPortfolioInputValue(e.target.value)}
               size="large"
+              className={indexStyles.nameFilter}
             />
           </Col>
           <Col xs={24} md={6}>
