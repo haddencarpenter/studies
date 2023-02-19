@@ -6,6 +6,7 @@
   border-right: 1px solid var(--cr-primary-border);
 
   :global(.ant-layout-sider-trigger) {
+    position: absolute;
     top: 0;
     left: 217px;
     bottom: unset;
@@ -24,10 +25,53 @@
   }
 
   &.collapsed {
+    padding-top: 30px;
+    background: var(--cr-secondary-bg);
+
     :global(.ant-layout-sider-trigger) {
       padding-right: unset;
       left: 16px;
       width: 20px !important;
+    }
+
+    :global(.ant-layout-sider-children) {
+      border-top: 1px solid var(--cr-primary-border);
+      border-bottom: 1px solid var(--cr-primary-border);
+      padding-top: 12px;
+      background: var(--cr-primary-bg);
+    }
+
+    .logo {
+      height: 32px;
+      margin-bottom: 12px;
+    }
+
+    .tools {
+      border-bottom: 1px solid var(--cr-primary-border);
+      padding-bottom: 12px;
+    }
+
+    :global(.anticon) {
+      width: 28px;
+      height: 28px;
+      vertical-align: -6px;
+
+      :global(svg:not([data-icon="menu-unfold"])) {
+        height: 17px;
+        vertical-align: 3px;
+      }
+    }
+
+    :global([aria-label="menu-unfold"]) {
+      vertical-align: -3px;
+    }
+
+    :global([role="menu"]) {
+      padding-top: 2px;
+    }
+
+    :global([role="menuitem"]) {
+      padding-left: 14px !important;
     }
   }
 }

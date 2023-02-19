@@ -1,10 +1,11 @@
 import { Space } from 'antd'
+import classnames from 'classnames';
 
 import styles from "../styles/socials.module.less"
 
-const Socials = () => {
+const Socials = ({ collapsed }) => {
   return (
-    <Space size={16} className={styles.socials}>
+    <Space size={16} className={classnames(styles.socials, { [styles.collapsed]: collapsed })} direction={collapsed ? "vertical" : "horizontal"}>
       <a href="https://discord.gg/zfnxHyrhSK" target="_blank" rel="noreferrer">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/discord.svg" alt="Discord Logo" />

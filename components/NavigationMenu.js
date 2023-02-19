@@ -141,39 +141,34 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
     menuItems = [
       {
         label: 'Watchlist',
-        icon: <Link href="/watchlist"><StarFilled className={styles.sunsetOrange} /></Link>,
+        icon: <Link href="/watchlist" prefetch={false}><StarFilled className={styles.sunsetOrange} /></Link>,
         key: '/watchlist',
       },
       {
         label: 'Trends',
-        icon: <Link href="/"><UpCircleFilled className={styles.polarGreen} /></Link>,
+        icon: <Link href="/" prefetch={false}><UpCircleFilled className={styles.polarGreen} /></Link>,
         key: '/'
       },
       {
         label: 'Market Health',
-        icon: <Link href="/market-health"><HeartFilled className={styles.dustRed} /></Link>,
+        icon: <Link href="/market-health" prefetch={false}><HeartFilled className={styles.dustRed} /></Link>,
         key: '/market-health',
       },
       {
-        label: 'Top Coins',
-        icon: <Link href="/top-coins"><RiseOutlined className={styles.geekBlue} /></Link>,
-        key: '/top-coins'
+        label: "Today's Trends",
+        key: '/todays-trends',
+        icon: <Link href="/todays-trends" prefetch={false}><AlertFilled className={styles.daybreakBlue} /></Link>
       },
       {
-        label: 'Gainser and Losers',
-        icon: <Link href="/gainers-and-losers"><LineChartOutlined className={styles.goldenPurple} /></Link>,
-        key: '/gainers-and-losers'
+        label: "Low Market Cap",
+        key: '/low-market-cap',
+        icon: <Link href="/low-market-cap" prefetch={false}><VerticalAlignBottomOutlined className={styles.goldenPurple} /></Link>
       },
-      {
-        label: 'New Pairs',
-        icon: <Link href="/new-pairs"><AlertFilled className={styles.daybreakBlue} /></Link>,
-        key: '/new-pairs'
-      },
-      {
-        label: 'Team',
-        icon: <Link href="/team"><TeamOutlined className={styles.geekBlue} /></Link>,
-        key: '/team'
-      },
+      // {
+      //   label: 'Team',
+      //   icon: <Link href="/team"><TeamOutlined className={styles.geekBlue} /></Link>,
+      //   key: '/team'
+      // },
       {
         label: 'FAQ',
         icon: <Link href="/faq"><QuestionCircleFilled className={styles.sunsetOrange} /></Link>,

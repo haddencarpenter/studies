@@ -30,14 +30,14 @@ const Sider = ({ topCategories, categories, coins }) => {
       trigger={<Trigger className={styles.trigger} />}
       className={classnames(styles.sidebar, { [styles.collapsed]: collapsed })}
     >
-      <Logo className={styles.logo} showText={!collapsed} />
+      <Logo className={styles.logo} showText={!collapsed} size={collapsed ? 32 : 24} />
       <Space size={12} className={styles.tools}>
         <Search categories={categories} coins={coins} collapsed={collapsed} />
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}
       </Space>
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />
       <div className={styles.footer}>
-        <Socials />
+        <Socials collapsed={collapsed} />
         { collapsed ? <></> : <Funders />}
       </div>
     </Layout.Sider>
