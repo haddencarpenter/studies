@@ -188,7 +188,6 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
         open={filterModalVisible}
         title="Customize"
         onCancel={() => setFilterModalVisible(false)}
-        className={indexStyles.configModal}
         footer={
           <Space className={indexStyles.configModalButtons}>
             <Button
