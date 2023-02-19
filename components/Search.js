@@ -1,18 +1,26 @@
-import { Select, Modal, Input } from 'antd'
+import { Modal, Input } from 'antd'
 import { SearchOutlined } from "@ant-design/icons";
-import { useState, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/router'
-import classnames from 'classnames'
+import debounce from 'lodash/debounce'
 
 import searchStyles from '../styles/search.module.less'
 
-const { Option, OptGroup } = Select;
-
 const Search = ({ categories, coins, collapsed }) => {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  // TODO: Debounce search
+  // TODO: Add category results and change coinOption name
+  // TODO: Add search headers
+  // TODO: Blur focus from fake input field after click
+  // TODO: Try to get the trend in
+  // TODO: Add empty results state
+  // TODO: Add no results state
+  const closeModal = useCallback(() => {
+    setSearchModalVisible(false)
+    setSearchValue('')
+  }, []);
   const router = useRouter()
-  const selectRef = useRef(null)
-  const searchRef = useRef(null)
 
   let searchTrigger = <div onClick={() => setSearchModalVisible(true)}>
     <Input
@@ -28,43 +36,48 @@ const Search = ({ categories, coins, collapsed }) => {
       <SearchOutlined className={searchStyles.placeholderMagnifier} />
     </div>
   }
-  const coinOptions = (
-    <OptGroup label="Coins">
-      {coins.map((coin) => {
+  let coinOptions = null
+  const filteredCoins = coins.filter((coin) => {
+    return coin.name.toLowerCase().includes(searchValue.toLowerCase()) || coin.symbol.toLowerCase().includes(searchValue.toLowerCase())
+  })
+  if (filteredCoins.length > 0) {
+    coinOptions = (
+      filteredCoins.map((coin) => {
         return (
-          <Option
-            value={coin.id}
+          <div
+            className={searchStyles.coinOption}
             key={coin.id}
-            className={classnames(searchStyles.coinOption, searchStyles.option)}
-            data-type="coin"
-            data-symbol={coin.symbol}
-          >
+            onClick={() => {
+              closeModal();
+              router.push(`/coin/${coin.id}`)}
+            }>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={coin.image} alt={coin.name}/>
             <span className={searchStyles.coinName}>{coin.name}</span>
             <span className={searchStyles.coinSymbol}>{coin.symbol.toUpperCase()}</span>
-          </Option>
+          </div>
         )
-      })}
-    </OptGroup>
-  )
-  const categoryOptions = (
-    <OptGroup label="Categories">
-      {categories.map((category) => {
-        return (
-          <Option
-            value={category}
-            key={category}
-            data-type="category"
-            className={classnames(searchStyles.categoryOption, searchStyles.option)}
-          >{category}</Option>
-        )
-      })}
-    </OptGroup>
-  )
+      })
+    )
+  }
+
+  // const categoryOptions = (
+  //   <OptGroup label="Categories">
+  //     {categories.map((category) => {
+  //       return (
+  //         <Option
+  //           value={category}
+  //           key={category}
+  //           data-type="category"
+  //           className={classnames(searchStyles.categoryOption, searchStyles.option)}
+  //         >{category}</Option>
+  //       )
+  //     })}
+  //   </OptGroup>
+  // )
 
   return (
-    <div ref={searchRef}>
+    <div>
       {searchTrigger}
       <Modal
         open={searchModalVisible}
@@ -73,12 +86,17 @@ const Search = ({ categories, coins, collapsed }) => {
         footer={null}
         closeIcon={null}
       >
-        <Select
-          allowClear
-          getPopupContainer={() => searchRef.current}
-          showSearch
-          open
+        <Input
           className={searchStyles.searchSelect}
+          allowClear
+          prefix={<SearchOutlined className={searchStyles.placeholderMagnifier}/>}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+        <div className={searchStyles.searchResults}>
+          {coinOptions}
+        </div>
+        {/* <Select
           popupClassName={searchStyles.searchResults}
           filterOption={(input, option) => {
             const matchesValue = option?.value?.toLowerCase()?.includes(input.toLowerCase());
@@ -88,8 +106,6 @@ const Search = ({ categories, coins, collapsed }) => {
               return matchesValue
             }
           }}
-          value={null}
-          ref={selectRef}
           onSelect={(value, target) => {
             if (target['data-type'] === 'coin') {
               router.push(`/coin/${value}`);
@@ -101,7 +117,7 @@ const Search = ({ categories, coins, collapsed }) => {
         >
           {coinOptions}
           {categoryOptions}
-        </Select>
+        </Select> */}
       </Modal>
     </div>
   );
