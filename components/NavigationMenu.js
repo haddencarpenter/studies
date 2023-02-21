@@ -86,6 +86,16 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
             label: <Link href="/solana-screener" prefetch={false}>Solana screener</Link>,
             key: '/solana-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/bybit-futures-screener" prefetch={false}>Bybit Futures screener</Link>,
+            key: '/bybit-futures-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/binance-futures-screener" prefetch={false}>Binance Futures screener</Link>,
+            key: '/binance-futures-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
           }
         ]
       },
