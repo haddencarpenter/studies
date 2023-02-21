@@ -42,6 +42,11 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
           label: <Link href="/market-health" prefetch={false}>Market Health</Link>,
           key: '/market-health',
           icon: <HeartFilled className={styles.dustRed} />
+        },
+        {
+          label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
+          key: '/todays-trends',
+          icon: <AlertFilled className={styles.daybreakBlue} />
         }
       ]
     },
@@ -62,11 +67,6 @@ const NavigationMenu = ({ collapsed = false , topCategories }) => {
         label: 'Preselects',
         key: 'preselects',
         children: [
-          {
-            label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
-            key: '/todays-trends',
-            icon: <AlertFilled className={styles.daybreakBlue} />
-          },
           {
             label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
             key: '/low-market-cap',
