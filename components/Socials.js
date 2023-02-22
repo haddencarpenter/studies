@@ -1,9 +1,13 @@
 import { Space } from 'antd'
 import classnames from 'classnames';
+import { useContext } from 'react'
 
 import styles from "../styles/socials.module.less"
+import DarkModeSwitch from './DarkModeSwitch'
+import { DarkModeContext } from '../pages/_app'
 
 const Socials = ({ collapsed }) => {
+  const [darkMode, setDarkMode] = useContext(DarkModeContext)
   return (
     <Space size={16} className={classnames(styles.socials, { [styles.collapsed]: collapsed })} direction={collapsed ? "vertical" : "horizontal"}>
       <a href="https://discord.gg/zfnxHyrhSK" target="_blank" rel="noreferrer">
@@ -26,6 +30,7 @@ const Socials = ({ collapsed }) => {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/youtube.svg" alt="YouTube Logo" />
       </a>
+      <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />
     </Space>
   );
 }
