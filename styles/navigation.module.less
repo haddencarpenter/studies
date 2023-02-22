@@ -59,7 +59,7 @@
   }
 
   :global(li[role="menuitem"]) {
-    flex: 0 1 50%;
+    flex: 0 1 33.3%;
     flex-direction: column;
     justify-content: center;
     height: unset !important;
@@ -76,6 +76,14 @@
       margin-left: 0;
       margin-top: 6px;
       color: var(--cr-primary-text) !important;
+    }
+  }
+}
+
+@media (max-width: @screen-sm) {
+  .modal {
+    :global(li[role="menuitem"]) {
+      flex: 0 1 50%;
     }
   }
 }
