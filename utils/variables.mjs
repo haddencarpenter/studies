@@ -13,7 +13,6 @@ export const defaultMultiplier = 1.5
 export const currentNarratives = [
   "AI",
   "DeFi",
-  "Layer 1",
   "Layer 2",
   "ZK Rollup"
 ]
