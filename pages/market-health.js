@@ -15,6 +15,7 @@ import useBreakPoint from '../hooks/useBreakPoint';
 import convertToDailySignals from '../utils/convertToDailySignals';
 import getTrends from '../utils/getTrends.mjs'
 import prisma from "../lib/prisma.mjs"
+import styles from "../styles/market-health.module.less"
 
 const { Content } = Layout;
 
@@ -25,7 +26,7 @@ export default function MarketHealth({ historicDailySuperSuperTrends }) {
     <>
       <PageHeader title="Market Health" />
       <Content className={baseStyles.container}>
-        <Card>
+        <Card className={styles.marketHealthCard}>
           <MarketHealthChart
             historicDailySuperSuperTrends={historicDailySuperSuperTrends}
             screens={screens}
