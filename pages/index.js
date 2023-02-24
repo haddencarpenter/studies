@@ -100,7 +100,7 @@ export default function Home({ coinsData, appData, exchangeData }) {
   return (
     <>
       <PageHeader
-        title="CoinRotator: Crypto&apos;s Best Coin Screener"
+        title="Crypto&apos;s Best Coin Screener"
         explainer="Stay Ahead of the Trend with Daily Updates and Analysis for the Top 1000+ markets"
       />
       <Layout.Content className={indexStyles.container}>
