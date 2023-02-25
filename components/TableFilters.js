@@ -188,6 +188,8 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
       <Modal
         open={filterModalVisible}
         title="Customize"
+        centered
+        className={indexStyles.configModal}
         onCancel={() => setFilterModalVisible(false)}
         footer={
           <Space className={indexStyles.configModalButtons}>
@@ -319,7 +321,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
                   />
                 </Col>
               </Row>
-              <Row gutter={{xs: 12, sm: 8}}>
+              <Row gutter={{xs: 6, lg: 12}}>
                 <Col>
                   <Button className={indexStyles.modalInputButton} size={buttonSize} onClick={setPredefinedMarketCap1}>-$100M</Button>
                 </Col>
@@ -370,7 +372,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
                   />
                 </Col>
               </Row>
-              <Row gutter={12}>
+              <Row gutter={{xs: 6, lg: 12}}>
                 <Col>
                   <Button className={indexStyles.modalInputButton} onClick={setPredefinedTrendLength1}>1-5</Button>
                 </Col>

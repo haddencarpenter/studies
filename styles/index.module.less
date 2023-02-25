@@ -97,6 +97,21 @@
   }
 }
 
+.configModal {
+  :global(.ant-modal-body) {
+    max-height: calc(700px - 56px - 64px);
+    overflow-y: auto;
+
+    @media (max-width: @screen-lg) {
+      max-height: calc(500px - 56px - 64px);
+    }
+
+    @media (max-width: @screen-md) {
+      max-height: unset;
+    }
+  }
+}
+
 .configModalButtons {
   width: 100%;
   justify-content: space-between;
