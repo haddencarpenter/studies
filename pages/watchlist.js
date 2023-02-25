@@ -70,6 +70,7 @@ export default function WatchList({ exchangeData }) {
       title: 'Coin',
       width: 200,
       dataIndex: 'name',
+      fixed: hydrated ? 'left' : null,
       sorter: (a, b) => a.coins.name.localeCompare(b.coins.name),
       render: (name, coin) => {
         return (

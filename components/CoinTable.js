@@ -156,7 +156,7 @@ const CoinTable = ({
       title: 'Coin',
       width: 200,
       dataIndex: 'coinData',
-      fixed: hydrated ? (screens.lg ? null : 'left') : null,
+      fixed: hydrated ? 'left' : null,
       sorter: (a, b) => a.coinData.name.localeCompare(b.coinData.name),
       render: (coinData, data) => {
         const isCoinWatched = watchlistCoins.includes(data.id)
