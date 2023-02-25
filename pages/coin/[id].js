@@ -6,8 +6,9 @@ import { Prisma } from '@prisma/client'
 import endOfYesterday from 'date-fns/endOfYesterday';
 import minBy from 'lodash/minBy';
 import pick from 'lodash/pick';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useContext } from 'react';
 import levenshtein from 'js-levenshtein';
+import classnames from 'classnames';
 
 import prisma from '../../lib/prisma.mjs'
 import UpTag from '../../components/UpTag';
@@ -28,7 +29,7 @@ import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../../ut
 import useBreakPoint from '../../hooks/useBreakPoint';
 import useIsHoverable from '../../hooks/useIsHoverable';
 import globalData from '../../lib/globalData';
-import classnames from 'classnames';
+import { NotificationContext } from '../../pages/_app';
 
 import baseStyles from '../../styles/base.module.less'
 import coinStyles from '../../styles/coin.module.less'
@@ -71,6 +72,7 @@ export default function Coin(coin) {
 
   const screens = useBreakPoint();
   const isHoverable = useIsHoverable();
+  const notification = useContext(NotificationContext)
   const dateFormatter = new Intl.DateTimeFormat([], { dateStyle: 'medium' })
 
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${dailySignal.toUpperCase()} | Daily Crypto Screener`
@@ -88,8 +90,16 @@ export default function Coin(coin) {
   const toggleWatched = useCallback(() => {
     if (isWatched) {
       removeFromWatchList(coin.id)
+      notification.open({
+        message: `Removed ${coin.name} from Watchlist`,
+        placement: 'bottomRight',
+      })
     } else {
       addToWatchList(coin.id)
+      notification.open({
+        message: `Added ${coin.name} to Watchlist`,
+        placement: 'bottomRight',
+      })
     }
     setIsWatched(!isWatched)
   }, [coin.id, isWatched])

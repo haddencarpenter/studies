@@ -1,7 +1,7 @@
 import { Table, Tag } from 'antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import intersection from 'lodash/intersection'
 import isEmpty from 'lodash/isEmpty'
 import { useHydrated } from "react-hydration-provider";
@@ -12,6 +12,7 @@ import useVirtualTable from '../hooks/useVirtualTable';
 import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
 import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';
+import { NotificationContext } from '../pages/_app';
 
 import coinTableStyles from '../styles/coinTable.module.less';
 
@@ -34,6 +35,7 @@ const CoinTable = ({
   const router = useRouter()
   const isHoverable = useIsHoverable()
   const hydrated = useHydrated()
+  const notification = useContext(NotificationContext)
   const [watchlistCoins, setWatchlistCoins] = useState([])
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
@@ -43,15 +45,23 @@ const CoinTable = ({
     .split(',')
     .map((coinName) => coinName.toLowerCase())
     .filter((coinName) => coinName.length)
-  const toggleWatchlistCoin = useCallback((e, coinId) => {
+  const toggleWatchlistCoin = useCallback((e, coinId, coinName) => {
     e.stopPropagation()
     if (watchlistCoins.includes(coinId)) {
       const newWatchlistCoins = watchlistCoins.filter(coin => coin !== coinId)
       setWatchlistCoins(newWatchlistCoins)
       removeFromWatchList(coinId)
+      notification.open({
+        message: `Removed ${coinName} from Watchlist`,
+        placement: 'bottomRight',
+      })
     } else {
       setWatchlistCoins([...watchlistCoins, coinId])
       addToWatchList(coinId)
+      notification.open({
+        message: `Added ${coinName} to Watchlist`,
+        placement: 'bottomRight',
+      })
     }
   }, [watchlistCoins])
 
@@ -165,7 +175,7 @@ const CoinTable = ({
         const isCoinWatched = watchlistCoins.includes(data.id)
         return (
           <>
-            <WatchlistStar active={isCoinWatched} onClick={(e) => toggleWatchlistCoin(e, data.id)} />
+            <WatchlistStar active={isCoinWatched} onClick={(e) => toggleWatchlistCoin(e, data.id, coinData.name)} />
             <Link href={`/coin/${data.id}`} className={coinTableStyles.coin} passHref>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coinData.images.small} alt={coinData.name} className={coinTableStyles.image} loading="lazy"/>
