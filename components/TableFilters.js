@@ -172,7 +172,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
               className={indexStyles.nameFilter}
             />
           </Col>
-          <Col xs={3} sm={8} md={6} xl={4}>
+          <Col xs={3} sm={8} md={6} lg={5} xl={3}>
             <Button
               size="large"
               onClick={() => setFilterModalVisible(true)}
