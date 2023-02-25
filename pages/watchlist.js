@@ -1,10 +1,11 @@
-import { Table, Row, Col, Layout } from 'antd'
+import { Table, Layout } from 'antd'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Client, useHydrated } from 'react-hydration-provider'
 import axios from 'axios'
 import compact from 'lodash/compact'
+import classnames from 'classnames'
 
 import globalData from '../lib/globalData'
 import prisma from '../lib/prisma.mjs'
@@ -16,8 +17,6 @@ import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, exchanges } fro
 
 import coinTableStyles from '../styles/coinTable.module.less'
 import watchlistStyles from '../styles/watchlist.module.less'
-
-const { Content } = Layout;
 
 export async function getStaticProps() {
   const appData = await globalData()
@@ -110,23 +109,19 @@ export default function WatchList({ exchangeData }) {
   return (
     <>
       <PageHeader title="Watchlist" />
-      <Content className={watchlistStyles.container}>
-        <Row className={watchlistStyles.table}>
-          <Col span={24}>
-            <Client>
-              <Table
-                columns={columns}
-                dataSource={watchlist}
-                pagination={false}
-                loading={loading}
-                className={coinTableStyles.table}
-                rowClassName={coinTableStyles.row}
-                {...useVirtualTable()}
-              />
-            </Client>
-          </Col>
-        </Row>
-      </Content>
+      <Layout.Content className={watchlistStyles.container}>
+        <Client>
+          <Table
+            columns={columns}
+            dataSource={watchlist}
+            pagination={false}
+            loading={loading}
+            className={classnames(coinTableStyles.table, watchlistStyles.table)}
+            rowClassName={coinTableStyles.row}
+            {...useVirtualTable()}
+          />
+        </Client>
+      </Layout.Content>
     </>
   );
 }
