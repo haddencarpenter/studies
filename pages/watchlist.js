@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Client, useHydrated } from 'react-hydration-provider'
 import axios from 'axios'
+import compact from 'lodash/compact'
 
 import globalData from '../lib/globalData'
 import prisma from '../lib/prisma.mjs'
@@ -41,6 +42,7 @@ export default function WatchList({ exchangeData }) {
     if (!watchlistCoins?.length) {
       watchlistCoins = getWatchListCoins()
     }
+    watchlistCoins = compact(watchlistCoins)
 
     const fetchData = async () => {
       let coins = (await axios.get('/api/watchlist', { params: { coins: watchlistCoins } })).data.coins;
@@ -62,7 +64,11 @@ export default function WatchList({ exchangeData }) {
       setLoading(false)
     }
 
-    fetchData()
+    if (!watchlistCoins.length) {
+      setLoading(false)
+    } else {
+      fetchData()
+    }
   }, [])
 
   const columns = [
