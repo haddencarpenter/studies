@@ -149,7 +149,7 @@ const Search = ({ categories, coins, collapsed }) => {
           value={searchValue}
           onChange={onSearchValueChange}
           ref={searchInputRef}
-          spellcheck="false"
+          spellCheck="false"
         />
         <div className={searchStyles.searchResults}>
           {results}

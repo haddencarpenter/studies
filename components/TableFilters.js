@@ -316,7 +316,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
                     onChange={(e) => formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: e.target.value })}
                     value={formState.marketCapMax}
                     placeholder="$100,000"
-                    spellcheck="false"
+                    spellCheck="false"
                     aria-label="Market Cap Max"
                   />
                 </Col>
