@@ -191,11 +191,6 @@ const useTableFilters = (coinsData) => {
       }
     })
   }, [router.isReady, router.query])
-  useEffect(() => {
-    if (router.isReady) {
-      formDispatch({ type: 'RESET' })
-    }
-  }, [router.asPath, router.isReady])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setPortfolioDebounced = useCallback(debounce((portfolio) => {
     formDispatch({ type: 'SET_PORTFOLIO', payload: portfolio })
