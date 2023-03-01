@@ -29,6 +29,7 @@ const CoinTable = ({
     defaultCategory,
     exchanges,
     derivatives,
+    showDerivatives,
     superTrendFlavor
   }) => {
 
@@ -204,28 +205,32 @@ const CoinTable = ({
   {
     width: 120,
     ...exchangesCol(router, isHoverable, exchangeData)
-  },
-  {
-    title: 'Derivatives',
-    dataIndex: 'derivatives',
-    width: 250,
-    className: coinTableStyles.unclickableCell,
-    render: (derivatives, data) => {
-      return <span title="Top derivatives. Click to see more.">
-        {derivatives.map((derivative) => {
-          const onTagClick = () => {
-            router.push(`/coin/${data.id}?tab=Trade&filter=Derivatives`)
-          }
-          return <Tag
-            key={`${derivative.market}${derivative.symbol}`}
-            onClick={onTagClick}
-            className={coinTableStyles.clickableTag}
-          >{derivative.symbol}</Tag>
-        })}
-      </span>;
-    }
   }
   )
+  if (showDerivatives) {
+    columns.push(
+      {
+        title: 'Derivatives',
+        dataIndex: 'derivatives',
+        width: 250,
+        className: coinTableStyles.unclickableCell,
+        render: (derivatives, data) => {
+          return <span title="Top derivatives. Click to see more.">
+            {derivatives.map((derivative) => {
+              const onTagClick = () => {
+                router.push(`/coin/${data.id}?tab=Trade&filter=Derivatives`)
+              }
+              return <Tag
+                key={`${derivative.market}${derivative.symbol}`}
+                onClick={onTagClick}
+                className={coinTableStyles.clickableTag}
+              >{derivative.symbol}</Tag>
+            })}
+          </span>;
+        }
+      }
+    )
+  }
 
   return (
     <Table

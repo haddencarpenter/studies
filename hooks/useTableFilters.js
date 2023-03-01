@@ -17,6 +17,7 @@ const useTableFilters = (coinsData) => {
       trendType: signals.all,
       exchanges: [],
       derivatives: [],
+      showDerivatives: false, // TODO
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
@@ -60,6 +61,11 @@ const useTableFilters = (coinsData) => {
         return {
           ...state,
           derivatives: action.payload
+        }
+      case 'SET_SHOW_DERIVATIVES':
+        return {
+          ...state,
+          showDerivatives: action.payload
         }
       case 'SET_SUPERTREND_FLAVOR':
         return {
@@ -183,6 +189,7 @@ const useTableFilters = (coinsData) => {
         trendType: router.query.trendType,
         exchanges,
         derivatives,
+        showDerivatives: router.query.showDerivatives,
         marketCapMin: router.query.marketCapMin,
         marketCapMax: router.query.marketCapMax,
         trendLengthMin: router.query.trendLengthMin,

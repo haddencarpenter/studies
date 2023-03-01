@@ -61,6 +61,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
             defaultCategory={defaultFormState.category}
             exchanges={formState.exchanges}
             derivatives={formState.derivatives}
+            showDerivatives={formState.showDerivatives}
             superTrendFlavor={formState.superTrendFlavor}
           />
         </Row>

@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { SlidersOutlined, QuestionCircleFilled } from '@ant-design/icons'
-import { Space, Card, Row, Col, Input, Button, Select, Modal, Divider, Tooltip, Radio, Typography, Tag } from 'antd'
+import { Space, Card, Row, Col, Input, Button, Select, Modal, Divider, Tooltip, Radio, Typography, Tag, Switch } from 'antd'
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import isEmpty from 'lodash/isEmpty'
 import uniq from 'lodash/uniq'
@@ -90,7 +90,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   const showCategory = !hiddenFilters?.includes('category')
   const showTrendLength = !hiddenFilters?.includes('trendLength')
   const showExchanges = !hiddenFilters?.includes('exchanges')
-  const showDerivatives = !hiddenFilters?.includes('derivatives')
+  const showDerivativesOptions = !hiddenFilters?.includes('derivatives')
 
   const renderAppliedFilters = () => {
     const marketCapFilterApplied = showMarketCap && (
@@ -104,7 +104,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
     const trendTypeFilterApplied = !isEqual(formState.trendType, defaultFormState.trendType)
     const categoryFilterApplied = showCategory && !isEqual(formState.category, defaultFormState.category)
     const exchangesFilterApplied = showExchanges && !isEqual(formState.exchanges, defaultFormState.exchanges)
-    const derivativesFilterApplied = showDerivatives && !isEqual(formState.derivatives, defaultFormState.derivatives)
+    const derivativesFilterApplied = showDerivativesOptions && !isEqual(formState.derivatives, defaultFormState.derivatives)
     const superTrendFlavorFilterApplied = !isEqual(formState.superTrendFlavor, defaultFormState.superTrendFlavor)
 
     if (!marketCapFilterApplied &&
@@ -426,9 +426,21 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
           ) : <></>
         }
         {
-          showDerivatives ? (
+          showDerivativesOptions ? (
             <>
               <Divider className={indexStyles.divider} />
+              <Row className={indexStyles.modalRow}>
+                <Col span={22}>
+                  <span>Show Derivatives</span>
+                </Col>
+                <Col span={2}>
+                  <Switch
+                    className={indexStyles.modalSwitch}
+                    checked={formState.showDerivatives}
+                    onChange={(checked) => { formDispatch({ type: 'SET_SHOW_DERIVATIVES', payload: checked }) }}
+                  />
+                </Col>
+              </Row>
               <Row className={indexStyles.modalHeaderRow}>
                 <Col>
                   <span>
