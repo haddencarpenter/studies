@@ -49,7 +49,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       ]
     },
     {
-      label: 'Current narratives',
+      label: 'Current Narratives',
       key: 'currentnarratives',
       children: currentNarratives.map((category) => {
         const slug = slugify(category, { lower: true })
@@ -87,17 +87,17 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
         key: 'preselects',
         children: [
           {
-            label: <Link href="/low-market-cap" prefetch={false}>Low market cap</Link>,
+            label: <Link href="/low-market-cap" prefetch={false}>Low Market Cap</Link>,
             key: '/low-market-cap',
             icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
           },
           {
-            label: <Link href="/bybit-futures-screener" prefetch={false}>Bybit Futures screener</Link>,
+            label: <Link href="/bybit-futures-screener" prefetch={false}>Bybit Futures Screener</Link>,
             key: '/bybit-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <Link href="/binance-futures-screener" prefetch={false}>Binance Futures screener</Link>,
+            label: <Link href="/binance-futures-screener" prefetch={false}>Binance Futures Screener</Link>,
             key: '/binance-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           }
