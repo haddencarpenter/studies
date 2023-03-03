@@ -1,6 +1,7 @@
 import { Layout, Row } from 'antd';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
+import Head from 'next/head';
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
@@ -19,7 +20,32 @@ export default function KucoinScreener({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
-      <PageHeader title="KuCoin screener" />
+      <Head>
+        <title key="title">Kucoin Screener</title>
+        <meta name="description" key="description" content="Explore the potential of KuCoin - a Seychelles-based crypto exchange with over 700 coins. Discover advanced strategies & features with CoinRotator."/>
+      </Head>
+      <PageHeader title="KuCoin screener" explainer={`KuCoin is a cryptocurrency exchange that offers trading for over 700 coins, many of which are not available on other exchanges. The exchange is primarily focused on the Asian market, as its founder is originally from China. KuCoin is registered in Seychelles, which is a common location for cryptocurrency exchanges.
+
+If you're considering trading on KuCoin, tracking trends with CoinRotator's screener can help inform your decisions. Here are some features and strategies to consider:
+
+<h3>KuCoin Screener Capabilities</h3>
+
+-   Daily updates on the trend status of all KuCoin-listed coins
+-   Sorting options based on market cap and volume
+
+<h3>Strategies to Consider on KuCoin</h3>
+
+-   Hedge your positions with futures trading on KuCoin
+-   Deposit your coins to leverage larger positions
+-   Use a pair trade strategy to reduce downside risk
+
+However, it's important to note that these are advanced trading strategies and can be risky. It's crucial to do your own research and carefully consider your investment strategy before making any decisions, as it's easy to end up with losing positions.
+
+**Similiar Exchanges**
+
+ - [Binance](https://coinrotator.app/?exchanges=Binance)
+ - [Huobi](https://coinrotator.app/?exchanges=Huobi)
+ - [Gate](https://coinrotator.app/?exchanges=Gate.io)`}/>
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

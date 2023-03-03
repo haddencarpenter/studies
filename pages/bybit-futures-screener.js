@@ -1,6 +1,7 @@
 import { Layout, Row } from 'antd';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
+import Head from 'next/head';
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
@@ -19,7 +20,26 @@ export default function ByBitFuturesScreener({ coinsData, appData, exchangeData 
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
-      <PageHeader title="ByBit Futures screener" />
+      <Head>
+        <title key="title">Bybit Futures Screener</title>
+        <meta name="description" key="description" content="Explore the exciting world of Bybit futures trading with CoinRotator's screener. Discover strong trends and trade alts on high leverage without KYC."/>
+      </Head>
+      <PageHeader title="ByBit Futures screener" explainer={`Bybit is a newer exchange that models itself as a one-stop exchange in the tradition of [Binance](https://coinrotator.app/binance-screener). Its futures screener on CoinRotator sorts the strongest trends on the Bybit futures exchange. Bybit offers no KYC leverage trading, enabling traders from jurisdictions where futures trading has been banned to trade alts on high leverage.
+
+Known for blowing out stops and heavy open interest against the trend, Bybit is one of the most exciting places in crypto to trade these days. However, be very wary as liquidity can be an issue at times.
+
+<h3>Bybit Futures Screener Capabilities</h3>
+
+-   Daily updates on the trend status of all Bybit-listed coins
+-   Sorting options based on market cap and derivatives market availability
+
+<h3>Strategies to Consider on Bybit Futures</h3>
+
+-   Hedge your positions with coin-margined or USDT-margined features on Bybit
+-   Deposit your coins to leverage larger positions
+-   Use a pair trade strategy to reduce downside risk
+
+However, it's important to note that these are advanced **Bybit Futures strategies** and can be risky. It's crucial to do your own research and carefully consider your investment strategy before making any decisions. As with all trading, there are inherent risks involved, so be sure to practice proper position sizing and keep leverage to a minimum.`}/>
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

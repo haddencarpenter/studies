@@ -1,6 +1,7 @@
 import { Layout, Row } from 'antd';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import subWeeks from 'date-fns/subWeeks';
+import Head from 'next/head';
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
@@ -19,7 +20,24 @@ export default function BinanceScreener({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
-      <PageHeader title="Binance screener" />
+      <Head>
+        <title key="title">Binance Screener</title>
+        <meta name="description" key="description" content="Stay up-to-date with Binance-listed coins using CoinRotator's daily and weekly screener. Sort by marketcap and identify trends on Binance to inform your investment decisions."/>
+      </Head>
+      <PageHeader title="Binance screener" explainer={`Tracking trends on Binance with CoinRotator's screener can help inform your decisions on using spot or derivatives insturments. Here are some features and strategies to consider:
+
+<h3>Binance Screener Capabilities</h3>
+
+-   Daily updates for all Binance-listed coins' trend status
+-   Sorting options based on marketcap and derivatives market availability
+
+<h3>[Binance Futures](https://coinrotator.app/binance-futures-screener) Strategies to Consider</h3>
+
+-   Hedge your spot positions with coin margined or usdt margin features on Binance
+-   Deposit your spot or stable coins to leverage larger positions
+-   Use a pair trade strategy to buy strong coins and short coins of equal value to reduce downside risk
+
+However, it's important to note that these are <b>advanced binance futures</b> strategies and can be risky. It's crucial to do your own research and carefully consider your investment strategy before making any decisions, as it's easy to get into losing positions on both sides of the trade.`}/>
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

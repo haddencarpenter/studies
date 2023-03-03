@@ -11,6 +11,7 @@ import baseStyles from '../styles/base.module.less'
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
 import { signals, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import ExplainerModal from './ExplainerModal';
 
 const { Text } = Typography;
 const { Option, OptGroup } = Select;
@@ -187,7 +188,14 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
       </Card>
       <Modal
         open={filterModalVisible}
-        title="Customize"
+        title={<>
+          <span>Customize</span>
+          <ExplainerModal
+            title="Customize"
+            explainer={`<h3>The Customize Feature</h3> <p>If you're using the Coinrotator screener, you have the ability to customize many  sorting functions to your liking. This is available on all pages of the screener.</p> <ul> <li><strong>Supertrend Flavor:</strong> Our Coinrotator Supertrend is specifically optimized for the crypto market. You can tweak the settings as much as like, however.</li> <li><strong>Market Cap:</strong> This sorting option allows you to organize coins based on their market capitalization. If you are looking for microcaps or big caps, this is the setting.</li> <li><strong>Trend Freshness:</strong> You can sort coins based on their trend freshness or staleness. This option can help you identify coins that are currently in an uptrend or downtrend, depending on your investment strategy.</li> <li><strong>Exchange:</strong> Sorting coins by exchange is useful if you prefer to invest on a particular exchange or if you want to diversify your portfolio across multiple exchanges.</li> <li><strong>Derivatives:</strong> This sorting option informs you which coins have leverage trading available.</li> </ul>`}
+            showSource={false}
+          />
+        </>}
         centered
         className={indexStyles.configModal}
         onCancel={() => setFilterModalVisible(false)}
