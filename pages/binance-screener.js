@@ -24,20 +24,24 @@ export default function BinanceScreener({ coinsData, appData, exchangeData }) {
         <title key="title">Binance Screener</title>
         <meta name="description" key="description" content="Stay up-to-date with Binance-listed coins using CoinRotator's daily and weekly screener. Sort by marketcap and identify trends on Binance to inform your investment decisions."/>
       </Head>
-      <PageHeader title="Binance screener" explainer={`Tracking trends on Binance with CoinRotator's screener can help inform your decisions on using spot or derivatives insturments. Here are some features and strategies to consider:
+      <PageHeader title="Binance screener" explainer={`Tracking trends on Binance with CoinRotator's screener can help inform your decisions on using spot or derivatives insturments.
 
-<h3>Binance Screener Capabilities</h3>
+Here are some features and strategies to consider:
 
--   Daily updates for all Binance-listed coins' trend status
--   Sorting options based on marketcap and derivatives market availability
+# Binance Screener Capabilities
 
-<h3>[Binance Futures](https://coinrotator.app/binance-futures-screener) Strategies to Consider</h3>
+ -Daily updates for all Binance-listed coins' trend status
+-Sorting options based on marketcap and derivatives market availability
 
--   Hedge your spot positions with coin margined or usdt margin features on Binance
--   Deposit your spot or stable coins to leverage larger positions
--   Use a pair trade strategy to buy strong coins and short coins of equal value to reduce downside risk
+## Strategies to Consider
 
-However, it's important to note that these are <b>advanced binance futures</b> strategies and can be risky. It's crucial to do your own research and carefully consider your investment strategy before making any decisions, as it's easy to get into losing positions on both sides of the trade.`}/>
+- Hedge your spot positions with coin margined or usdt margin features on Binance
+- Deposit your spot or stable coins to leverage larger positions.
+-  Use a pair trade strategy to buy strong coins and short coins of equal value to reduce downside risk
+
+However, it's important to note that these are advanced [Binance Futures](https://coinrotator.app/binance-futures-screener)  strategies and can be risky.
+
+It's crucial to do your own research and carefully consider your investment strategy before making any decisions, as it's easy to get into losing positions on both sides of the trade.`}/>
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

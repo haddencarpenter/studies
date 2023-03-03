@@ -24,21 +24,25 @@ export default function SolanaScreener({ coinsData, appData, exchangeData }) {
         <title key="title">Solana Screener</title>
         <meta name="description" key="description" content="Discover the latest trends on Solana with CoinRotator's screener. Filter by trend streak 1-5 and learn to trade with proper position sizing."/>
       </Head>
-      <PageHeader title="Solana screener" explainer={`<h2>Discover the Latest Trends on Solana</h2>
-The Solana blockchain has a high TPS but is not without growing pains. Despite this, many notable protocols on Solana offer huge percentage moves. CoinRotator's screener effectively alerts you to new trends. If you are looking for a high volatility environment in a centralized exchange Bybit [check out the Bybit futures screener](https://coinrotator.app/bybit-futures-screener) can provide excellent leverage opportunities without the uncertainty of trading on a new chain with multiple and frequent outages.
+      <PageHeader title="Solana screener" explainer={`Discover the Latest Trends on Solana Screener
 
-<h3>Filter by Trend Streak 1-5</h3>
+The Solana blockchain has a high TPS but is not without growing pains. Despite this, many notable protocols on Solana offer huge percentage moves.
 
- - Filter by trend streak 1-5 to catch the freshest trends.
+CoinRotator's screener effectively alerts you to new trends on Solana but it's fraught with controversy these days.
 
-  <h3>Other Ways to Use CoinRotator's Screener</h3>
+If you are looking for a high volatility environment on a centralized exchange, Bybit an provide excellent leverage opportunities without the uncertainty of trading on a new chain with multiple and frequent outages.  [check out the Bybit futures screener](https://coinrotator.app/bybit-futures-screener)
+
+## Filter by Trend Streak 1-5
+- Filtering by trend streak  to the fastest setting will catch the freshest trends.
+
+## Other Ways to Use Solana Screener
+
 Here are additional ways to use the screener:
+- Look for coins with high trading volume for liquidity
+-  Pay attention to the market cap to avoid thinly traded coins
+-  Check for coins that recently formed uptrends with trend streaks of 1-5 Remember, trading carries inherent risk, so practice proper position sizing and minimize leverage.
 
- - Look for coins with high trading volume for liquidity
- - Pay attention to the market cap to avoid thinly traded coins
- - Check for coins that recently formed uptrends with trend streaks of 1-5
-
-Remember, trading carries inherent risk, so practice proper position sizing and minimize leverage. While CoinRotator's screener can help inform your trades, it's still essential to conduct your own research and make wise investment decisions.`} />
+While CoinRotator's screener can help inform your trades, it's still essential to conduct your own research and make wise investment decisions, never go full ape on any one trade.`} />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

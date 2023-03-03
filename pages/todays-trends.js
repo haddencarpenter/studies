@@ -25,19 +25,31 @@ export default function TodaysTrends({ coinsData, appData, exchangeData }) {
         <title key="title">Today&apos;s Trends - CoinRotator</title>
         <meta name="description" key="description" content="Unlock the power of cryptocurrency trading with CoinRotator's Today's Trends Table. Spot new trade conditions and identify the strongest and weakest coins in the market. Stay informed with the latest trends and maximize your success."/>
       </Head>
-      <PageHeader title="Today's Trends" explainer={`<h2>Identifying New Trade Conditions</h2>
+      <PageHeader title="Today's Trends" explainer={`## Identifying New Trends Today
 
-The Today's Trends table lists all coins that have shifted from one trade status to another, indicating whether they are in an UPtrend or DOWNtrend or have gone neutral with a HODL status. By monitoring this information, traders can identify the strongest and weakest coins in the market and make informed investment decisions.
+Today's Trends table lists all coins that have shifted from one trade status to another, indicating whether they are in an UPtrend or DOWNtrend or have gone neutral with a HODL status. By monitoring this information, traders can identify the strongest and weakest coins in the market and make informed investment decisions.
 
-<h2>Build A Watchlist for Easy Tracking</h2>
+## Build A Watchlist for Easy Tracking
 
-Advanced traders can use the Today's Trends  to build a [watchlist of coins](https://coinrotator.app/watchlist) that are in the strongest or weakest trends. By clicking on the star next to the coin, they can save these coins in their watchlist for easy tracking over time. This allows traders to monitor changes in the market and identify potential opportunities for buying or selling.
+Advanced traders can use the Today's Trends screener to build a [watchlist of coins](https://coinrotator.app/watchlist) that are in the strongest or weakest trends right now.
 
-<h2>Creating a Long-Short Basket for Advanced Trading</h2>
+By clicking on the star next to the coin, they can save these coins in their watchlist for easy tracking over time.
 
-For those who are comfortable with derivatives trading, the <b>Today's Trends</b>  can be used to create a long-short basket. This involves taking a long position in the strongest trends and a short position in the weakest trends, with the goal of profiting from the spread between the two.
+This allows traders to monitor changes in the market and identify potential opportunities for buying or selling.
 
-Whether you're a beginner or an advanced trader, the Today's Trends Table is a valuable resource that can help you achieve your cryptocurrency trading goals.`} />
+## Creating a Long-Short Basket for Advanced Trading
+
+For those who are comfortable with derivatives trading, the <b>Today's Trends</b> screener can be used to create a long-short basket. This involves taking a long position in the strongest trends and a short position in the weakest trends, with the goal of profiting from the spread between the two.
+
+**Additional Advanced strategies for use with the CoinRotator Screener**
+
+ - Use trailing stop-loss orders to maximize profits and minimize
+   losses.
+ - Apply position sizing strategies such as the Kelly    criterion to
+   optimize risk management.
+ - Monitor market sentiment through social media and news sources to
+   identify potential catalysts that could affect trends.
+ - Consider using options at [Binance](https://coinrotator.app/binance-screener) or Deribit to hedge against potential losses or to benefit from high volatility in the market.`} />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

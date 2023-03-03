@@ -30,20 +30,25 @@ export default function MarketHealth({ historicDailySuperSuperTrends }) {
         <title key="title">Market Health</title>
         <meta name="description" key="description" content="Assess cryptocurrency total trend status with CoinRotator Market Health Screener. Identify strong markets, predict reversals, and inspect trend totals."/>
       </Head>
-      <PageHeader title="Market Health" explainer={`The CoinRotator **Market Health Screener** assesses the top 1000+ coins, including BTC and ETH, and measures their trend. The screener categorizes coins as being in an UpTrend against BTC and ETH or a Downtrend against them. Coins in a mixed trend status are considered HODL. The Market Health trend measures the total health of the trend in one direction or the other.
+      <PageHeader title="Market Health" explainer={`The CoinRotator **Market Health Screener** assesses the top 1000+ coins, including BTC and ETH, and measures their trend.
 
-<h2>Assessing Trend Status</h2>
+The screener categorizes coins as being in an UpTrend against BTC and ETH or a DownTrend against them. Coins in a mixed trend status are considered HODL.
+
+The Market Health trend measures the total health of the trend in one direction or the other.
+
+## HeadingAssessing Trend Status
 
 The Market Health Screener can help traders assess the status of a trend. If the largest percentage of coins is in an UpTrend, the Market Health will show this with the color yellow. If the largest percentage of coins is in a Downtrend, it will show this with the color red. If the trend is indecisive, the color blue will be shown above the other two conditions, indicating a HODL trend status.
 
-<h2>Extreme Warning</h2>
+## Extreme Warning
 
 The screener also has a Market Health Extreme warning. If there are more than 600 trends in one of these states, it's a good indication that the current trend state is getting stale or overheated, and a reversal is imminent. This warning can help to generate caution for fresh screener trends, and traders can reduce their exposure or take smaller positions to minimize losses when trend alerts are issued.
 
-<h2>Predicting Market Reversals</h2>
-The CoinRotator Market Health Screener is a tool that can identify not just individual coin trends, but also signal potential market reversals. If there are more than 600 coins in one direction (UpTrend or DownTrend), it may indicate that the current trend is becoming overheated and a reversal is possible. This can help traders exercise caution when dealing with fresh screener trends and potentially reduce losses by taking smaller positions or reducing exposure.
+## Predicting Market Reversals
 
-<h2>Inspect Trend Totals</h2>
+The CoinRotator Market Health Screener is a tool that can identify not just individual coin trends, but also signal potential market reversals. If there are more than 600 coins in one direction (UpTrend or DownTrend), it may indicate that the current trend is becoming overheated and a reversal is possible. This can help traders exercise caution when dealing with today's [fresh screener trends](https://coinrotator.app/todays-trends) and potentially reduce losses by taking smaller positions or reducing exposure.
+
+## Inspect Trend Totals
 
 The graph allows traders to hover over the trend totals each day and determine which trends are strongest or weakest, both visually and numerically. This can help traders stay informed about market trends and make informed decisions about their investments in cryptocurrencies.`} />
       <Content className={baseStyles.container}>
