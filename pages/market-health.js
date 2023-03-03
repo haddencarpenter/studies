@@ -2,6 +2,7 @@ import { Layout, Card } from 'antd';
 import endOfYesterday from 'date-fns/endOfYesterday';
 import { useContext } from 'react'
 import subDays from 'date-fns/subDays';
+import addDays from 'date-fns/addDays';
 import isEqualDate from 'date-fns/isEqual';
 import subWeeks from 'date-fns/subWeeks';
 import Head from 'next/head'
@@ -125,7 +126,7 @@ export async function getStaticProps() {
     }
   }
   historicDailySuperSuperTrends = historicDailySuperSuperTrends.map((historicalDataPoint) => {
-    historicalDataPoint.date = dateFormatter.format(historicalDataPoint.date)
+    historicalDataPoint.date = dateFormatter.format(addDays(historicalDataPoint.date, 1))
 
     return historicalDataPoint
   })
