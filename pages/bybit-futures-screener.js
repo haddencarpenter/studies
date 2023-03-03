@@ -17,7 +17,7 @@ import useTableFilters from '../hooks/useTableFilters';
 import prisma from "../lib/prisma.mjs";
 
 export default function ByBitFuturesScreener({ coinsData, appData, exchangeData }) {
-  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
+  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData, true)
   return (
     <>
       <Head>

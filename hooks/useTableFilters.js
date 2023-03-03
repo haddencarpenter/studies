@@ -8,7 +8,7 @@ import debounce from 'lodash/debounce'
 
 import { signals, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
 
-const useTableFilters = (coinsData) => {
+const useTableFilters = (coinsData, showDerivativesByDefault = false) => {
   const router = useRouter()
   const defaultFormState = useMemo(() =>
   ({
@@ -17,7 +17,7 @@ const useTableFilters = (coinsData) => {
       trendType: signals.all,
       exchanges: [],
       derivatives: [],
-      showDerivatives: false, // TODO
+      showDerivatives: showDerivativesByDefault,
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',

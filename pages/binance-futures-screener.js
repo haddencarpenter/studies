@@ -16,7 +16,7 @@ import useTableFilters from '../hooks/useTableFilters';
 import prisma from "../lib/prisma.mjs";
 
 export default function BinanceFuturesScreener({ coinsData, appData, exchangeData }) {
-  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
+  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData, true)
   return (
     <>
       <PageHeader title="Binance Futures screener" />
