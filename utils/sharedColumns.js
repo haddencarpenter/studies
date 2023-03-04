@@ -25,7 +25,6 @@ export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort) 
       </Tooltip>
     </span>,
     dataIndex: 'dailySuperSuperTrend',
-    defaultSortOrder: 'ascend',
     sorter: {
       compare: tableSort(reverseMarketCapSort),
       multiple: 1,
@@ -58,6 +57,7 @@ export function dailySuperSuperTrendStreak(router) {
     onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
     title: 'Trend Streak',
     dataIndex: 'dailySuperSuperTrendStreak',
+    sorter: (a, b) => Number(a.dailySuperSuperTrendStreak) - Number(b.dailySuperSuperTrendStreak),
     render: (dailySuperSuperTrendStreak) => {
       return dailySuperSuperTrendStreak
     }

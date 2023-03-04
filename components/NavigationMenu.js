@@ -10,7 +10,8 @@ import {
   VideoCameraFilled,
   VerticalAlignBottomOutlined,
   SwapOutlined,
-  ReadFilled
+  ReadFilled,
+  StepBackwardOutlined
 } from '@ant-design/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -90,6 +91,11 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
             label: <Link href="/low-market-cap" prefetch={false}>Low Market Cap</Link>,
             key: '/low-market-cap',
             icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
+          },
+          {
+            label: <Link href="/oldest-trends" prefetch={false}>Oldest Trends</Link>,
+            key: '/oldest-trends',
+            icon: <StepBackwardOutlined className={styles.sunsetOrange} />
           },
           {
             label: <Link href="/bybit-futures-screener" prefetch={false}>Bybit Futures Screener</Link>,

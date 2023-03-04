@@ -33,6 +33,7 @@ const CoinTable = ({
     superTrendFlavor,
     reverseMarketCapSort = false,
     showTrendStreak = true,
+    defaultSort = ['dailySuperSuperTrend', 'ascend'],
   }) => {
 
   const router = useRouter()
@@ -246,6 +247,7 @@ const CoinTable = ({
       }
     )
   }
+  columns.find(column => column.dataIndex === defaultSort[0]).defaultSortOrder = defaultSort[1]
 
   return (
     <Table
