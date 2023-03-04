@@ -53,6 +53,17 @@ export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort) 
   }
 }
 
+export function dailySuperSuperTrendStreak(router) {
+  return {
+    onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
+    title: 'Trend Streak',
+    dataIndex: 'dailySuperSuperTrendStreak',
+    render: (dailySuperSuperTrendStreak) => {
+      return dailySuperSuperTrendStreak
+    }
+  }
+}
+
 export function weeklySuperSuperTrend(router, isHoverable) {
   return {
     onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),

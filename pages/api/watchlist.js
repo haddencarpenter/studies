@@ -51,7 +51,7 @@ const handler = async (req, res) => {
     })
     coins = coins.map((coin) => {
       const ohlcs = convertToDailySignals(coin.ohlcs)
-      const [_dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
+      const [_dailyTrends, dailySuperSuperTrend, dailySuperSuperTrendStreak] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
       const [_weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
       const exchanges = convertTickersToExchanges(coin.tickers)
       delete coin.ohlcs
@@ -61,6 +61,7 @@ const handler = async (req, res) => {
         exchanges,
         marketCap: Number(coin.marketCap),
         dailySuperSuperTrend,
+        dailySuperSuperTrendStreak,
         weeklySuperSuperTrend
       }
     })

@@ -77,6 +77,7 @@ For those who are comfortable with derivatives trading, the **Today's Trends** s
             derivatives={formState.derivatives}
             showDerivatives={formState.showDerivatives}
             superTrendFlavor={formState.superTrendFlavor}
+            showTrendStreak={false}
           />
         </Row>
       </Layout.Content>

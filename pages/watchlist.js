@@ -14,7 +14,7 @@ import { getWatchListCoins } from '../utils/watchlist'
 import PageHeader from '../components/PageHeader'
 import useIsHoverable from '../hooks/useIsHoverable'
 import useVirtualTable from '../hooks/useVirtualTable'
-import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, exchanges } from '../utils/sharedColumns'
+import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap, exchanges } from '../utils/sharedColumns'
 
 import coinTableStyles from '../styles/coinTable.module.less'
 import watchlistStyles from '../styles/watchlist.module.less'
@@ -92,6 +92,10 @@ export default function WatchList({ exchangeData }) {
     {
       width: 100,
       ...dailySuperSuperTrend(router, isHoverable),
+    },
+    {
+      width: 80,
+      ...dailySuperSuperTrendStreak(router),
     },
     {
       width: 100,

@@ -11,7 +11,7 @@ import useIsHoverable from '../hooks/useIsHoverable';
 import useVirtualTable from '../hooks/useVirtualTable';
 import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
-import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';
+import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';
 import { NotificationContext } from '../pages/_app';
 
 import coinTableStyles from '../styles/coinTable.module.less';
@@ -32,6 +32,7 @@ const CoinTable = ({
     showDerivatives,
     superTrendFlavor,
     reverseMarketCapSort = false,
+    showTrendStreak = true,
   }) => {
 
   const router = useRouter()
@@ -157,6 +158,7 @@ const CoinTable = ({
       derivatives: shownDerivatives,
       marketCap: coinData.marketCap,
       dailySuperSuperTrend: coinData.dailySuperSuperTrend,
+      dailySuperSuperTrendStreak: coinData.dailySuperSuperTrendStreak,
       weeklySuperSuperTrend: coinData.weeklySuperSuperTrend,
     }
   })
@@ -191,12 +193,24 @@ const CoinTable = ({
     {
       width: 100,
       ...dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort),
-    },
+    }
+  ];
+
+  if (showTrendStreak) {
+    columns.push(
+      {
+        width: 80,
+        ...dailySuperSuperTrendStreak(router),
+      }
+    )
+  }
+
+  columns.push(
     {
       width: 100,
       ...weeklySuperSuperTrend(router, isHoverable),
     }
-  ];
+  )
 
   columns.push(
   {

@@ -101,7 +101,7 @@ export async function getStaticProps() {
   })
   coinsData = coinsData.map((coinData) => {
     const ohlcs = convertToDailySignals(coinData.ohlcs)
-    const [dailyTrends, dailySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
+    const [dailyTrends, dailySuperSuperTrend, dailySuperSuperTrendStreak] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, false)
     const [weeklyTrends, weeklySuperSuperTrend] = getTrends(ohlcs, defaultAtrPeriods, defaultMultiplier, true)
     const [dailyClassicTrends, dailyClassicSuperSuperTrend] = getTrends(ohlcs, 10, 3, false)
     const [weeklyClassicTrends, weeklyClassicSuperSuperTrend] = getTrends(ohlcs, 10, 3, true)
@@ -114,6 +114,7 @@ export async function getStaticProps() {
       ...coinData,
       dailyTrends,
       dailySuperSuperTrend,
+      dailySuperSuperTrendStreak,
       weeklyTrends,
       weeklySuperSuperTrend,
       dailyClassicTrends,
