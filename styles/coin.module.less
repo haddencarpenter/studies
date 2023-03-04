@@ -133,41 +133,7 @@
   width: 100%;
   padding-right: 32px;
 
-  h1, h2, h3 {
-    color: var(--cr-primary-text);
-    font-weight: bold;
-    margin-bottom: 16px;
-  }
-
-  p {
-    margin-bottom: 0;
-  }
-
-  img {
-    max-width: 800px;
-    max-height: 600px;
-    margin-bottom: 16px;
-
-    @media screen and (max-width: @screen-lg) {
-      width: 100%;
-      height: auto;
-    }
-  }
-
-  blockquote {
-    border-left: 4px solid rgba(var(--cr-primary-text), .08);
-    background: rgba(var(--cr-primary-text), .02);
-    padding: 12px;
-    margin-bottom: 16px;
-
-    p {
-      margin-bottom: 0;
-    }
-  }
-
-  ul {
-    margin-bottom: 16px;
-  }
+  &:extend(.markdown all);
 }
 
 .sectionContract {
