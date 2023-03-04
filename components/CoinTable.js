@@ -255,7 +255,6 @@ const CoinTable = ({
       dataSource={tableData}
       rowClassName={coinTableStyles.row}
       pagination={{ position: ['none', 'none'], pageSize: 1000 }}
-      bordered
       className={coinTableStyles.table}
       {...useVirtualTable()}
     />

@@ -1,12 +1,18 @@
 @import (reference) './base.module.less';
 @import './variables.module.less';
 
-.table table {
-  border-top: 1px solid var(--cr-primary-border) !important;
+.table {
+  :global(.ant-table-header) {
+    table {
+      border-top: 1px solid var(--cr-primary-border) !important;
+    }
+  }
 
-  colgroup col:first-child {
-    @media screen and (max-width: @screen-lg) {
-      width: 150px;
+  table {
+    colgroup col:first-child {
+      @media screen and (max-width: @screen-lg) {
+        width: 150px;
+      }
     }
   }
 }
