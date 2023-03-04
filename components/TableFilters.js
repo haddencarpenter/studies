@@ -194,13 +194,13 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
             title="Customize"
             explainer={`## The Customize Feature
 
-            If you're using the CoinRotator screener, you have the ability to customize many sorting functions to your liking. This is available on most pages of the screener.
+If you're using the CoinRotator screener, you have the ability to customize many sorting functions to your liking. This is available on most pages of the screener.
 
-             - **Supertrend Flavor**: Our CoinRotator Supertrend is specifically optimized for the crypto market. You can tweak the settings as much as like, however.
-             - **Market Cap**: This sorting option allows you to organize coins based on their market capitalization. If you are looking for microcaps or big caps, this is the setting.
-             - **Trend Freshness**: You can sort coins based on their trend freshness or staleness. This option can help you identify coins that are currently in an uptrend or downtrend, depending on your investment strategy.
-             - **Exchange**: Sorting coins by exchange is useful if you prefer to invest on a particular exchange or if you want to diversify your portfolio across multiple exchanges.
-             - **Derivatives**: This sorting option informs you which coins have leverage trading available.`}
+- **Supertrend Flavor**: Our CoinRotator Supertrend is specifically optimized for the crypto market. You can tweak the settings as much as like, however.
+- **Market Cap**: This sorting option allows you to organize coins based on their market capitalization. If you are looking for microcaps or big caps, this is the setting.
+- **Trend Freshness**: You can sort coins based on their trend freshness or staleness. This option can help you identify coins that are currently in an uptrend or downtrend, depending on your investment strategy.
+- **Exchange**: Sorting coins by exchange is useful if you prefer to invest on a particular exchange or if you want to diversify your portfolio across multiple exchanges.
+- **Derivatives**: This sorting option informs you which coins have leverage trading available.`}
             showSource={false}
           />
         </>}

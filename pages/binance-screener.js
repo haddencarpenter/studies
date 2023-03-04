@@ -30,8 +30,8 @@ Here are some features and strategies to consider:
 
 # Binance Screener Capabilities
 
- -Daily updates for all Binance-listed coins' trend status
--Sorting options based on marketcap and derivatives market availability
+- Daily updates for all Binance-listed coins' trend status
+- Sorting options based on marketcap and derivatives market availability
 
 ## Strategies to Consider
 

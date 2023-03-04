@@ -43,13 +43,13 @@ For those who are comfortable with derivatives trading, the **Today's Trends** s
 
 **Additional Advanced strategies for use with the CoinRotator Screener**
 
- - Use trailing stop-loss orders to maximize profits and minimize
+- Use trailing stop-loss orders to maximize profits and minimize
    losses.
- - Apply position sizing strategies such as the Kelly    criterion to
+- Apply position sizing strategies such as the Kelly    criterion to
    optimize risk management.
- - Monitor market sentiment through social media and news sources to
+- Monitor market sentiment through social media and news sources to
    identify potential catalysts that could affect trends.
- - Consider using options at [Binance](https://coinrotator.app/binance-screener) or Deribit to hedge against potential losses or to benefit from high volatility in the market.`} />
+- Consider using options at [Binance](https://coinrotator.app/binance-screener) or Deribit to hedge against potential losses or to benefit from high volatility in the market.`} />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}
