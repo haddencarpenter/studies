@@ -21,7 +21,7 @@ import styles from "../styles/market-health.module.less"
 
 const { Content } = Layout;
 
-export default function MarketHealth({ historicDailySuperSuperTrends }) {
+export default function MarketHealth({ historicDailySuperSuperTrends, appData }) {
   const [darkMode] = useContext(DarkModeContext);
   const screens = useBreakPoint();
   return (
@@ -30,7 +30,7 @@ export default function MarketHealth({ historicDailySuperSuperTrends }) {
         <title key="title">Market Health</title>
         <meta name="description" key="description" content="Assess cryptocurrency total trend status with CoinRotator Market Health Screener. Identify strong markets, predict reversals, and inspect trend totals."/>
       </Head>
-      <PageHeader title="Market Health" explainer={`The CoinRotator **Market Health Screener** assesses the top 1000+ coins, including BTC and ETH, and measures their trend.
+      <PageHeader lastUpdated={appData.lastUpdated} title="Market Health" explainer={`The CoinRotator **Market Health Screener** assesses the top 1000+ coins, including BTC and ETH, and measures their trend.
 
 The screener categorizes coins as being in an UpTrend against BTC and ETH or a DownTrend against them. Coins in a mixed trend status are considered HODL.
 

@@ -24,7 +24,7 @@ export default function ByBitFuturesScreener({ coinsData, appData, exchangeData 
         <title key="title">Bybit Futures Screener</title>
         <meta name="description" key="description" content="Explore the exciting world of Bybit futures trading with CoinRotator's screener. Discover strong trends and trade alts on high leverage without KYC."/>
       </Head>
-      <PageHeader title="ByBit Futures screener" explainer={`Bybit is a newer exchange that models itself as a one-stop exchange in the tradition of [Binance](https://coinrotator.app/binance-screener).
+      <PageHeader lastUpdated={appData.lastUpdated} title="ByBit Futures screener" explainer={`Bybit is a newer exchange that models itself as a one-stop exchange in the tradition of [Binance](https://coinrotator.app/binance-screener).
 
 Its futures screener on CoinRotator sorts the strongest trends on the Bybit futures exchange.
 

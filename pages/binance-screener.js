@@ -24,7 +24,7 @@ export default function BinanceScreener({ coinsData, appData, exchangeData }) {
         <title key="title">Binance Screener</title>
         <meta name="description" key="description" content="Stay up-to-date with Binance-listed coins using CoinRotator's daily and weekly screener. Sort by marketcap and identify trends on Binance to inform your investment decisions."/>
       </Head>
-      <PageHeader title="Binance screener" explainer={`Tracking trends on Binance with CoinRotator's screener can help inform your decisions on using spot or derivatives insturments.
+      <PageHeader lastUpdated={appData.lastUpdated} title="Binance screener" explainer={`Tracking trends on Binance with CoinRotator's screener can help inform your decisions on using spot or derivatives insturments.
 
 Here are some features and strategies to consider:
 

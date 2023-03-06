@@ -19,7 +19,7 @@ export default function BinanceFuturesScreener({ coinsData, appData, exchangeDat
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData, true)
   return (
     <>
-      <PageHeader title="Binance Futures screener" />
+      <PageHeader lastUpdated={appData.lastUpdated} title="Binance Futures screener" />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

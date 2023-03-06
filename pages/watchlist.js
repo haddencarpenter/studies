@@ -30,7 +30,7 @@ export async function getStaticProps() {
   }
 }
 
-export default function WatchList({ exchangeData }) {
+export default function WatchList({ exchangeData, appData }) {
   const [watchlist, setWatchlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter()
@@ -118,7 +118,7 @@ export default function WatchList({ exchangeData }) {
         <title key="title">Crypto Watchlist - CoinRotator</title>
         <meta name="description" key="description" content="Create a personalized watchlist with CoinRotator's Watchlist tool. Track daily and weekly trends of the top 1000 coins in crypto, compare their strength, and monitor the market health."/>
       </Head>
-      <PageHeader title="Crypto Watchlist - CoinRotator" explainer={`### How to Use The Watchlist
+      <PageHeader lastUpdated={appData.lastUpdated} title="Crypto Watchlist - CoinRotator" explainer={`### How to Use The Watchlist
 Stay up-to-date on the daily and weekly trends of the top 1000 coins in crypto. Add coins to your watchlist by clicking the star icon, and keep a close eye on their strength or weakness.
 
 ### Track and Monitor Your Favorite Coins

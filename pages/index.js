@@ -106,6 +106,7 @@ export default function Home({ coinsData, appData, exchangeData }) {
         <meta name="description" key="description" content={`Find early trends with Coinrotator's powerful coin screener, featuring proprietary tracking and valuable metrics. Use it as a tool to stay informed and make smart investments in the dynamic crypto market.`}/>
       </Head>
       <PageHeader
+        lastUpdated={appData.lastUpdated}
         title="Crypto&apos;s Best Coin Screener"
         explainer={`## Identify Early Trends: CoinRotator's Proprietary Method
 Coinrotator is the ultimate crypto trend analysis tool designed to help you identify early trends before the masses catch on. With its proprietary method, Coinrotator tracks all coins against Bitcoin (BTC), Ethereum (ETH), and Tether (USDT) to signal an uptrend when a coin is on the rise against all three or a downtrend when it is weaker against them. This gives traders a valuable edge in assessing investment opportunities and taking advantage of trends early on.

@@ -24,7 +24,7 @@ export default function KucoinScreener({ coinsData, appData, exchangeData }) {
         <title key="title">Kucoin Screener</title>
         <meta name="description" key="description" content="Explore the potential of KuCoin - a Seychelles-based crypto exchange with over 700 coins. Discover advanced strategies & features with CoinRotator."/>
       </Head>
-      <PageHeader title="KuCoin screener" explainer={`KuCoin offers trading for over 700 coins, many of which are not available on other exchanges.
+      <PageHeader lastUpdated={appData.lastUpdated} title="KuCoin screener" explainer={`KuCoin offers trading for over 700 coins, many of which are not available on other exchanges.
 
 The exchange is primarily focused on the Asian market, as its founder is originally from China. KuCoin is registered in Seychelles, which is a common location for offshore exchanges.
 

@@ -19,7 +19,7 @@ export default function OldesTrends({ coinsData, appData, exchangeData }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData, true)
   return (
     <>
-      <PageHeader title="Oldest Trends" />
+      <PageHeader lastUpdated={appData.lastUpdated} title="Oldest Trends" />
       <Layout.Content className={baseStyles.container}>
         <TableFilters
           coinsData={coinsData}

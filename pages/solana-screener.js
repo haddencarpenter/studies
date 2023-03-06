@@ -24,7 +24,7 @@ export default function SolanaScreener({ coinsData, appData, exchangeData }) {
         <title key="title">Solana Screener</title>
         <meta name="description" key="description" content="Discover the latest trends on Solana with CoinRotator's screener. Filter by trend streak 1-5 and learn to trade with proper position sizing."/>
       </Head>
-      <PageHeader title="Solana screener" explainer={`Discover the Latest Trends on Solana Screener
+      <PageHeader lastUpdated={appData.lastUpdated} title="Solana screener" explainer={`Discover the Latest Trends on Solana Screener
 
 The Solana blockchain has a high TPS but is not without growing pains. Despite this, many notable protocols on Solana offer huge percentage moves.
 

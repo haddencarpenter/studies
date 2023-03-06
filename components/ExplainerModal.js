@@ -7,7 +7,7 @@ import styles from "../styles/explainerModal.module.less"
 import useBreakPoint from '../hooks/useBreakPoint';
 import ChatGPTSource from './ChatGPTSource';
 
-const ExplainerModal = ({ title, explainer, showSource }) => {
+const ExplainerModal = ({ title, explainer, showSource, lastUpdated }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const screens = useBreakPoint();
   const modalProps = {
@@ -26,6 +26,7 @@ const ExplainerModal = ({ title, explainer, showSource }) => {
     <>
       <InfoCircleFilled className={styles.explainer} onClick={() => setModalVisible(true)} />
       <Modal {...modalProps}>
+        {lastUpdated ? <div className={styles.lastUpdated}>Last Updated: {new Intl.DateTimeFormat([]).format(lastUpdated)}</div> : <></>}
         <ReactMarkdown>{explainer}</ReactMarkdown>
         {showSource ? <ChatGPTSource /> : <></>}
       </Modal>

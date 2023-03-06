@@ -1,7 +1,7 @@
 import styles from "../styles/pageheader.module.less"
 import ExplainerModal from './ExplainerModal';
 
-const PageHeader = ({ title, explainer, showSource, prefix, postfix }) => {
+const PageHeader = ({ title, explainer, showSource, prefix, postfix, lastUpdated }) => {
   return (
     <div className={styles.header}>
       {prefix}
@@ -11,6 +11,7 @@ const PageHeader = ({ title, explainer, showSource, prefix, postfix }) => {
           title={title}
           explainer={explainer}
           showSource={showSource}
+          lastUpdated={lastUpdated}
         />
       )}
       {postfix}

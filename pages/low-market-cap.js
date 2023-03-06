@@ -24,7 +24,7 @@ export default function LowMarketCap({ coinsData, appData, exchangeData }) {
         <title key="title">Low MarketCap Screener</title>
         <meta name="description" key="description" content="Discover undervalued coins with CoinRotator's Low Marketcap screener and customize your search with options such as Supertrend, Trend, Marketcap, Exchanges, and Derivatives. Note the risks of low marketcap coins and consider market health before investing."/>
       </Head>
-      <PageHeader title="Low market cap coins" explainer={`**The Low Marketcap Screener** is to help you identify coins that are currently in an UPTrend or DownTrend, which can potentially lead you to undervalued coins with the potential to increase or decrease in value.
+      <PageHeader lastUpdated={appData.lastUpdated} title="Low market cap coins" explainer={`**The Low Marketcap Screener** is to help you identify coins that are currently in an UPTrend or DownTrend, which can potentially lead you to undervalued coins with the potential to increase or decrease in value.
 
 Consider the [Market Health](https://coinrotator.app/market-health). Undervalued coins tend to perform better when markets are strong. When they are weak, they tend to become less volatile and returns are reduced in both directions.
 

@@ -31,7 +31,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
         <meta property="og:type" content="app" />
         <meta property="og:locale" content="en_US" />
       </Head>
-      <PageHeader
+      <PageHeader lastUpdated={appData.lastUpdated}
         title={`${category.name} coins`}
         explainer={category.description}
         showSource

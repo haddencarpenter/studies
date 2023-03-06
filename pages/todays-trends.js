@@ -25,7 +25,7 @@ export default function TodaysTrends({ coinsData, appData, exchangeData }) {
         <title key="title">Today&apos;s Trends - CoinRotator</title>
         <meta name="description" key="description" content="Unlock the power of cryptocurrency trading with CoinRotator's Today's Trends Table. Spot new trade conditions and identify the strongest and weakest coins in the market. Stay informed with the latest trends and maximize your success."/>
       </Head>
-      <PageHeader title="Today's Trends" explainer={`## Identifying New Trends Today
+      <PageHeader lastUpdated={appData.lastUpdated} title="Today's Trends" explainer={`## Identifying New Trends Today
 
 Today's Trends table lists all coins that have shifted from one trade status to another, indicating whether they are in an UPtrend or DOWNtrend or have gone neutral with a HODL status. By monitoring this information, traders can identify the strongest and weakest coins in the market and make informed investment decisions.
 
