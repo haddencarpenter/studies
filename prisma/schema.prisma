@@ -91,7 +91,7 @@ model Ohlc {
   coinId      String   @db.VarChar(255)
   closeTime   DateTime
   quoteSymbol String
-  coin        Coin     @relation(fields: [coinId], references: [id])
+  coin        Coin     @relation(fields: [coinId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([coinId, quoteSymbol, closeTime])
   @@index([closeTime(sort: Desc)])
@@ -108,9 +108,9 @@ model CoinTime {
 }
 
 model Exchange {
-  id          String   @id @db.VarChar(255)
+  id          String  @id @db.VarChar(255)
   name        String
   image       String
   url         String
-  centralized Boolean? @default(false)
+  centralized Boolean @default(false)
 }
