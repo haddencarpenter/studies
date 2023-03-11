@@ -26,7 +26,7 @@ const ExplainerModal = ({ title, explainer, showSource, lastUpdated }) => {
     <>
       <InfoCircleFilled className={styles.explainer} onClick={() => setModalVisible(true)} />
       <Modal {...modalProps}>
-        {lastUpdated ? <div className={styles.lastUpdated}>Last Updated: {new Intl.DateTimeFormat([]).format(lastUpdated)}</div> : <></>}
+        {lastUpdated ? <div className={styles.lastUpdated}>Last Data Update: {new Intl.DateTimeFormat([]).format(lastUpdated)}</div> : <></>}
         <ReactMarkdown>{explainer}</ReactMarkdown>
         {showSource ? <ChatGPTSource /> : <></>}
       </Modal>
