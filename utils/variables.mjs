@@ -138,4 +138,4 @@ export const SUPERTREND_FLAVOR = {
   'classic': 'Classic',
 }
 
-export const excludedExchanges = ['ftx', 'ftx_us', 'ftx_spot', 'ftx_tr']
+export const excludedExchanges = ['ftx', 'ftx_us', 'ftx_spot', 'ftx_tr', 'binance_dex_mini']
