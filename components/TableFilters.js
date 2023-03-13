@@ -22,36 +22,36 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   const setPredefinedMarketCap1 = useCallback(() => {
     formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: 0 })
     formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: 100000000 })
-  }, [])
+  }, [formDispatch])
   const setPredefinedMarketCap2 = useCallback(() => {
     formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: 100000000 })
     formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: 1000000000 })
-  }, [])
+  }, [formDispatch])
   const setPredefinedMarketCap3 = useCallback(() => {
     formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: 1000000000 })
     formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: 10000000000 })
-  }, [])
+  }, [formDispatch])
   const setPredefinedMarketCap4 = useCallback(() => {
     formDispatch({ type: 'SET_MARKET_CAP_MIN', payload: 10000000000 })
     formDispatch({ type: 'SET_MARKET_CAP_MAX', payload: coinsData[0].marketCap })
-  }, [coinsData])
+  }, [formDispatch, coinsData])
 
   const setPredefinedTrendLength1 = useCallback(() => {
     formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: 1})
     formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: 5})
-  }, [])
+  }, [formDispatch])
   const setPredefinedTrendLength2 = useCallback(() => {
     formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: 5})
     formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: 10})
-  }, [])
+  }, [formDispatch])
   const setPredefinedTrendLength3 = useCallback(() => {
     formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: 10})
     formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: 20})
-  }, [])
+  }, [formDispatch])
   const setPredefinedTrendLength4 = useCallback(() => {
     formDispatch({ type: 'SET_TREND_LENGTH_MIN', payload: 20})
     formDispatch({ type: 'SET_TREND_LENGTH_MAX', payload: ''})
-  }, [])
+  }, [formDispatch])
 
   const buttonSize = screens.xl ? 'large' : screens.sm ? 'medium' : 'small'
   const isHoverable = useIsHoverable();
