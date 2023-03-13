@@ -6,7 +6,7 @@ import NavigationModal from './NavigationModal'
 
 import headerStyles from '../styles/header.module.less'
 
-const Header = ({ categories, coins, screens, topCategories }) => {
+const Header = ({ categories, screens, topCategories }) => {
   const { Header: AntHeader } = Layout;
 
   if (screens.lg) return (<></>);
@@ -21,7 +21,7 @@ const Header = ({ categories, coins, screens, topCategories }) => {
     {
       key: 'search',
       className: headerStyles.search,
-      label: <Search categories={categories} coins={coins} collapsed />
+      label: <Search categories={categories} collapsed />
     },
     {
       key: 'dark-mode',

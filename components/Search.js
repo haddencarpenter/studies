@@ -8,12 +8,19 @@ import slugify from 'slugify'
 
 import searchStyles from '../styles/search.module.less'
 
-const Search = ({ categories, coins, collapsed }) => {
+const Search = ({ categories, collapsed }) => {
+  const [coins, setCoins] = useState([])
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState(searchValue);
   const searchInputRef = useRef(null)
   useEffect(() => {
+    const fetchCoins = async () => {
+      const res = await fetch('/api/search')
+      const { coins } = await res.json()
+      setCoins(coins)
+    }
+    fetchCoins()
     const eventRef = document.addEventListener('keydown', (e) => {
       if (e.key === '/') {
         setSearchModalVisible(true)
@@ -22,7 +29,7 @@ const Search = ({ categories, coins, collapsed }) => {
     return () => {
       document.removeEventListener('keydown', eventRef)
     }
-  })
+  }, [])
   useEffect(() => {
     if (searchModalVisible) {
       setTimeout(

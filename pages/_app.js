@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }) {
 
   const currentUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${router.asPath}`
   pageProps.currentUrl = currentUrl
-  const {topCategories,categories, coins} = pageProps.appData
+  const {topCategories,categories} = pageProps.appData
   const googleAnalytics = process.env.NODE_ENV === 'production' ? (
     <>
       <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
@@ -56,13 +56,12 @@ function MyApp({ Component, pageProps }) {
               <link rel="canonical" href={currentUrl} />
             </Head>
             <Client>
-              { screens.lg && <Sider topCategories={topCategories} categories={categories} coins={coins} /> }
+              { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
             </Client>
             <Layout className={baseStyles.innerLayout}>
               <Client>
                 <Header
                   categories={categories}
-                  coins={coins}
                   screens={screens}
                   topCategories={topCategories}
                 />

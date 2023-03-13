@@ -15,7 +15,7 @@ import DarkModeSwitch from './DarkModeSwitch'
 import { DarkModeContext } from '../pages/_app'
 import styles from "../styles/sider.module.less"
 
-const Sider = ({ topCategories, categories, coins }) => {
+const Sider = ({ topCategories, categories }) => {
   const [darkMode, setDarkMode] = useContext(DarkModeContext)
   const [collapsed, setCollapsed] = useState(false)
   const [collapsing, setCollapsing] = useState(false)
@@ -42,7 +42,7 @@ const Sider = ({ topCategories, categories, coins }) => {
     >
       <Logo className={styles.logo} showText={!collapsed} size={collapsed ? 32 : 24} />
       <Space size={12} className={styles.tools}>
-        <Search categories={categories} coins={coins} collapsed={collapsed} />
+        <Search categories={categories} collapsed={collapsed} />
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}
       </Space>
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />

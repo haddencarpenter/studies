@@ -9,7 +9,7 @@ import HodlTag from '../components/HodlTag'
 import PageHeader from '../components/PageHeader'
 import globalData from '../lib/globalData';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 const { Panel } = Collapse;
 const { Content } = Layout;
 
