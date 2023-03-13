@@ -125,11 +125,6 @@ export async function getStaticProps() {
     return coin.exchanges.some((exchange) => exchange[0] === 'Binance')
   })
   const exchangeData = await prisma.exchange.findMany()
-  console.dir({
-    coinsData,
-    exchangeData,
-    appData
-  }, { depth: null })
   return {
     props: {
       coinsData,
