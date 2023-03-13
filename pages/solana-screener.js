@@ -10,6 +10,7 @@ import CoinTable from '../components/CoinTable';
 import { SUPERTREND_FLAVOR } from '../utils/variables.mjs'
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getSuperTrends } from '../utils/getTrends.mjs'
+import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'
 import useTableFilters from '../hooks/useTableFilters';
 import prisma from "../lib/prisma.mjs";
 
@@ -101,36 +102,34 @@ export async function getStaticProps() {
   } else {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
   }
-  coinsData = await Promise.all(
-    coinsData.map(async (coinData) => {
-      const [dailyTrends, dailySuperSuperTrend, dailySuperSuperTrendStreak] = await getSuperTrends(coinData.id)
-      const [weeklyTrends, weeklySuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true })
-      const [dailyClassicTrends, dailyClassicSuperSuperTrend] = await getSuperTrends(coinData.id, { flavor: SUPERTREND_FLAVOR.classic })
-      const [weeklyClassicTrends, weeklyClassicSuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true, flavor: SUPERTREND_FLAVOR.classic })
+  coinsData = await chunkedPromiseAll(coinsData, 5, async (coinData) => {
+    const [dailyTrends, dailySuperSuperTrend, dailySuperSuperTrendStreak] = await getSuperTrends(coinData.id)
+    const [weeklyTrends, weeklySuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true })
+    const [dailyClassicTrends, dailyClassicSuperSuperTrend] = await getSuperTrends(coinData.id, { flavor: SUPERTREND_FLAVOR.classic })
+    const [weeklyClassicTrends, weeklyClassicSuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true, flavor: SUPERTREND_FLAVOR.classic })
 
-      const exchanges = convertTickersToExchanges(coinData.tickers)
-      delete coinData.tickers
+    const exchanges = convertTickersToExchanges(coinData.tickers)
+    delete coinData.tickers
 
-      return {
-        ...coinData,
-        dailyTrends,
-        dailySuperSuperTrend,
-        dailySuperSuperTrendStreak,
-        weeklyTrends,
-        weeklySuperSuperTrend,
-        dailyClassicTrends,
-        dailyClassicSuperSuperTrend,
-        weeklyClassicTrends,
-        weeklyClassicSuperSuperTrend,
-        ath: Number(coinData.ath),
-        atl: Number(coinData.atl),
-        fullyDilutedValue: Number(coinData.fullyDilutedValue),
-        circulatingSupply: Number(coinData.circulatingSupply),
-        totalSupply: Number(coinData.totalSupply),
-        exchanges
-      }
-    })
-  )
+    return {
+      ...coinData,
+      dailyTrends,
+      dailySuperSuperTrend,
+      dailySuperSuperTrendStreak,
+      weeklyTrends,
+      weeklySuperSuperTrend,
+      dailyClassicTrends,
+      dailyClassicSuperSuperTrend,
+      weeklyClassicTrends,
+      weeklyClassicSuperSuperTrend,
+      ath: Number(coinData.ath),
+      atl: Number(coinData.atl),
+      fullyDilutedValue: Number(coinData.fullyDilutedValue),
+      circulatingSupply: Number(coinData.circulatingSupply),
+      totalSupply: Number(coinData.totalSupply),
+      exchanges
+    }
+  })
   const exchangeData = await prisma.exchange.findMany()
   return {
     props: {
