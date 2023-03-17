@@ -17,7 +17,7 @@ import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
 
 export default function Category({ coinsData, appData, exchangeData, category, currentUrl }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
-  const metaTitle = `${category.name} coins - CoinRotator`
+  const metaTitle = `${category.name} - CoinRotator`
   return (
     <>
       <Head>
@@ -30,7 +30,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
         <meta property="og:locale" content="en_US" />
       </Head>
       <PageHeader lastUpdated={appData.lastUpdated}
-        title={`${category.name} coins`}
+        title={`${category.name}`}
         explainer={category.description}
         showSource
       />
