@@ -16,7 +16,7 @@ export const currentNarratives = [
   "AI",
   "DeFi",
   "Layer 2",
-  "ZK Rollup"
+  "Zk Rollup"
 ]
 export const preferredExchanges = [
   'Binance',
