@@ -49,7 +49,7 @@ export async function getCategories() {
     const matchingCategory = categoryDescriptions.find((cat) => cat.CategoryName === categoryName)
     return {
       name: categoryName,
-      slug: slugify(categoryName, { lower: true }),
+      slug: slugify(categoryName),
       description: matchingCategory?.CategoryDescription,
       metaDescription: matchingCategory?.CategroyMetaDescription
     }

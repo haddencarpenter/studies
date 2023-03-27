@@ -53,7 +53,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       label: 'Current Narratives',
       key: 'currentnarratives',
       children: currentNarratives.map((category) => {
-        const slug = slugify(category, { lower: true })
+        const slug = slugify(category)
         return (
           {
             label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
