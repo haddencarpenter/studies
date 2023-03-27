@@ -3,21 +3,37 @@ import Head from 'next/head'
 
 import baseStyles from '../../styles/base.module.less'
 import indexStyles from '../../styles/index.module.less'
+import categoryStyles from '../../styles/category.module.less'
 import globalData from '../../lib/globalData';
 import PageHeader from '../../components/PageHeader'
 import TableFilters from '../../components/TableFilters'
 import CoinTable from '../../components/CoinTable';
-import { SUPERTREND_FLAVOR } from '../../utils/variables.mjs'
+import UpTag from '../../components/UpTag';
+import DownTag from '../../components/DownTag';
+import HodlTag from '../../components/HodlTag';
+import { SUPERTREND_FLAVOR, signals } from '../../utils/variables.mjs'
 import convertTickersToExchanges from '../../utils/convertTickersToExchanges';
 import { getSuperTrends } from '../../utils/getTrends.mjs'
 import useTableFilters from '../../hooks/useTableFilters';
 import prisma from "../../lib/prisma.mjs";
 import { getCategories } from '../../utils/categories.mjs'
 import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
+import mode from '../../utils/mode';
 
-export default function Category({ coinsData, appData, exchangeData, category, currentUrl }) {
+export default function Category({ coinsData, appData, exchangeData, category, currentUrl, categorySuperTrend }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   const metaTitle = `${category.name} - CoinRotator`
+  let dailySignalTag
+  switch (categorySuperTrend) {
+    case signals.buy:
+      dailySignalTag = <UpTag className={categoryStyles.tag} />
+      break;
+    case signals.sell:
+      dailySignalTag = <DownTag className={categoryStyles.tag} />
+      break;
+    default:
+      dailySignalTag = <HodlTag className={categoryStyles.tag} />
+  }
   return (
     <>
       <Head>
@@ -30,7 +46,10 @@ export default function Category({ coinsData, appData, exchangeData, category, c
         <meta property="og:locale" content="en_US" />
       </Head>
       <PageHeader lastUpdated={appData.lastUpdated}
-        title={`${category.name}`}
+        title={<>
+          <span>{category.name}</span>&nbsp;&nbsp;
+          {dailySignalTag}
+        </>}
         explainer={category.description}
         showSource
       />
@@ -132,13 +151,15 @@ export async function getStaticProps({ params }) {
       exchanges
     }
   })
+  const categorySuperTrend = mode(coinsData.map(coin => coin.dailySuperSuperTrend))
   const exchangeData = await prisma.exchange.findMany()
   return {
     props: {
       coinsData,
       exchangeData,
       appData,
-      category
+      category,
+      categorySuperTrend
     }
   }
 }
