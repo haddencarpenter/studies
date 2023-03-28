@@ -13,10 +13,12 @@ export const classicAtrPeriods = 10
 export const classicMultiplier = 3
 
 export const currentNarratives = [
+  "China Coins",
+  "LSD Tokens",
   "AI",
-  "DeFi",
-  "Layer 2",
-  "Zk Rollup"
+  "Arbitrum Ecosystem",
+  "BTC",
+  "Layer 2"
 ]
 export const preferredExchanges = [
   'Binance',

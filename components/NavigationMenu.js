@@ -50,7 +50,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
         {
-          label: <Link href="https://www.tradingview.com/u/pxeo/#published-scripts" prefetch={false}>TradingView indicator</Link>,
+          label: <Link href="https://www.tradingview.com/script/yNrotMjf-CoinRotator">TradingView indicator</Link>,
           key: '/tradingview-indicator',
           icon: <LineChartOutlined className={styles.goldenPurple} />
         }
