@@ -16,9 +16,7 @@ export const currentNarratives = [
   "China Coins",
   "LSD Tokens",
   "AI",
-  "Arbitrum Ecosystem",
-  "BTC",
-  "Layer 2"
+  "Arbitrum Ecosystem"
 ]
 export const preferredExchanges = [
   'Binance',
