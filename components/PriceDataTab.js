@@ -6,6 +6,7 @@ import Link from 'next/link'
 import classnames from 'classnames';
 import round from 'lodash/round';
 import { useHydrated } from "react-hydration-provider";
+import slugify from 'slugify'
 
 import PlatformSelect from './PlatformSelect';
 import coinStyles from '../styles/coin.module.less'
@@ -126,8 +127,9 @@ const PriceDataTab = ({ coin, screens }) => {
       <Title level={3} className={coinStyles.label}>Tags</Title>
       {
         coin.categories.map((tag) => {
+          const categorySlug = slugify(tag);
           return (
-            <Link href={`/?category=${tag}`} key={tag}>
+            <Link href={`/category/${categorySlug}`} key={tag} prefetch={false}>
               <Tag>{tag}</Tag>
             </Link>
           );
