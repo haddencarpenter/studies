@@ -3,7 +3,7 @@ import Document, { Html, Head, Main, NextScript } from 'next/document'
 class MyDocument extends Document {
   render() {
     return (
-      <Html lang="en">
+      <Html lang="en" data-theme="theme-light">
         <Head>
           <meta charSet="UTF-8"/>
           <link rel="preload" as="font" href="/Satoshi-Variable.woff2" type="font/woff2" crossOrigin="anonymous"/>
