@@ -14,7 +14,7 @@ import * as Tracing from '@sentry/tracing'
 
 import { quoteSymbols } from '../utils/variables.mjs'
 import prisma from '../lib/prisma.mjs'
-import coinGecko, { getOhlc, getCoin } from '../lib/coinGecko.mjs'
+import coinGecko, { getOhlc, getCoin, getMarket } from '../lib/coinGecko.mjs'
 import cryptowatch from '../lib/cryptowatch.mjs'
 import { getAllCoins } from '../lib/lunr.mjs'
 import { Prisma } from '@prisma/client'
@@ -252,10 +252,10 @@ const fetchOhlcData = async (coinId, symbol, cryptowatchMarkets) => {
 }
 
 const fetchCoinDataAndOhlcs = async () => {
-  const coinMarketsPage1 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250')
-  const coinMarketsPage2 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250&page=2')
-  const coinMarketsPage3 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250&page=3')
-  const coinMarketsPage4 = await coinGecko.get('/coins/markets?vs_currency=usd&per_page=250&page=4')
+  const coinMarketsPage1 = await getMarket(1)
+  const coinMarketsPage2 = await getMarket(2)
+  const coinMarketsPage3 = await getMarket(3)
+  const coinMarketsPage4 = await getMarket(4)
   let coinsMarketData = [...coinMarketsPage1.data, ...coinMarketsPage2.data, ...coinMarketsPage3.data, ...coinMarketsPage4.data]
   coinsMarketData = coinsMarketData.filter(coinMarket => !excludedSymbols.includes(coinMarket.symbol))
   coinsMarketData = coinsMarketData.filter(coinMarket => !excludedTokens.includes(coinMarket.id))
