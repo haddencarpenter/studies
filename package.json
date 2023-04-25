@@ -52,7 +52,7 @@
     "react-dom": "^18.2.0",
     "react-hydration-provider": "^1.0.1",
     "react-markdown": "^8.0.7",
-    "react-responsive": "^9.0.0",
+    "react-responsive": "^9.0.2",
     "react-ts-tradingview-widgets": "^1.0.14",
     "retry-axios": "3",
     "slugify": "^1.6.5",
