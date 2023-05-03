@@ -1,6 +1,6 @@
-import csv from 'csvtojson'
+import { gql } from '@apollo/client'
 
-let data;
+import strapi from './strapi.js'
 
 function addTemplateDescription(description, coin) {
   return `${description}
@@ -16,13 +16,29 @@ Of course, don’t trust price predictions alone, always check the Coinrotator t
 }
 
 export async function getDescriptionByCoin(coin) {
-  data ||= await csv().fromFile('lib/CoinDescription.csv');
-  const descriptionRow = data.find(description => description.Symbol.toLowerCase() === coin.symbol)
+  const { data } = await strapi.query({
+    query: gql`
+      query Coins {
+        coins(pagination: { page: 1, pageSize: 100000 }) {
+          data {
+            attributes {
+              name
+              symbol
+              description
+              isArticle
+            }
+          }
+        }
+      }
+    `,
+  })
+  const coinsData = data.coins.data
+  const coinData = coinsData.find(data => data.attributes.symbol.toLowerCase() === coin.symbol)
 
   let description
-  if (descriptionRow) {
-    description = descriptionRow.Description
-    if (descriptionRow.Article !== 'yes') {
+  if (coinData) {
+    description = coinData.attributes.description
+    if (coinData.attributes.isArticle !== 'yes') {
       description = addTemplateDescription(description, coin)
     }
   } else {
