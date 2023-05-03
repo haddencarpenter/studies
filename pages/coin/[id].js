@@ -27,7 +27,7 @@ import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../../ut
 import useBreakPoint from '../../hooks/useBreakPoint';
 import useIsHoverable from '../../hooks/useIsHoverable';
 import globalData from '../../lib/globalData';
-import { NotificationContext } from '../../pages/_app';
+import { NotificationContext } from '../../layouts/screener.js';
 
 import baseStyles from '../../styles/base.module.less'
 import coinStyles from '../../styles/coin.module.less'

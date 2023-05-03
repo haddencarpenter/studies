@@ -12,7 +12,7 @@ import useVirtualTable from '../hooks/useVirtualTable';
 import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
 import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';
-import { NotificationContext } from '../pages/_app';
+import { NotificationContext } from '../layouts/screener.js';
 
 import coinTableStyles from '../styles/coinTable.module.less';
 
