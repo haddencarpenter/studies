@@ -10,8 +10,6 @@ export default function PageLayout(page, pageProps) {
       <Head>
         <title key="title">{pageProps.title}</title>
         <meta name="description" key="description" content={pageProps.metaDescription} />
-        <meta key="noindex" name="robots" content="noindex"/>
-        <meta key="nofollow" name="robots" content="nofollow"/>
       </Head>
       <SharedLayout pageProps={pageProps} />
       {page}
