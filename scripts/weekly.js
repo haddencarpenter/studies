@@ -3,8 +3,8 @@ import * as Tracing from '@sentry/tracing'
 import puppeteer from 'puppeteer';
 
 import prisma from '../lib/prisma.mjs'
-import findMatchingCoinDropstab from '../utils/findMatchingCoinDropstab.mjs';
 import { overrideCoinCategories } from '../utils/categories.mjs';
+import findMatchingDropstabUrl from '../utils/findMatchingDropstabUrl.mjs';
 
 init({
   dsn: process.env.SENTRY_DSN,
@@ -26,7 +26,8 @@ const fetchCoinData = async (url, coin, page) => {
     launch_price,
     launch_date_start,
     launch_date_end,
-    categories
+    categories,
+    is404
   ] = await page.evaluate(() => {
     const icoAndRoiSection = Array.from(document.querySelectorAll('h3'))?.find((h3 => h3.innerText.includes("ROI since ICO")))?.nextSibling
     const roiSection = icoAndRoiSection?.firstChild
@@ -55,6 +56,7 @@ const fetchCoinData = async (url, coin, page) => {
     }
     const tags = Array.from(document.querySelector('ul[aria-label="Tags"]')?.querySelectorAll('li') || []).map(x => x.innerText)
     data.push(tags)
+    data.push(window.find('Error 404'))
     return data
   });
 
@@ -63,6 +65,11 @@ const fetchCoinData = async (url, coin, page) => {
   launch_date_end = Date.parse(launch_date_end);
   launch_date_end = isNaN(launch_date_end) ? null : new Date(launch_date_end);
   categories = await overrideCoinCategories(coin.name, coin.symbol, categories)
+
+  if (is404) {
+    console.log(coin, 'not found on dropstab')
+    return
+  }
 
   await prisma.coin.update({
     where: {
@@ -80,64 +87,25 @@ const fetchCoinData = async (url, coin, page) => {
   })
 }
 
-const getDropsTabData = async (browser) => {
-  const page = await browser.newPage();
-  await page.goto('https://dropstab.com/', {waitUntil: 'domcontentloaded'});
-
-  const data = [];
-  let hasNextPage = true;
-  let currentPage = 1;
-
-  while (hasNextPage) {
-    console.log('Scraping page #', currentPage);
-    const pageData = await page.$$eval('table tbody td:nth-child(2)', (elements) => {
-      const data = [];
-      for (const element of elements) {
-        const url = element.querySelector('a').href;
-        const symbolElement = element.querySelector('a div div:nth-child(3) div')
-        const symbol = symbolElement.innerText;
-        const name = symbolElement.nextSibling.innerText;
-        data.push({
-          url,
-          symbol,
-          name
-        })
-      }
-
-      return data;
-    });
-
-    data.push(...pageData)
-
-    const nextPage = await page.$('[aria-label="Next page"]');
-    if (nextPage) {
-      currentPage++;
-      await page.goto(`https://dropstab.com?p=${currentPage}`, {waitUntil: 'domcontentloaded'});
-    } else {
-      hasNextPage = false
-    }
-  }
-
-  await page.close();
-
-  return data
-}
-
 const dropsTab = async () => {
   let browser
   try {
     browser = await puppeteer.launch({
       timeout: 100000,
+      headless: 'new'
     });
-    const dropsTabData = await getDropsTabData(browser);
+    const coins = await prisma.coin.findMany({
+      select: {
+        id: true,
+        name: true,
+        symbol: true,
+      },
+    })
 
     const page = await browser.newPage();
-    for (const dropsData of dropsTabData) {
-      const coin = await findMatchingCoinDropstab(dropsData.symbol, dropsData.name);
-      console.log('Matching dropstab coin with database', dropsData.symbol, dropsData.name, coin, dropsData.url)
-      if (coin) {
-        await fetchCoinData(dropsData.url, coin, page);
-      }
+    for (const coin of coins) {
+      const url = await findMatchingDropstabUrl(coin);
+      await fetchCoinData(url, coin, page);
     }
   } catch(e) {
     throw(e)
