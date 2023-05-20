@@ -11,11 +11,11 @@ const parseDiscrepancies = async () => {
   return discrepancies
 }
 
-const isDropstabDiscrepancy = async(symbol) => {
+const isDropstabDiscrepancy = async(id) => {
   const discrepancies = await parseDiscrepancies();
-  const match = discrepancies.find(discrepancy => discrepancy["Dropstab symbol"] === symbol);
+  const match = discrepancies.find(discrepancy => discrepancy["Coingecko id"] === id);
 
-  return match && match["Coingecko symbol"];
+  return match && match["Dropstab id"];
 }
 
 export default isDropstabDiscrepancy;
