@@ -6322,10 +6322,10 @@ vfile@^5.0.0:
     unist-util-stringify-position "^3.0.0"
     vfile-message "^3.0.0"
 
-virtuallist-antd@^0.7.6:
-  version "0.7.6"
-  resolved "https://registry.yarnpkg.com/virtuallist-antd/-/virtuallist-antd-0.7.6.tgz#377c718333d2e3b98d7731edf16984ac4a858f8a"
-  integrity sha512-mVlxseQBpdJ4o0KRu1UTIewKQlz44VWAJfN382sjG+OKB5nbCMuJO1U9kODgLVrjD03uxKcE6bUEAeTfdxjkXA==
+virtuallist-antd@^0.8.0-beta.1:
+  version "0.8.0-beta.1"
+  resolved "https://registry.yarnpkg.com/virtuallist-antd/-/virtuallist-antd-0.8.0-beta.1.tgz#d2c6d07fa4970dbbbe13007014ab607e85a3e71e"
+  integrity sha512-Tw95tQ1fzCMnlFyS6d3wQJQudd4K2N8Z74eI8BzA/JAZPp35q24nhpfJg90VEcnVi+4yvl97VneYWwD4GIWnvQ==
 
 vm2@^3.9.17:
   version "3.9.19"
