@@ -8,7 +8,7 @@ import HodlTag from '../components/HodlTag'
 import { signals } from '../utils/variables'
 import tableSort from '../utils/tableSort'
 
-import coinTableStyles from '../styles/coinTable.module.less'
+import coinTableStyles from '../styles/table.module.less'
 import baseStyles from '../styles/base.module.less'
 
 export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort) {
@@ -69,6 +69,27 @@ export function dailySuperSuperTrendStreak(router, isHoverable) {
     sorter: (a, b) => Number(a.dailySuperSuperTrendStreak) - Number(b.dailySuperSuperTrendStreak),
     render: (dailySuperSuperTrendStreak) => {
       return dailySuperSuperTrendStreak
+    }
+  }
+}
+
+export function weeklySuperSuperTrendStreak(router, isHoverable) {
+  return {
+    onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
+    title: <span className={coinTableStyles.columnTitle}>
+      <span>Weekly Trend Streak</span>
+      <Tooltip
+          placement={'right'}
+          trigger={isHoverable ? 'hover' : 'click'}
+          title="The Trend Streak is the number of consecutive weeks that the trend has been in an UP, HODL or DOWNtrend."
+      >
+        <QuestionCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.icon)} />
+      </Tooltip>
+    </span>,
+    dataIndex: 'weeklySuperSuperTrendStreak',
+    sorter: (a, b) => Number(a.weeklySuperSuperTrendStreak) - Number(b.weeklySuperSuperTrendStreak),
+    render: (weeklySuperSuperTrendStreak) => {
+      return weeklySuperSuperTrendStreak
     }
   }
 }
