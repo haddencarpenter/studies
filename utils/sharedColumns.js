@@ -73,6 +73,27 @@ export function dailySuperSuperTrendStreak(router, isHoverable) {
   }
 }
 
+export function weeklySuperSuperTrendStreak(router, isHoverable) {
+  return {
+    onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
+    title: <span className={coinTableStyles.columnTitle}>
+      <span>Weekly Trend Streak</span>
+      <Tooltip
+          placement={'right'}
+          trigger={isHoverable ? 'hover' : 'click'}
+          title="The Trend Streak is the number of consecutive weeks that the trend has been in an UP, HODL or DOWNtrend."
+      >
+        <QuestionCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.icon)} />
+      </Tooltip>
+    </span>,
+    dataIndex: 'weeklySuperSuperTrendStreak',
+    sorter: (a, b) => Number(a.weeklySuperSuperTrendStreak) - Number(b.weeklySuperSuperTrendStreak),
+    render: (weeklySuperSuperTrendStreak) => {
+      return weeklySuperSuperTrendStreak
+    }
+  }
+}
+
 export function weeklySuperSuperTrend(router, isHoverable) {
   return {
     onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),

@@ -5,6 +5,8 @@ import { useRouter } from 'next/router'
 import slugify from 'slugify';
 import classnames from 'classnames';
 import { useCallback } from 'react';
+import mapValues from 'lodash/mapValues';
+import zip from 'lodash/zip';
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
@@ -15,10 +17,11 @@ import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'
 import prisma from "../lib/prisma.mjs";
 import useVirtualTable from '../hooks/useVirtualTable';
 import mode from '../utils/mode';
-import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap } from '../utils/sharedColumns';
+import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, dailySuperSuperTrendStreak, weeklySuperSuperTrendStreak } from '../utils/sharedColumns';
 import useIsHoverable from '../hooks/useIsHoverable';
 
 import tableStyles from '../styles/table.module.less'
+import supersupertrend from '../utils/supersupertrend.mjs';
 
 export default function Categories({ categoryData, appData }) {
   const router = useRouter()
@@ -44,8 +47,18 @@ export default function Categories({ categoryData, appData }) {
       onCell: onCellClick
     },
     {
+      width: 90,
+      ...dailySuperSuperTrendStreak(router, isHoverable),
+      onCell: onCellClick
+    },
+    {
       width: 100,
       ...weeklySuperSuperTrend(router, isHoverable),
+      onCell: onCellClick
+    },
+    {
+      width: 150,
+      ...weeklySuperSuperTrendStreak(router, isHoverable),
       onCell: onCellClick
     },
     {
@@ -116,13 +129,23 @@ export async function getStaticProps() {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
   }
   coinsData = await chunkedPromiseAll(coinsData, 5, async (coinData) => {
-    const [_dailyTrends, dailySuperSuperTrend, _dailySuperSuperTrendStreak] = await getSuperTrends(coinData.id)
-    const [_weeklyTrends, weeklySuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true })
+    let [dailyTrends, dailySuperSuperTrend, _dailySuperSuperTrendStreak] = await getSuperTrends(coinData.id)
+    let [weeklyTrends, weeklySuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true })
+
+    dailyTrends = mapValues(dailyTrends, trend => trend[2].reverse())
+    dailyTrends = zip(...Object.values(dailyTrends))
+    dailyTrends = dailyTrends.map((dailyTrend) => supersupertrend(dailyTrend))
+
+    weeklyTrends = mapValues(weeklyTrends, trend => trend[2].reverse())
+    weeklyTrends = zip(...Object.values(weeklyTrends))
+    weeklyTrends = weeklyTrends.map((dailyTrend) => supersupertrend(dailyTrend))
 
     return {
       ...coinData,
       dailySuperSuperTrend,
       weeklySuperSuperTrend,
+      dailyTrends,
+      weeklyTrends,
     }
   })
   const categoryData = []
@@ -143,6 +166,29 @@ export async function getStaticProps() {
     }
   }
   for (const category of categoryData) {
+    let allDailyCoinTrends = zip(...category.coins.map(coin => coin.dailyTrends))
+    const dailyCategoryTrends = allDailyCoinTrends.map((dailyCoinTrends) => mode(dailyCoinTrends))
+    let [dailyCurrentTrend, dailyTrendStreak] = [dailyCategoryTrends[0], 0];
+    for (let i = 0; i < dailyCategoryTrends.length; i++) {
+      if (dailyCurrentTrend === dailyCategoryTrends[i]) {
+        dailyTrendStreak++
+      } else {
+        break
+      }
+    }
+    category.dailySuperSuperTrendStreak = dailyTrendStreak
+
+    let allWeeklyCoinTrends = zip(...category.coins.map(coin => coin.weeklyTrends))
+    const weeklyCategoryTrends = allWeeklyCoinTrends.map((weeklyCoinTrends) => mode(weeklyCoinTrends))
+    let [weeklyCurrentTrend, weeklyTrendStreak] = [weeklyCategoryTrends[0], 0];
+    for (let i = 0; i < weeklyCategoryTrends.length; i++) {
+      if (weeklyCurrentTrend === weeklyCategoryTrends[i]) {
+        weeklyTrendStreak++
+      } else {
+        break
+      }
+    }
+    category.weeklySuperSuperTrendStreak = weeklyTrendStreak
     category.dailySuperSuperTrend = mode(category.coins.map(coin => coin.dailySuperSuperTrend))
     category.weeklySuperSuperTrend = mode(category.coins.map(coin => coin.weeklySuperSuperTrend))
     category.marketCap = category.coins.reduce((acc, coin) => acc + Number(coin.marketCap), 0)
