@@ -50,6 +50,11 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
         {
+          label: <Link href="/categories" prefetch={false}>Categories</Link>,
+          key: '/categories',
+          icon: <TagsOutlined className={styles.sunsetOrange} />
+        },
+        {
           label: <a href="https://www.tradingview.com/script/yNrotMjf-CoinRotator" target="_blank"  rel="noopener noreferrer">TradingView indicator</a>,
           key: '/tradingview-indicator',
           icon: <LineChartOutlined className={styles.goldenPurple} />
@@ -69,27 +74,6 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           }
           )
         })
-      },
-      {
-        label: 'Exchanges',
-        key: 'exchanges',
-        children: [
-          {
-            label: <Link href="/binance-screener" prefetch={false}>Binance</Link>,
-            key: '/binance-screener',
-            icon: <SwapOutlined className={styles.geekBlue} />
-          },
-          {
-            label: <Link href="/kucoin-screener" prefetch={false}>Kucoin</Link>,
-            key: '/kucoin-screener',
-            icon: <SwapOutlined className={styles.geekBlue} />
-          },
-          {
-            label: <Link href="/solana-screener" prefetch={false}>Solana</Link>,
-            key: '/solana-screener',
-            icon: <SwapOutlined className={styles.geekBlue} />
-          }
-        ]
       },
       {
         label: 'Preselects',
@@ -113,6 +97,27 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           {
             label: <Link href="/binance-futures-screener" prefetch={false}>Binance Futures Screener</Link>,
             key: '/binance-futures-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          }
+        ]
+      },
+      {
+        label: 'Exchanges',
+        key: 'exchanges',
+        children: [
+          {
+            label: <Link href="/binance-screener" prefetch={false}>Binance</Link>,
+            key: '/binance-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/kucoin-screener" prefetch={false}>Kucoin</Link>,
+            key: '/kucoin-screener',
+            icon: <SwapOutlined className={styles.geekBlue} />
+          },
+          {
+            label: <Link href="/solana-screener" prefetch={false}>Solana</Link>,
+            key: '/solana-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           }
         ]
