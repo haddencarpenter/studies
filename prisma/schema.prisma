@@ -134,7 +134,6 @@ model FourHourTrends {
   coinSymbol String   @db.VarChar(255)
   date       DateTime @db.Date
   trend      String
-  categories String[]
 
   @@unique([coinSymbol, date])
 }
