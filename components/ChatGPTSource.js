@@ -5,7 +5,7 @@ const ChatGPTSource = () => {
     <div className={styles.sectionDescriptionSource}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/chat-gpt-logo.jpeg" alt="Chat GPT Logo" className={styles.sectionDescriptionSourceGPTLogo} />
-      <span className={styles.sectionDescriptionSourceGPTSummarized}>Summarized in part by</span>&nbsp;ChatGPT 3.5
+      <span className={styles.sectionDescriptionSourceGPTSummarized}>Summarized in part by</span>&nbsp;ChatGPT 4
     </div>
   );
 }
