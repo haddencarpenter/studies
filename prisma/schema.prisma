@@ -130,12 +130,10 @@ model SuperTrend {
 }
 
 model FourHourTrends {
-  id         Int      @id @default(autoincrement())
-  coinSymbol String   @db.VarChar(255)
-  date       DateTime @db.Date
+  id         Int       @id @default(autoincrement())
   trend      String
-
-  @@unique([coinSymbol, date])
+  coinSymbol String    @db.VarChar(255)
+  timestamp  DateTime? @db.Timestamp(6)
 }
 
 model User {
