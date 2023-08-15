@@ -5,11 +5,13 @@ import Script from 'next/script'
 import { Layout, notification } from 'antd'
 import { createContext, useEffect } from "react"
 import { HydrationProvider, Client } from "react-hydration-provider";
+import io from 'socket.io-client'
 
 import Header from '../components/Header'
 import Sider from '../components/Sider'
 import useDarkMode from "../hooks/usedarkmode"
 import useBreakPoint from "../hooks/useBreakPoint"
+import useSocketStore from "../hooks/useSocketStore"
 import baseStyles from "../styles/base.module.less"
 
 export const DarkModeContext = createContext(null);
@@ -19,6 +21,24 @@ function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const darkMode = useDarkMode();
   const isDark = darkMode[0]
+  const setSocket = useSocketStore(state => state.setSocket)
+  useEffect(() => {
+    console.log("Connecting to WebSocket server...");
+    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER_URL, {
+      transports: ["websocket"],
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      console.log("Disconnecting from WebSocket server...");
+      newSocket.disconnect();
+    };
+  }, [setSocket]);
   useEffect(() => {
     const html = document.querySelector('html');
     html.dataset.theme = isDark ? 'theme-dark' : 'theme-light';
