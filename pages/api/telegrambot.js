@@ -26,11 +26,9 @@ const handler = async (req, res) => {
             flavor: 'CoinRotator',
             weekly: false,
             date: {
-              // TODO: Which dates?
-              gte: subDays(new Date(), 10),
+              gte: subDays(new Date(), 2),
             }
           },
-          // orderBy: { date: 'asc' },
         }
       }
     })
