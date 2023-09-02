@@ -172,6 +172,15 @@ Category,CoinSymbol,CoinName,addORremove
 "RWA Protocols","GFI","Goldfinch",add
 "RWA Protocols","RBN","Ribbon Finance",add
 "RWA Protocols","TRU","TrueFi",add
+"DWF Labs","KAVA","Kava",add
+"DWF Labs","CRV","Curve DAO",add
+"DWF Labs","CYBER","CyberCONNECT",add
+"DWF Labs","BEL","Bella Protocol",add
+"DWF Labs","QUICK","Quickswap",add
+"DWF Labs","AMB","AirDao",add
+"DWF Labs","MDT","Measurable Data Token",add
+"DWF Labs","FET","Fetch.ai",add
+
 
 
 
