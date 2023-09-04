@@ -36,11 +36,15 @@
   border-radius: 2px;
 }
 
-.searchBar {
-  width: 169px !important;
-  background-color: var(--cr-primary-bg) !important;
+.searchBarWrapper {
   cursor: pointer !important;
-  padding: 5px 11px !important;
+}
+
+.searchBar {
+  width: 169px;
+  background-color: var(--cr-primary-bg);
+  pointer-events: none;
+  padding: 5px 11px;
 
   input {
     background-color: var(--cr-primary-bg);
