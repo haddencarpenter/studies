@@ -51,7 +51,7 @@ export default function Faq() {
             <li>Change settings to ATR length 5 and Factor to 1.5 for CoinRotator settings.<img src="/supertrend3.png" alt="Change the settings" /></li>
             { /* eslint-enable @next/next/no-img-element */ }
           </ol>
-          If you prefer to use the default Supertrend settings in the screener you can do so in the advanced filter in the "customize" setting on each page.
+          If you prefer to use the default Supertrend settings in the screener you can do so in the advanced filter in the &quot;customize&quot; setting on each page.
         </Panel>
         <Panel header="Do you have any backtest data?" key="6">
           We have personal experience with these trends for several years in the crypto market. They work, but not as a stand-alone system. They are very powerful as a filtering mechanism (don’t fight the trend). We will begin publishing individual market performance for each altcoin in Q1 2024.
