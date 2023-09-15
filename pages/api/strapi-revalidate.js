@@ -19,7 +19,7 @@ export default async function strapiRevalidate(req, res) {
     } else if (model === "coin") {
       revalidatePath = `/coin/${entry.slug}`
     } else if (model === "page") {
-      revalidatePath = `/`
+      revalidatePath = entry.slug
     }
     try {
       await res.revalidate(revalidatePath)
