@@ -1,5 +1,5 @@
 import { Layout, Row } from 'antd';
-import { gql } from '@apollo/client'
+import { gql } from '@urql/core'
 import Head from 'next/head'
 
 import baseStyles from '../styles/base.module.less'
@@ -76,8 +76,8 @@ export async function getStaticProps() {
       derivatives: true,
     }
   }
-  let { data } = await strapi.query({
-    query: gql`
+  let { data } = await strapi.query(
+    gql`
       query Pages($slug: String) {
         pages(filters: {slug: {eq: $slug}}) {
           data {
@@ -90,10 +90,10 @@ export async function getStaticProps() {
         }
       }
     `,
-    variables: {
+    {
       slug: 'oldest-trends',
     }
-  })
+  )
   data = data.pages.data[0].attributes
   let coinsData
   if (process.env.NODE_ENV === 'development') {

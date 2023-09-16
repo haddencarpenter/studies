@@ -3,7 +3,7 @@ import flow from 'lodash/fp/flow.js'
 import uniq from 'lodash/fp/uniq.js'
 import flatMap from 'lodash/fp/flatMap.js'
 import slugify from 'slugify'
-import { gql } from '@apollo/client'
+import { gql } from '@urql/core'
 
 import prisma from '../lib/prisma.mjs'
 import strapi from './strapi.js'
@@ -36,8 +36,8 @@ export async function overrideCoinCategories(name, symbol, categories) {
 }
 
 export async function getCategories() {
-  const { data } = await strapi.query({
-    query: gql`
+  const { data } = await strapi.query(
+    gql`
       query Categories {
         categories(pagination: { page: 1, pageSize: 1000 }) {
           data {
@@ -50,7 +50,7 @@ export async function getCategories() {
         }
       }
     `,
-  })
+  )
   const categoryDescriptions = data.categories.data
   let categories = await prisma.coin.findMany({
     select: {

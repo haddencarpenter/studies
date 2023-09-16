@@ -6,7 +6,7 @@ import addDays from 'date-fns/addDays';
 import Head from 'next/head';
 import groupBy from 'lodash/groupBy.js';
 import countBy from 'lodash/countBy.js';
-import { gql } from '@apollo/client'
+import { gql } from '@urql/core'
 
 import { DarkModeContext } from '../layouts/screener.js';
 import baseStyles from '../styles/base.module.less'
@@ -55,8 +55,8 @@ export async function getStaticProps() {
       id: true,
     }
   }
-  let { data } = await strapi.query({
-    query: gql`
+  let { data } = await strapi.query(
+    gql`
       query Pages($slug: String) {
         pages(filters: {slug: {eq: $slug}}) {
           data {
@@ -69,10 +69,10 @@ export async function getStaticProps() {
         }
       }
     `,
-    variables: {
+    {
       slug: 'market-health',
     }
-  })
+  )
   data = data.pages.data[0].attributes
   let coins
   if (process.env.NODE_ENV === 'development') {

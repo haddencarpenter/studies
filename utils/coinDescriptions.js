@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@urql/core'
 
 import strapi from './strapi.js'
 
@@ -16,8 +16,8 @@ Of course, don’t trust price predictions alone, always check the Coinrotator t
 }
 
 export async function getDescriptionByCoin(coin) {
-  const { data } = await strapi.query({
-    query: gql`
+  const { data } = await strapi.query(
+    gql`
       query Coins($slug: String) {
         coins(filters: {slug: {eq: $slug}}) {
           data {
@@ -31,10 +31,10 @@ export async function getDescriptionByCoin(coin) {
         }
       }
     `,
-    variables: {
+    {
       slug: coin.id,
     }
-  })
+  )
   const coinData = data.coins.data[0]
 
   let description
