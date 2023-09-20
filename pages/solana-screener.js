@@ -76,7 +76,7 @@ export async function getStaticProps() {
     },
     where: {
       categories: {
-        hasSome: 'Solana Ecosystem'
+        hasSome: ['Solana Ecosystem']
       }
     }
   }
