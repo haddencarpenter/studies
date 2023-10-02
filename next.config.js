@@ -35,6 +35,15 @@ let moduleExports = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        source: '/categories',
+        destination: '/category',
+        permanent: true,
+      },
+    ]
+  },
 }
 moduleExports = withLess(moduleExports)
 moduleExports = withSentryConfig(moduleExports, {

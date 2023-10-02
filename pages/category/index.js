@@ -9,21 +9,21 @@ import mapValues from 'lodash/mapValues';
 import zip from 'lodash/zip';
 import { gql } from '@urql/core'
 
-import baseStyles from '../styles/base.module.less'
-import indexStyles from '../styles/index.module.less'
-import globalData from '../lib/globalData';
-import PageHeader from '../components/PageHeader'
-import { getSuperTrends } from '../utils/getTrends.mjs'
-import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'
-import prisma from "../lib/prisma.mjs";
-import useVirtualTable from '../hooks/useVirtualTable';
-import mode from '../utils/mode';
-import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, dailySuperSuperTrendStreak, weeklySuperSuperTrendStreak } from '../utils/sharedColumns';
-import useIsHoverable from '../hooks/useIsHoverable';
-import strapi from '../utils/strapi';
+import baseStyles from '../../styles/base.module.less'
+import indexStyles from '../../styles/index.module.less'
+import globalData from '../../lib/globalData';
+import PageHeader from '../../components/PageHeader'
+import { getSuperTrends } from '../../utils/getTrends.mjs'
+import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
+import prisma from "../../lib/prisma.mjs";
+import useVirtualTable from '../../hooks/useVirtualTable';
+import mode from '../../utils/mode';
+import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, dailySuperSuperTrendStreak, weeklySuperSuperTrendStreak } from '../../utils/sharedColumns';
+import useIsHoverable from '../../hooks/useIsHoverable';
+import strapi from '../../utils/strapi';
 
-import tableStyles from '../styles/table.module.less'
-import supersupertrend from '../utils/supersupertrend.mjs';
+import tableStyles from '../../styles/table.module.less'
+import supersupertrend from '../../utils/supersupertrend.mjs';
 
 export default function Categories({ categoryData, appData, pageData }) {
   const router = useRouter()
