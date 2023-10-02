@@ -2,7 +2,14 @@ import prisma from '../../lib/prisma.mjs'
 import requestIp from 'request-ip'
 
 const handler = async (req, res) => {
-  if (req.body.salt !== '0xdeadbeef') {
+  if (req.method === 'OPTIONS') {
+    res.status(200).json({})
+    return
+  }
+
+  const body = JSON.parse(req.body)
+
+  if (body.salt !== '0xdeadbeef') {
     res.status(401).send("Unauthorized")
   } else if (req.method !== 'POST') {
     res.status(400).send("Bad request")
@@ -21,7 +28,7 @@ const handler = async (req, res) => {
     } else {
       await prisma.WhiteListAddress.create({
         data: {
-          walletAddress: req.body.address,
+          walletAddress: body.address,
           ip: ip
         }
       })
