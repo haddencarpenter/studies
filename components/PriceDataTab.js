@@ -124,7 +124,7 @@ const PriceDataTab = ({ coin, screens }) => {
       </Card.Grid>
     ) : <></>}
     <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionData, coinStyles.sectionTags)}>
-      <Title level={3} className={coinStyles.label}>Tags</Title>
+      <Title level={3} className={coinStyles.label}>Categories</Title>
       {
         coin.categories.map((tag) => {
           const categorySlug = slugify(tag);
