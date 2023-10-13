@@ -252,6 +252,17 @@ Category,CoinSymbol,CoinName,addORremove
 "Social","XCAD","XCAD Network",add
 "Social","BGB","Bitget Token",add
 "Application","UNI","Uniswap",add
+"RWA Protocols","EL","ELYSIA",add
+"RWA Protocols","PROPC","Propchain",add
+"RWA Protocols","OPUL","Opulous",add
+"RWA Protocols","BOSON","Boson Protocol",add
+"RWA Protocols","PRO","Propy",add
+"RWA Protocols","Creditcoin","CTC",add
+"RWA Protocols","BTM","Bytom",add
+"RWA Protocols","POLYX","Polymesh",add
+"RWA Protocols","POLY","Polymath",add
+
+
 
 
 
