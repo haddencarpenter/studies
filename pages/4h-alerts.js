@@ -68,21 +68,6 @@ export default function FourHourAlerts({ alerts, appData }) {
       }
     },
     {
-      title: 'Categories',
-      width: 350,
-      dataIndex: 'categories',
-      render: (categories) => {
-        return categories.map((category) => {
-          const categorySlug = slugify(category);
-          return (
-            <Link href={`/category/${categorySlug}`} key={category} prefetch={false}>
-              <Tag>{category}</Tag>
-            </Link>
-          );
-        });
-      }
-    },
-    {
       width: 100,
       ...dailySuperSuperTrend(router, isHoverable),
     },
@@ -97,6 +82,21 @@ export default function FourHourAlerts({ alerts, appData }) {
     {
       width: 130,
       ...marketCap(router, hydrated)
+    },
+    {
+      title: 'Categories',
+      width: 350,
+      dataIndex: 'categories',
+      render: (categories) => {
+        return categories.map((category) => {
+          const categorySlug = slugify(category);
+          return (
+            <Link href={`/category/${categorySlug}`} key={category} prefetch={false}>
+              <Tag>{category}</Tag>
+            </Link>
+          );
+        });
+      }
     }
   ]
   return (
