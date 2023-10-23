@@ -200,6 +200,7 @@ export async function getStaticProps() {
     props: {
       alerts,
       appData
-    }
+    },
+    revalidate: 60 * 30 // 30 minutes
   }
 }
