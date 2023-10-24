@@ -35,7 +35,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           icon: <StarFilled className={styles.sunsetOrange} />
         },
         {
-          label: <Link href="/" prefetch={false}>All Trends</Link>,
+          label: <Link href="/" prefetch={false}>Crypto Trends</Link>,
           key: '/',
           icon: <UpCircleFilled className={styles.polarGreen} />
         },
