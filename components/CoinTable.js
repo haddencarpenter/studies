@@ -35,6 +35,7 @@ const CoinTable = ({
     superTrendFlavor,
     reverseMarketCapSort = false,
     showTrendStreak = true,
+    showExchanges = true,
     defaultSort = ['dailySuperSuperTrend', 'ascend'],
   }) => {
 
@@ -254,12 +255,16 @@ const CoinTable = ({
   {
     width: 90,
     ...marketCap(router, hydrated)
-  },
-  {
-    width: 120,
-    ...exchangesCol(router, isHoverable, exchangeData)
   }
   )
+  if (showExchanges) {
+    columns.push(
+      {
+        width: 120,
+        ...exchangesCol(router, isHoverable, exchangeData)
+      }
+    )
+  }
   if (showDerivatives) {
     columns.push(
       {
