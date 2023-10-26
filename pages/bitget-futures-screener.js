@@ -52,6 +52,7 @@ export default function BitgetFuturesScreener({ coinsData, appData, exchangeData
             derivatives={formState.derivatives}
             showDerivatives={formState.showDerivatives}
             superTrendFlavor={formState.superTrendFlavor}
+            showExchanges={false}
           />
         </Row>
       </Layout.Content>

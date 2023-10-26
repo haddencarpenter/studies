@@ -52,6 +52,7 @@ export default function MexcFuturesScreener({ coinsData, appData, exchangeData, 
             derivatives={formState.derivatives}
             showDerivatives={formState.showDerivatives}
             superTrendFlavor={formState.superTrendFlavor}
+            showExchanges={false}
           />
         </Row>
       </Layout.Content>
