@@ -401,7 +401,7 @@ setTimeout(async () => {
     name: `Datafetch ${new Date()}`,
   });
   try {
-    // await fetchCoinDataAndOhlcs();
+    await fetchCoinDataAndOhlcs();
     await fetchDerivativesData();
     // await fetchLunrData();
     if (process.env.NODE_ENV === 'production') {
