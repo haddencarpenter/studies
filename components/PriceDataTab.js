@@ -12,6 +12,7 @@ import PlatformSelect from './PlatformSelect';
 import coinStyles from '../styles/coin.module.less'
 import variableStyles from '../styles/variables.module.less'
 import { DarkModeContext } from '../layouts/screener.js';
+import { cleanupCoinLink } from "../utils/cleanupLinks";
 
 const { Title } = Typography;
 
@@ -27,10 +28,7 @@ const PriceDataTab = ({ coin, screens }) => {
   if (coin.circulatingSupply && coin.totalSupply) {
     circulatingSupplyPercentage = round(coin.circulatingSupply / coin.totalSupply * 100, 2)
   }
-  let url
-  try {
-    url = new URL(coin.homepage).host
-  } catch(e) {}
+  const url = cleanupCoinLink(coin.homepage, coin.symbol)
   const dateFormatter = new Intl.DateTimeFormat([], { dateStyle: 'medium' })
   const currencyFormatter = new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'symbol', notation })
   const preciseCurrencyFormatter = new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'symbol', maximumFractionDigits: 20, notation })
@@ -65,9 +63,9 @@ const PriceDataTab = ({ coin, screens }) => {
           </a>
         ) : <></> }
         { url ? (
-          <a href={coin.homepage} target="_blank" rel="noreferrer">
+          <a href={url} target="_blank" rel="noreferrer">
             <Tag icon={<GlobalOutlined />} color={variableStyles.black} className={classnames(coinStyles.button, coinStyles.buttonSite)}>
-              {url}
+              {url.host}
             </Tag>
           </a>
         ) : <></>}

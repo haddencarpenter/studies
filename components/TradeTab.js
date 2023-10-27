@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import coinStyles from '../styles/coin.module.less';
 import variableStyles from '../styles/variables.module.less'
-import cleanupExchangeLink from '../utils/cleanupExchangeLink';
+import { cleanupExchangeLink } from '../utils/cleanupLinks';
 
 const { Title } = Typography;
 const EXCHANGE_FILTER = {

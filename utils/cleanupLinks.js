@@ -1,4 +1,4 @@
-const cleanupExchangeLink = (link, baseSymbol) => {
+export const cleanupExchangeLink = (link, baseSymbol) => {
   let cleanLink = link;
 
   try {
@@ -16,4 +16,20 @@ const cleanupExchangeLink = (link, baseSymbol) => {
   return cleanLink
 }
 
-export default cleanupExchangeLink;
+const removeWebsiteLinkSymbols = ['SB', 'AA']
+
+export const cleanupCoinLink = (link, symbol) => {
+  symbol = symbol.toUpperCase()
+  let url
+  if (symbol === 'ICX') {
+    url = new URL('https://icon.community')
+  } else if (removeWebsiteLinkSymbols.includes(symbol)) {
+    url = null
+  } else {
+    try {
+      url = new URL(link)
+    } catch(e) {}
+  }
+
+  return url
+}
