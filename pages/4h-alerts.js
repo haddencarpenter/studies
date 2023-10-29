@@ -127,7 +127,7 @@ export async function getStaticProps() {
   const alerts = await prisma.FourHourTrends.findMany();
   let coinSymbols = new Set()
   for (const alert of alerts) {
-    coinSymbols.add(alert.coinSymbol.toLowerCase())
+    coinSymbols.add(alert.coinsymbol.toLowerCase())
   }
   let coins = await prisma.Coin.findMany({
     where: {
@@ -163,7 +163,7 @@ export async function getStaticProps() {
   })
   const alertsToDelete = []
   for (const [i, alert] of alerts.entries()) {
-    const coin = coins.find(coin => coin.symbol.toLowerCase() === alert.coinSymbol.toLowerCase())
+    const coin = coins.find(coin => coin.symbol.toLowerCase() === alert.coinsymbol.toLowerCase())
     if (!coin) {
       alertsToDelete.push(i)
       continue;
