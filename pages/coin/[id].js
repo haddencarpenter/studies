@@ -3,10 +3,8 @@ import { Card, Layout, Space, Tag, Tooltip, Typography } from 'antd';
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Prisma } from '@prisma/client'
-import minBy from 'lodash/minBy';
 import pick from 'lodash/pick';
 import { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react';
-import levenshtein from 'js-levenshtein';
 import classnames from 'classnames';
 
 import prisma from '../../lib/prisma.mjs'
@@ -318,43 +316,6 @@ export async function getStaticProps({ params }) {
 
   const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   const chainsData = await getChainsData();
-  const exchanges = await prisma.exchange.findMany()
-  const tickers = coinData.tickers || []
-  coinData.tickers = tickers.map((ticker) => {
-    const baseSymbol = ticker.base.toUpperCase()
-    const quoteSymbol = ticker.target.toUpperCase()
-    const exchangeName = ticker.market.name
-    let matchingExchange = exchanges.find((exchange) => exchange.name === exchangeName)
-    if (!matchingExchange) {
-      matchingExchange = minBy(exchanges, (exchange) => levenshtein(exchange.name, exchangeName))
-    }
-    return {
-      key: `${baseSymbol}/${quoteSymbol}${exchangeName}`,
-      name: exchangeName,
-      tradeLink: ticker.trade_url,
-      volume: ticker.volume,
-      baseSymbol: baseSymbol,
-      pair: `${baseSymbol}/${quoteSymbol}`,
-      centralized: matchingExchange?.centralized
-    }
-  })
-  const derivatives = coinData.derivatives || []
-  derivatives.forEach((derivative) => {
-    const marketName = derivative['market']
-    let matchingMarket = exchanges.find((exchange) => exchange.name === marketName)
-    if (!matchingMarket) {
-      matchingMarket = minBy(exchanges, (exchange) => { levenshtein(exchange.name, marketName) })
-    }
-    coinData.tickers.push({
-      key: `derivative${derivative['symbol']}${marketName}`,
-      name: marketName,
-      tradeLink: matchingMarket?.url,
-      volume: null,
-      baseSymbol: null,
-      pair: derivative['symbol'],
-      derivative: true
-    })
-  })
   coinData = pick(coinData, [
     'id',
     'symbol',
@@ -370,7 +331,6 @@ export async function getStaticProps({ params }) {
     'circulatingSupply',
     'totalSupply',
     'maxSupply',
-    'tickers',
     'twitter',
     'twitterFollowers',
     'homepage',

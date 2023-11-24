@@ -18,6 +18,17 @@ const EXCHANGE_FILTER = {
 const TradeTab = ({ coin, screens }) => {
   const router = useRouter();
   const [exchangeFilter, setExchangeFilter] = useState(EXCHANGE_FILTER.all)
+  const [isLoading, setLoading] = useState(true)
+  const [tickers, setTickers] = useState([])
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(`/api/coin-tickers?id=${coin.id}`)
+      const { tickers } = await res.json()
+      setTickers(tickers)
+      setLoading(false)
+    }
+    fetchData()
+  }, [coin.id])
   useEffect(() => {
     if (router.isReady) {
       let routerFilter = router.query.filter
@@ -43,16 +54,16 @@ const TradeTab = ({ coin, screens }) => {
   let tableData;
   switch(exchangeFilter) {
     case EXCHANGE_FILTER.all:
-      tableData = coin.tickers;
+      tableData = tickers;
       break;
     case EXCHANGE_FILTER.spot:
-      tableData = coin.tickers.filter(ticker => ticker.centralized && !ticker.derivative);
+      tableData = tickers.filter(ticker => ticker.centralized && !ticker.derivative);
       break;
     case EXCHANGE_FILTER.dex:
-      tableData = coin.tickers.filter(ticker => !ticker.centralized && !ticker.derivative);
+      tableData = tickers.filter(ticker => !ticker.centralized && !ticker.derivative);
       break;
     case EXCHANGE_FILTER.derivatives:
-      tableData = coin.tickers.filter(ticker => ticker.derivative);
+      tableData = tickers.filter(ticker => ticker.derivative);
       break;
   }
 
@@ -120,6 +131,7 @@ const TradeTab = ({ coin, screens }) => {
         })}
       </Radio.Group>
       <Table
+        isLoading={isLoading}
         columns={columns}
         dataSource={tableData}
         pagination={{ position: ['none', 'none'], pageSize: 1000 }}
