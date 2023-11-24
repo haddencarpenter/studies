@@ -117,6 +117,7 @@ export async function getStaticProps() {
 
     const exchanges = convertTickersToExchanges(coinData.tickers)
     coinData.imageSlug = getImageSlug(coinData.images.large)
+    coinData.derivatives = coinData.derivatives?.slice(0, 5)
 
     coinData = pick(coinData, [
       'id',

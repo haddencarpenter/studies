@@ -115,6 +115,8 @@ export async function getStaticProps() {
     coinData.imageSlug = getImageSlug(coinData.images.large)
     delete coinData.images
 
+    coinData.derivatives = coinData.derivatives?.slice(0, 5)
+
     return {
       ...coinData,
       dailySuperSuperTrend,
