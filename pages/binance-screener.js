@@ -1,6 +1,7 @@
 import { Layout, Row } from 'antd';
 import Head from 'next/head';
 import { gql } from '@urql/core'
+import pick from 'lodash/pick'
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
@@ -108,13 +109,21 @@ export async function getStaticProps() {
     const [_dailyClassicTrends, dailyClassicSuperSuperTrend, dailyClassicSuperSuperTrendStreak] = await getSuperTrends(coinData.id, { flavor: SUPERTREND_FLAVOR.classic })
     const [_weeklyClassicTrends, weeklyClassicSuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true, flavor: SUPERTREND_FLAVOR.classic })
 
-    const exchanges = convertTickersToExchanges(coinData.tickers)
-    delete coinData.tickers
-
+    coinData.exchanges = convertTickersToExchanges(coinData.tickers)
     coinData.imageSlug = getImageSlug(coinData.images.large)
-    delete coinData.images
-
     coinData.derivatives = coinData.derivatives?.slice(0, 5)
+
+    coinData = pick(coinData, [
+      'id',
+      'symbol',
+      'name',
+      'marketCap',
+      'marketCapRank',
+      'categories',
+      'exchanges',
+      'derivatives',
+      'imageSlug',
+    ])
 
     return {
       ...coinData,
@@ -124,12 +133,6 @@ export async function getStaticProps() {
       weeklyClassicSuperSuperTrend,
       dailySuperSuperTrendStreak,
       dailyClassicSuperSuperTrendStreak,
-      ath: Number(coinData.ath),
-      atl: Number(coinData.atl),
-      fullyDilutedValue: Number(coinData.fullyDilutedValue),
-      circulatingSupply: Number(coinData.circulatingSupply),
-      totalSupply: Number(coinData.totalSupply),
-      exchanges
     }
   })
   coinsData = coinsData.filter((coin) => {
