@@ -206,19 +206,19 @@ const CoinTable = ({
         return (
           <>
             <WatchlistStar active={isCoinWatched} onClick={(e) => toggleWatchlistCoin(e, data.id, coinData.name)} />
-            <a href={`/coin/${data.id}`} className={coinTableStyles.coin}>
+            <Link href={`/coin/${data.id}`} className={coinTableStyles.coin}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={getImageURL(coinData.imageSlug, 'small')} alt={coinData.name} className={coinTableStyles.image} loading="lazy"/>
               <span className={coinTableStyles.name}>{coinData.name}</span>
               <span className={coinTableStyles.symbol}>{coinData.symbol}</span>
-            </a>
-            <a href={`/coin/${data.id}#chart`} onClick={(e) => e.stopPropagation()}>
+            </Link>
+            <Link href={`/coin/${data.id}#chart`} onClick={(e) => e.stopPropagation()}>
               <BarChartOutlined
                 className={coinTableStyles.chart}
                 alt="Real time chart"
                 title="Real time chart"
               />
-            </a>
+            </Link>
           </>
         );
       }

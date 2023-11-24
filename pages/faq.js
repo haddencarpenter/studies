@@ -27,9 +27,9 @@ export default function Faq() {
         <Panel header="How do you use CoinRotator?" key="1">
           <p>There are several ways CoinRotator will become an indispensable part of your daily Crypto trading routine.</p>
           <ol>
-            <li>Check for new trends daily in order to buy into coins which are outperforming BTC ETH and USDT. After checking the Market Health <a href="/market-health">here</a>, general health of the market (BTCUSD), you can take a position and check its performance daily. The CoinRotator screener currently updates once per day at 01:00 UTC.</li>
+            <li>Check for new trends daily in order to buy into coins which are outperforming BTC ETH and USDT. After checking the Market Health <Link href="/market-health">here</Link>, general health of the market (BTCUSD), you can take a position and check its performance daily. The CoinRotator screener currently updates once per day at 01:00 UTC.</li>
             <li>Search your favorite altcoin in the top 1000+ (based on market cap) and see if it is a <UpTag /> <DownTag /> and <HodlTag /> trend. Consider your time horizon and profit expectations. If you are in profit, consider taking some profits based on what the CoinRotator trend streak or market health.</li>
-            <li>Seek out undervalued low marketcap coins by applying advanced settings in the filter. Choose &lt;100m and trend streak 1-5 and select UP only. Here will be a screen result of the <a href="https://coinrotator.app/low-market-cap">best performing low marketcap coins</a> in the top 1000. Be warned, these coins are more volatile than the top ranked coins but if BTC behaves you are likely to see much larger gains.</li>
+            <li>Seek out undervalued low marketcap coins by applying advanced settings in the filter. Choose &lt;100m and trend streak 1-5 and select UP only. Here will be a screen result of the <Link href="/low-market-cap">best performing low marketcap coins</Link> in the top 1000. Be warned, these coins are more volatile than the top ranked coins but if BTC behaves you are likely to see much larger gains.</li>
             <li>Check out our explainer video for more details</li>
             <iframe width="560" height="315" src="https://www.youtube.com/embed/OcyZcip24pM" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
           </ol>
@@ -41,7 +41,7 @@ export default function Faq() {
           Primarily on the SuperTrend indicator. CoinRotator&apos;s default settings are faster than the respective indicator found on Tradingview. In addition we track the performance of altcoins against BTC ETH and USDT. An &quot;actionable&quot; trend is only generated if all three markets are in agreement. If not, a <HodlTag /> trend is issued.
         </Panel>
         <Panel header="How accurate are Trends?" key="4">
-          They are not designed to be a complete trading system. You&apos;ll need to check the trend health of the overall market before taking any position (we built a <a href="https://coinrotator.app/market-health">Market Health oscillator</a> to asses the overall market conditions). Also, check out the Twitter feed for your chosen coin (found on the coin pages), and then check the trend staus of BTC. If things look positive (or excessively negative, for that matter), it&apos;s a likely winner.
+          They are not designed to be a complete trading system. You&apos;ll need to check the trend health of the overall market before taking any position (we built a <Link href="/market-health">Market Health oscillator</Link> to asses the overall market conditions). Also, check out the Twitter feed for your chosen coin (found on the coin pages), and then check the trend staus of BTC. If things look positive (or excessively negative, for that matter), it&apos;s a likely winner.
         </Panel>
         <Panel header="How to Apply the Supertrend indicator to the Coin Page Chart?" key="5">
           <ol className={faqStyles.imageList}>

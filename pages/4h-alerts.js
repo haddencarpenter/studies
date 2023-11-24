@@ -41,12 +41,12 @@ export default function FourHourAlerts({ alerts, appData }) {
       onCell: onCellClick,
       render: (name, alert) => {
         return (
-          <a href={`/coin/${alert.id}`} className={coinTableStyles.coin} passHref>
+          <Link href={`/coin/${alert.id}`} className={coinTableStyles.coin} passHref>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={alert.image} alt={name} className={coinTableStyles.image} loading="lazy"/>
             <span className={coinTableStyles.name}>{name}</span>
             <span className={coinTableStyles.symbol}>{alert.symbol}</span>
-          </a>
+          </Link>
         );
       }
     },
@@ -91,9 +91,9 @@ export default function FourHourAlerts({ alerts, appData }) {
         return categories.map((category) => {
           const categorySlug = slugify(category);
           return (
-            <a href={`/category/${categorySlug}`} key={category} prefetch={false}>
+            <Link href={`/category/${categorySlug}`} key={category} prefetch={false}>
               <Tag>{category}</Tag>
-            </a>
+            </Link>
           );
         });
       }

@@ -128,9 +128,9 @@ const PriceDataTab = ({ coin, screens }) => {
         coin.categories.map((tag) => {
           const categorySlug = slugify(tag);
           return (
-            <a href={`/category/${categorySlug}`} key={tag} prefetch={false}>
+            <Link href={`/category/${categorySlug}`} key={tag} prefetch={false}>
               <Tag>{tag}</Tag>
-            </a>
+            </Link>
           );
         })
       }

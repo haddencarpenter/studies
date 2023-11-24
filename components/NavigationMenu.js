@@ -30,37 +30,37 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       key: 'screenertools',
       children: [
         {
-          label: <a href="/" prefetch={false}>Crypto Trends</a>,
+          label: <Link href="/" prefetch={false}>Crypto Trends</Link>,
           key: '/',
           icon: <UpCircleFilled className={styles.polarGreen} />
         },
         {
-          label: <a href="/market-health" prefetch={false}>Market Health</a>,
+          label: <Link href="/market-health" prefetch={false}>Market Health</Link>,
           key: '/market-health',
           icon: <HeartFilled className={styles.dustRed} />
         },
         {
-          label: <a href="/todays-trends" prefetch={false}>Today&apos;s Trends</a>,
+          label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
           key: '/todays-trends',
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
         {
-          label: <a href="/categories" prefetch={false}>Categories</a>,
+          label: <Link href="/categories" prefetch={false}>Categories</Link>,
           key: '/categories',
           icon: <TagsOutlined className={styles.sunsetOrange} />
         },
         // {
-        //   label: <a href="/4h-alerts" prefetch={false}>4h Alerts</a>,
+        //   label: <Link href="/4h-alerts" prefetch={false}>4h Alerts</Link>,
         //   key: '/4h-alerts',
         //   icon: <TagsOutlined className={styles.daybreakBlue} />
         // },
         {
-          label: <a href="https://www.tradingview.com/script/yNrotMjf-CoinRotator" target="_blank"  rel="noopener noreferrer">TradingView indicator</a>,
+          label: <Link href="https://www.tradingview.com/script/yNrotMjf-CoinRotator" target="_blank"  rel="noopener noreferrer">TradingView indicator</Link>,
           key: '/tradingview-indicator',
           icon: <LineChartOutlined className={styles.goldenPurple} />
         },
         {
-          label: <a href="/watchlist">Watchlist</a>,
+          label: <Link href="/watchlist">Watchlist</Link>,
           key: '/watchlist',
           icon: <StarFilled className={styles.sunsetOrange} />
         }
@@ -73,7 +73,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
         const slug = slugify(category)
         return (
           {
-            label: <a href={`/category/${slug}`} prefetch={false}>{category}</a>,
+            label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
             key: `narrative-${slug}`,
             icon: <TagsOutlined className={styles.goldenPurple} />
           }
@@ -85,47 +85,47 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
         key: 'preselects',
         children: [
           {
-            label: <a href="/low-market-cap" prefetch={false}>Low Market Cap</a>,
+            label: <Link href="/low-market-cap" prefetch={false}>Low Market Cap</Link>,
             key: '/low-market-cap',
             icon: <VerticalAlignBottomOutlined className={styles.goldenPurple} />
           },
           {
-            label: <a href="/oldest-trends" prefetch={false}>Oldest Trends</a>,
+            label: <Link href="/oldest-trends" prefetch={false}>Oldest Trends</Link>,
             key: '/oldest-trends',
             icon: <StepBackwardOutlined className={styles.sunsetOrange} />
           },
           {
-            label: <a href="/bybit-futures-screener" prefetch={false}>Bybit Futures Screener</a>,
+            label: <Link href="/bybit-futures-screener" prefetch={false}>Bybit Futures Screener</Link>,
             key: '/bybit-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/binance-futures-screener" prefetch={false}>Binance Futures Screener</a>,
+            label: <Link href="/binance-futures-screener" prefetch={false}>Binance Futures Screener</Link>,
             key: '/binance-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/kucoin-futures-screener" prefetch={false}>Kucoin Futures Screener</a>,
+            label: <Link href="/kucoin-futures-screener" prefetch={false}>Kucoin Futures Screener</Link>,
             key: '/kucoin-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/okx-futures-screener" prefetch={false}>OKX Futures Screener</a>,
+            label: <Link href="/okx-futures-screener" prefetch={false}>OKX Futures Screener</Link>,
             key: '/okx-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/mexc-futures-screener" prefetch={false}>MEXC Futures Screener</a>,
+            label: <Link href="/mexc-futures-screener" prefetch={false}>MEXC Futures Screener</Link>,
             key: '/mexc-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/bitget-futures-screener" prefetch={false}>Bitget Futures Screener</a>,
+            label: <Link href="/bitget-futures-screener" prefetch={false}>Bitget Futures Screener</Link>,
             key: '/bitget-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/bingx-futures-screener" prefetch={false}>BingX Futures Screener</a>,
+            label: <Link href="/bingx-futures-screener" prefetch={false}>BingX Futures Screener</Link>,
             key: '/bingx-futures-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           }
@@ -136,17 +136,17 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
         key: 'exchanges',
         children: [
           {
-            label: <a href="/binance-screener" prefetch={false}>Binance</a>,
+            label: <Link href="/binance-screener" prefetch={false}>Binance</Link>,
             key: '/binance-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/kucoin-screener" prefetch={false}>Kucoin</a>,
+            label: <Link href="/kucoin-screener" prefetch={false}>Kucoin</Link>,
             key: '/kucoin-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           },
           {
-            label: <a href="/solana-screener" prefetch={false}>Solana</a>,
+            label: <Link href="/solana-screener" prefetch={false}>Solana</Link>,
             key: '/solana-screener',
             icon: <SwapOutlined className={styles.geekBlue} />
           }
@@ -157,12 +157,12 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       key: 'tutorials',
       children: [
         {
-          label: <a href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</a>,
+          label: <Link href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</Link>,
           key: 'video-tutorials',
           icon: <VideoCameraFilled className={styles.dustRed} />
         },
         {
-          label: <a href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</a>,
+          label: <Link href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</Link>,
           key: 'article-tutorials',
           icon: <ReadFilled className={styles.gray} />
         }
@@ -173,7 +173,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       key: 'topcategories',
       children: topCategories.map((category) => {
         return {
-          label: <a href={`/category/${category.slug}`} prefetch={false}>{category.name}</a>,
+          label: <Link href={`/category/${category.slug}`} prefetch={false}>{category.name}</Link>,
           key: `/${category.slug}`,
           icon: <TagsOutlined className={styles.goldenPurple} />
         }
@@ -184,17 +184,17 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       key: 'about',
       children: [
         // {
-        //   label: <a href="/team">Team</a>,
+        //   label: <Link href="/team">Team</Link>,
         //   key: '/team',
         //   icon: <TeamOutlined className={styles.geekBlue} />
         // },
         {
-          label: <a href="/faq">FAQ</a>,
+          label: <Link href="/faq">FAQ</Link>,
           key: '/faq',
           icon: <QuestionCircleFilled className={styles.sunsetOrange} />
         },
         {
-          label: <a href="/terms">Terms & Conditions</a>,
+          label: <Link href="/terms">Terms & Conditions</Link>,
           key: '/terms',
           icon: <ContainerFilled className={styles.polarGreen} />
         }
@@ -205,42 +205,42 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
     menuItems = [
       {
         label: 'Watchlist',
-        icon: <a href="/watchlist" prefetch={false}><StarFilled className={styles.sunsetOrange} /></a>,
+        icon: <Link href="/watchlist" prefetch={false}><StarFilled className={styles.sunsetOrange} /></Link>,
         key: '/watchlist',
       },
       {
         label: 'All Trends',
-        icon: <a href="/" prefetch={false}><UpCircleFilled className={styles.polarGreen} /></a>,
+        icon: <Link href="/" prefetch={false}><UpCircleFilled className={styles.polarGreen} /></Link>,
         key: '/'
       },
       {
         label: 'Market Health',
-        icon: <a href="/market-health" prefetch={false}><HeartFilled className={styles.dustRed} /></a>,
+        icon: <Link href="/market-health" prefetch={false}><HeartFilled className={styles.dustRed} /></Link>,
         key: '/market-health',
       },
       {
         label: "Today's Trends",
         key: '/todays-trends',
-        icon: <a href="/todays-trends" prefetch={false}><AlertFilled className={styles.daybreakBlue} /></a>
+        icon: <Link href="/todays-trends" prefetch={false}><AlertFilled className={styles.daybreakBlue} /></Link>
       },
       {
         label: "Low Market Cap",
         key: '/low-market-cap',
-        icon: <a href="/low-market-cap" prefetch={false}><VerticalAlignBottomOutlined className={styles.goldenPurple} /></a>
+        icon: <Link href="/low-market-cap" prefetch={false}><VerticalAlignBottomOutlined className={styles.goldenPurple} /></Link>
       },
       // {
       //   label: 'Team',
-      //   icon: <a href="/team"><TeamOutlined className={styles.geekBlue} /></a>,
+      //   icon: <Link href="/team"><TeamOutlined className={styles.geekBlue} /></Link>,
       //   key: '/team'
       // },
       {
         label: 'FAQ',
-        icon: <a href="/faq"><QuestionCircleFilled className={styles.sunsetOrange} /></a>,
+        icon: <Link href="/faq"><QuestionCircleFilled className={styles.sunsetOrange} /></Link>,
         key: '/faq'
       },
       {
         label: 'Terms & Conditions',
-        icon: <a href="/terms"><ContainerFilled className={styles.polarGreen} /></a>,
+        icon: <Link href="/terms"><ContainerFilled className={styles.polarGreen} /></Link>,
         key: '/terms'
       }
     ]
