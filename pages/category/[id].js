@@ -87,16 +87,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
   );
 }
 
-export async function getStaticPaths() {
-  const categories = await getCategories()
-
-  return {
-    paths: categories.map(category => ({ params: {id: category.slug} }) ),
-    fallback: false
-  }
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const categories = await getCategories()
   const category = categories.find(cat => cat.slug === params.id)
   const appData = await globalData();

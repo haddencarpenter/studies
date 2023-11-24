@@ -279,18 +279,7 @@ export default function Coin(coin) {
   </>;
 }
 
-export async function getStaticPaths() {
-  const coinsData = await prisma.coin.findMany({
-    select: { id: true }
-  })
-
-  return {
-    paths: coinsData.map(coin => ({ params: { ...coin }}) ),
-    fallback: false
-  }
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const appData = await globalData();
   let coinData = await prisma.coin.findUnique({
     where: {
