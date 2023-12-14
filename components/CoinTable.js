@@ -38,6 +38,7 @@ const CoinTable = ({
     showTrendStreak = true,
     showExchanges = true,
     defaultSort = ['dailySuperSuperTrend', 'ascend'],
+    filter,
   }) => {
 
   const router = useRouter()
@@ -125,7 +126,22 @@ const CoinTable = ({
     }
   }, [watchlistCoins, notification])
 
-  let displayedCoinData = coinsData.filter((coinData) => {
+  let displayedCoinData = coinsData.map((coinData) => {
+    if (trends) {
+      const dailyTrend = trends.daily[coinData.id].supersuperTrend
+      if (dailyTrend) {
+        coinData.dailySuperSuperTrend = dailyTrend.trend
+        coinData.dailySuperSuperTrendStreak = dailyTrend.streak
+      }
+      const weeklyTrend = trends.weekly[coinData.id].supersuperTrend
+      if (weeklyTrend) {
+        coinData.weeklySuperSuperTrend = weeklyTrend.trend
+        coinData.weeklySuperSuperTrendStreak = weeklyTrend.streak
+      }
+    }
+    return coinData
+  })
+  displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY
     const coinSymbolLower = coinData.symbol.toLowerCase()
@@ -167,6 +183,10 @@ const CoinTable = ({
     }
   })
 
+  if (filter) {
+    displayedCoinData = displayedCoinData.filter(filter)
+  }
+
   const tableData = displayedCoinData.map((coinData) => {
     let shownDerivatives = coinData.derivatives || []
     if (!isEmpty(derivatives)) {
@@ -189,18 +209,6 @@ const CoinTable = ({
       }
     })
     shownExchanges = shownExchanges.slice(0, 5)
-    if (trends) {
-      const dailyTrend = trends.daily[coinData.id].supersuperTrend
-      if (dailyTrend) {
-        coinData.dailySuperSuperTrend = dailyTrend.trend
-        coinData.dailySuperSuperTrendStreak = dailyTrend.streak
-      }
-      const weeklyTrend = trends.weekly[coinData.id].supersuperTrend
-      if (weeklyTrend) {
-        coinData.weeklySuperSuperTrend = weeklyTrend.trend
-        coinData.weeklySuperSuperTrendStreak = weeklyTrend.streak
-      }
-    }
     return {
       key: `${coinData.id}-${coinData.name}`,
       id: coinData.id,
