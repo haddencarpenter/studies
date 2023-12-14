@@ -120,7 +120,8 @@ export async function getStaticProps() {
       'marketCap',
       'marketCapRank',
       'derivatives',
-      'categories'
+      'categories',
+      'exchanges'
     ])
 
     return coinData
