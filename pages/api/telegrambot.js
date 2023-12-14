@@ -5,7 +5,7 @@ import mapKeys from 'lodash/mapKeys';
 import mapValues from 'lodash/mapValues';
 
 import prisma from '../../lib/prisma.mjs'
-import supersupertrend from '../../utils/supersupertrend.mjs';
+import supersupertrend from 'coinrotator-utils/supersupertrend.mjs';
 
 const handler = async (req, res) => {
   if (req.query.apiKey !== 'TELEGRAM_BOT_API_KEY') {

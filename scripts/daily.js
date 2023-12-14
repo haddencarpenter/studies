@@ -10,7 +10,7 @@ import isNil from 'lodash/isNil.js'
 import union from 'lodash/union.js'
 import uniqBy from 'lodash/uniqBy.js'
 
-import { quoteSymbols } from '../utils/variables.mjs'
+import { quoteSymbols } from 'coinrotator-utils/variables.mjs'
 import prisma from '../lib/prisma.mjs'
 import coinGecko, { getOhlc, getCoin, getMarket } from '../lib/coinGecko.mjs'
 import cryptowatch from '../lib/cryptowatch.mjs'
@@ -18,7 +18,7 @@ import { getAllCoins } from '../lib/lunr.mjs'
 import { Prisma } from '@prisma/client'
 import { hasPlatforms } from '../utils/coingecko.mjs';
 import convertToDailySignals from '../utils/convertToDailySignals.mjs';
-import { saveDailyOhlcsToSupertrends } from '../utils/supersupertrend.mjs';
+import { saveDailyOhlcsToSupertrends } from 'coinrotator-utils/supersupertrend.mjs';
 
 dotenv.config();
 
@@ -391,5 +391,6 @@ setTimeout(async () => {
   // await fetchLunrData();
   if (process.env.NODE_ENV === 'production') {
     await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/zigJ5zntts')
+    await axios.post('https://coinrotator-realtime.onrender.com/new-trends')
   }
 }, 99);

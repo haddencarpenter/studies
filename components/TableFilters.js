@@ -11,7 +11,7 @@ import indexStyles from '../styles/index.module.less'
 import baseStyles from '../styles/base.module.less'
 import useBreakPoint from '../hooks/useBreakPoint';
 import useIsHoverable from '../hooks/useIsHoverable';
-import { signals, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { signals, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 import ExplainerModal from './ExplainerModal';
 
 const { Text } = Typography;

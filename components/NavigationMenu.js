@@ -20,7 +20,7 @@ import { useRouter } from 'next/router'
 import slugify from 'slugify'
 
 import styles from "../styles/navigationmenu.module.less"
-import { currentNarratives } from '../utils/variables.mjs'
+import { currentNarratives } from 'coinrotator-utils/variables.mjs'
 
 const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected }) => {
   const router = useRouter()

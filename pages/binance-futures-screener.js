@@ -8,7 +8,7 @@ import globalData from '../lib/globalData';
 import PageHeader from '../components/PageHeader'
 import TableFilters from '../components/TableFilters'
 import CoinTable from '../components/CoinTable';
-import { SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import { getSuperTrends } from '../utils/getTrends.mjs'
 import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'

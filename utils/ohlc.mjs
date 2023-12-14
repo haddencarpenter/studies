@@ -1,6 +1,6 @@
-import { signals } from './variables.mjs'
+import { signals } from 'coinrotator-utils/variables.mjs'
 import prisma from '../lib/prisma.mjs';
-import { defaultAtrPeriods, defaultMultiplier, classicAtrPeriods, classicMultiplier, SUPERTREND_FLAVOR } from './variables.mjs';
+import { defaultAtrPeriods, defaultMultiplier, classicAtrPeriods, classicMultiplier, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
 import supertrend from './supertrend.mjs';
 import convertToWeeklySignals from './convertToWeeklySignals.mjs';
 import { subDays, isMonday } from 'date-fns';

@@ -1,7 +1,7 @@
 import { Line } from '@ant-design/plots';
 
 import variableStyles from '../styles/variables.module.less'
-import { signals } from '../utils/variables'
+import { signals } from 'coinrotator-utils/variables.mjs'
 
 const MarketHealthChart = ({ historicDailySuperSuperTrends, darkMode }) => {
   return (

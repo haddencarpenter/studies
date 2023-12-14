@@ -18,7 +18,7 @@ import useIsHoverable from '../hooks/useIsHoverable';
 import { signals } from '../utils/variables';
 import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'
 import { getSuperTrends } from '../utils/getTrends.mjs'
-import { SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 
 import tableStyles from '../styles/table.module.less'
 import coinTableStyles from '../styles/table.module.less';

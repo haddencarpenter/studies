@@ -11,7 +11,7 @@ import WatchlistStar from './WatchlistStar';
 import useIsHoverable from '../hooks/useIsHoverable';
 import useVirtualTable from '../hooks/useVirtualTable';
 import useSocketStore from '../hooks/useSocketStore';
-import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
+import { signals, preferredExchanges, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
 import { getImageURL } from '../utils/minifyImageURL';
 import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';

@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import UpTag from '../components/UpTag'
 import DownTag from '../components/DownTag'
 import HodlTag from '../components/HodlTag'
-import { signals } from '../utils/variables'
+import { signals } from 'coinrotator-utils/variables.mjs'
 import tableSort from '../utils/tableSort'
 
 import coinTableStyles from '../styles/table.module.less'

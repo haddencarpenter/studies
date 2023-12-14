@@ -1,6 +1,6 @@
 import round from 'lodash/round.js';
 
-import { signals } from './variables.mjs';
+import { signals } from 'coinrotator-utils/variables.mjs';
 
 // Taken from https://tradingtuitions.com/supertrend-indicator-excel-sheet-with-realtime-buy-sell-signals/
 const supertrend = (data = [], options = { atrPeriods: 10, multiplier: 1.5 }) => {

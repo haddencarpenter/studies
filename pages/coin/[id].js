@@ -16,7 +16,7 @@ import AnalyticsTab from '../../components/AnalysisTab';
 import TradeTab from '../../components/TradeTab';
 import PageHeader from '../../components/PageHeader';
 import WatchlistStar from '../../components/WatchlistStar';
-import { signals } from '../../utils/variables.mjs';
+import { signals } from 'coinrotator-utils/variables.mjs';
 import { getSuperTrends } from '../../utils/getTrends.mjs';
 import getChainsData from '../../utils/getChainsData';
 import getPlatformData from '../../utils/getPlatformData';
@@ -282,9 +282,7 @@ export default function Coin(coin) {
 
 export async function getStaticPaths() {
   const coinsData = await prisma.coin.findMany({
-    select: { id: true },
-      orderBy: { marketCapRank: 'asc' },
-      take: 1000
+    select: { id: true }
   })
 
   return {

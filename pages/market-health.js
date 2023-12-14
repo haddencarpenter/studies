@@ -13,9 +13,9 @@ import baseStyles from '../styles/base.module.less'
 import globalData from '../lib/globalData';
 import PageHeader from '../components/PageHeader'
 import MarketHealthChart from '../components/MarketHealthChart';
-import { signals, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { signals, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 import useBreakPoint from '../hooks/useBreakPoint';
-import supersupertrend from '../utils/supersupertrend.mjs';
+import supersupertrend from 'coinrotator-utils/supersupertrend.mjs';
 import prisma from "../lib/prisma.mjs"
 import strapi from '../utils/strapi';
 

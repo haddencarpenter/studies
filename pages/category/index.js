@@ -24,7 +24,7 @@ import useIsHoverable from '../../hooks/useIsHoverable';
 import strapi from '../../utils/strapi';
 
 import tableStyles from '../../styles/table.module.less'
-import supersupertrend from '../../utils/supersupertrend.mjs';
+import supersupertrend from 'coinrotator-utils/supersupertrend.mjs';
 
 export default function Categories({ categoryData, appData, pageData }) {
   const router = useRouter()

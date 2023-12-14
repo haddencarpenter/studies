@@ -6,7 +6,7 @@ import pick from 'lodash/pick'
 import CoinTable from '../components/CoinTable';
 import PageHeader from '../components/PageHeader';
 import TableFilters from '../components/TableFilters'
-import { SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
 import prisma from '../lib/prisma.mjs'
 import globalData from '../lib/globalData';

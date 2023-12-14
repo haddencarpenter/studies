@@ -1,9 +1,9 @@
 import mapValues from 'lodash/mapValues.js'
-import zipWith from 'lodash/zipWith.js'
 import groupBy from 'lodash/groupBy.js';
 
-import supersupertrend from './supersupertrend.mjs';
-import { SUPERTREND_FLAVOR } from './variables.mjs';
+import supersupertrend from 'coinrotator-utils/supersupertrend.mjs';
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
+import { getTrendStreak, superSupertrendStreak } from 'coinrotator-utils/gettrends.mjs';
 import prisma from '../lib/prisma.mjs';
 
 export async function getSuperTrends(coinId, { flavor = SUPERTREND_FLAVOR.coinrotator, weekly = false, skipLast = false } = {}) {
@@ -36,26 +36,4 @@ export async function getSuperTrends(coinId, { flavor = SUPERTREND_FLAVOR.coinro
   const streak = superSupertrendStreak(trends)
 
   return [trends, superSupertrend, streak]
-}
-
-function superSupertrendStreak(trends) {
-  const supertrends = Object.values(trends).map(t => t[2])
-  const supertrendsByTime = zipWith(...supertrends, (a, b, c) => [a || '', b || '', c || ''])
-  const supersuperTrends = supertrendsByTime.map(supertrends => supersupertrend(supertrends))
-
-  return getTrendStreak(supersuperTrends)[1]
-}
-
-function getTrendStreak(trends) {
-  const lastTrend = trends[trends.length - 1] || ''
-  let trendLength = 0
-  for (let i = trends.length - 1; i > 0; i--) {
-    if (lastTrend === trends[i]) {
-      trendLength++
-    } else {
-      break
-    }
-  }
-
-  return [lastTrend, trendLength]
 }

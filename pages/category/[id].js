@@ -11,7 +11,7 @@ import CoinTable from '../../components/CoinTable';
 import UpTag from '../../components/UpTag';
 import DownTag from '../../components/DownTag';
 import HodlTag from '../../components/HodlTag';
-import { SUPERTREND_FLAVOR, signals } from '../../utils/variables.mjs'
+import { SUPERTREND_FLAVOR, signals } from 'coinrotator-utils/variables.mjs'
 import convertTickersToExchanges from '../../utils/convertTickersToExchanges';
 import { getSuperTrends } from '../../utils/getTrends.mjs'
 import useTableFilters from '../../hooks/useTableFilters';
