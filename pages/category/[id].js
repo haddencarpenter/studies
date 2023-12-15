@@ -1,7 +1,7 @@
 import { Layout, Row } from 'antd';
 import Head from 'next/head'
-import { useState } from 'react';
-import pickBy from 'lodash/pickBy';
+import { useState, useCallback, useEffect } from 'react';
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
 
 import baseStyles from '../../styles/base.module.less'
 import indexStyles from '../../styles/index.module.less'
@@ -20,20 +20,40 @@ import useTableFilters from '../../hooks/useTableFilters';
 import prisma from "../../lib/prisma.mjs";
 import { getCategories } from '../../utils/categories.mjs'
 import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
-import mode from '../../utils/mode';
 import { getImageSlug } from '../../utils/minifyImageURL';
+import useSocketStore from '../../hooks/useSocketStore';
 
 export default function Category({ coinsData, appData, exchangeData, category, currentUrl }) {
   const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
+  const socket = useSocketStore(state => state.socket)
   const [trends, setTrends] = useState(null)
+  const fetchTrends = useCallback(() => {
+    if (socket) {
+      socket.emit('get_category_trends', {
+        flavor: SUPERTREND_FLAVOR.coinrotator,
+        category: category.name
+      })
+    }
+  }, [socket])
+  useEffect(() => {
+    console.log('useeffect fetch trends')
+    fetchTrends()
+  }, [fetchTrends])
+  useEffect(() => {
+    if (socket) {
+      socket.on('category_trends', (trends) => setTrends(trends))
+      socket.on('new_trends', fetchTrends)
+    }
+    return () => {
+      if (socket) {
+        socket.off('category_trends')
+        socket.off('new_trends')
+      }
+    }
+  }, [socket, fetchTrends])
   let categorySuperTrend
   if (trends) {
-    const categoryCoinIds = coinsData.map(coin => coin.id)
-    let dailyCategorySuperTrends = pickBy(trends.daily, (_value, coinId) => {
-      return categoryCoinIds.includes(coinId)
-    })
-    dailyCategorySuperTrends = Object.values(dailyCategorySuperTrends).map(trend => trend.supersuperTrend.trend)
-    categorySuperTrend = mode(dailyCategorySuperTrends)
+    categorySuperTrend = trends.daily.trend
   }
   const metaTitle = `${category.name} - CoinRotator`
   let dailySignalTag
