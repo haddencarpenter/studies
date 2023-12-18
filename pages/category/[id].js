@@ -34,7 +34,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
         category: category.name
       })
     }
-  }, [socket])
+  }, [socket, category.name])
   useEffect(() => {
     console.log('useeffect fetch trends')
     fetchTrends()
@@ -53,7 +53,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
   }, [socket, fetchTrends])
   let categorySuperTrend
   if (trends) {
-    categorySuperTrend = trends.daily.trend
+    categorySuperTrend = trends.daily[0]
   }
   const metaTitle = `${category.name} - CoinRotator`
   let dailySignalTag
