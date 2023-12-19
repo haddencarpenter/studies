@@ -26,7 +26,7 @@ export default function MarketHealth({ appData, pageData }) {
   const [trends, setTrends] = useState(null)
   const fetchTrends = useCallback(() => {
     if (socket) {
-      socket.emit('get_historical_trends')
+      socket.emit('get_historical_trends', (trends) => setTrends(trends))
     }
   }, [socket])
   useEffect(() => {
@@ -35,12 +35,10 @@ export default function MarketHealth({ appData, pageData }) {
   }, [fetchTrends])
   useEffect(() => {
     if (socket) {
-      socket.on('historical_trends', (trends) => setTrends(trends))
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
-        socket.off('historical_trends')
         socket.off('new_trends')
       }
     }
