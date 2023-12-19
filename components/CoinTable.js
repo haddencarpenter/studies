@@ -69,13 +69,12 @@ const CoinTable = ({
       let cache = sessionStorage.getItem(`trends_${superTrendFlavor}`)
       cache = JSON.parse(cache)
       if (cache) {
+        updateTrends(cache)
         socket.emit('get_trends_outdated', cache.lastUpdated, (outdated) => {
           if (outdated) {
             socket.emit('get_trends', {
               flavor: superTrendFlavor,
             })
-          } else {
-            updateTrends(cache)
           }
         })
       } else {
