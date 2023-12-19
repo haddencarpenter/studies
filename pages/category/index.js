@@ -37,7 +37,7 @@ export default function Categories({ categoryData, appData, pageData }) {
     if (socket) {
       socket.emit('get_category_trends', {
         flavor: SUPERTREND_FLAVOR.coinrotator,
-      })
+      }, (trends) => setTrends(trends))
     }
   }, [socket])
   useEffect(() => {
@@ -46,12 +46,10 @@ export default function Categories({ categoryData, appData, pageData }) {
   }, [fetchTrends])
   useEffect(() => {
     if (socket) {
-      socket.on('category_trends', (trends) => setTrends(trends))
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
-        socket.off('category_trends')
         socket.off('new_trends')
       }
     }

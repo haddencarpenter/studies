@@ -89,7 +89,7 @@ export default function Coin(coin) {
       socket.emit('get_trends', {
         coinId: coin.id,
         flavor: SUPERTREND_FLAVOR.coinrotator
-      })
+      }, (trends) => setTrends(trends))
     }
   }, [socket, coin.id])
   useEffect(() => {
@@ -122,14 +122,12 @@ export default function Coin(coin) {
         }
       })
 
-      socket.on('trends', (trends) => setTrends(trends))
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
         socket.off('i')
         socket.off('p')
-        socket.off('trends')
         socket.off('new_trends')
       }
     }

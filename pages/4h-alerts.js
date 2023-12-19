@@ -31,7 +31,7 @@ export default function FourHourAlerts({ alerts, appData }) {
     if (socket) {
       socket.emit('get_trends', {
         flavor: SUPERTREND_FLAVOR.coinrotator,
-      })
+      }, (trends) => setTrends(trends))
     }
   }, [socket])
   useEffect(() => {
@@ -40,12 +40,10 @@ export default function FourHourAlerts({ alerts, appData }) {
   }, [fetchTrends])
   useEffect(() => {
     if (socket) {
-      socket.on('trends', (trends) => setTrends(trends))
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
-        socket.off('trends')
         socket.off('new_trends')
       }
     }

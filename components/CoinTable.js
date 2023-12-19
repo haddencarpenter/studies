@@ -74,12 +74,18 @@ const CoinTable = ({
           if (outdated) {
             socket.emit('get_trends', {
               flavor: superTrendFlavor,
+            }, (trends) => {
+              sessionStorage.setItem(`trends_${superTrendFlavor}`, JSON.stringify(trends))
+              updateTrends(trends)
             })
           }
         })
       } else {
         socket.emit('get_trends', {
           flavor: superTrendFlavor,
+        }, (trends) => {
+          sessionStorage.setItem(`trends_${superTrendFlavor}`, JSON.stringify(trends))
+          updateTrends(trends)
         })
       }
     }
@@ -106,17 +112,12 @@ const CoinTable = ({
         })
       })
 
-      socket.on('trends', (trends) => {
-        sessionStorage.setItem(`trends_${superTrendFlavor}`, JSON.stringify(trends))
-        updateTrends(trends)
-      })
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
         socket.off('i')
         socket.off('p')
-        socket.off('trends')
         socket.off('new_trends')
       }
     }

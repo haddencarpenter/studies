@@ -73,7 +73,7 @@ export default function WatchList({ exchangeData, appData, pageData }) {
     if (socket) {
       socket.emit('get_trends', {
         flavor: SUPERTREND_FLAVOR.coinrotator
-      })
+      }, (trends) => setTrends(trends))
     }
   }, [socket])
   useEffect(() => {
@@ -82,12 +82,10 @@ export default function WatchList({ exchangeData, appData, pageData }) {
   }, [fetchTrends])
   useEffect(() => {
     if (socket) {
-      socket.on('trends', (trends) => setTrends(trends))
       socket.on('new_trends', fetchTrends)
     }
     return () => {
       if (socket) {
-        socket.off('trends')
         socket.off('new_trends')
       }
     }
