@@ -1,4 +1,4 @@
-import { Layout, Card } from 'antd';
+import { Layout, Card, Skeleton } from 'antd';
 import { useContext, useCallback, useEffect, useState } from 'react'
 import subDays from 'date-fns/subDays';
 import addDays from 'date-fns/addDays';
@@ -79,11 +79,13 @@ export default function MarketHealth({ appData, pageData }) {
       <PageHeader lastUpdated={appData.lastUpdated} title={pageData.title} explainer={pageData.content}/>
       <Content className={baseStyles.container}>
         <Card className={styles.marketHealthCard}>
-          <MarketHealthChart
-            historicDailySuperSuperTrends={historicDailySuperSuperTrends}
-            screens={screens}
-            darkMode={darkMode}
-          />
+          { trends === null ? <Skeleton active/> : (
+            <MarketHealthChart
+              historicDailySuperSuperTrends={historicDailySuperSuperTrends}
+              screens={screens}
+              darkMode={darkMode}
+            />
+          )}
         </Card>
       </Content>
     </>
