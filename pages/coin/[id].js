@@ -241,7 +241,7 @@ export default function Coin(coin) {
               </Space>
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {dailySignalTag}
-                {Object.keys(trends?.daily || {}).filter(key => key !== 'supersuperTrend').map((trendKey) => {
+                {Object.keys(trends?.daily || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
                   const trend = trends.daily[trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
@@ -269,7 +269,7 @@ export default function Coin(coin) {
               </Space>
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {weeklySignalTag}
-                {Object.keys(trends?.weekly || {}).filter(key => key !== 'supersuperTrend').map((trendKey) => {
+                {Object.keys(trends?.weekly || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
                   const trend = trends.weekly[trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
