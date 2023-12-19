@@ -16,6 +16,10 @@ export default function Document() {
         <meta name="theme-color" content="#ffffff"></meta>
       </Head>
       <body>
+        <script>
+          const date = new Date();
+          console.log(date.toLocaleTimeString(), date.getMilliseconds());
+        </script>
         <Main />
         <NextScript />
       </body>
