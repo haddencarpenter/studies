@@ -1,6 +1,6 @@
 import { HttpProxyAgent, HttpsProxyAgent } from 'hpagent'
 
-import { proxyList } from './variables.mjs'
+import { proxyList } from 'coinrotator-utils/variables.mjs'
 
 let agentList
 let agentListIndex = 0

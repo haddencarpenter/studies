@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy'
 import sumBy from 'lodash/sumBy'
 
-import { excludedExchanges } from './variables.mjs'
+import { excludedExchanges } from 'coinrotator-utils/variables.mjs'
 
 export default function convertTickersToExchanges(tickers) {
   tickers = tickers.filter(ticker => !excludedExchanges.includes(ticker.market?.identifier))

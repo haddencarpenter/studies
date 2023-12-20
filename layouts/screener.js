@@ -20,13 +20,15 @@ export default function ScreenerLayout(page, pageProps) {
   const isDark = darkMode[0]
   const setSocket = useSocketStore(state => state.setSocket)
   useEffect(() => {
-    console.log("Connecting to WebSocket server...");
+    const date = new Date();
+    console.log("Connecting to WebSocket server...", date.toLocaleTimeString(), date.getMilliseconds());
     const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER_URL, {
       transports: ["websocket"],
     });
 
     newSocket.on("connect", () => {
-      console.log("Connected to WebSocket server");
+      const date = new Date();
+      console.log("Connected to WebSocket server", date.toLocaleTimeString(), date.getMilliseconds());
     });
 
     setSocket(newSocket);

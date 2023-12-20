@@ -1,4 +1,4 @@
-import { signals } from './variables.mjs'
+import { signals } from 'coinrotator-utils/variables.mjs'
 
 export default function tableSort(reverseMarketCapSort) {
   return function(a, b, sortOrder) {

@@ -4,27 +4,23 @@ import { useHydrated } from "react-hydration-provider";
 import { useRouter } from 'next/router'
 import slugify from 'slugify';
 import classnames from 'classnames';
-import { useCallback } from 'react';
-import mapValues from 'lodash/mapValues';
-import zip from 'lodash/zip';
+import { useCallback, useState, useEffect } from 'react';
 import { gql } from '@urql/core'
 import pick from 'lodash/pick';
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
 
 import baseStyles from '../../styles/base.module.less'
 import indexStyles from '../../styles/index.module.less'
 import globalData from '../../lib/globalData';
 import PageHeader from '../../components/PageHeader'
-import { getSuperTrends } from '../../utils/getTrends.mjs'
-import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
 import prisma from "../../lib/prisma.mjs";
 import useVirtualTable from '../../hooks/useVirtualTable';
-import mode from '../../utils/mode';
 import { dailySuperSuperTrend, weeklySuperSuperTrend, marketCap, dailySuperSuperTrendStreak, weeklySuperSuperTrendStreak } from '../../utils/sharedColumns';
 import useIsHoverable from '../../hooks/useIsHoverable';
+import useSocketStore from '../../hooks/useSocketStore';
 import strapi from '../../utils/strapi';
 
 import tableStyles from '../../styles/table.module.less'
-import supersupertrend from '../../utils/supersupertrend.mjs';
 
 export default function Categories({ categoryData, appData, pageData }) {
   const router = useRouter()
@@ -35,6 +31,29 @@ export default function Categories({ categoryData, appData, pageData }) {
       onClick: () => router.push(`/category/${slugify(record.name)}`)
     }
   }, [router])
+  const socket = useSocketStore(state => state.socket)
+  const [trends, setTrends] = useState(null)
+  const fetchTrends = useCallback(() => {
+    if (socket) {
+      socket.emit('get_category_trends', {
+        flavor: SUPERTREND_FLAVOR.coinrotator,
+      }, (trends) => setTrends(trends))
+    }
+  }, [socket])
+  useEffect(() => {
+    console.log('useeffect fetch trends')
+    fetchTrends()
+  }, [fetchTrends])
+  useEffect(() => {
+    if (socket) {
+      socket.on('new_trends', fetchTrends)
+    }
+    return () => {
+      if (socket) {
+        socket.off('new_trends')
+      }
+    }
+  }, [socket, fetchTrends])
   const columns = [
     {
       title: 'Category',
@@ -89,6 +108,18 @@ export default function Categories({ categoryData, appData, pageData }) {
       }
     }
   ]
+  const tableData = categoryData.map((category) => {
+    if (trends) {
+      const matchingDailyCategory = trends.daily[category.name]
+      const matchingWeeklyCategory = trends.weekly[category.name]
+      category.dailySuperSuperTrend = matchingDailyCategory[0]
+      category.dailySuperSuperTrendStreak = matchingDailyCategory[1]
+      category.weeklySuperSuperTrend = matchingWeeklyCategory[0]
+      category.weeklySuperSuperTrendStreak = matchingWeeklyCategory[1]
+    }
+
+    return category
+  })
   return (
     <>
       <Head>
@@ -100,7 +131,7 @@ export default function Categories({ categoryData, appData, pageData }) {
         <Row className={indexStyles.tableRow}>
           <Table
             columns={columns}
-            dataSource={categoryData}
+            dataSource={tableData}
             rowClassName={tableStyles.row}
             pagination={{ position: ['none', 'none'], pageSize: 1000 }}
             className={tableStyles.table}
@@ -151,26 +182,6 @@ export async function getStaticProps() {
   } else {
     coinsData = await prisma.coin.findMany({...coinQuery, take: 1000})
   }
-  coinsData = await chunkedPromiseAll(coinsData, 5, async (coinData) => {
-    let [dailyTrends, dailySuperSuperTrend, _dailySuperSuperTrendStreak] = await getSuperTrends(coinData.id)
-    let [weeklyTrends, weeklySuperSuperTrend] = await getSuperTrends(coinData.id, { weekly: true })
-
-    dailyTrends = mapValues(dailyTrends, trend => trend[2].reverse())
-    dailyTrends = zip(...Object.values(dailyTrends))
-    dailyTrends = dailyTrends.map((dailyTrend) => supersupertrend(dailyTrend))
-
-    weeklyTrends = mapValues(weeklyTrends, trend => trend[2].reverse())
-    weeklyTrends = zip(...Object.values(weeklyTrends))
-    weeklyTrends = weeklyTrends.map((dailyTrend) => supersupertrend(dailyTrend))
-
-    return {
-      ...coinData,
-      dailySuperSuperTrend,
-      weeklySuperSuperTrend,
-      dailyTrends,
-      weeklyTrends,
-    }
-  })
   const categoryData = []
   for (const coin of coinsData) {
     coin.image = coin.images.small
@@ -189,33 +200,6 @@ export async function getStaticProps() {
     }
   }
   for (const category of categoryData) {
-    let allDailyCoinTrends = zip(...category.coins.map(coin => coin.dailyTrends))
-    allDailyCoinTrends = allDailyCoinTrends.map((dailyCoinTrends) => dailyCoinTrends.filter(trend => trend !== undefined))
-    const dailyCategoryTrends = allDailyCoinTrends.map((dailyCoinTrends) => mode(dailyCoinTrends))
-    let [dailyCurrentTrend, dailyTrendStreak] = [dailyCategoryTrends[0], 0];
-    for (let i = 0; i < dailyCategoryTrends.length; i++) {
-      if (dailyCurrentTrend === dailyCategoryTrends[i]) {
-        dailyTrendStreak++
-      } else {
-        break
-      }
-    }
-    category.dailySuperSuperTrendStreak = dailyTrendStreak
-
-    let allWeeklyCoinTrends = zip(...category.coins.map(coin => coin.weeklyTrends))
-    allWeeklyCoinTrends = allWeeklyCoinTrends.map((weeklyCoinTrends) => weeklyCoinTrends.filter(trend => trend !== undefined))
-    const weeklyCategoryTrends = allWeeklyCoinTrends.map((weeklyCoinTrends) => mode(weeklyCoinTrends))
-    let [weeklyCurrentTrend, weeklyTrendStreak] = [weeklyCategoryTrends[0], 0];
-    for (let i = 0; i < weeklyCategoryTrends.length; i++) {
-      if (weeklyCurrentTrend === weeklyCategoryTrends[i]) {
-        weeklyTrendStreak++
-      } else {
-        break
-      }
-    }
-    category.weeklySuperSuperTrendStreak = weeklyTrendStreak
-    category.dailySuperSuperTrend = mode(category.coins.map(coin => coin.dailySuperSuperTrend))
-    category.weeklySuperSuperTrend = mode(category.coins.map(coin => coin.weeklySuperSuperTrend))
     category.marketCap = category.coins.reduce((acc, coin) => acc + Number(coin.marketCap), 0)
     category.coins = category.coins.sort((a, b) => a.marketCapRank - b.marketCapRank).slice(0, 5)
     category.coins = category.coins.map(coin => pick(coin, ['id', 'name', 'image']))

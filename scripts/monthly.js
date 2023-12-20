@@ -6,7 +6,7 @@ import levenshtein from 'js-levenshtein';
 import prisma from '../lib/prisma.mjs'
 import coinGecko, { getExchange } from '../lib/coinGecko.mjs';
 import { getCoin, getCoins } from '../lib/coinpaprika.mjs'
-import { excludedExchanges } from '../utils/variables.mjs';
+import { excludedExchanges } from 'coinrotator-utils/variables.mjs';
 
 dotenv.config();
 

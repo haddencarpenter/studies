@@ -9,9 +9,9 @@ import { promises as fs } from 'fs';
 import prisma from '../lib/prisma.mjs'
 import supertrend from '../utils/supertrend.mjs'
 import convertToDailySignals from '../utils/convertToDailySignals.mjs';
-import { defaultAtrPeriods, defaultMultiplier } from '../utils/variables.mjs'
-import supersupertrend from '../utils/supersupertrend.mjs';
-import { signals } from '../utils/variables.mjs';
+import { defaultAtrPeriods, defaultMultiplier } from 'coinrotator-utils/variables.mjs'
+import supersupertrend from 'coinrotator-utils/supersupertrend.mjs';
+import { signals } from 'coinrotator-utils/variables.mjs';
 
 dotenv.config();
 

@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual'
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
 
-import { signals, SUPERTREND_FLAVOR } from '../utils/variables.mjs'
+import { signals, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
 
 const useTableFilters = (coinsData, showDerivativesByDefault = false) => {
   const router = useRouter()

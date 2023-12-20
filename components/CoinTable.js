@@ -11,7 +11,7 @@ import WatchlistStar from './WatchlistStar';
 import useIsHoverable from '../hooks/useIsHoverable';
 import useVirtualTable from '../hooks/useVirtualTable';
 import useSocketStore from '../hooks/useSocketStore';
-import { signals, preferredExchanges, SUPERTREND_FLAVOR } from '../utils/variables'
+import { signals, preferredExchanges } from 'coinrotator-utils/variables.mjs'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
 import { getImageURL } from '../utils/minifyImageURL';
 import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap, exchanges as exchangesCol } from '../utils/sharedColumns';
@@ -38,6 +38,8 @@ const CoinTable = ({
     showTrendStreak = true,
     showExchanges = true,
     defaultSort = ['dailySuperSuperTrend', 'ascend'],
+    filter,
+    passTrends,
   }) => {
 
   const router = useRouter()
@@ -47,6 +49,13 @@ const CoinTable = ({
   const [watchlistCoins, setWatchlistCoins] = useState([])
   const socket = useSocketStore(state => state.socket)
   const [prices, setPrices] = useState({})
+  const [trends, setTrends] = useState(null)
+  const updateTrends = useCallback((trends) => {
+    setTrends(trends)
+    if (passTrends) {
+      passTrends(trends)
+    }
+  }, [passTrends])
 
   const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 9 }), [])
   useEffect(() => {
@@ -55,6 +64,36 @@ const CoinTable = ({
       setPrices(prices)
     }
   }, [])
+  const fetchTrends = useCallback(() => {
+    if (socket) {
+      let cache = sessionStorage.getItem(`trends_${superTrendFlavor}`)
+      cache = JSON.parse(cache)
+      if (cache) {
+        updateTrends(cache)
+        socket.emit('get_trends_outdated', cache.lastUpdated, (outdated) => {
+          if (outdated) {
+            socket.emit('get_trends', {
+              flavor: superTrendFlavor,
+            }, (trends) => {
+              sessionStorage.setItem(`trends_${superTrendFlavor}`, JSON.stringify(trends))
+              updateTrends(trends)
+            })
+          }
+        })
+      } else {
+        socket.emit('get_trends', {
+          flavor: superTrendFlavor,
+        }, (trends) => {
+          sessionStorage.setItem(`trends_${superTrendFlavor}`, JSON.stringify(trends))
+          updateTrends(trends)
+        })
+      }
+    }
+  }, [socket, superTrendFlavor, updateTrends])
+  useEffect(() => {
+    console.log('useeffect fetch trends')
+    fetchTrends()
+  }, [fetchTrends])
   useEffect(() => {
     if (socket) {
       socket.on("i", (prices) => {
@@ -72,8 +111,17 @@ const CoinTable = ({
           return newPrices
         })
       })
+
+      socket.on('new_trends', fetchTrends)
     }
-  }, [socket, currencyFormatter])
+    return () => {
+      if (socket) {
+        socket.off('i')
+        socket.off('p')
+        socket.off('new_trends')
+      }
+    }
+  }, [socket, fetchTrends, updateTrends, superTrendFlavor])
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
@@ -102,16 +150,22 @@ const CoinTable = ({
     }
   }, [watchlistCoins, notification])
 
-  if (superTrendFlavor === SUPERTREND_FLAVOR.classic) {
-    coinsData = coinsData.map((coinData) => {
-      coinData.dailySuperSuperTrend = coinData.dailyClassicSuperSuperTrend
-      coinData.weeklySuperSuperTrend = coinData.weeklyClassicSuperSuperTrend
-      coinData.dailySuperSuperTrendStreak = coinData.dailyClassicSuperSuperTrendStreak
-
-      return coinData
-    })
-  }
-  let displayedCoinData = coinsData.filter((coinData) => {
+  let displayedCoinData = coinsData.map((coinData) => {
+    if (trends) {
+      const dailyTrend = trends.daily[coinData.id].supersuperTrend
+      if (dailyTrend) {
+        coinData.dailySuperSuperTrend = dailyTrend.trend
+        coinData.dailySuperSuperTrendStreak = dailyTrend.streak
+      }
+      const weeklyTrend = trends.weekly[coinData.id].supersuperTrend
+      if (weeklyTrend) {
+        coinData.weeklySuperSuperTrend = weeklyTrend.trend
+        coinData.weeklySuperSuperTrendStreak = weeklyTrend.streak
+      }
+    }
+    return coinData
+  })
+  displayedCoinData = coinsData.filter((coinData) => {
     const max = marketCapMax || Number.POSITIVE_INFINITY
     const min = marketCapMin || Number.NEGATIVE_INFINITY
     const coinSymbolLower = coinData.symbol.toLowerCase()
@@ -135,7 +189,11 @@ const CoinTable = ({
     let max = parseInt(trendLengthMax)
     max = isFinite(max) ? max : Number.POSITIVE_INFINITY
 
-    return coinData.dailySuperSuperTrendStreak >= min && coinData.dailySuperSuperTrendStreak <= max
+    if (coinData.dailySuperSuperTrendStreak) {
+      return coinData.dailySuperSuperTrendStreak >= min && coinData.dailySuperSuperTrendStreak <= max
+    } else {
+      return true
+    }
   })
   displayedCoinData = displayedCoinData.filter((coinData) => {
     if (trendType === signals.all) {
@@ -148,6 +206,10 @@ const CoinTable = ({
       return coinData.dailySuperSuperTrend === signals.sell
     }
   })
+
+  if (filter) {
+    displayedCoinData = displayedCoinData.filter(filter)
+  }
 
   const tableData = displayedCoinData.map((coinData) => {
     let shownDerivatives = coinData.derivatives || []
@@ -186,6 +248,7 @@ const CoinTable = ({
       dailySuperSuperTrend: coinData.dailySuperSuperTrend,
       dailySuperSuperTrendStreak: coinData.dailySuperSuperTrendStreak,
       weeklySuperSuperTrend: coinData.weeklySuperSuperTrend,
+      weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
     }
   })
 
