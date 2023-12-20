@@ -5,6 +5,7 @@ import {
   HeartFilled,
   AlertFilled,
   TeamOutlined,
+  SnippetsOutlined,
   QuestionCircleFilled,
   ContainerFilled,
   VideoCameraFilled,
@@ -197,6 +198,11 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           label: <Link href="/terms">Terms & Conditions</Link>,
           key: '/terms',
           icon: <ContainerFilled className={styles.polarGreen} />
+        },
+        {
+          label: 'Sitemap',
+          icon: <Link href="/sitemap.xml"><SnippetsOutlined className={styles.daybreakBlue} /></Link>,
+          key: '/sitemap.xml'
         }
       ]
     },
@@ -242,6 +248,11 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
         label: 'Terms & Conditions',
         icon: <Link href="/terms"><ContainerFilled className={styles.polarGreen} /></Link>,
         key: '/terms'
+      },
+      {
+        label: 'Sitemap',
+        icon: <Link href="/sitemap.xml"><SnippetsOutlined className={styles.daybreakBlue} /></Link>,
+        key: '/sitemap.xml'
       }
     ]
   }
