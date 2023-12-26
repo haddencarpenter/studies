@@ -152,12 +152,12 @@ const CoinTable = ({
 
   let displayedCoinData = coinsData.map((coinData) => {
     if (trends) {
-      const dailyTrend = trends.daily[coinData.id].supersuperTrend
+      const dailyTrend = trends.daily[coinData.id]?.supersuperTrend
       if (dailyTrend) {
         coinData.dailySuperSuperTrend = dailyTrend.trend
         coinData.dailySuperSuperTrendStreak = dailyTrend.streak
       }
-      const weeklyTrend = trends.weekly[coinData.id].supersuperTrend
+      const weeklyTrend = trends.weekly[coinData.id]?.supersuperTrend
       if (weeklyTrend) {
         coinData.weeklySuperSuperTrend = weeklyTrend.trend
         coinData.weeklySuperSuperTrendStreak = weeklyTrend.streak
