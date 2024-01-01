@@ -24,12 +24,12 @@ const HUMAN_PAGE_NAMES_EXCEPTIONS = {
   'index': 'Home'
 }
 const HUMANIZE_PAGE_NAMES = page => HUMAN_PAGE_NAMES_EXCEPTIONS[page] || startCase(page)
-const APPLICATION_PAGES = ['terms', 'faq', 'watchlist']
+const INFOMATION_PAGES = ['terms', 'faq']
 
 export default function Sitemap({ coinsData, appData, pageData, shallowPages }) {
   const breadCrumbItemClass = classnames('ant-breadcrumb-link', sitemapStyles.breadcrumb)
-  const informationPages = shallowPages.filter(page => !APPLICATION_PAGES.includes(page))
-  const applicationPages = shallowPages.filter(page => APPLICATION_PAGES.includes(page))
+  const toolsPages = shallowPages.filter(page => !INFOMATION_PAGES.includes(page))
+  const informationPages = shallowPages.filter(page => INFOMATION_PAGES.includes(page))
   return (
     <>
       <Head>
@@ -39,17 +39,17 @@ export default function Sitemap({ coinsData, appData, pageData, shallowPages }) 
       <PageHeader lastUpdated={appData.lastUpdated} title={pageData.title} explainer={pageData.content}/>
       <Layout.Content className={sitemapStyles.container}>
         <Breadcrumb separator="|" className={sitemapStyles.breadcrumbs}>
+          <Breadcrumb.Item href="#tools" className={breadCrumbItemClass}>Tools</Breadcrumb.Item>
           <Breadcrumb.Item href="#information" className={breadCrumbItemClass}>Information</Breadcrumb.Item>
-          <Breadcrumb.Item href="#application" className={breadCrumbItemClass}>Application</Breadcrumb.Item>
           <Breadcrumb.Item href="#coins" className={breadCrumbItemClass}>Coins</Breadcrumb.Item>
           <Breadcrumb.Item href="#categories" className={breadCrumbItemClass}>Categories</Breadcrumb.Item>
         </Breadcrumb>
-        <Title id="information" level={2} className={sitemapStyles.title}>Information</Title>
-        {informationPages.map(page =>
+        <Title id="tools" level={2} className={sitemapStyles.title}>Tools</Title>
+        {toolsPages.map(page =>
           <Link prefetch={false} className={sitemapStyles.link} href={`/${page}`} key={page}>{HUMANIZE_PAGE_NAMES(page)}</Link>
         )}
-        <Title id="application" level={2} className={sitemapStyles.title}>Application</Title>
-        {applicationPages.map(page =>
+        <Title id="information" level={2} className={sitemapStyles.title}>Information</Title>
+        {informationPages.map(page =>
           <Link prefetch={false} className={sitemapStyles.link} href={`/${page}`} key={page}>{HUMANIZE_PAGE_NAMES(page)}</Link>
         )}
 
