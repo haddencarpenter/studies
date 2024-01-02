@@ -133,9 +133,10 @@ export default function Coin(coin) {
     }
   }, [socket, coin.symbol, currencyFormatter, fetchTrends])
 
-  const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | ${dailySignal.toUpperCase()} | Daily Crypto Screener`
-  const ogTitle = `${coin.name} | ${dailySignal.toUpperCase()} | ${dateFormatter.format(new Date())} | Coinrotator`
-  const metaDescription = `Coinrotator issues a daily trend for ${coin.name}. A coin screener that captures strong momentum in both directions!`
+  const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | Daily Crypto Trend Screener`
+  const metaDescription = `Daily insights on ${coin.name} (${coin.symbol})! Discover Coinrotator's comprehensive trend analysis for multiple timeframes.`
+  const ogTitle = `${coin.name} trends for ${dateFormatter.format(new Date())}`
+  const ogDescription = `CoinRotator shows daily insights on ${coin.symbol} trends!`
 
   const router = useRouter();
   const [isWatched, setIsWatched] = useState(false);
@@ -198,7 +199,7 @@ export default function Coin(coin) {
       <title key="title">{metaTitle}</title>
       <meta name="description" key="description" content={metaDescription}/>
       <meta property="og:title" content={ogTitle} />
-      <meta property="og:description" content={metaDescription} />
+      <meta property="og:description" content={ogDescription} />
       <meta property="og:url" content={coin.currentUrl} />
       <meta property="og:type" content="app" />
       <meta property="og:locale" content="en_US" />
