@@ -15,66 +15,70 @@ const fetchCoinData = async (url, coin, page) => {
     3
   )
 
+  let launch_date_start
   let [
+    is404,
+    categories,
     launch_roi_usd,
     launch_roi_btc,
     launch_roi_eth,
-    launch_price,
-    launch_date_start,
-    launch_date_end,
-    categories,
-    is404
   ] = await page.evaluate(() => {
-    const icoAndRoiSection = Array.from(document.querySelectorAll('h3'))?.find((h3 => h3.innerText.includes("ROI since ICO")))?.nextSibling
-    const roiSection = icoAndRoiSection?.firstChild
-    const icoSection = icoAndRoiSection?.lastChild
+    let data = []
+    const is404 = window.find('Error 404')
+    data.push(is404)
 
-    let data = [null, null, null, null, null, null]
-    if (roiSection || icoSection) {
-      const currencySections = Array.from(roiSection.querySelectorAll('div'))
-      const rois = currencySections.map((currencySection) => {
-        const roi = Number(currencySection.firstChild.innerText.replace('x', ''))
-        return isNaN(roi) ? null : roi
-      })
-      const usdRoi = rois[0]
-      const btcRoi = rois[1]
-      const ethRoi = rois[2]
+    if (!is404) {
+      const tagsList = Array.from(document.querySelectorAll('h4'))?.find(node => node.innerText === 'Tags')?.nextSibling
+      if (tagsList) {
+        const tags = Array.from(tagsList.querySelectorAll('li') || []).map(x => x.innerText)
+        data.push(tags)
+      } else {
+        data.push([])
+      }
 
-      const sections = Array.from(icoSection.querySelectorAll('div'))
-      const launchPriceSection = sections[1]
-      const launchDateSection = sections[2]
-      let launchPrice = launchPriceSection.lastChild.innerText.replace('$', '').replace(',', '').trim();
-      if (isNaN(launchPrice)) { launchPrice = null }
-
-      const launchDate = launchDateSection.lastChild.innerText.split(' - ')
-
-      data = [usdRoi, btcRoi, ethRoi, launchPrice, launchDate[0], launchDate[1]]
+      const roiSection = Array.from(document.querySelectorAll('span'))?.find((span => span.innerText.includes("ROI since ICO")))?.nextSibling
+      if (roiSection) {
+        const currencySections = Array.from(roiSection.querySelectorAll('div'))
+        const rois = currencySections.map((currencySection) => {
+          const roi = Number(currencySection.firstChild.innerText.replace('x', ''))
+          return isNaN(roi) ? null : roi
+        })
+        const usdRoi = rois[0]
+        const btcRoi = rois[1]
+        const ethRoi = rois[2]
+        data.push(usdRoi, btcRoi, ethRoi)
+      }
     }
-    const tags = Array.from(document.querySelector('ul[aria-label="Tags"]')?.querySelectorAll('li') || []).map(x => x.innerText)
-    data.push(tags)
-    data.push(window.find('Error 404'))
     return data
   });
 
-  launch_date_start = Date.parse(launch_date_start);
-  launch_date_start = isNaN(launch_date_start) ? null : new Date(launch_date_start);
-  launch_date_end = Date.parse(launch_date_end);
-  launch_date_end = isNaN(launch_date_end) ? null : new Date(launch_date_end);
   categories = await overrideCoinCategories(coin.name, coin.symbol, categories)
 
   if (is404) {
     console.log(coin, 'not found on dropstab')
     return
+  } else {
+    await retry(
+      () => page.goto(`${url}/fundraising`, {waitUntil: 'domcontentloaded'}),
+      3
+    )
+    launch_date_start = await page.evaluate(() => {
+      const launchDateSection = Array.from(document.querySelectorAll('dt')).find(node => node.innerText === 'Trade Launch Date')
+      if (launchDateSection) {
+        return launchDateSection.nextSibling.innerText
+      } else {
+        return null
+      }
+    })
   }
 
+  launch_date_start = isNaN(Date.parse(launch_date_start)) ? null : new Date(launch_date_start)
   await prisma.coin.update({
     where: {
       id: coin.id
     },
     data: {
-      launch_price,
       launch_date_start,
-      launch_date_end,
       launch_roi_usd,
       launch_roi_btc,
       launch_roi_eth,
@@ -95,7 +99,7 @@ const dropsTab = async () => {
         id: true,
         name: true,
         symbol: true,
-      },
+      }
     })
 
     const page = await browser.newPage();
