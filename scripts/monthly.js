@@ -91,6 +91,6 @@ const fetchCoinpaprikaData = async () => {
 }
 
 setTimeout(async () => {
-  await fetchCoinpaprikaData()
   await fetchExchanges()
+  await fetchCoinpaprikaData()
 }, 99);
