@@ -1,6 +1,5 @@
 import axios from 'axios'
 import dotenv from 'dotenv';
-import subDays from 'date-fns/subDays/index.js'
 import levenshtein from 'js-levenshtein';
 import chunk from 'lodash/chunk.js'
 import groupBy from 'lodash/groupBy.js'
@@ -269,6 +268,7 @@ const fetchCoinDataAndOhlcs = async () => {
   if (process.env.NODE_ENV == "development") {
     coinIds = coinIds.slice(0, 10)
   }
+  coinIds = ['ethereum']
   const chunkedCoinIds = chunk(coinIds, 5)
 
   const coinsToFetchOhlcsFor = []

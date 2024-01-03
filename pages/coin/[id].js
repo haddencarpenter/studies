@@ -134,7 +134,7 @@ export default function Coin(coin) {
   }, [socket, coin.symbol, currencyFormatter, fetchTrends])
 
   const metaTitle = `${coin.name} (${coin.symbol.toUpperCase()}) | Daily Crypto Trend Screener`
-  const metaDescription = `Daily insights on ${coin.name} (${coin.symbol})! Discover Coinrotator's comprehensive trend analysis for multiple timeframes.`
+  const metaDescription = `Daily insights on ${coin.name} (${coin.symbol.toUpperCase()})! Discover Coinrotator's comprehensive trend analysis for multiple timeframes.`
   const ogTitle = `${coin.name} trends for ${dateFormatter.format(new Date())}`
   const ogDescription = `CoinRotator shows daily insights on ${coin.symbol} trends!`
 

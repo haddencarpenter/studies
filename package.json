@@ -21,7 +21,8 @@
     "ohlcToSupertrendMigration": "swc scripts/ohlcToSupertrendMigration.js -o dist/ohlcToSupertrendMigration.mjs",
     "fixWeeklyTrends": "swc scripts/fixWeeklyTrends.js -o dist/fixWeeklyTrends.mjs",
     "start": "next start",
-    "overrideCategories": "swc scripts/overrideCategories.js -o dist/overrideCategories.mjs"
+    "overrideCategories": "swc scripts/overrideCategories.js -o dist/overrideCategories.mjs",
+    "debbb": "node dist/daily.mjs"
   },
   "dependencies": {
     "@ant-design/plots": "^1.2.5",
