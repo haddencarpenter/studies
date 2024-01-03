@@ -268,7 +268,6 @@ const fetchCoinDataAndOhlcs = async () => {
   if (process.env.NODE_ENV == "development") {
     coinIds = coinIds.slice(0, 10)
   }
-  coinIds = ['ethereum']
   const chunkedCoinIds = chunk(coinIds, 5)
 
   const coinsToFetchOhlcsFor = []
