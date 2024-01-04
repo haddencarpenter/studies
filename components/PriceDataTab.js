@@ -176,15 +176,7 @@ const PriceDataTab = ({ coin, screens }) => {
               <div className={coinStyles.data}>
                 <Title level={3} className={coinStyles.label}>ICO Date</Title>
                 {
-                  coin.launch_date_start?.getTime() == coin.launch_date_end?.getTime() ? (
-                    <span className={coinStyles.value}>{hydrated ? dateFormatter.format(coin.launch_date_start) : dateFormatter.format(coin.launch_date_start)}</span>
-                  ) : (
-                    <>
-                      <span className={coinStyles.value}>{hydrated ? dateFormatter.format(coin.launch_date_start) : dateFormatter.format(coin.launch_date_start)}</span>
-                      {` - `}
-                      <span className={coinStyles.value}>{hydrated ? dateFormatter.format(coin.launch_date_end) : dateFormatter.format(coin.launch_date_end)}</span>
-                    </>
-                  )
+                  <span className={coinStyles.value}>{dateFormatter.format(coin.launch_date_start)}</span>
                 }
               </div>
             ) : (
