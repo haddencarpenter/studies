@@ -151,7 +151,7 @@ export default function FourHourAlerts({ alerts, appData }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps(ctx) {
   const appData = await globalData();
   const alerts = await prisma.FourHourTrends.findMany({
     take: 1000,
@@ -208,11 +208,14 @@ export async function getStaticProps() {
     alerts.splice(i, 1)
   }
 
+  ctx.res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=60'
+  )
   return {
     props: {
       alerts,
       appData
-    },
-    revalidate: 60 * 30 // 30 minutes
+    }
   }
 }
