@@ -72,12 +72,6 @@ export default function FourHourAlerts({ alerts, appData }) {
       }
     },
     {
-      width: 100,
-      ...dailySuperSuperTrend(router, isHoverable, false, 'fourHourTrend'),
-      title: 'Trend',
-      onCell: onCellClick
-    },
-    {
       title: 'Timestamp',
       width: 120,
       onCell: onCellClick,
@@ -90,12 +84,18 @@ export default function FourHourAlerts({ alerts, appData }) {
     },
     {
       width: 100,
-      ...dailySuperSuperTrend(router, isHoverable),
+      ...dailySuperSuperTrend(router, isHoverable, false, 'fourHourTrend'),
+      title: 'Trend',
+      onCell: onCellClick
     },
     {
       width: 90,
       ...dailySuperSuperTrendStreak(router, isHoverable),
     },
+    // {
+    //   width: 100,
+    //   ...dailySuperSuperTrend(router, isHoverable),
+    // },
     // {
     //   width: 100,
     //   ...weeklySuperSuperTrend(router, isHoverable),
