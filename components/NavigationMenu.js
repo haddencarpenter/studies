@@ -50,11 +50,11 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           key: '/categories',
           icon: <TagsOutlined className={styles.sunsetOrange} />
         },
-        // {
-        //   label: <Link href="/4h-alerts" prefetch={false}>4h Alerts</Link>,
-        //   key: '/4h-alerts',
-        //   icon: <TagsOutlined className={styles.daybreakBlue} />
-        // },
+        {
+          label: <Link href="/4h-alerts">4h Alerts</Link>,
+          key: '/4h-alerts',
+          icon: <TagsOutlined className={styles.daybreakBlue} />
+        },
         {
           label: <Link href="https://www.tradingview.com/script/yNrotMjf-CoinRotator" target="_blank"  rel="noopener noreferrer">TradingView indicator</Link>,
           key: '/tradingview-indicator',

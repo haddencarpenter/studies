@@ -1822,7 +1822,7 @@ code-block-writer@^10.1.1:
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
   version "1.0.0"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#8fe94a8f72575b67a47364951de66ab992d8210d"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#08a961c953c9ffc4b3bfb41fce0f800829523111"
   dependencies:
     lodash "^4.17.21"
 
