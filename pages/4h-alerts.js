@@ -74,7 +74,7 @@ export default function FourHourAlerts({ alerts, appData }) {
     {
       width: 100,
       ...dailySuperSuperTrend(router, isHoverable, false, 'fourHourTrend'),
-      title: 'Trend',
+      title: 'Trend (4h)',
       onCell: onCellClick
     },
     {
