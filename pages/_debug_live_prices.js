@@ -47,7 +47,7 @@ export default function LivePriceDebugger({ coins, appData }) {
   const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 9 }), [])
   useEffect(() => {
     if (socket) {
-      socket.on("debug_i", (prices) => {
+      socket.emit('debug_i', (prices) => {
         const now = Date.now()
         Object.entries(prices).forEach(([coinSymbol, price]) => {
           prices[coinSymbol] = {
@@ -57,7 +57,8 @@ export default function LivePriceDebugger({ coins, appData }) {
         })
         setPrices(prices)
         console.debug("Received initial prices", prices);
-      });
+        socket.emit('room', 'debuggers')
+      })
 
       socket.on('debug_p', (priceUpdates) => {
         setPrices((prevPrices) => {
