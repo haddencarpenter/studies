@@ -78,6 +78,8 @@ model Coin {
   coinpaprikaTeam              Json?
   coinpaprikaWhitepaper        Json?
   coinpaprikaTags              Json?
+  openInterest                 Decimal?
+  fundingRate                  Decimal?
   coinTimes                    CoinTime[]
   ohlcs                        Ohlc[]
   superTrends                  SuperTrend[]
