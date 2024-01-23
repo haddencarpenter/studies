@@ -30,6 +30,9 @@ export async function getStaticProps() {
       fullyDilutedValuation: true,
       circulatingSupply: true,
       totalSupply: true,
+      ath: true,
+      atl: true,
+      currentPrice: true,
       categories: true,
       tickers: true,
       derivatives: true,
@@ -68,6 +71,9 @@ export async function getStaticProps() {
     coinData.fullyDilutedValuation = Number(coinData.fullyDilutedValuation)
     coinData.circulatingSupply = Number(coinData.circulatingSupply)
     coinData.totalSupply = Number(coinData.totalSupply)
+    coinData.ath = Number(coinData.ath)
+    coinData.atl = Number(coinData.atl)
+    coinData.currentPrice = Number(coinData.currentPrice)
 
     coinData = pick(coinData, [
       'id',
@@ -78,6 +84,9 @@ export async function getStaticProps() {
       'fullyDilutedValuation',
       'circulatingSupply',
       'totalSupply',
+      'ath',
+      'atl',
+      'currentPrice',
       'categories',
       'imageSlug',
       'derivatives',

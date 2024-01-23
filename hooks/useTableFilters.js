@@ -19,6 +19,8 @@ const useTableFilters = (coinsData) => {
       derivatives: [],
       showMarketCapFDV: false,
       showCirculatingSupplyPercentage: false,
+      showPercentageFromATH: false,
+      showPercentageFromATL: false,
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
@@ -72,6 +74,16 @@ const useTableFilters = (coinsData) => {
         return {
           ...state,
           showCirculatingSupplyPercentage: action.payload
+        }
+      case 'SET_SHOW_PERCENTAGE_FROM_ATH':
+        return {
+          ...state,
+          showPercentageFromATH: action.payload
+        }
+      case 'SET_SHOW_PERCENTAGE_FROM_ATL':
+        return {
+          ...state,
+          showPercentageFromATL: action.payload
         }
       case 'SET_SUPERTREND_FLAVOR':
         return {
@@ -202,6 +214,8 @@ const useTableFilters = (coinsData) => {
         superTrendFlavor: router.query.superTrendFlavor,
         showMarketCapFDV: router.query.showMarketCapFDV,
         showCirculatingSupplyPercentage: router.query.showCirculatingSupplyPercentage,
+        showPercentageFromATH: router.query.showPercentageFromATH,
+        showPercentageFromATL: router.query.showPercentageFromATL
       }
     })
   }, [router.isReady, router.query])

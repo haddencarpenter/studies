@@ -73,6 +73,30 @@ const TableFiltersAdvancedTab = ({
                 />
               </Col>
             </Row>
+            <Row className={indexStyles.modalRow}>
+              <Col span={22}>
+                <span>Show Percentage from ATH</span>
+              </Col>
+              <Col span={2}>
+                <Switch
+                  className={indexStyles.modalSwitch}
+                  checked={formState.percentageFromATH}
+                  onChange={(checked) => { formDispatch({ type: 'SET_SHOW_PERCENTAGE_FROM_ATH', payload: checked }) }}
+                />
+              </Col>
+            </Row>
+            <Row className={indexStyles.modalRow}>
+              <Col span={22}>
+                <span>Show Percentage from ATL</span>
+              </Col>
+              <Col span={2}>
+                <Switch
+                  className={indexStyles.modalSwitch}
+                  checked={formState.percentageFromATL}
+                  onChange={(checked) => { formDispatch({ type: 'SET_SHOW_PERCENTAGE_FROM_ATL', payload: checked }) }}
+                />
+              </Col>
+            </Row>
           </>
         ) : <></>
       }

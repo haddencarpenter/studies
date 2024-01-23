@@ -46,6 +46,8 @@ const CoinTable = ({
     superTrendFlavor,
     showMarketCapFDV,
     showCirculatingSupplyPercentage,
+    showPercentageFromATH,
+    showPercentageFromATL,
   } = formState
   const {
     category: defaultCategory,
@@ -260,6 +262,8 @@ const CoinTable = ({
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       marketCapFDV: round(Number(coinData.marketCap) / coinData.fullyDilutedValuation, 2),
       circulatingSupplyPercentage: `${round(Number(coinData.circulatingSupply) / Number(coinData.totalSupply), 2) * 100}%`,
+      percentageFromATH: `${round((Number(coinData.currentPrice) / Number(coinData.ath)) * 100, 2)}%`,
+      percentageFromATL: `${round((Number(coinData.currentPrice) / Number(coinData.atl)) * 100, 2)}%`,
     }
   })
 
@@ -357,6 +361,26 @@ const CoinTable = ({
       {
         title: 'Circulating supply',
         dataIndex: 'circulatingSupplyPercentage',
+        width: 120,
+        className: coinTableStyles.unclickableCell,
+      }
+    )
+  }
+  if (showPercentageFromATH) {
+    columns.push(
+      {
+        title: 'Percentage from ATH',
+        dataIndex: 'percentageFromATH',
+        width: 120,
+        className: coinTableStyles.unclickableCell,
+      }
+    )
+  }
+  if (showPercentageFromATL) {
+    columns.push(
+      {
+        title: 'Percentage from ATL',
+        dataIndex: 'percentageFromATL',
         width: 120,
         className: coinTableStyles.unclickableCell,
       }
