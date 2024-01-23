@@ -135,6 +135,8 @@ export async function getStaticProps({ params }) {
       marketCap: true,
       marketCapRank: true,
       fullyDilutedValuation: true,
+      circulatingSupply: true,
+      totalSupply: true,
       categories: true,
       tickers: true,
       derivatives: true,
@@ -159,6 +161,8 @@ export async function getStaticProps({ params }) {
     delete coinData.images
 
     coinData.fullyDilutedValuation = Number(coinData.fullyDilutedValuation)
+    coinData.circulatingSupply = Number(coinData.circulatingSupply)
+    coinData.totalSupply = Number(coinData.totalSupply)
 
     return coinData
   })

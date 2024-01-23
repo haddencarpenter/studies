@@ -61,6 +61,18 @@ const TableFiltersAdvancedTab = ({
                 />
               </Col>
             </Row>
+            <Row className={indexStyles.modalRow}>
+              <Col span={22}>
+                <span>Show Circulating Supply Percentage</span>
+              </Col>
+              <Col span={2}>
+                <Switch
+                  className={indexStyles.modalSwitch}
+                  checked={formState.showCirculatingSupplyPercentage}
+                  onChange={(checked) => { formDispatch({ type: 'SET_SHOW_CIRCULATING_SUPPLY_PERCENTAGE', payload: checked }) }}
+                />
+              </Col>
+            </Row>
           </>
         ) : <></>
       }

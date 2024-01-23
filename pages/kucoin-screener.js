@@ -61,6 +61,8 @@ export async function getStaticProps() {
       marketCap: true,
       marketCapRank: true,
       fullyDilutedValuation: true,
+      circulatingSupply: true,
+      totalSupply: true,
       categories: true,
       tickers: true,
       derivatives: true,
@@ -97,6 +99,8 @@ export async function getStaticProps() {
     coinData.imageSlug = getImageSlug(coinData.images.large)
     coinData.derivatives = coinData.derivatives?.slice(0, 5)
     coinData.fullyDilutedValuation = Number(coinData.fullyDilutedValuation)
+    coinData.circulatingSupply = Number(coinData.circulatingSupply)
+    coinData.totalSupply = Number(coinData.totalSupply)
 
     coinData = pick(coinData, [
       'id',
@@ -105,6 +109,8 @@ export async function getStaticProps() {
       'marketCap',
       'marketCapRank',
       'fullyDilutedValuation',
+      'circulatingSupply',
+      'totalSupply',
       'categories',
       'imageSlug',
       'derivatives',

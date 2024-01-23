@@ -45,6 +45,7 @@ const CoinTable = ({
     derivatives,
     superTrendFlavor,
     showMarketCapFDV,
+    showCirculatingSupplyPercentage,
   } = formState
   const {
     category: defaultCategory,
@@ -258,6 +259,7 @@ const CoinTable = ({
       weeklySuperSuperTrend: coinData.weeklySuperSuperTrend,
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       marketCapFDV: round(Number(coinData.marketCap) / coinData.fullyDilutedValuation, 2),
+      circulatingSupplyPercentage: `${round(Number(coinData.circulatingSupply) / Number(coinData.totalSupply), 2) * 100}%`,
     }
   })
 
@@ -346,6 +348,16 @@ const CoinTable = ({
         title: 'Market cap / FDV',
         dataIndex: 'marketCapFDV',
         width: 150,
+        className: coinTableStyles.unclickableCell,
+      }
+    )
+  }
+  if (showCirculatingSupplyPercentage) {
+    columns.push(
+      {
+        title: 'Circulating supply',
+        dataIndex: 'circulatingSupplyPercentage',
+        width: 120,
         className: coinTableStyles.unclickableCell,
       }
     )
