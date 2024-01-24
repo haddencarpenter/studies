@@ -7,6 +7,7 @@ import isEmpty from 'lodash/isEmpty'
 import round from 'lodash/round'
 import { useHydrated } from "react-hydration-provider";
 import BarChartOutlined from '@ant-design/icons/BarChartOutlined';
+import classnames from 'classnames';
 
 import WatchlistStar from './WatchlistStar';
 import useIsHoverable from '../hooks/useIsHoverable';
@@ -51,6 +52,7 @@ const CoinTable = ({
     showMarketCapRank,
     showOpenInterest,
     showFundingRate,
+    showFuturesVolume,
   } = formState
   const {
     category: defaultCategory,
@@ -73,6 +75,7 @@ const CoinTable = ({
   }, [passTrends])
 
   const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 9 }), [])
+  const numberFormatter = useMemo(() => new Intl.NumberFormat([], { notation: 'compact', compactDisplay: 'short' }), [])
   useEffect(() => {
     const prices = JSON.parse(localStorage.getItem("prices"))
     if (prices) {
@@ -145,7 +148,7 @@ const CoinTable = ({
     })
   }, [socket])
   useEffect(() => {
-    if (showOpenInterest || showFundingRate) {
+    if (showOpenInterest || showFundingRate || showFuturesVolume) {
       const cache = JSON.parse(sessionStorage.getItem('live_coin_data'))
       if (cache) {
         setLiveCoinData(cache)
@@ -159,7 +162,7 @@ const CoinTable = ({
         socket.off('new_live_coin_data')
       }
     }
-  }, [showOpenInterest, showFundingRate, socket, fetchLiveCoinData])
+  }, [showOpenInterest, showFundingRate, showFuturesVolume, socket, fetchLiveCoinData])
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
@@ -277,12 +280,14 @@ const CoinTable = ({
       percentageFromATH = round((livePrice / coinData.ath) * 100, 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate
+    let openInterest, fundingRate, futuresExchange, futuresVolume
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
         openInterest = matchingCoinData.openInterest
         fundingRate = round(matchingCoinData.fundingRate, 4)
+        futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
+        futuresVolume = matchingCoinData.futuresVolume24h
       }
     }
     return {
@@ -308,6 +313,8 @@ const CoinTable = ({
       percentageFromATL,
       openInterest,
       fundingRate,
+      futuresExchange,
+      futuresVolume,
     }
   })
 
@@ -441,21 +448,58 @@ const CoinTable = ({
   if (showOpenInterest) {
     columns.push(
       {
-        title: 'Open Interest',
+        title: 'Open Interest (4h)',
         dataIndex: 'openInterest',
-        width: 180,
+        width: 150,
         className: coinTableStyles.unclickableCell,
-        render: (openInterest) => currencyFormatter.format(openInterest)
+        render: (openInterest, data) => {
+          if (openInterest) {
+            return (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={data.futuresExchange.image}
+                  alt={data.futuresExchange.name}
+                  title={data.futuresExchange.name}
+                  loading="lazy"
+                  key={data.futuresExchange.name}
+                  onClick={() => router.push(`/coin/${data.id}?tab=Trade`)}
+                  className={classnames(coinTableStyles.clickableTag, coinTableStyles.image)}
+                />
+                {numberFormatter.format(openInterest)}
+              </>
+            )
+          } else {
+            return null
+          }
+        }
       }
     )
   }
   if (showFundingRate) {
     columns.push(
       {
-        title: 'Funding Rate',
+        title: 'Funding Rate (4h)',
         dataIndex: 'fundingRate',
+        width: 150,
+        className: coinTableStyles.unclickableCell,
+      }
+    )
+  }
+  if (showFuturesVolume) {
+    columns.push(
+      {
+        title: 'OI / 24h Volume',
+        dataIndex: 'futuresVolume',
         width: 120,
         className: coinTableStyles.unclickableCell,
+        render: (futuresVolume) => {
+          if (futuresVolume) {
+            return numberFormatter.format(futuresVolume)
+          } else {
+            return null
+          }
+        }
       }
     )
   }

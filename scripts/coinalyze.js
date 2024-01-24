@@ -3,15 +3,21 @@ import axios from 'axios'
 
 import prisma from '../lib/prisma.mjs';
 
-import { getSupportedFutureMarkets, getOpenInterest, getFundingRate } from '../lib/coinalyze.mjs';
+import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
 
 dotenv.config();
 
 const preferredMarkets = ['A', '6'];
 
 const fetchCoinalyze = async () => {
+  const databaseExchanges = await prisma.exchange.findMany({ select: { id: true, name: true } })
+  const databaseExchangeNames = databaseExchanges.map(exchange => exchange.name);
+  let supportedExchanges = await getSupportedExchanges()
+  supportedExchanges = supportedExchanges.data.filter(exchange => databaseExchangeNames.includes(exchange.name));
+  const supporteExchangeCodes = supportedExchanges.map(exchange => exchange.code);
+
   let supportedFutureMarkets = await getSupportedFutureMarkets();
-  supportedFutureMarkets = supportedFutureMarkets.data.filter(market => market.is_perpetual);
+  supportedFutureMarkets = supportedFutureMarkets.data.filter(market => market.is_perpetual && supporteExchangeCodes.includes(market.exchange));
 
   const databaseCoins = await prisma.coin.findMany({
     select: {
@@ -30,8 +36,11 @@ const fetchCoinalyze = async () => {
     if (!market) {
       market = supportedMarketsForCoin[0];
     }
+    const marketExchange = supportedExchanges.find(exchange => exchange.code === market.exchange);
+    const databaseExchange = databaseExchanges.find(exchange => exchange.name === marketExchange.name);
     const openInterest = (await getOpenInterest(market.symbol)).data[0].value;
     const fundingRate = (await getFundingRate(market.symbol)).data[0].value;
+    const futuresVolume24h = await getVolume24h(market.symbol);
     await prisma.coin.update({
       where: {
         id: coin.id
@@ -39,6 +48,8 @@ const fetchCoinalyze = async () => {
       data: {
         openInterest,
         fundingRate,
+        futuresExchangeId: databaseExchange.id,
+        futuresVolume24h,
       }
     });
   }

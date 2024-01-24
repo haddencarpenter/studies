@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["relationJoins"]
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -80,9 +80,12 @@ model Coin {
   coinpaprikaTags              Json?
   openInterest                 Decimal?
   fundingRate                  Decimal?
+  futuresExchangeId            String?
+  futuresVolume24h             Decimal?
   coinTimes                    CoinTime[]
   ohlcs                        Ohlc[]
   superTrends                  SuperTrend[]
+  futuresExchange              Exchange?    @relation(fields: [futuresExchangeId], references: [id])
 
   @@index([marketCapRank])
 }
@@ -118,6 +121,7 @@ model Exchange {
   image       String
   url         String
   centralized Boolean @default(false)
+  Coin        Coin[]
 }
 
 model SuperTrend {
@@ -137,8 +141,8 @@ model SuperTrend {
 model FourHourTrends {
   id         Int       @id @default(autoincrement())
   trend      String
-  coinsymbol String    @db.VarChar(255) @default("")
-  timestamp  DateTime? @db.Timestamp(6) @default(now())
+  coinsymbol String    @default("") @db.VarChar(255)
+  timestamp  DateTime? @default(now()) @db.Timestamp(6)
 }
 
 model User {
@@ -149,6 +153,6 @@ model User {
 
 model WhiteListAddress {
   id            Int    @id @default(autoincrement())
-  ip           String @unique
+  ip            String @unique
   walletAddress String @unique
 }
