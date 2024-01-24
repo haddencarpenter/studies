@@ -65,7 +65,6 @@ export async function getStaticProps() {
       totalSupply: true,
       ath: true,
       atl: true,
-      currentPrice: true,
       categories: true,
       tickers: true,
       derivatives: true,
@@ -106,7 +105,6 @@ export async function getStaticProps() {
     coinData.totalSupply = Number(coinData.totalSupply)
     coinData.ath = Number(coinData.ath)
     coinData.atl = Number(coinData.atl)
-    coinData.currentPrice = Number(coinData.currentPrice)
 
     coinData = pick(coinData, [
       'id',
@@ -119,7 +117,6 @@ export async function getStaticProps() {
       'totalSupply',
       'ath',
       'atl',
-      'currentPrice',
       'categories',
       'imageSlug',
       'derivatives',

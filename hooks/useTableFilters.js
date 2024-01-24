@@ -22,6 +22,8 @@ const useTableFilters = (coinsData) => {
       showPercentageFromATH: false,
       showPercentageFromATL: false,
       showMarketCapRank: false,
+      showOpenInterest: false,
+      showFundingRate: false,
       marketCapMin: coinsData[coinsData.length - 1].marketCap,
       marketCapMax: coinsData[0].marketCap,
       trendLengthMin: '',
@@ -90,6 +92,16 @@ const useTableFilters = (coinsData) => {
         return {
           ...state,
           showMarketCapRank: action.payload
+        }
+      case 'SET_SHOW_OPEN_INTEREST':
+        return {
+          ...state,
+          showOpenInterest: action.payload
+        }
+      case 'SET_SHOW_FUNDING_RATE':
+        return {
+          ...state,
+          showFundingRate: action.payload
         }
       case 'SET_SUPERTREND_FLAVOR':
         return {
@@ -223,6 +235,8 @@ const useTableFilters = (coinsData) => {
         showPercentageFromATH: router.query.showPercentageFromATH,
         showPercentageFromATL: router.query.showPercentageFromATL,
         showMarketCapRank: router.query.showMarketCapRank,
+        showOpenInterest: router.query.showOpenInterest,
+        showFundingRate: router.query.showFundingRate
       }
     })
   }, [router.isReady, router.query])

@@ -109,6 +109,30 @@ const TableFiltersAdvancedTab = ({
                 />
               </Col>
             </Row>
+            <Row className={indexStyles.modalRow}>
+              <Col span={22}>
+                <span>Show Open Interest</span>
+              </Col>
+              <Col span={2}>
+                <Switch
+                  className={indexStyles.modalSwitch}
+                  checked={formState.openInterest}
+                  onChange={(checked) => { formDispatch({ type: 'SET_SHOW_OPEN_INTEREST', payload: checked }) }}
+                />
+              </Col>
+            </Row>
+            <Row className={indexStyles.modalRow}>
+              <Col span={22}>
+                <span>Show Funding Rate</span>
+              </Col>
+              <Col span={2}>
+                <Switch
+                  className={indexStyles.modalSwitch}
+                  checked={formState.fundingRate}
+                  onChange={(checked) => { formDispatch({ type: 'SET_SHOW_FUNDING_RATE', payload: checked }) }}
+                />
+              </Col>
+            </Row>
           </>
         ) : <></>
       }

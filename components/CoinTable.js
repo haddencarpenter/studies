@@ -49,6 +49,8 @@ const CoinTable = ({
     showPercentageFromATH,
     showPercentageFromATL,
     showMarketCapRank,
+    showOpenInterest,
+    showFundingRate,
   } = formState
   const {
     category: defaultCategory,
@@ -62,6 +64,7 @@ const CoinTable = ({
   const socket = useSocketStore(state => state.socket)
   const [prices, setPrices] = useState({})
   const [trends, setTrends] = useState(null)
+  const [liveCoinData, setLiveCoinData] = useState([])
   const updateTrends = useCallback((trends) => {
     setTrends(trends)
     if (passTrends) {
@@ -134,6 +137,29 @@ const CoinTable = ({
       }
     }
   }, [socket, fetchTrends, updateTrends, superTrendFlavor])
+  const fetchLiveCoinData = useCallback(() => {
+    socket.emit('get_live_coin_data', (liveCoinData) => {
+      const data = liveCoinData.data
+      sessionStorage.setItem(`live_coin_data`, JSON.stringify(data))
+      setLiveCoinData(data)
+    })
+  }, [socket])
+  useEffect(() => {
+    if (showOpenInterest || showFundingRate) {
+      const cache = JSON.parse(sessionStorage.getItem('live_coin_data'))
+      if (cache) {
+        setLiveCoinData(cache)
+      } else if (socket) {
+        fetchLiveCoinData()
+        socket.on('new_live_coin_data', fetchLiveCoinData)
+      }
+    }
+    return () => {
+      if (socket) {
+        socket.off('new_live_coin_data')
+      }
+    }
+  }, [showOpenInterest, showFundingRate, socket, fetchLiveCoinData])
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
@@ -245,6 +271,20 @@ const CoinTable = ({
       }
     })
     shownExchanges = shownExchanges.slice(0, 5)
+    let percentageFromATH, percentageFromATL
+    const livePrice = prices[coinData.symbol]
+    if (livePrice) {
+      percentageFromATH = round((livePrice / coinData.ath) * 100, 2) + '%'
+      percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
+    }
+    let openInterest, fundingRate
+    if (liveCoinData) {
+      const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
+      if (matchingCoinData) {
+        openInterest = matchingCoinData.openInterest
+        fundingRate = round(matchingCoinData.fundingRate, 4)
+      }
+    }
     return {
       key: `${coinData.id}-${coinData.name}`,
       id: coinData.id,
@@ -264,12 +304,12 @@ const CoinTable = ({
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       marketCapFDV: round(Number(coinData.marketCap) / coinData.fullyDilutedValuation, 2),
       circulatingSupplyPercentage: `${round(Number(coinData.circulatingSupply) / Number(coinData.totalSupply), 2) * 100}%`,
-      percentageFromATH: `${round((Number(coinData.currentPrice) / Number(coinData.ath)) * 100, 2)}%`,
-      percentageFromATL: `${round((Number(coinData.currentPrice) / Number(coinData.atl)) * 100, 2)}%`,
+      percentageFromATH,
+      percentageFromATL,
+      openInterest,
+      fundingRate,
     }
   })
-
-  console.log(tableData.marketCapFDV)
 
   let columns = [
     {
@@ -383,7 +423,7 @@ const CoinTable = ({
       {
         title: 'Percentage from ATL',
         dataIndex: 'percentageFromATL',
-        width: 120,
+        width: 150,
         className: coinTableStyles.unclickableCell,
       }
     )
@@ -393,6 +433,27 @@ const CoinTable = ({
       {
         title: 'Market Cap #',
         dataIndex: 'marketCapRank',
+        width: 120,
+        className: coinTableStyles.unclickableCell,
+      }
+    )
+  }
+  if (showOpenInterest) {
+    columns.push(
+      {
+        title: 'Open Interest',
+        dataIndex: 'openInterest',
+        width: 180,
+        className: coinTableStyles.unclickableCell,
+        render: (openInterest) => currencyFormatter.format(openInterest)
+      }
+    )
+  }
+  if (showFundingRate) {
+    columns.push(
+      {
+        title: 'Funding Rate',
+        dataIndex: 'fundingRate',
         width: 120,
         className: coinTableStyles.unclickableCell,
       }
