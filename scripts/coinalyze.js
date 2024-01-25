@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import axios from 'axios'
+import startofHour from 'date-fns/startOfHour/index.js';
 
 import prisma from '../lib/prisma.mjs';
 
@@ -10,6 +11,7 @@ dotenv.config();
 const preferredMarkets = ['A', '6'];
 
 const fetchCoinalyze = async () => {
+  const now = startofHour(new Date());
   const databaseExchanges = await prisma.exchange.findMany({ select: { id: true, name: true } })
   const databaseExchangeNames = databaseExchanges.map(exchange => exchange.name);
   let supportedExchanges = await getSupportedExchanges()
@@ -52,6 +54,17 @@ const fetchCoinalyze = async () => {
         futuresVolume24h,
       }
     });
+    await prisma.coinTime.create({
+      data: {
+        coinId: coin.id,
+        date: now,
+        time: now,
+        timeframe: '4h',
+        openInterest,
+        fundingRate,
+        futuresVolume24h,
+      }
+    })
   }
 }
 
