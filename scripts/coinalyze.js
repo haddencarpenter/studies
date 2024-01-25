@@ -71,6 +71,6 @@ const fetchCoinalyze = async () => {
 setTimeout(async () => {
   await fetchCoinalyze()
   if (process.env.NODE_ENV === 'production') {
-    await axios.post('https://coinrotator-realtime-2.onrender.com/new-coinalyze-data')
+    await axios.post(`${process.env.NEXT_PUBLIC_SOCKET_SERVER_URL}/new-coinalyze-data`)
   }
 }, 99);
