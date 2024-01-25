@@ -77,7 +77,7 @@ const CoinTable = ({
   }, [passTrends])
 
   const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 9 }), [])
-  const numberFormatter = useMemo(() => new Intl.NumberFormat([], { notation: 'compact', compactDisplay: 'short' }), [])
+  const numberFormatter = useMemo(() => new Intl.NumberFormat([], { notation: 'compact', compactDisplay: 'short', maximumFractionDigits: 3 }), [])
   useEffect(() => {
     const prices = JSON.parse(localStorage.getItem("prices"))
     if (prices) {
@@ -284,14 +284,15 @@ const CoinTable = ({
       percentageFromATH = round((livePrice / coinData.ath) * 100, 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate, futuresExchange, futuresVolume
+    let openInterest, fundingRate, futuresExchange, futuresVolume, openInterestChangePercent
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
         openInterest = matchingCoinData.openInterest
-        fundingRate = round(matchingCoinData.fundingRate, 4)
+        fundingRate = matchingCoinData.fundingRate ? round(matchingCoinData.fundingRate, 4) : null
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
         futuresVolume = matchingCoinData.futuresVolume24h
+        openInterestChangePercent = round(matchingCoinData.openInterestChangePercent, 2)
       }
     }
     return {
@@ -320,6 +321,7 @@ const CoinTable = ({
       fundingRate,
       futuresExchange,
       futuresVolume,
+      openInterestChangePercent,
     }
   })
 
@@ -447,7 +449,7 @@ const CoinTable = ({
       {
         title: 'Open Interest (4h)',
         dataIndex: 'openInterest',
-        width: 150,
+        width: 200,
         className: coinTableStyles.unclickableCell,
         render: (openInterest, data) => {
           if (openInterest) {
@@ -464,6 +466,14 @@ const CoinTable = ({
                   className={classnames(coinTableStyles.clickableTag, coinTableStyles.image)}
                 />
                 {numberFormatter.format(openInterest)}
+                {!isNaN(data.openInterestChangePercent) ? (
+                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent < 0 })}>
+                    &nbsp;(
+                    {data.openInterestChangePercent > 0 ? '+' : ''}
+                    {data.openInterestChangePercent}%
+                    )
+                  </span>
+                ) : null}
               </>
             )
           } else {
