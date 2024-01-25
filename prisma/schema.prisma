@@ -107,12 +107,19 @@ model Ohlc {
 }
 
 model CoinTime {
-  id        Int      @id @default(autoincrement())
-  coinId    String   @db.VarChar(255)
-  date      DateTime @db.Date
-  marketCap BigInt
-  volume    BigInt
-  coin      Coin     @relation(fields: [coinId], references: [id])
+  id               Int       @id @default(autoincrement())
+  coinId           String    @db.VarChar(255)
+  date             DateTime  @db.Date
+  time             DateTime? @db.Time(0)
+  marketCap        BigInt?
+  volume           BigInt?
+  coin             Coin      @relation(fields: [coinId], references: [id])
+  timeframe        String    @default("1d")
+  openInterest     Decimal?
+  fundingRate      Decimal?
+  futuresVolume24h Decimal?
+
+  @@index ([coinId, timeframe, date, time])
 }
 
 model Exchange {
