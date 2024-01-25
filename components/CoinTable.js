@@ -472,16 +472,15 @@ const CoinTable = ({
       }
     )
   }
-  if (showOpenInterest) {
+  if (showOpenInterest || showFundingRate || showFuturesVolume) {
     columns.push(
       {
-        title: 'Open Interest (4h)',
-        dataIndex: 'openInterest',
-        width: 210,
+        title: 'Futures Data Source',
+        dataIndex: 'futuresExchange',
+        width: 150,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.openInterest) - Number(b.openInterest),
-        render: (openInterest, data) => {
-          if (openInterest) {
+        render: (futuresExchange, data) => {
+          if (futuresExchange) {
             return (
               <>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -494,6 +493,28 @@ const CoinTable = ({
                   onClick={() => router.push(`/coin/${data.id}?tab=Trade`)}
                   className={classnames(coinTableStyles.clickableTag, coinTableStyles.image)}
                 />
+                {futuresExchange.name}
+              </>
+            )
+          } else {
+            return null
+          }
+        }
+      }
+    )
+  }
+  if (showOpenInterest) {
+    columns.push(
+      {
+        title: 'Open Interest (4h)',
+        dataIndex: 'openInterest',
+        width: 170,
+        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.openInterest) - Number(b.openInterest),
+        render: (openInterest, data) => {
+          if (openInterest) {
+            return (
+              <>
                 {numberFormatter.format(openInterest)}
                 {!isNaN(data.openInterestChangePercent) ? (
                   <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent < 0 })}>
@@ -517,7 +538,7 @@ const CoinTable = ({
       {
         title: 'Funding Rate (4h)',
         dataIndex: 'fundingRate',
-        width: 150,
+        width: 120,
         sorter: (a, b) => Number(a.fundingRate) - Number(b.fundingRate),
         className: coinTableStyles.unclickableCell,
       }
