@@ -313,8 +313,8 @@ const CoinTable = ({
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       ath: coinData.ath,
       atl: coinData.atl,
-      marketCapFDV: round(Number(coinData.marketCap) / coinData.fullyDilutedValuation, 2),
-      circulatingSupplyPercentage: `${round(Number(coinData.circulatingSupply) / Number(coinData.totalSupply), 2) * 100}%`,
+      marketCapFDV: `${round((Number(coinData.marketCap) / coinData.fullyDilutedValuation * 100), 2)}%`,
+      circulatingSupplyPercentage: `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`,
       percentageFromATH,
       percentageFromATL,
       openInterest,
@@ -390,7 +390,7 @@ const CoinTable = ({
 
   columns.push(
   {
-    width: 90,
+    width: 100,
     ...marketCap(router, hydrated)
   }
   )
@@ -399,8 +399,20 @@ const CoinTable = ({
       {
         title: 'Market cap / FDV',
         dataIndex: 'marketCapFDV',
-        width: 150,
+        width: 130,
         className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.marketCapFDV.slice(0, -1)) - Number(b.marketCapFDV.slice(0, -1))
+      }
+    )
+  }
+  if (showMarketCapRank) {
+    columns.push(
+      {
+        title: 'Market Cap #',
+        dataIndex: 'marketCapRank',
+        width: 100,
+        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.marketCapRank) - Number(b.marketCapRank)
       }
     )
   }
@@ -414,6 +426,18 @@ const CoinTable = ({
       }
     )
   }
+  if (showATH) {
+    columns.push(
+      {
+        title: 'ATH',
+        dataIndex: 'ath',
+        width: 150,
+        className: coinTableStyles.unclickableCell,
+        render: (ath) => ath ? currencyFormatter.format(ath) : null,
+        sorter: (a, b) => Number(a.ath) - Number(b.ath)
+      }
+    )
+  }
   if (showPercentageFromATH) {
     columns.push(
       {
@@ -421,6 +445,19 @@ const CoinTable = ({
         dataIndex: 'percentageFromATH',
         width: 120,
         className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.percentageFromATH.slice(0, -1)) - Number(b.percentageFromATH.slice(0, -1))
+      }
+    )
+  }
+  if (showATL) {
+    columns.push(
+      {
+        title: 'ATL',
+        dataIndex: 'atl',
+        width: 150,
+        className: coinTableStyles.unclickableCell,
+        render: (atl) => atl ? currencyFormatter.format(atl) : null,
+        sorter: (a, b) => Number(a.atl) - Number(b.atl)
       }
     )
   }
@@ -431,16 +468,7 @@ const CoinTable = ({
         dataIndex: 'percentageFromATL',
         width: 150,
         className: coinTableStyles.unclickableCell,
-      }
-    )
-  }
-  if (showMarketCapRank) {
-    columns.push(
-      {
-        title: 'Market Cap #',
-        dataIndex: 'marketCapRank',
-        width: 120,
-        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.percentageFromATL.slice(0, -1)) - Number(b.percentageFromATL.slice(0, -1))
       }
     )
   }
@@ -449,8 +477,9 @@ const CoinTable = ({
       {
         title: 'Open Interest (4h)',
         dataIndex: 'openInterest',
-        width: 200,
+        width: 210,
         className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.openInterest) - Number(b.openInterest),
         render: (openInterest, data) => {
           if (openInterest) {
             return (
@@ -489,6 +518,7 @@ const CoinTable = ({
         title: 'Funding Rate (4h)',
         dataIndex: 'fundingRate',
         width: 150,
+        sorter: (a, b) => Number(a.fundingRate) - Number(b.fundingRate),
         className: coinTableStyles.unclickableCell,
       }
     )
@@ -500,6 +530,7 @@ const CoinTable = ({
         dataIndex: 'futuresVolume',
         width: 120,
         className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.futuresVolume) - Number(b.futuresVolume),
         render: (futuresVolume) => {
           if (futuresVolume) {
             return numberFormatter.format(futuresVolume)
@@ -507,28 +538,6 @@ const CoinTable = ({
             return null
           }
         }
-      }
-    )
-  }
-  if (showATH) {
-    columns.push(
-      {
-        title: 'ATH',
-        dataIndex: 'ath',
-        width: 150,
-        className: coinTableStyles.unclickableCell,
-        render: (ath) => ath ? currencyFormatter.format(ath) : null
-      }
-    )
-  }
-  if (showATL) {
-    columns.push(
-      {
-        title: 'ATL',
-        dataIndex: 'atl',
-        width: 150,
-        className: coinTableStyles.unclickableCell,
-        render: (atl) => atl ? currencyFormatter.format(atl) : null
       }
     )
   }

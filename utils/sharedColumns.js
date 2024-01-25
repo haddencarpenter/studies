@@ -53,6 +53,7 @@ export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort, 
 
 export function dailySuperSuperTrendStreak(router, isHoverable) {
   return {
+    width: 150,
     onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
     title: <span className={coinTableStyles.columnTitle}>
       <span>Trend Streak (24h)</span>
