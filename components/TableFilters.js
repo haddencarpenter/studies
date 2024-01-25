@@ -219,6 +219,8 @@ If you're using the CoinRotator screener, you have the ability to customize many
               showMarketCap={showMarketCap}
               showTrendLength={showTrendLength}
               showExchanges={showExchanges}
+              showDerivativesOptions={showDerivativesOptions}
+              allDerivativeExchanges={allDerivativeExchanges}
               allExchangeNames={allExchangeNames}
               isHoverable={isHoverable}
               categories={categories}
@@ -230,9 +232,7 @@ If you're using the CoinRotator screener, you have the ability to customize many
               formState={formState}
               formDispatch={formDispatch}
               defaultFormState={defaultFormState}
-              showDerivativesOptions={showDerivativesOptions}
               isHoverable={isHoverable}
-              allDerivativeExchanges={allDerivativeExchanges}
             />
           )}
         </div>

@@ -21,6 +21,8 @@ const TableFiltersFiltersTab = ({
   showExchanges,
   isHoverable,
   allExchangeNames,
+  showDerivativesOptions,
+  allDerivativeExchanges,
   marketCapMax,
   buttonSize,
  }) => {
@@ -282,6 +284,42 @@ const TableFiltersFiltersTab = ({
                   onChange={(exchanges) => { formDispatch({ type: 'SET_EXCHANGES', payload: exchanges }) }}
                 >
                   {allExchangeNames.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
+                </Select>
+              </Col>
+            </Row>
+          </>
+        ) : <></>
+      }
+      {
+        showDerivativesOptions ? (
+          <>
+            <Divider className={indexStyles.divider} />
+            <Row className={indexStyles.modalHeaderRow}>
+              <Col>
+                <span>
+                  <span>Derivative markets</span>
+                  <Tooltip
+                    placement={'right'}
+                    trigger={isHoverable ? 'hover' : 'click'}
+                    title="Select your derivatives markets to see their trend condition."
+                  >
+                    <QuestionCircleFilled className={classnames(baseStyles.tooltipIcon, baseStyles.tooltipIconBig, baseStyles.icon)} />
+                  </Tooltip>
+                </span>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24}>
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Select derivative exchanges"
+                  className={indexStyles.modalSelect}
+                  size="large"
+                  value={formState.derivatives}
+                  onChange={(exchanges) => { formDispatch({ type: 'SET_DERIVATIVES', payload: exchanges }) }}
+                >
+                  {allDerivativeExchanges.map(exchangeName => <Option key={exchangeName}>{exchangeName}</Option>)}
                 </Select>
               </Col>
             </Row>
