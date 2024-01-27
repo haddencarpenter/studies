@@ -18,6 +18,7 @@ import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils
 import { getImageURL } from '../utils/minifyImageURL';
 import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap } from '../utils/sharedColumns';
 import { NotificationContext } from '../layouts/screener.js';
+import useBreakPoint from '../hooks/useBreakPoint.js';
 
 import coinTableStyles from '../styles/table.module.less';
 
@@ -62,6 +63,7 @@ const CoinTable = ({
 
   const router = useRouter()
   const isHoverable = useIsHoverable()
+  const screens = useBreakPoint()
   const hydrated = useHydrated()
   const notification = useContext(NotificationContext)
   const [watchlistCoins, setWatchlistCoins] = useState([])
@@ -328,7 +330,7 @@ const CoinTable = ({
   let columns = [
     {
       title: () => `Coin (${tableData.length})`,
-      width: isHoverable ? 140 : 200,
+      width: screens.sm ? 200 : 140,
       dataIndex: 'coinData',
       onCell: ({ id }) => {
         return {
@@ -345,10 +347,10 @@ const CoinTable = ({
             <Link href={`/coin/${data.id}`} className={coinTableStyles.coin}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={getImageURL(coinData.imageSlug, 'small')} alt={coinData.name} className={coinTableStyles.image} loading="lazy"/>
-              {isHoverable ? null : <span className={coinTableStyles.name}>{coinData.name}</span>}
+              {screens.sm ? <span className={coinTableStyles.name}>{coinData.name}</span> : null}
               <span className={coinTableStyles.symbol}>{coinData.symbol}</span>
             </Link>
-            { isHoverable ? null : (
+            { screens.sm ? (
               <Link href={`/coin/${data.id}#chart`} onClick={(e) => e.stopPropagation()}>
                 <BarChartOutlined
                   className={coinTableStyles.chart}
@@ -356,7 +358,7 @@ const CoinTable = ({
                   title="Real time chart"
                 />
               </Link>
-            ) }
+            ) : null}
           </>
         );
       }
