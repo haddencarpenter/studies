@@ -8,7 +8,7 @@ import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getF
 
 dotenv.config();
 
-const preferredMarkets = ['A', '6'];
+const preferredMarkets = ['A', '6', 'Y', 'F'];
 
 const fetchCoinalyze = async () => {
   const now = startofHour(new Date());
@@ -34,7 +34,8 @@ const fetchCoinalyze = async () => {
   });
   for (const coin of databaseCoins) {
     const supportedMarketsForCoin = supportedFutureMarkets.filter(market => market.base_asset.toLowerCase() === coin.symbol);
-    let market = supportedMarketsForCoin.find(market => preferredMarkets.includes(market.exchange));
+    let market = supportedMarketsForCoin.filter(market => preferredMarkets.includes(market.exchange))
+                                        .sort((a, b) => preferredMarkets.indexOf(a.exchange) - preferredMarkets.indexOf(b.exchange))[0];
     if (!market) {
       market = supportedMarketsForCoin[0];
     }
