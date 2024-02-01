@@ -427,6 +427,7 @@ const CoinTable = ({
         dataIndex: 'circulatingSupplyPercentage',
         width: 120,
         className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.circulatingSupplyPercentage.slice(0, -1)) - Number(b.circulatingSupplyPercentage.slice(0, -1))
       }
     )
   }
