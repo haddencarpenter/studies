@@ -1,5 +1,6 @@
 import Script from 'next/script'
 import Head from 'next/head'
+import mixpanel from 'mixpanel-browser';
 
 export default function SharedLayout({ pageProps }) {
   const googleAnalytics = process.env.NODE_ENV === 'production' ? (
@@ -19,6 +20,13 @@ export default function SharedLayout({ pageProps }) {
       />
     </>
   ) : <></>
+  const mixPanel = process.env.NODE_ENV === 'production' ? (
+    <Script id="mixpanel">
+      {`
+          mixpanel.init("743aa6797630eaf251e029aaed46382f", { debug: true, track_pageview: true, persistence: 'localStorage' });
+      `}
+    </Script>
+  ) : <></>
   return (
     <>
       <Head>
@@ -26,6 +34,7 @@ export default function SharedLayout({ pageProps }) {
         <link rel="canonical" href={pageProps.currentUrl} />
       </Head>
       {googleAnalytics}
+      {mixPanel}
     </>
   )
 }
