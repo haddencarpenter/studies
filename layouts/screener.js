@@ -23,7 +23,7 @@ export default function ScreenerLayout(page, pageProps) {
     const date = new Date();
     console.log("Connecting to WebSocket server...", date.toLocaleTimeString(), date.getMilliseconds());
     const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_SERVER_URL, {
-      transports: ["websocket"],
+      transports: ["websocket", "webtransport"],
     });
 
     newSocket.on("connect", () => {
