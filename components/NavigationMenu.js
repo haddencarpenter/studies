@@ -273,9 +273,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
     }
   }
 
-  let props = {
-    openKeys: ['currentnarratives', 'tutorials']
-  }
+  let props = {}
   if (!screens.lg) {
     props.openKeys = ['screenertools', 'currentnarratives', 'exchanges', 'preselects', 'topcategories', 'tutorials', 'about']
   }
