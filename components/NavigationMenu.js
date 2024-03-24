@@ -29,36 +29,6 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
   const screens = useBreakPoint()
   let menuItems = [
     {
-      label: 'Current Narratives',
-      key: 'currentnarratives',
-      children: currentNarratives.map((category) => {
-        const slug = slugify(category)
-        return (
-          {
-            label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
-            key: `narrative-${slug}`,
-            icon: <TagsOutlined className={styles.goldenPurple} />
-          }
-        )
-      })
-    },
-    {
-      label: 'Tutorials',
-      key: 'tutorials',
-      children: [
-        {
-          label: <Link href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</Link>,
-          key: 'video-tutorials',
-          icon: <VideoCameraFilled className={styles.dustRed} />
-        },
-        {
-          label: <Link href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</Link>,
-          key: 'article-tutorials',
-          icon: <ReadFilled className={styles.gray} />
-        }
-      ]
-    },
-    {
       label: 'Screener Tools',
       key: 'screenertools',
       children: [
@@ -96,6 +66,36 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           label: <Link href="/watchlist">Watchlist</Link>,
           key: '/watchlist',
           icon: <StarFilled className={styles.sunsetOrange} />
+        }
+      ]
+    },
+    {
+      label: 'Current Narratives',
+      key: 'currentnarratives',
+      children: currentNarratives.map((category) => {
+        const slug = slugify(category)
+        return (
+          {
+            label: <Link href={`/category/${slug}`} prefetch={false}>{category}</Link>,
+            key: `narrative-${slug}`,
+            icon: <TagsOutlined className={styles.goldenPurple} />
+          }
+        )
+      })
+    },
+    {
+      label: 'Tutorials',
+      key: 'tutorials',
+      children: [
+        {
+          label: <Link href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</Link>,
+          key: 'video-tutorials',
+          icon: <VideoCameraFilled className={styles.dustRed} />
+        },
+        {
+          label: <Link href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</Link>,
+          key: 'article-tutorials',
+          icon: <ReadFilled className={styles.gray} />
         }
       ]
     },
