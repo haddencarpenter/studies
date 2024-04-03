@@ -18,6 +18,7 @@ import { Prisma } from '@prisma/client'
 import { hasPlatforms } from '../utils/coingecko.mjs';
 import convertToDailySignals from '../utils/convertToDailySignals.mjs';
 import { saveDailyOhlcsToSupertrends } from '../utils/ohlc.mjs';
+import { overrideCoinCategories } from '../utils/categories.mjs';
 
 dotenv.config();
 
@@ -84,6 +85,7 @@ const fetchCoinDataCoingecko = async (coinId) => {
   const marketCap = Math.ceil(coinData.market_data.market_cap.usd)
   const volume = Math.ceil(coinData.market_data.total_volume.usd)
   const tickers = uniqBy(coinData.tickers, ticker => `${ticker.base}${ticker.target}${ticker.market.name}`)
+  const categories = await overrideCoinCategories(coinData.name, symbol, coinData.categories)
   const dbCoinData = {
     symbol,
     name: coinData.name,
@@ -106,6 +108,7 @@ const fetchCoinDataCoingecko = async (coinId) => {
     tickers: tickers,
     dailyChange: dailyChange,
     weeklyChange: weeklyChange,
+    categories: categories,
   }
 
   await prisma.coin.upsert({
