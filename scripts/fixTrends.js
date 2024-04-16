@@ -45,7 +45,7 @@ const fixTrends = async () => {
       await prisma.superTrend.createMany({ data: dailyClassicTrends, skipDuplicates: true })
     }
   }
-  // axios.post('https://coinrotator-realtime-fra.onrender.com/new-trends')
+  axios.post('https://coinrotator-realtime-fra.onrender.com/new-trends')
 }
 
 fixTrends();
