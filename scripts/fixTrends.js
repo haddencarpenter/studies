@@ -13,6 +13,9 @@ const fixTrends = async () => {
   let allCoinIds = await prisma.coin.findMany({
     select: {
       id: true,
+    },
+    orderBy: {
+      id: 'asc'
     }
   })
   allCoinIds = allCoinIds.map(coin => coin.id)
