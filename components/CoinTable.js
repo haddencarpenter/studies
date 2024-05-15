@@ -46,7 +46,6 @@ const CoinTable = ({
     derivatives,
     cexdex,
     superTrendFlavor,
-    showMarketCapFDV,
     showCirculatingSupplyPercentage,
     showPercentageFromATH,
     showPercentageFromATL,
@@ -315,7 +314,6 @@ const CoinTable = ({
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       ath: coinData.ath,
       atl: coinData.atl,
-      marketCapFDV: `${round((Number(coinData.marketCap) / coinData.fullyDilutedValuation * 100), 2)}%`,
       circulatingSupplyPercentage: `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`,
       percentageFromATH,
       percentageFromATL,
@@ -398,17 +396,6 @@ const CoinTable = ({
     ...marketCap(router, hydrated)
   }
   )
-  if (showMarketCapFDV) {
-    columns.push(
-      {
-        title: 'Market cap / FDV',
-        dataIndex: 'marketCapFDV',
-        width: 130,
-        className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.marketCapFDV.slice(0, -1)) - Number(b.marketCapFDV.slice(0, -1))
-      }
-    )
-  }
   if (showMarketCapRank) {
     columns.push(
       {

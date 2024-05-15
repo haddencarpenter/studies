@@ -17,7 +17,6 @@ const useTableFilters = (coinsData) => {
       trendType: signals.all,
       exchanges: [],
       derivatives: [],
-      showMarketCapFDV: false,
       showCirculatingSupplyPercentage: false,
       showPercentageFromATH: false,
       showPercentageFromATL: false,
@@ -71,11 +70,6 @@ const useTableFilters = (coinsData) => {
         return {
           ...state,
           derivatives: action.payload
-        }
-      case 'SET_SHOW_MARKET_CAP_FDV':
-        return {
-          ...state,
-          showMarketCapFDV: action.payload
         }
       case 'SET_SHOW_CIRCULATING_SUPPLY_PERCENTAGE':
         return {
@@ -254,7 +248,6 @@ const useTableFilters = (coinsData) => {
         trendLengthMin: router.query.trendLengthMin,
         trendLengthMax: router.query.trendLengthMax,
         superTrendFlavor: router.query.superTrendFlavor,
-        showMarketCapFDV: router.query.showMarketCapFDV,
         showCirculatingSupplyPercentage: router.query.showCirculatingSupplyPercentage,
         showPercentageFromATH: router.query.showPercentageFromATH,
         showPercentageFromATL: router.query.showPercentageFromATL,

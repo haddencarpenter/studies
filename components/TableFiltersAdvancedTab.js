@@ -10,18 +10,6 @@ const TableFiltersAdvancedTab = ({
     <>
       <Row className={indexStyles.modalRow}>
         <Col span={22}>
-          <span>Show Market Cap / FDV</span>
-        </Col>
-        <Col span={2}>
-          <Switch
-            className={indexStyles.modalSwitch}
-            checked={formState.showMarketCapFDV}
-            onChange={(checked) => { formDispatch({ type: 'SET_SHOW_MARKET_CAP_FDV', payload: checked }) }}
-          />
-        </Col>
-      </Row>
-      <Row className={indexStyles.modalRow}>
-        <Col span={22}>
           <span>Show Market Cap #</span>
         </Col>
         <Col span={2}>
@@ -34,7 +22,7 @@ const TableFiltersAdvancedTab = ({
       </Row>
       <Row className={indexStyles.modalRow}>
         <Col span={22}>
-          <span>Show Circulating Supply Percentage</span>
+          <span>Show Circulating Supply % (Market Cap / FDV)</span>
         </Col>
         <Col span={2}>
           <Switch
@@ -58,7 +46,7 @@ const TableFiltersAdvancedTab = ({
       </Row>
       <Row className={indexStyles.modalRow}>
         <Col span={22}>
-          <span>Show Percentage from ATH</span>
+          <span>Show % from ATH</span>
         </Col>
         <Col span={2}>
           <Switch
@@ -82,7 +70,7 @@ const TableFiltersAdvancedTab = ({
       </Row>
       <Row className={indexStyles.modalRow}>
         <Col span={22}>
-          <span>Show Percentage from ATL</span>
+          <span>Show % from ATL</span>
         </Col>
         <Col span={2}>
           <Switch
