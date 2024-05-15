@@ -42,9 +42,11 @@ const fetchCoinalyze = async () => {
     }
     const marketExchange = supportedExchanges.find(exchange => exchange.code === market.exchange);
     const databaseExchange = databaseExchanges.find(exchange => exchange.name === marketExchange.name);
-    const openInterest = (await getOpenInterest(market.symbol)).data[0].value;
-    const fundingRate = (await getFundingRate(market.symbol)).data[0].value;
-    const futuresVolume24h = await getVolume24h(market.symbol);
+    const [openInterest, fundingRate, futuresVolume24h] = await Promise.all([
+        getOpenInterest(market.symbol),
+        getFundingRate(market.symbol),
+        getVolume24h(market.symbol)
+    ])
     await prisma.coin.update({
       where: {
         id: coin.id
