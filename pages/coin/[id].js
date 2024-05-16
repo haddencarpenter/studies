@@ -4,6 +4,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Prisma } from '@prisma/client'
 import pick from 'lodash/pick';
+import uniq from 'lodash/uniq';
 import { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react';
 import classnames from 'classnames';
 
@@ -76,7 +77,7 @@ export default function Coin(coin) {
   const isHoverable = useIsHoverable();
   const notification = useContext(NotificationContext)
   const dateFormatter = new Intl.DateTimeFormat([], { dateStyle: 'medium' })
-  const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 9 }), [])
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { style: 'currency', currency: 'usd', currencyDisplay: 'narrowSymbol', maximumFractionDigits: 15 }), [])
   const socket = useSocketStore(state => state.socket)
 
   const fetchTrends = useCallback(() => {
@@ -346,12 +347,15 @@ export async function getStaticProps({ params }) {
     }
   })
   let similarCoins = []
-  if (coinData.categories.length) {
+  if (coinData.categories.length || coinData.coingeckoCategories.length) {
+    const safeCategories = coinData.categories.length ? coinData.categories : ['xxxxxxxxxxxxx']
+    const safeCoingeckoCategories = coinData.coingeckoCategories.length ? coinData.coingeckoCategories : ['xxxxxxxxxxxxx']
     similarCoins = await prisma.$queryRaw`
       SELECT id, images, name, count(*)
       FROM "Coin",
-      unnest(array[${Prisma.join(coinData.categories)}]) unnested_categories
-      WHERE categories @> array[unnested_categories]
+      unnest(array[${Prisma.join(safeCategories)}]) unnested_categories,
+      unnest(array[${Prisma.join(safeCoingeckoCategories)}]) unnested_coingecko_categories
+      WHERE (categories @> array[unnested_categories] OR "coingeckoCategories" @> array[unnested_coingecko_categories])
       AND id != ${coinData.id}
       GROUP BY id
       ORDER BY 4 desc, 1
@@ -389,10 +393,14 @@ export async function getStaticProps({ params }) {
     'launch_roi_usd',
     'launch_roi_eth',
     'launch_roi_btc',
+    'currentPrice',
+    'coingeckoCategories',
   ])
+  const categories = uniq([...coinData.categories, ...coinData.coingeckoCategories])
   return {
     props: {
       ...coinData,
+      categories,
       ath: Number(coinData.ath),
       atl: Number(coinData.atl),
       fullyDilutedValuation: Number(coinData.fullyDilutedValuation),

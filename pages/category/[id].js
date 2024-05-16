@@ -19,7 +19,7 @@ import convertTickersToExchanges from '../../utils/convertTickersToExchanges';
 import useTableFilters from '../../hooks/useTableFilters';
 import prisma from "../../lib/prisma.mjs";
 import { getCategories } from '../../utils/categories.mjs'
-import chunkedPromiseAll from '../../utils/chunkedPromiseAll.mjs'
+import chunkedPromiseAll from 'coinrotator-utils/chunkedPromiseAll.mjs'
 import { getImageSlug } from '../../utils/minifyImageURL';
 import useSocketStore from '../../hooks/useSocketStore';
 
@@ -53,7 +53,7 @@ export default function Category({ coinsData, appData, exchangeData, category, c
   if (trends) {
     categorySuperTrend = trends.daily?.trend
   }
-  const metaTitle = `Find the daily trends of all ${coinsData.length} ${category.name} coins | CoinRotator`
+  const metaTitle = `Trend Analysis for ${coinsData.length} ${category.name} coins`
   let dailySignalTag
   switch (categorySuperTrend) {
     case signals.buy:
@@ -142,9 +142,18 @@ export async function getStaticProps({ params }) {
       derivatives: true,
     },
     where: {
-      categories: {
-        hasSome: [category.name]
-      }
+      OR: [
+        {
+          categories: {
+            hasSome: [category.name]
+          }
+        },
+        {
+          coingeckoCategories: {
+            hasSome: [category.name]
+          }
+        }
+      ]
     }
   }
   let coinsData

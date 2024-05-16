@@ -333,6 +333,12 @@ Category,CoinSymbol,CoinName,addORremove
 "DePIN","NAVI","Atlas Navi",add
 "DePIN","RWN","Rowan Coin",add
 "RWA (Real World Assets)","USDY","Ondo US Dollar Yield",add
+"Layer 1","SEI","Sei",add
+"Layer 1","KLAY","Klaytn",add
+"Gaming","APE","ApeCoin",add
+"NFT","APE","ApeCoin",add
+"Infrastructure",BLUR,Blur,add
+
 
 
 

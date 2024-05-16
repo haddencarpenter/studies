@@ -10,7 +10,7 @@ import PageHeader from '../components/PageHeader'
 import TableFilters from '../components/TableFilters'
 import CoinTable from '../components/CoinTable';
 import convertTickersToExchanges from '../utils/convertTickersToExchanges';
-import chunkedPromiseAll from '../utils/chunkedPromiseAll.mjs'
+import chunkedPromiseAll from 'coinrotator-utils/chunkedPromiseAll.mjs'
 import { getImageSlug } from '../utils/minifyImageURL';
 import useTableFilters from '../hooks/useTableFilters';
 import prisma from "../lib/prisma.mjs";
@@ -68,6 +68,7 @@ export async function getStaticProps() {
       ath: true,
       atl: true,
       categories: true,
+      coingeckoCategories: true,
       tickers: true,
       derivatives: true,
     }
@@ -121,6 +122,7 @@ export async function getStaticProps() {
       'ath',
       'atl',
       'categories',
+      'coingeckoCategories',
       'exchanges',
       'derivatives',
     ])

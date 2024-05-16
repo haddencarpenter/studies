@@ -22,9 +22,11 @@ import slugify from 'slugify'
 
 import styles from "../styles/navigationmenu.module.less"
 import { currentNarratives } from 'coinrotator-utils/variables.mjs'
+import useBreakPoint from '../hooks/useBreakPoint'
 
 const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected }) => {
   const router = useRouter()
+  const screens = useBreakPoint()
   let menuItems = [
     {
       label: 'Screener Tools',
@@ -78,9 +80,25 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
             key: `narrative-${slug}`,
             icon: <TagsOutlined className={styles.goldenPurple} />
           }
-          )
-        })
-      },
+        )
+      })
+    },
+    {
+      label: 'Tutorials',
+      key: 'tutorials',
+      children: [
+        {
+          label: <Link href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</Link>,
+          key: 'video-tutorials',
+          icon: <VideoCameraFilled className={styles.dustRed} />
+        },
+        {
+          label: <Link href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</Link>,
+          key: 'article-tutorials',
+          icon: <ReadFilled className={styles.gray} />
+        }
+      ]
+    },
       {
         label: 'Preselects',
         key: 'preselects',
@@ -153,22 +171,6 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           }
         ]
       },
-    {
-      label: 'Tutorials',
-      key: 'tutorials',
-      children: [
-        {
-          label: <Link href="https://youtu.be/OcyZcip24pM" target="_blank" rel="noreferrer">Video Tutorials</Link>,
-          key: 'video-tutorials',
-          icon: <VideoCameraFilled className={styles.dustRed} />
-        },
-        {
-          label: <Link href="https://coinrotator.medium.com/how-to-search-the-most-profitable-altcoins-daily-d8ac02d52e23" target="_blank" rel="noreferrer">Article Tutorials</Link>,
-          key: 'article-tutorials',
-          icon: <ReadFilled className={styles.gray} />
-        }
-      ]
-    },
     {
       label: 'Top Categories',
       key: 'topcategories',
@@ -271,16 +273,19 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
     }
   }
 
+  let props = {}
+  if (!screens.lg) {
+    props.openKeys = ['screenertools', 'currentnarratives', 'exchanges', 'preselects', 'topcategories', 'tutorials', 'about']
+  }
   return (
     <Menu
       mode="inline"
       motion={{}}
-      openKeys={['screenertools', 'currentnarratives', 'exchanges', 'preselects', 'topcategories', 'tutorials', 'about']}
       items={menuItems}
       className={styles.menu}
-      inlineIndent={0}
       selectedKeys={[selectedKey]}
       onClick={onMenuItemSelected}
+      {...props}
     />
   );
 }
