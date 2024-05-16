@@ -521,11 +521,26 @@ const CoinTable = ({
         width: 170,
         className: coinTableStyles.unclickableCell,
         sorter: (a, b) => Number(a.openInterest) - Number(b.openInterest),
-        render: (openInterest, data) => {
+        render: (openInterest) => {
           if (openInterest) {
+            return numberFormatter.format(openInterest)
+          } else {
+            return null
+          }
+        }
+      }
+    )
+    columns.push(
+      {
+        title: 'Open Interest (1h%)',
+        dataIndex: 'openInterestChangePercent1h',
+        width: 170,
+        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.openInterestChangePercent1h) - Number(b.openInterestChangePercent1h),
+        render: (openInterestChangePercent1h) => {
+          if (openInterestChangePercent1h) {
             return (
               <>
-                {numberFormatter.format(openInterest)}
                 {!isNaN(data.openInterestChangePercent1h) ? (
                   <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent < 0 })}>
                     &nbsp;(
@@ -534,8 +549,27 @@ const CoinTable = ({
                     )
                   </span>
                 ) : null}
+              </>
+            )
+          } else {
+            return null
+          }
+        }
+      }
+    )
+    columns.push(
+      {
+        title: 'Open Interest (24h%)',
+        dataIndex: 'openInterestChangePercent24h',
+        width: 170,
+        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.openInterestChangePercent24h) - Number(b.openInterestChangePercent24h),
+        render: (openInterestChangePercent24h) => {
+          if (openInterestChangePercent24h) {
+            return (
+              <>
                 {!isNaN(data.openInterestChangePercent24h) ? (
-                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent24h < 0 })}>
+                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent < 0 })}>
                     &nbsp;(
                     {data.openInterestChangePercent24h > 0 ? '+' : ''}
                     {data.openInterestChangePercent24h}%
