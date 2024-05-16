@@ -18,6 +18,7 @@ const useTableFilters = (coinsData) => {
       exchanges: [],
       derivatives: [],
       showCirculatingSupplyPercentage: false,
+      show24VolumeByMarketCap: false,
       showPercentageFromATH: false,
       showPercentageFromATL: false,
       showMarketCapRank: false,
@@ -75,6 +76,11 @@ const useTableFilters = (coinsData) => {
         return {
           ...state,
           showCirculatingSupplyPercentage: action.payload
+        }
+      case 'SET_SHOW_24H_VOLUME_BY_MARKET_CAP':
+        return {
+          ...state,
+          show24hVolumeByMarketCap: action.payload
         }
       case 'SET_SHOW_PERCENTAGE_FROM_ATH':
         return {
@@ -249,6 +255,7 @@ const useTableFilters = (coinsData) => {
         trendLengthMax: router.query.trendLengthMax,
         superTrendFlavor: router.query.superTrendFlavor,
         showCirculatingSupplyPercentage: router.query.showCirculatingSupplyPercentage,
+        show24hVolumeByMarketCap: router.query.show24hVolumeByMarketCap,
         showPercentageFromATH: router.query.showPercentageFromATH,
         showPercentageFromATL: router.query.showPercentageFromATL,
         showMarketCapRank: router.query.showMarketCapRank,

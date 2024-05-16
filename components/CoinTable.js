@@ -47,6 +47,7 @@ const CoinTable = ({
     cexdex,
     superTrendFlavor,
     showCirculatingSupplyPercentage,
+    show24hVolumeByMarketCap,
     showPercentageFromATH,
     showPercentageFromATL,
     showMarketCapRank,
@@ -285,7 +286,7 @@ const CoinTable = ({
       percentageFromATH = round((livePrice / coinData.ath) * 100, 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate, futuresExchange, futuresVolume, openInterestChangePercent1h, openInterestChangePercent24h
+    let openInterest, fundingRate, futuresExchange, futuresVolume, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
@@ -293,6 +294,9 @@ const CoinTable = ({
         fundingRate = matchingCoinData.fundingRate ? round(matchingCoinData.fundingRate, 4) : null
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
         futuresVolume = matchingCoinData.futuresVolume24h
+        if (matchingCoinData.volume24h && coinData.marketCap) {
+          twentyFourHourVolumeByMarketCap = round(matchingCoinData.volume24h / parseFloat(coinData.marketCap), 2)
+        }
         openInterestChangePercent1h = round(matchingCoinData.openInterestChangePercent1h, 2)
         openInterestChangePercent24h = round(matchingCoinData.openInterestChangePercent24h, 2)
       }
@@ -316,6 +320,7 @@ const CoinTable = ({
       ath: coinData.ath,
       atl: coinData.atl,
       circulatingSupplyPercentage: `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`,
+      twentyFourHourVolumeByMarketCap,
       percentageFromATH,
       percentageFromATL,
       openInterest,
@@ -417,6 +422,17 @@ const CoinTable = ({
         width: 120,
         className: coinTableStyles.unclickableCell,
         sorter: (a, b) => Number(a.circulatingSupplyPercentage.slice(0, -1)) - Number(b.circulatingSupplyPercentage.slice(0, -1))
+      }
+    )
+  }
+  if (show24hVolumeByMarketCap) {
+    columns.push(
+      {
+        title: '24h Volume / Market Cap',
+        dataIndex: 'twentyFourHourVolumeByMarketCap',
+        width: 120,
+        className: coinTableStyles.unclickableCell,
+        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap.slice(0, -1))
       }
     )
   }

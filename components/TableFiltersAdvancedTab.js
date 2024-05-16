@@ -78,6 +78,18 @@ const TableFiltersAdvancedTab = ({
       </Row>
       <Row className={indexStyles.modalRow}>
         <Col span={22}>
+          <span>Show 24h Volume / Market Cap</span>
+        </Col>
+        <Col span={2}>
+          <Switch
+            className={indexStyles.modalSwitch}
+            checked={formState.show24hVolumeByMarketCap}
+            onChange={(checked) => { formDispatch({ type: 'SET_SHOW_24H_VOLUME_BY_MARKET_CAP', payload: checked }) }}
+          />
+        </Col>
+      </Row>
+      <Row className={indexStyles.modalRow}>
+        <Col span={22}>
           <span>Show ATH</span>
         </Col>
         <Col span={2}>
