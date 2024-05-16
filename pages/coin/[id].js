@@ -393,7 +393,6 @@ export async function getStaticProps({ params }) {
     'launch_roi_usd',
     'launch_roi_eth',
     'launch_roi_btc',
-    'currentPrice',
     'coingeckoCategories',
   ])
   const categories = uniq([...coinData.categories, ...coinData.coingeckoCategories])
