@@ -47,7 +47,7 @@ const Sider = ({ topCategories, categories }) => {
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}
       </Space>
       <Space size={12} className={styles.connect}>
-        <ConnectButton />
+        { collapsed ? <></> : <ConnectButton /> }
       </Space>
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />
       <div className={styles.footer}>
