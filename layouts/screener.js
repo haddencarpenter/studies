@@ -7,6 +7,7 @@ import io from 'socket.io-client'
 import Header from '../components/Header'
 import Sider from '../components/Sider'
 import useDarkMode from "../hooks/usedarkmode"
+import useWallet from "../hooks/useWallet"
 import useBreakPoint from "../hooks/useBreakPoint"
 import useSocketStore from "../hooks/useSocketStore"
 import baseStyles from "../styles/base.module.less"
@@ -14,9 +15,11 @@ import SharedLayout from "../layouts/shared"
 
 export const DarkModeContext = createContext(null);
 export const NotificationContext = createContext(null);
+export const WalletContext = createContext(null);
 
 export default function ScreenerLayout(page, pageProps) {
   const darkMode = useDarkMode();
+  const [walletAddress, setWalletAddress, provider] = useWallet()
   const isDark = darkMode[0]
   const setSocket = useSocketStore(state => state.setSocket)
   useEffect(() => {
@@ -50,29 +53,31 @@ export default function ScreenerLayout(page, pageProps) {
   return (
     <HydrationProvider>
       <DarkModeContext.Provider value={darkMode}>
-        <NotificationContext.Provider value={api}>
-          {contextHolder}
-          <Layout className={baseStyles.outerLayout}>
-            <SharedLayout pageProps={pageProps} />
-            <Head>
-              <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
-              <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
-            </Head>
-            <Client>
-              { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
-            </Client>
-            <Layout className={baseStyles.innerLayout}>
+        <WalletContext.Provider value={[walletAddress, setWalletAddress, provider]}>
+          <NotificationContext.Provider value={api}>
+            {contextHolder}
+            <Layout className={baseStyles.outerLayout}>
+              <SharedLayout pageProps={pageProps} />
+              <Head>
+                <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
+                <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
+              </Head>
               <Client>
-                <Header
-                  categories={categories}
-                  screens={screens}
-                  topCategories={topCategories}
-                />
+                { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
               </Client>
-              {page}
+              <Layout className={baseStyles.innerLayout}>
+                <Client>
+                  <Header
+                    categories={categories}
+                    screens={screens}
+                    topCategories={topCategories}
+                  />
+                </Client>
+                {page}
+              </Layout>
             </Layout>
-          </Layout>
-        </NotificationContext.Provider>
+          </NotificationContext.Provider>
+        </WalletContext.Provider>
       </DarkModeContext.Provider>
     </HydrationProvider>
   )

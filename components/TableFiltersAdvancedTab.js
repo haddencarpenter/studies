@@ -1,12 +1,15 @@
 import { Row, Col, Switch, Divider } from 'antd'
 import classnames from 'classnames'
+import { useContext } from 'react'
 
 import indexStyles from '../styles/index.module.less'
+import { WalletContext } from '../layouts/screener.js'
 
 const TableFiltersAdvancedTab = ({
   formState,
   formDispatch,
  }) => {
+  const [walletAddress] = useContext(WalletContext)
   return (
     <>
       <Row className={classnames(indexStyles.modalRow, indexStyles.modalRowHeader)}>
