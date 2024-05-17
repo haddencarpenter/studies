@@ -152,7 +152,7 @@ const CoinTable = ({
     })
   }, [socket])
   useEffect(() => {
-    if (showOpenInterest || showFundingRate || showFuturesVolume) {
+    if (showOpenInterest || showFundingRate || showFuturesVolume || show24hVolumeByMarketCap) {
       const cache = JSON.parse(sessionStorage.getItem('live_coin_data'))
       if (cache) {
         setLiveCoinData(cache)
@@ -166,7 +166,7 @@ const CoinTable = ({
         socket.off('new_live_coin_data')
       }
     }
-  }, [showOpenInterest, showFundingRate, showFuturesVolume, socket, fetchLiveCoinData])
+  }, [showOpenInterest, showFundingRate, showFuturesVolume, show24hVolumeByMarketCap, socket, fetchLiveCoinData])
   useEffect(() => {
     setWatchlistCoins(getWatchListCoins())
   }, [])
@@ -295,7 +295,7 @@ const CoinTable = ({
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
         futuresVolume = matchingCoinData.futuresVolume24h
         if (matchingCoinData.volume24h && coinData.marketCap) {
-          twentyFourHourVolumeByMarketCap = round(matchingCoinData.volume24h / parseFloat(coinData.marketCap), 2)
+          twentyFourHourVolumeByMarketCap = matchingCoinData.volume24h / parseFloat(coinData.marketCap)
         }
         openInterestChangePercent1h = round(matchingCoinData.openInterestChangePercent1h, 2)
         openInterestChangePercent24h = round(matchingCoinData.openInterestChangePercent24h, 2)
@@ -432,7 +432,8 @@ const CoinTable = ({
         dataIndex: 'twentyFourHourVolumeByMarketCap',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap.slice(0, -1))
+        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap.slice(0, -1)),
+        render: (twentyFourHourVolumeByMarketCap) => twentyFourHourVolumeByMarketCap ? round(twentyFourHourVolumeByMarketCap * 100, 2) + '%' : null
       }
     )
   }
