@@ -1,0 +1,23 @@
+@import './variables.module.less';
+
+.text {
+  color: @cr-gray-7;
+}
+
+.link {
+  margin-bottom: 1em;
+  color: @black;
+  text-decoration: underline;
+
+  &:hover, &:focus {
+    color: var(--cr-primary-color);
+    text-decoration: underline;
+  }
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 1em;
+  width: 100%;
+}

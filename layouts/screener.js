@@ -19,7 +19,7 @@ export const WalletContext = createContext(null);
 
 export default function ScreenerLayout(page, pageProps) {
   const darkMode = useDarkMode();
-  const [walletAddress, setWalletAddress, provider] = useWallet()
+  const [walletAddress, setWalletAddress, provider, hasKeyPass, setHasKeyPass] = useWallet()
   const isDark = darkMode[0]
   const setSocket = useSocketStore(state => state.setSocket)
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function ScreenerLayout(page, pageProps) {
   return (
     <HydrationProvider>
       <DarkModeContext.Provider value={darkMode}>
-        <WalletContext.Provider value={[walletAddress, setWalletAddress, provider]}>
+        <WalletContext.Provider value={[walletAddress, setWalletAddress, provider, hasKeyPass, setHasKeyPass]}>
           <NotificationContext.Provider value={api}>
             {contextHolder}
             <Layout className={baseStyles.outerLayout}>

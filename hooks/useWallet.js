@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 const useWallet = () => {
   const [provider, setProvider] = useState(null)
   const [walletAddress, setWalletAddress] = useState(null)
+  const [hasKeyPass, setHasKeyPass] = useState(false)
 
   useEffect(() => {
     async function setProviderAndCheckConnection() {
@@ -18,7 +19,7 @@ const useWallet = () => {
     setProviderAndCheckConnection();
   }, [])
 
-  return [walletAddress, setWalletAddress, provider]
+  return [walletAddress, setWalletAddress, provider, hasKeyPass, setHasKeyPass]
 }
 
 export default useWallet

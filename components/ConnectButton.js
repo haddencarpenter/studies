@@ -15,7 +15,7 @@ const ConnectButton = ({ collapsed }) => {
     }
     if (!provider) {
       notification.error({
-        description: "Please install MetaMask",
+        description: "Please install MetaMask or any other Base-compatible wallet",
       })
       return
     }
