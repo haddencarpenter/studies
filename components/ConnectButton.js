@@ -21,11 +21,20 @@ const ConnectButton = ({ collapsed }) => {
     }
     setDisabled(true)
 
+    const onSwitchSuccess = async (wallet) => {
+      if (wallet) {
+        notification.success({
+          description: "Connected",
+        })
+      }
+    }
+
     const addAccount = async () => {
+      let wallet
       try {
         const accounts = await provider.request({ method: 'eth_requestAccounts' })
-        const walletAddress = accounts[0]
-        setWalletAddress(walletAddress)
+        wallet = accounts[0]
+        setWalletAddress(wallet)
       } catch(e) {
         notification.error({
           description: "Failed to connect",
@@ -41,13 +50,9 @@ const ConnectButton = ({ collapsed }) => {
               }
             ]
           })
-          if (walletAddress) {
-            notification.success({
-              description: "Connected",
-            })
-          }
+          onSwitchSuccess(wallet)
         } catch(e) {
-          if (e.code === 4902) {
+          if (e.code === 4902) { // chain not added
             try {
               await window.ethereum.request({
                 "method": "wallet_addEthereumChain",
@@ -65,15 +70,11 @@ const ConnectButton = ({ collapsed }) => {
                   }
                 ]
               })
-              if (walletAddress) {
-                notification.success({
-                  description: "Connected",
-                })
-              }
+              onSwitchSuccess(wallet)
             } catch(e) {
               console.error(e)
               notification.error({
-                description: "Failed to add Base chain, please switch manually: https://docs.base.org/docs/using-base/",
+                description: "Failed to add Base chain, please add manually: https://docs.base.org/docs/using-base/",
               })
             }
           } else {
