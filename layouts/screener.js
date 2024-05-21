@@ -7,7 +7,7 @@ import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
 
 import { WagmiProvider } from 'wagmi'
-import { base } from 'wagmi/chains'
+import { base, mainnet } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import Header from '../components/Header'
@@ -29,7 +29,7 @@ const metadata = {
   url: 'https://coinrotator.app', // origin must match your domain & subdomain
   icons: ['https://coinrotator.app/coin.svg']
 }
-const chains = [base]
+const chains = [mainnet, base]
 const config = defaultWagmiConfig({
   chains,
   projectId,
