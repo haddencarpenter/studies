@@ -7,7 +7,7 @@ import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
 
 import { WagmiProvider } from 'wagmi'
-import { base, mainnet } from 'wagmi/chains'
+import { base } from 'wagmi/chains'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import Header from '../components/Header'
@@ -33,7 +33,7 @@ const metadata = {
   url,
   icons: ['https://coinrotator.app/coin.svg']
 }
-const chains = [mainnet, base]
+const chains = [base]
 const config = defaultWagmiConfig({
   chains,
   projectId,
@@ -45,6 +45,7 @@ export default function ScreenerLayout(page, pageProps) {
   const darkMode = useDarkMode();
   const isDark = darkMode[0]
   createWeb3Modal({
+    defaultChain: base,
     wagmiConfig: config,
     projectId,
     featuredWalletIds: [
