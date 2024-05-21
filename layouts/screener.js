@@ -41,9 +41,13 @@ export default function ScreenerLayout(page, pageProps) {
   const darkMode = useDarkMode();
   const isDark = darkMode[0]
   createWeb3Modal({
-    defaultChain: base,
     wagmiConfig: config,
     projectId,
+    featuredWalletIds: [
+      'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+      '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
+      '18388be9ac2d02726dbac9777c96efaac06d744b2f6d580fccdd4127a6d01fd1'
+    ],
     enableAnalytics: true,
     themeMode: isDark ? 'dark' : 'light',
     themeVariables: {
