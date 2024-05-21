@@ -29,7 +29,7 @@ const handler = async (req, res) => {
       const result = (await alchemy.get(`getNFTs/?owner=${walletAddress}`)).data
       const contracts = result?.ownedNfts?.map(nft => nft?.contract?.address)
       console.log(contracts)
-      res.setHeader('Cache-Control', 'maxage=3600')
+      res.setHeader('Cache-Control', 'max-age=3600')
       if (contracts?.includes(KEY_PASS_CONTRACT)) {
         res.status(200).json({ ok: true })
       } else {
