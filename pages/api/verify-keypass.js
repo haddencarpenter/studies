@@ -18,7 +18,11 @@ alchemy.interceptors.request.use(AxiosLogger.requestLogger);
 const handler = async (req, res) => {
   const walletAddress = req.query.walletAddress
   const validWallet = walletAddress?.startsWith('0x')
-  if (req.method !== 'GET' || !validWallet) {
+  const isLocal = req.headers?.referer?.includes('localhost:300')
+  const isPreview = req.headers?.referer?.includes(process.env.VERCEL_BRANCH_URL)
+  const isProd = req.headers?.referer?.includes('coinrotator.app')
+  const isCoinrotatorReferrer = isLocal || isPreview || isProd
+  if (req.method !== 'GET' || !validWallet || !isCoinrotatorReferrer) {
     res.status(400).json({ ok: false })
   } else {
     try {
