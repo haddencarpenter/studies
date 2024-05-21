@@ -1,13 +1,22 @@
 import { Button } from 'antd'
 import classnames from 'classnames';
 import { useWeb3Modal } from '@web3modal/wagmi/react'
-import { useAccount } from 'wagmi'
+import { useAccount, useDisconnect } from 'wagmi'
+import { useCallback } from 'react';
 
 import connectButtonStyles from '../styles/connectButton.module.less';
 
 const ConnectButton = ({ collapsed }) => {
   const { open } = useWeb3Modal()
   const { address: walletAddress } = useAccount()
+  const { disconnect } = useDisconnect()
+  const connectOrDisconnect = useCallback(() => {
+    if (walletAddress) {
+      disconnect()
+    } else {
+      open()
+    }
+  }, [walletAddress, disconnect, open])
 
   let text
   if (collapsed) {
@@ -24,7 +33,7 @@ const ConnectButton = ({ collapsed }) => {
 
   return (
     <Button
-      onClick={open}
+      onClick={connectOrDisconnect}
       className={classnames(connectButtonStyles.button, { [connectButtonStyles.connected]: Boolean(walletAddress), [connectButtonStyles.collapsed]: collapsed })}
     >
       <span className={connectButtonStyles.text}>{text}</span>
