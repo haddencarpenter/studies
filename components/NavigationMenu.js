@@ -14,7 +14,8 @@ import {
   ReadFilled,
   StepBackwardOutlined,
   LineChartOutlined,
-  TagsOutlined
+  TagsOutlined,
+  LinkOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -23,10 +24,12 @@ import slugify from 'slugify'
 import styles from "../styles/navigationmenu.module.less"
 import { currentNarratives } from 'coinrotator-utils/variables.mjs'
 import useBreakPoint from '../hooks/useBreakPoint'
+import useKeyPass from '../hooks/useKeyPass'
 
 const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected }) => {
   const router = useRouter()
   const screens = useBreakPoint()
+  let hasKeyPass = useKeyPass()
   let menuItems = [
     {
       label: 'Screener Tools',
@@ -209,6 +212,24 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       ]
     },
   ]
+  if (hasKeyPass) {
+    menuItems.unshift({
+      label: `🍄 KEY PASS 🍄`,
+      key: 'keypass',
+      children: [
+        {
+          label: 'Lower timeframes',
+          icon: <a href="https://coinrotator-git-websockt-candles-my-team-49a155bf.vercel.app/" target="_blank"><LinkOutlined className={styles.daybreakBlue} /></a>,
+          key: 'lowertimeframes'
+        },
+        {
+          label: 'Advanced data',
+          icon: <a target="_blank" href="https://coinrotator-git-more-data-points-my-team-49a155bf.vercel.app/"><LinkOutlined className={styles.daybreakBlue} /></a>,
+          key: 'moredatapoints'
+        },
+      ]
+    })
+  }
   if (collapsed) {
     menuItems = [
       {
@@ -275,7 +296,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
 
   let props = {}
   if (!screens.lg) {
-    props.openKeys = ['screenertools', 'currentnarratives', 'exchanges', 'preselects', 'topcategories', 'tutorials', 'about']
+    props.openKeys = ['keypass', 'screenertools', 'currentnarratives', 'exchanges', 'preselects', 'topcategories', 'tutorials', 'about']
   }
   return (
     <Menu
