@@ -301,6 +301,10 @@ const CoinTable = ({
         openInterestChangePercent24h = round(matchingCoinData.openInterestChangePercent24h, 2)
       }
     }
+    let circulatingSupplyPercentage
+    if (coinData.totalSupply) { // Some coins have infinite supply and totalSupply is NULL for them
+      circulatingSupplyPercentage = `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`
+    }
     return {
       key: `${coinData.id}-${coinData.name}`,
       id: coinData.id,
@@ -319,7 +323,7 @@ const CoinTable = ({
       weeklySuperSuperTrendStreak: coinData.weeklySuperSuperTrendStreak,
       ath: coinData.ath,
       atl: coinData.atl,
-      circulatingSupplyPercentage: `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`,
+      circulatingSupplyPercentage,
       twentyFourHourVolumeByMarketCap,
       percentageFromATH,
       percentageFromATL,
@@ -421,7 +425,7 @@ const CoinTable = ({
         dataIndex: 'circulatingSupplyPercentage',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.circulatingSupplyPercentage.slice(0, -1)) - Number(b.circulatingSupplyPercentage.slice(0, -1))
+        sorter: (a, b) => Number(a.circulatingSupplyPercentage?.slice(0, -1)) - Number(b.circulatingSupplyPercentage?.slice(0, -1))
       }
     )
   }
