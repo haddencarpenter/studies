@@ -543,7 +543,7 @@ const CoinTable = ({
             return (
               <>
                 {!isNaN(openInterestChangePercent1h) ? (
-                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestChangePercent1h < 0 })}>
+                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: openInterestChangePercent1h < 0 })}>
                     &nbsp;(
                     {openInterestChangePercent1h > 0 ? '+' : ''}
                     {openInterestChangePercent1h}%
