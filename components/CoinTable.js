@@ -436,7 +436,7 @@ const CoinTable = ({
         dataIndex: 'twentyFourHourVolumeByMarketCap',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap.slice(0, -1)),
+        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap?.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap?.slice(0, -1)),
         render: (twentyFourHourVolumeByMarketCap) => twentyFourHourVolumeByMarketCap ? round(twentyFourHourVolumeByMarketCap * 100, 2) + '%' : null
       }
     )
@@ -460,7 +460,7 @@ const CoinTable = ({
         dataIndex: 'percentageFromATH',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.percentageFromATH.slice(0, -1)) - Number(b.percentageFromATH.slice(0, -1))
+        sorter: (a, b) => Number(a.percentageFromATH?.slice(0, -1)) - Number(b.percentageFromATH?.slice(0, -1))
       }
     )
   }
@@ -483,7 +483,7 @@ const CoinTable = ({
         dataIndex: 'percentageFromATL',
         width: 150,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.percentageFromATL.slice(0, -1)) - Number(b.percentageFromATL.slice(0, -1))
+        sorter: (a, b) => Number(a.percentageFromATL?.slice(0, -1)) - Number(b.percentageFromATL?.slice(0, -1))
       }
     )
   }
