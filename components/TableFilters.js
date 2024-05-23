@@ -30,7 +30,7 @@ const TableFilters = ({ coinsData, categories, portfolioInputValue, setPortfolio
   useEffect(() => {
     const path = router.asPath
     const afterHash = path.split('#')[1]
-    if (afterHash.startsWith('customize')) {
+    if (afterHash?.startsWith('customize')) {
       setFilterModalVisible(true)
     }
     if (afterHash === 'customize-advanced-filters') {
