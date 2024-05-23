@@ -436,7 +436,7 @@ const CoinTable = ({
         dataIndex: 'twentyFourHourVolumeByMarketCap',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap?.slice(0, -1)) - Number(b.twentyFourHourVolumeByMarketCap?.slice(0, -1)),
+        sorter: (a, b) => Number(a.twentyFourHourVolumeByMarketCap) - Number(b.twentyFourHourVolumeByMarketCap),
         render: (twentyFourHourVolumeByMarketCap) => twentyFourHourVolumeByMarketCap ? round(twentyFourHourVolumeByMarketCap * 100, 2) + '%' : null
       }
     )
