@@ -236,13 +236,15 @@ const CoinTable = ({
         }
       }
     })
+    const hasDailyOrWeekly = trends ? (coinData.dailySuperSuperTrend !== undefined || coinData.weeklySuperSuperTrend !== undefined) : true
     return coinData.marketCap <= max &&
            coinData.marketCap >= min &&
            matchesPortfolio &&
            matchesCategory &&
            matchesExchanges &&
            matchesDerivatives &&
-           matchesCexDex
+           matchesCexDex &&
+           hasDailyOrWeekly
   })
   displayedCoinData = displayedCoinData.filter((coinData) => {
     let min = parseInt(trendLengthMin)
