@@ -16,7 +16,7 @@ const Socials = ({ collapsed }) => {
       </a>
       <a href="https://x.com/coinrotatorapp" target="_blank" rel="noreferrer">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/twitter.svg" alt="X Logo" />
+        <img src="/x3.svg" alt="X Logo" />
       </a>
       <a href="https://coinrotator.medium.com/" target="_blank" rel="noreferrer">
         {/* eslint-disable-next-line @next/next/no-img-element */}
