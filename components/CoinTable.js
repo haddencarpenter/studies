@@ -197,16 +197,16 @@ const CoinTable = ({
 
   let displayedCoinData = coinsData.map((coinData) => {
     if (trends) {
-      // const dailyTrend = trends.daily[coinData.id]?.supersuperTrend
-      // if (dailyTrend) {
+      const dailyTrend = trends.daily[coinData.id]?.supersuperTrend
+      if (dailyTrend) {
         coinData.dailySuperSuperTrend = 'UP'
         coinData.dailySuperSuperTrendStreak = 2
-      // }
-      // const weeklyTrend = trends.weekly[coinData.id]?.supersuperTrend
-      // if (weeklyTrend) {
+      }
+      const weeklyTrend = trends.weekly[coinData.id]?.supersuperTrend
+      if (weeklyTrend) {
         coinData.weeklySuperSuperTrend = 'UP'
         coinData.weeklySuperSuperTrendStreak = 2
-      // }
+      }
     }
     return coinData
   })
