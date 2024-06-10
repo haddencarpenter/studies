@@ -550,10 +550,8 @@ const CoinTable = ({
               <>
                 {!isNaN(openInterestChangePercent1h) ? (
                   <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: openInterestChangePercent1h < 0 })}>
-                    &nbsp;(
                     {openInterestChangePercent1h > 0 ? '+' : ''}
                     {openInterestChangePercent1h}%
-                    )
                   </span>
                 ) : null}
               </>
@@ -577,10 +575,8 @@ const CoinTable = ({
               <>
                 {!isNaN(openInterestChangePercent24h) ? (
                   <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: openInterestChangePercent24h < 0 })}>
-                    &nbsp;(
                     {openInterestChangePercent24h > 0 ? '+' : ''}
                     {openInterestChangePercent24h}%
-                    )
                   </span>
                 ) : null}
               </>
