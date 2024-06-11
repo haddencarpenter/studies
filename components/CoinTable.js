@@ -288,14 +288,14 @@ const CoinTable = ({
       percentageFromATH = round(((coinData.ath - livePrice) / coinData.ath * 100), 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate, futuresExchange, futuresVolume, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
+    let openInterest, fundingRate, futuresExchange, openInterestByFuturesVolume24h, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
         openInterest = matchingCoinData.openInterest
         fundingRate = matchingCoinData.fundingRate ? round(matchingCoinData.fundingRate, 4) : null
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
-        futuresVolume = matchingCoinData.futuresVolume24h
+        openInterestByFuturesVolume24h = matchingCoinData.openInterestByfuturesVolume24h
         if (matchingCoinData.volume24h && coinData.marketCap) {
           twentyFourHourVolumeByMarketCap = matchingCoinData.volume24h / parseFloat(coinData.marketCap)
         }
@@ -332,7 +332,7 @@ const CoinTable = ({
       openInterest,
       fundingRate,
       futuresExchange,
-      futuresVolume,
+      openInterestByFuturesVolume24h,
       openInterestChangePercent1h,
       openInterestChangePercent24h,
     }
@@ -615,13 +615,13 @@ const CoinTable = ({
     columns.push(
       {
         title: 'OI / 24h Volume',
-        dataIndex: 'futuresVolume',
+        dataIndex: 'openInterestByFuturesVolume24h',
         width: 120,
         className: coinTableStyles.unclickableCell,
-        sorter: (a, b) => Number(a.futuresVolume) - Number(b.futuresVolume),
-        render: (futuresVolume) => {
-          if (futuresVolume) {
-            return numberFormatter.format(futuresVolume)
+        sorter: (a, b) => Number(a.openInterestByFuturesVolume24h) - Number(b.openInterestByFuturesVolume24h),
+        render: (openInterestByFuturesVolume24h) => {
+          if (openInterestByFuturesVolume24h) {
+            return numberFormatter.format(openInterestByFuturesVolume24h)
           } else {
             return null
           }
