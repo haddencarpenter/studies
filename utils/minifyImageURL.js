@@ -1,5 +1,5 @@
 export const getImageSlug = (largeImage) => {
-  return largeImage.replace("https://assets.coingecko.com/coins/images", "")
+  return largeImage.replace("https://coin-images.coingecko.com/coins/images", "")
 }
 
 export const getImageURL = (imageSlug, imageSize = 'large') => {
@@ -7,6 +7,6 @@ export const getImageURL = (imageSlug, imageSize = 'large') => {
   if (imageSlug === `missing_${imageSize}.png`) {
     return "/favicon-32x32.png"
   } else {
-    return `https://assets.coingecko.com/coins/images${imageSlug}`
+    return `https://coin-images.coingecko.com/coins/images${imageSlug}`
   }
 }

@@ -13,7 +13,7 @@ let moduleExports = {
   },
   staticPageGenerationTimeout: 60 * 60,
   images: {
-    domains: ['assets.coingecko.com'],
+    domains: ['assets.coingecko.com', 'coin-images.coingecko.com'],
   },
   env: {
     'TZ': 'UTC',
