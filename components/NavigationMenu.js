@@ -221,12 +221,7 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           label: 'Lower timeframes',
           icon: <a href="https://coinrotator-git-websockt-candles-my-team-49a155bf.vercel.app/" target="_blank"><LinkOutlined className={styles.daybreakBlue} /></a>,
           key: 'lowertimeframes'
-        },
-        {
-          label: 'Advanced data',
-          icon: <a target="_blank" href="https://coinrotator-git-more-data-points-my-team-49a155bf.vercel.app/"><LinkOutlined className={styles.daybreakBlue} /></a>,
-          key: 'moredatapoints'
-        },
+        }
       ]
     })
   }
