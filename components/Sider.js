@@ -5,6 +5,7 @@ import {
 } from '@ant-design/icons'
 import classnames from 'classnames'
 import { useState, useContext } from 'react'
+import TelegramLoginButton from 'react-telegram-login';
 
 import Logo from './Logo'
 import Search from './Search'
@@ -21,6 +22,9 @@ const Sider = ({ topCategories, categories }) => {
   const [collapsed, setCollapsed] = useState(false)
   const [collapsing, setCollapsing] = useState(false)
   let Trigger = collapsed ? MenuUnfoldOutlined : MenuFoldOutlined
+  const handleTelegramResponse = response => {
+    console.log(response);
+  };
 
   return (
     <Layout.Sider
@@ -46,9 +50,10 @@ const Sider = ({ topCategories, categories }) => {
         <Search categories={categories} collapsed={collapsed} />
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}
       </Space>
-      {/* <Space size={12} className={styles.connect}>
+      <Space size={12} className={styles.connect}>
         { collapsed ? <></> : <ConnectButton /> }
-      </Space> */}
+        { collapsed ? <></> : <TelegramLoginButton dataOnauth={handleTelegramResponse} botName="CRtesting_bot" /> }
+      </Space>
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />
       <div className={styles.footer}>
         <Socials collapsed={collapsed} />
