@@ -288,7 +288,7 @@ const CoinTable = ({
       percentageFromATH = round(((coinData.ath - livePrice) / coinData.ath * 100), 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate, futuresExchange, openInterestByFuturesVolume24h, openInterestByfuturesVolume24hChangePercent, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
+    let openInterest, fundingRate, futuresExchange, openInterestByFuturesVolume24h, openInterestByfuturesVolume24hChangePercent24h, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
@@ -296,7 +296,7 @@ const CoinTable = ({
         fundingRate = matchingCoinData.fundingRate ? round(matchingCoinData.fundingRate, 4) : null
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
         openInterestByFuturesVolume24h = matchingCoinData.openInterestByfuturesVolume24h
-        openInterestByfuturesVolume24hChangePercent = matchingCoinData.openInterestByfuturesVolume24hChangePercent
+        openInterestByfuturesVolume24hChangePercent24h = matchingCoinData.openInterestByfuturesVolume24hChangePercent24h
         if (matchingCoinData.volume24h && coinData.marketCap) {
           twentyFourHourVolumeByMarketCap = matchingCoinData.volume24h / parseFloat(coinData.marketCap)
         }
@@ -334,7 +334,7 @@ const CoinTable = ({
       fundingRate,
       futuresExchange,
       openInterestByFuturesVolume24h,
-      openInterestByfuturesVolume24hChangePercent,
+      openInterestByfuturesVolume24hChangePercent24h,
       openInterestChangePercent1h,
       openInterestChangePercent24h,
     }
