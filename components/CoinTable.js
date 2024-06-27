@@ -288,7 +288,7 @@ const CoinTable = ({
       percentageFromATH = round(((coinData.ath - livePrice) / coinData.ath * 100), 2) + '%'
       percentageFromATL = round((livePrice / coinData.atl) * 100, 2) + '%'
     }
-    let openInterest, fundingRate, futuresExchange, openInterestByFuturesVolume24h, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
+    let openInterest, fundingRate, futuresExchange, openInterestByFuturesVolume24h, openInterestByfuturesVolume24hChangePercent, openInterestChangePercent1h, openInterestChangePercent24h, twentyFourHourVolumeByMarketCap
     if (liveCoinData) {
       const matchingCoinData = liveCoinData.find(coin => coin.id === coinData.id)
       if (matchingCoinData) {
@@ -296,6 +296,7 @@ const CoinTable = ({
         fundingRate = matchingCoinData.fundingRate ? round(matchingCoinData.fundingRate, 4) : null
         futuresExchange = exchangeData.find(exchange => exchange.id === matchingCoinData.futuresExchangeId)
         openInterestByFuturesVolume24h = matchingCoinData.openInterestByfuturesVolume24h
+        openInterestByfuturesVolume24hChangePercent = matchingCoinData.openInterestByfuturesVolume24hChangePercent
         if (matchingCoinData.volume24h && coinData.marketCap) {
           twentyFourHourVolumeByMarketCap = matchingCoinData.volume24h / parseFloat(coinData.marketCap)
         }
@@ -333,6 +334,7 @@ const CoinTable = ({
       fundingRate,
       futuresExchange,
       openInterestByFuturesVolume24h,
+      openInterestByfuturesVolume24hChangePercent,
       openInterestChangePercent1h,
       openInterestChangePercent24h,
     }
@@ -619,9 +621,21 @@ const CoinTable = ({
         width: 120,
         className: coinTableStyles.unclickableCell,
         sorter: (a, b) => Number(a.openInterestByFuturesVolume24h) - Number(b.openInterestByFuturesVolume24h),
-        render: (openInterestByFuturesVolume24h) => {
+        render: (openInterestByFuturesVolume24h, data) => {
           if (openInterestByFuturesVolume24h) {
-            return numberFormatter.format(openInterestByFuturesVolume24h)
+            return (
+              <>
+                <>{numberFormatter.format(openInterestByFuturesVolume24h)}</>
+                {data.openInterestByfuturesVolume24hChangePercent24h ? (
+                  <span className={classnames(coinTableStyles.changePercentage, { [coinTableStyles.changePercentageNegative]: data.openInterestByfuturesVolume24hChangePercent24h < 0 })}>
+                    (
+                      {data.openInterestByfuturesVolume24hChangePercent24h > 0 ? '+' : ''}
+                      {data.openInterestByfuturesVolume24hChangePercent24h}%
+                    )
+                  </span>
+                ) : null}
+              </>
+            )
           } else {
             return null
           }
