@@ -9,6 +9,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import prisma from '../lib/prisma.mjs';
 
 import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
+import { deformat } from '../utils/number.mjs';
 
 dotenv.config();
 puppeteer.use(StealthPlugin())
@@ -27,11 +28,18 @@ const initializeScraping = async () => {
   await page.setDefaultNavigationTimeout(0);
 }
 
-const scrapeCoinData = async (coinSymbol) => {
+const scrapeCoinData = async (coinId, coinSymbol) => {
   let openInterest = 0
-  let fundingRate = 0
   let futuresVolume24h = 0
-  return [openInterest, fundingRate, futuresVolume24h]
+  await page.goto(`https://coinalyze.net/${coinId}/open-interest/`)
+  openInterest = await page.$eval('.stats .box:nth-child(2) .box-row:first-child', node => node.innerText)
+  openInterest = deformat(openInterest)
+
+  await page.goto(`https://www.coinglass.com/currencies/${coinSymbol}`)
+  futuresVolume24h = await page.$eval('.ant-row:nth-child(2) > div:first-child .MuiBox-root:first-child .Number:nth-child(2)', node => node.ariaLabel)
+  futuresVolume24h = deformat(futuresVolume24h)
+
+  return [openInterest, futuresVolume24h]
 }
 
 const fetchCoinalyze = async () => {
@@ -87,10 +95,9 @@ const fetchCoinalyze = async () => {
     let futuresVolume24h = data.filter(data => data.futuresVolume24h)
     futuresVolume24h = sum(futuresVolume24h.map(data => data.futuresVolume24h))
     if (CME_SCRAPING_COINS.includes(coin.id)) {
-      const [scrapedOpenInterest, scrapedFundingRate, scrapedFuturesVolume24h] = await scrapeCoinData(coin.symbol)
-      openInterest += scrapedOpenInterest
-      fundingRate += scrapedFundingRate
-      futuresVolume24h += scrapedFuturesVolume24h
+      const [scrapedOpenInterest, scrapedFuturesVolume24h] = await scrapeCoinData(coin.id, coin.symbol.toUpperCase())
+      openInterest = scrapedOpenInterest
+      futuresVolume24h = scrapedFuturesVolume24h
     }
     await prisma.coin.update({
       where: {
