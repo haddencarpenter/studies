@@ -19,8 +19,8 @@ const preferredFundingRateMarkets = ['A', '6', '3']
 let browser, page
 const initializeScraping = async () => {
   browser = await puppeteer.launch({
-    headless: false,
-    devtools: true,
+    // headless: false,
+    // devtools: true,
     timeout: 1000000
   })
   page = await browser.newPage()
