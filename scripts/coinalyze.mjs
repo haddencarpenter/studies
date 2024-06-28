@@ -1,14 +1,13 @@
 import dotenv from 'dotenv';
 import axios from 'axios'
 import startofHour from 'date-fns/startOfHour/index.js';
+import sum from 'lodash/sum.js';
 
 import prisma from '../lib/prisma.mjs';
 
 import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
 
 dotenv.config();
-
-const preferredMarkets = ['A', '6', 'Y', 'F'];
 
 const fetchCoinalyze = async () => {
   const now = startofHour(new Date());
@@ -31,22 +30,28 @@ const fetchCoinalyze = async () => {
       symbol: {
         in: supportedFutureSymbols
       }
+    },
+    orderBy: {
+      marketCapRank: 'asc'
     }
   });
   for (const coin of databaseCoins) {
-    const supportedMarketsForCoin = supportedFutureMarkets.filter(market => market.base_asset.toLowerCase() === coin.symbol);
-    let market = supportedMarketsForCoin.filter(market => preferredMarkets.includes(market.exchange))
-                                        .sort((a, b) => preferredMarkets.indexOf(a.exchange) - preferredMarkets.indexOf(b.exchange))[0];
-    if (!market) {
-      market = supportedMarketsForCoin[0];
+    let supportedMarketsForCoin = supportedFutureMarkets.filter(market => market.base_asset.toLowerCase() === coin.symbol);
+    const requests = []
+    for (const market of supportedMarketsForCoin) {
+      requests.push(
+        getOpenInterest(market.symbol, market.exchange),
+        getFundingRate(market.symbol, market.exchange),
+        getVolume24h(market.symbol, market.exchange)
+      )
     }
-    const marketExchange = supportedExchanges.find(exchange => exchange.code === market.exchange);
-    const databaseExchange = databaseExchanges.find(exchange => exchange.name === marketExchange.name);
-    const [openInterest, fundingRate, futuresVolume24h] = await Promise.all([
-        getOpenInterest(market.symbol),
-        getFundingRate(market.symbol),
-        getVolume24h(market.symbol)
-    ])
+    const data = await Promise.all(requests)
+    let openInterest = data.filter(data => data.openInterest)
+    openInterest = sum(openInterest.map(data => data.openInterest))
+    let fundingRate = data.filter(data => data.fundingRate)
+    fundingRate = sum(fundingRate.map(data => data.fundingRate))
+    let futuresVolume24h = data.filter(data => data.futuresVolume24h)
+    futuresVolume24h = sum(futuresVolume24h.map(data => data.futuresVolume24h))
     await prisma.coin.update({
       where: {
         id: coin.id
@@ -54,7 +59,6 @@ const fetchCoinalyze = async () => {
       data: {
         openInterest,
         fundingRate,
-        futuresExchangeId: databaseExchange.id,
         futuresVolume24h,
       }
     });
