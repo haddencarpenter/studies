@@ -492,7 +492,7 @@ const CoinTable = ({
   if (showOpenInterest) {
     columns.push(
       {
-        title: 'Open Interest (1h)',
+        title: 'Open Interest',
         dataIndex: 'openInterest',
         width: 170,
         className: coinTableStyles.unclickableCell,
