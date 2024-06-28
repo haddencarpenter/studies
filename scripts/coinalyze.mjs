@@ -99,6 +99,9 @@ const fetchCoinalyze = async () => {
       openInterest = scrapedOpenInterest
       futuresVolume24h = scrapedFuturesVolume24h
     }
+    if (coin.id === CME_SCRAPING_COINS[CME_SCRAPING_COINS.length - 1]) {
+      await browser.close()
+    }
     await prisma.coin.update({
       where: {
         id: coin.id
