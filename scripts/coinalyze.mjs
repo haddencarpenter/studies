@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import axios from 'axios'
 import startofHour from 'date-fns/startOfHour/index.js';
 import sum from 'lodash/sum.js';
+import mean from 'lodash/mean.js';
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
@@ -12,6 +13,7 @@ import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getF
 dotenv.config();
 puppeteer.use(StealthPlugin())
 const CME_SCRAPING_COINS = ['bitcoin', 'ethereum']
+const preferredFundingRateMarkets = ['A', '6', '3']
 
 let browser, page
 const initializeScraping = async () => {
@@ -61,19 +63,27 @@ const fetchCoinalyze = async () => {
   });
   for (const coin of databaseCoins) {
     let supportedMarketsForCoin = supportedFutureMarkets.filter(market => market.base_asset.toLowerCase() === coin.symbol);
+    let preferredFundingRateMarket = supportedMarketsForCoin.find(market => preferredFundingRateMarkets.includes(market.exchange))
+    if (!preferredFundingRateMarket) {
+      preferredFundingRateMarket = supportedMarketsForCoin[0]
+    }
     const requests = []
     for (const market of supportedMarketsForCoin) {
       requests.push(
         getOpenInterest(market.symbol, market.exchange),
-        getFundingRate(market.symbol, market.exchange),
         getVolume24h(market.symbol, market.exchange)
       )
+      if (market.exchange === preferredFundingRateMarket.exchange) {
+        requests.push(
+          getFundingRate(market.symbol, market.exchange)
+        )
+      }
     }
     const data = await Promise.all(requests)
     let openInterest = data.filter(data => data.openInterest)
     openInterest = sum(openInterest.map(data => data.openInterest))
     let fundingRate = data.filter(data => data.fundingRate)
-    fundingRate = sum(fundingRate.map(data => data.fundingRate))
+    fundingRate = mean(fundingRate.map(data => data.fundingRate))
     let futuresVolume24h = data.filter(data => data.futuresVolume24h)
     futuresVolume24h = sum(futuresVolume24h.map(data => data.futuresVolume24h))
     if (CME_SCRAPING_COINS.includes(coin.id)) {
