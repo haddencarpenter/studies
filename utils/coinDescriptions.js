@@ -40,7 +40,7 @@ export async function getDescriptionByCoin(coin) {
 
   let description
   if (coinData) {
-    description = coinData.attributes.description
+    description = coinData.attributes.description || coin.description
     if (coinData.attributes.isArticle !== 'yes') {
       description = addTemplateDescription(description, coin)
     }
