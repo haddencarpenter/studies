@@ -38,12 +38,14 @@ const handler = async (req, res) => {
     dateTime = dateTime.split('?')[1]
   } catch(e) {
     console.error(e)
+    console.log(req.url)
     console.log(signature, decryptedData)
     res.status(400).send("Bad request")
     return
   }
 
   if (Number(dateTime) * 1000 < subMinutes(new Date(), 1).getTime()) {
+    console.log(dateTime)
     res.status(400).send("Bad request")
     return
   }
