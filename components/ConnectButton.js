@@ -13,11 +13,9 @@ const ConnectButton = ({ collapsed }) => {
   const { address: nativeWalletAddress } = useAccount()
   const { disconnect: nativeDisconnect } = useDisconnect()
   const [cookies, , removeCookie] = useCookies(['user']);
-  let telegramUserName, telegramId, telegramWalletAddress
+  let telegramId, telegramWalletAddress
   if (cookies.user) {
-    telegramUserName = cookies.user.userName
-    telegramId = cookies.user.telegramId
-    telegramWalletAddress = cookies.user.walletAddress
+    ({ telegramId, walletAddress: telegramWalletAddress } = cookies.user);
   }
   const finalWalletAddress = nativeWalletAddress || telegramWalletAddress
 
@@ -88,7 +86,7 @@ const ConnectButton = ({ collapsed }) => {
             <Button
               onClick={telegramConnectOrDisconnect}
             >
-              {telegramId ? `Disconnect from Telegram` : `Connect Telegram`}
+              {telegramId ? `Disconnect Telegram` : `Connect Telegram`}
             </Button>
           )}
         </div>

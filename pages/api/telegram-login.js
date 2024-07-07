@@ -6,11 +6,12 @@ import decrypt from '../../utils/decrypt.js'
 
 const onSuccess = (res, user) => {
   const relevantUserData = pick(user, ['telegramId', 'telegramUserName', 'walletAddress'])
-  const twentyYearsFromNow = new Date();
+  let twentyYearsFromNow = new Date();
   twentyYearsFromNow.setFullYear(twentyYearsFromNow.getFullYear() + 20);
-  res.setHeader('Set-Cookie', `user=${JSON.stringify(relevantUserData)};Expires=${twentyYearsFromNow.toUTCString()};Secure;SameSite=Strict;Path=/;`);
+  twentyYearsFromNow = twentyYearsFromNow.toUTCString();
+  res.setHeader('Set-Cookie', `user=${JSON.stringify(relevantUserData)};Expires=${twentyYearsFromNow};Secure;SameSite=Strict;Path=/;`);
 
-  res.writeHead(307, { Location: new URL('/', process.env.NEXT_PUBLIC_SITE_URL) });
+  res.writeHead(307, { Location: new URL(process.env.NEXT_PUBLIC_SITE_URL) });
 
   res.end();
 }
