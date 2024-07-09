@@ -88,6 +88,16 @@
     button {
       height: 40px;
       font-size: 16px;
+
+      &.connected {
+        background-color: var(--cr-error-color);
+        color: white;
+
+        &:hover {
+          background-color: var(--cr-error-color) !important;
+          border-color: var(--cr-primary-border);
+        }
+      }
     }
   }
 

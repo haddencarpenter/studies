@@ -38,7 +38,7 @@ const ConnectButton = ({ collapsed }) => {
     }
   }, [telegramId, removeCookie])
 
-  let text
+  let text, modalDescription
   if (collapsed) {
     if (finalWalletAddress) {
       text = `0x${finalWalletAddress.slice(2, 4).toUpperCase()}...${finalWalletAddress.slice(-4).toUpperCase()}`
@@ -49,6 +49,11 @@ const ConnectButton = ({ collapsed }) => {
     } else {
       text = 'Connect'
     }
+  }
+  if (finalWalletAddress) {
+    modalDescription = "After you are disconnect, you will be able to reconnect here with Telegram or your wallet."
+  } else {
+    modalDescription = "Connect your wallet natively or with Telegram in order to access advanced features and/or use your Key Pass."
   }
 
   return (
@@ -67,26 +72,28 @@ const ConnectButton = ({ collapsed }) => {
         open={loginModalVisible}
         onCancel={() => setLoginModalVisible(false)}
         footer={null}
-        title="Connect"
+        title={finalWalletAddress ? "Disconnect" : "Connect"}
         zIndex={10}
         className={connectButtonStyles.modal}
         centered
       >
-        {finalWalletAddress ? null : (<p className={connectButtonStyles.modalDescription}>Connect your wallet or login with Telegram in order to access advanced features and/or use your Key Pass.</p>)}
+        <p className={connectButtonStyles.modalDescription}>{modalDescription}</p>
         <div className={connectButtonStyles.modalButtons}>
           {!telegramWalletAddress && (
             <Button
               type="primary"
+              className={{ [connectButtonStyles.connected]: Boolean(finalWalletAddress)}}
               onClick={nativeConnectOrDisconnect}
             >
-              {nativeWalletAddress ? `Disconnect Wallet` : `Connect Wallet`}
+              {nativeWalletAddress ? `Disconnect` : `Connect Wallet`}
             </Button>
           )}
           {!nativeWalletAddress && (
             <Button
               onClick={telegramConnectOrDisconnect}
+              className={{ [connectButtonStyles.connected]: Boolean(finalWalletAddress)}}
             >
-              {telegramId ? `Disconnect Telegram` : `Connect Telegram`}
+              {telegramId ? `Disconnect` : `Connect Telegram`}
             </Button>
           )}
         </div>
