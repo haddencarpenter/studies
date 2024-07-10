@@ -11,14 +11,17 @@ const onSuccess = (res, user) => {
   twentyYearsFromNow = twentyYearsFromNow.toUTCString();
   res.setHeader('Set-Cookie', `user=${JSON.stringify(relevantUserData)};Expires=${twentyYearsFromNow};Secure;SameSite=Strict;Path=/;`);
 
-  res.writeHead(307, { Location: new URL(process.env.NEXT_PUBLIC_SITE_URL) });
+  redirectToMainSite(res)
+}
 
+const redirectToMainSite = (res) => {
+  res.writeHead(307, { Location: new URL(process.env.NEXT_PUBLIC_SITE_URL) });
   res.end();
 }
 
 const handler = async (req, res) => {
   if (req.method !== 'GET' || !req.query.signature) {
-    res.status(400).send("Bad request")
+    redirectToMainSite(res)
     return
   }
   let signature, decryptedData, telegramId, telegramUserName, walletAddress, dateTime
@@ -37,13 +40,13 @@ const handler = async (req, res) => {
     console.error(e)
     console.log(req.url)
     console.log(signature, decryptedData)
-    res.status(400).send("Bad request")
+    redirectToMainSite(res)
     return
   }
 
   if (Number(dateTime) * 1000 < subMinutes(new Date(), 1).getTime()) {
     console.log(dateTime)
-    res.status(400).send("Bad request")
+    redirectToMainSite(res)
     return
   }
 
@@ -56,7 +59,7 @@ const handler = async (req, res) => {
     if (existingUser.telegramId === telegramId) {
       onSuccess(res, existingUser)
     } else {
-      res.status(403).json({ ok: false })
+      redirectToMainSite(res)
       return
     }
   } else {
