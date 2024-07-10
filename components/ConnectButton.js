@@ -51,9 +51,9 @@ const ConnectButton = ({ collapsed }) => {
     }
   }
   if (finalWalletAddress) {
-    modalDescription = "After you are disconnect, you will be able to reconnect here with Telegram or your wallet."
+    modalDescription = "After you are disconnect, you will be able to reconnect here with your wallet directly or through Telegram."
   } else {
-    modalDescription = "Connect your wallet natively or with Telegram in order to access advanced features and/or use your Key Pass."
+    modalDescription = "Connect your wallet directly or through Telegram to access advanced features and use your Key Pass."
   }
 
   return (
