@@ -1,5 +1,5 @@
 import { AdvancedRealTimeChart } from "react-ts-tradingview-widgets";
-import { TwitterOutlined, GlobalOutlined } from '@ant-design/icons';
+import { XOutlined, GlobalOutlined } from '@ant-design/icons';
 import { useContext, useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { Card, Space, Table, Tag, Typography } from 'antd';
 import Link from 'next/link'
@@ -88,8 +88,8 @@ const PriceDataTab = ({ coin, screens, liveCoinData, price }) => {
     <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionOnline, coinStyles.sectionFlex, { [coinStyles.sectionOnlineFW]: !coin.platforms.length })}>
       <Space wrap>
         { coin.twitter ? (
-          <a href={`https://twitter.com/${coin.twitter}`} target="_blank" rel="noreferrer">
-            <Tag icon={<TwitterOutlined />} color="#55ACEE" className={coinStyles.button}>
+          <a href={`https://x.com/${coin.twitter}`} target="_blank" rel="noreferrer">
+            <Tag icon={<XOutlined />} color="#55ACEE" className={coinStyles.button}>
             @{coin.twitter}
             </Tag>
           </a>
@@ -314,7 +314,7 @@ const PriceDataTab = ({ coin, screens, liveCoinData, price }) => {
       ) : <></>
     }
     <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionChart)} id="chart">
-      { showChart ? <Chart symbol={`${coin.symbol.toUpperCase()}USDT`} hideToolbar={!screens.sm} darkMode={darkMode} /> : <></> }
+      { showChart ? <Chart symbol={coin.chart} hideToolbar={!screens.sm} darkMode={darkMode} /> : <></> }
     </Card.Grid>
   </>;
 }

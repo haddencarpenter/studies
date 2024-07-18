@@ -366,7 +366,7 @@ export async function getStaticProps({ params }) {
       return pick(coin, ['id', 'name', 'imageSlug'])
     })
   }
-  const description = await getDescriptionByCoin(coinData)
+  const [description, TVChart] = await getDescriptionByCoin(coinData)
   const platforms = await getPlatformData(coinData.platforms, coinData.defaultPlatform)
   const chainsData = await getChainsData();
   coinData.imageSlug = getImageSlug(coinData.images.large)
@@ -396,6 +396,7 @@ export async function getStaticProps({ params }) {
     'coingeckoCategories',
   ])
   const categories = uniq([...coinData.categories, ...coinData.coingeckoCategories])
+  const chart = TVChart || `${coinData.symbol.toUpperCase()}USDT`
   return {
     props: {
       ...coinData,
@@ -415,6 +416,7 @@ export async function getStaticProps({ params }) {
       description,
       similarCoins,
       appData,
+      chart,
     }
   }
 }

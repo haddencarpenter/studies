@@ -25,6 +25,7 @@ import coinTableStyles from '../styles/table.module.less';
 
 const CoinTable = ({
     coinsData,
+    hiddenCoins,
     exchangeData,
     formState,
     defaultFormState,
@@ -247,7 +248,8 @@ const CoinTable = ({
            matchesExchanges &&
            matchesDerivatives &&
            matchesCexDex &&
-           hasDailyOrWeekly
+           hasDailyOrWeekly &&
+           !hiddenCoins.includes(coinData.slug)
   })
   displayedCoinData = displayedCoinData.filter((coinData) => {
     let min = parseInt(trendLengthMin)

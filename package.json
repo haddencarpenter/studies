@@ -26,6 +26,7 @@
     "debbb": "node dist/daily.mjs"
   },
   "dependencies": {
+    "@ant-design/icons": "4.8.2",
     "@ant-design/plots": "^1.2.5",
     "@metamask/detect-provider": "2",
     "@next/bundle-analyzer": "^13.4.9",

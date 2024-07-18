@@ -128,7 +128,7 @@ export default function WatchList({ appData, pageData }) {
       width: 200,
       dataIndex: 'name',
       fixed: hydrated ? 'left' : null,
-      sorter: (a, b) => a.coins.name.localeCompare(b.coins.name),
+      sorter: (a, b) => a.name.localeCompare(b.name),
       render: (name, coin) => {
         return (
           (<Link href={`/coin/${coin.id}`} className={tableStyles.coin} passHref>

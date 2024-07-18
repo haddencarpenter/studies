@@ -41,7 +41,7 @@ export default function Faq() {
           Primarily on the SuperTrend indicator. CoinRotator&apos;s default settings are faster than the respective indicator found on Tradingview. In addition we track the performance of altcoins against BTC ETH and USDT. An &quot;actionable&quot; trend is only generated if all three markets are in agreement. If not, a <HodlTag /> trend is issued.
         </Panel>
         <Panel header="How accurate are Trends?" key="4">
-          They are not designed to be a complete trading system. You&apos;ll need to check the trend health of the overall market before taking any position (we built a <Link href="/market-health">Market Health oscillator</Link> to asses the overall market conditions). Also, check out the Twitter feed for your chosen coin (found on the coin pages), and then check the trend staus of BTC. If things look positive (or excessively negative, for that matter), it&apos;s a likely winner.
+          They are not designed to be a complete trading system. You&apos;ll need to check the trend health of the overall market before taking any position (we built a <Link href="/market-health">Market Health oscillator</Link> to asses the overall market conditions). Also, check out the X feed for your chosen coin (found on the coin pages), and then check the trend staus of BTC. If things look positive (or excessively negative, for that matter), it&apos;s a likely winner.
         </Panel>
         <Panel header="How to Apply the Supertrend indicator to the Coin Page Chart?" key="5">
           <ol className={faqStyles.imageList}>
@@ -86,7 +86,7 @@ If you prefer you can always bookmark <a href="https://coinrotator.app/todays-tr
     </Panel>
 <Panel header="Does CoinRotator have Discord bots?" key="14">
 
-Yes! We have a Coinrotator Discord bot as well. If this link has expired, please message us directly on twitter @coinrotatorapp
+Yes! We have a Coinrotator Discord bot as well. If this link has expired, please message us directly on X @coinrotatorapp
 The discord has the Daily Trend Alerts as well as the 4hr signals sorted by sector.
 
     </Panel>

@@ -6,14 +6,13 @@ import slugify from 'slugify';
 import { useCallback, useState, useEffect } from 'react';
 import Link from 'next/link'
 import { formatDistanceToNowStrict } from 'date-fns'
-import { signals, SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
+import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs';
 import { gql } from '@urql/core'
 
 import baseStyles from '../styles/base.module.less'
 import indexStyles from '../styles/index.module.less'
 import globalData from '../lib/globalData';
 import PageHeader from '../components/PageHeader'
-import prisma from "../lib/prisma.mjs";
 import useVirtualTable from '../hooks/useVirtualTable';
 import { dailySuperSuperTrend, marketCap, dailySuperSuperTrendStreak, weeklySuperSuperTrend } from '../utils/sharedColumns';
 import useIsHoverable from '../hooks/useIsHoverable';
@@ -23,7 +22,8 @@ import strapi from '../utils/strapi';
 import tableStyles from '../styles/table.module.less'
 import coinTableStyles from '../styles/table.module.less';
 
-export default function FourHourAlerts({ alerts, appData, pageData }) {
+export default function FourHourAlerts({ appData, pageData }) {
+  const [alerts, setAlerts] = useState([])
   const router = useRouter()
   const hydrated = useHydrated()
   const isHoverable = useIsHoverable()
@@ -36,6 +36,14 @@ export default function FourHourAlerts({ alerts, appData, pageData }) {
       }, (trends) => setTrends(trends))
     }
   }, [socket])
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      const res = await fetch('/api/4h-alerts')
+      const { alerts } = await res.json()
+      setAlerts(alerts)
+    }
+    fetchAlerts()
+  }, [])
   useEffect(() => {
     console.log('useeffect fetch trends')
     fetchTrends()
@@ -154,62 +162,8 @@ export default function FourHourAlerts({ alerts, appData, pageData }) {
   );
 }
 
-export async function getServerSideProps(ctx) {
+export async function getStaticProps() {
   const appData = await globalData();
-  const alerts = await prisma.FourHourTrends.findMany({
-    take: 1000,
-    orderBy: {
-      timestamp: 'desc'
-    },
-  });
-  let coinSymbols = new Set()
-  for (const alert of alerts) {
-    coinSymbols.add(alert.coinsymbol.toLowerCase())
-  }
-  let coins = await prisma.Coin.findMany({
-    where: {
-      symbol: {
-        in: [...coinSymbols]
-      }
-    },
-    select: {
-      id: true,
-      name: true,
-      symbol: true,
-      categories: true,
-      images: true,
-      marketCap: true,
-      coingeckoCategories: true
-    }
-  })
-  const alertsToDelete = []
-  for (const [i, alert] of alerts.entries()) {
-    const coin = coins.find(coin => coin.symbol.toLowerCase() === alert.coinsymbol.toLowerCase())
-    if (!coin) {
-      alertsToDelete.push(i)
-      continue;
-    }
-    alert.name = coin.name
-    alert.categories = [...coin.categories, ...coin.coingeckoCategories]
-    alert.image = coin.images.small
-    alert.id = coin.id
-    alert.marketCap = coin.marketCap
-    switch (alert.trend) {
-      case 'BULL':
-      case 'MEAN REV BULL':
-        alert.fourHourTrend = signals.buy
-        break;
-      case 'BEAR':
-      case 'MEAN REV BEAR':
-        alert.fourHourTrend = signals.sell
-        break;
-      default:
-        alert.fourHourTrend = signals.hodl
-    }
-  }
-  for (const i of alertsToDelete.reverse()) {
-    alerts.splice(i, 1)
-  }
   let { data } = await strapi.query(
     gql`
       query Pages($slug: String) {
@@ -231,13 +185,8 @@ export async function getServerSideProps(ctx) {
   )
   data = data.pages.data[0].attributes
 
-  ctx.res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=60'
-  )
   return {
     props: {
-      alerts,
       appData,
       pageData: data,
     }
