@@ -35,8 +35,7 @@ const ConnectButton = ({ collapsed }) => {
       removeCookie('user', { path: '/' })
       setLoginModalVisible(false)
     } else {
-      // TODO: Correct tg bot link
-      window.open('https://t.me/CRtesting_bot?start=_','_blank');
+      window.open('https://t.me/CoinRotator_bot?start=_','_blank');
     }
   }, [telegramId, removeCookie])
 
