@@ -35,7 +35,9 @@ const ConnectButton = ({ collapsed }) => {
       removeCookie('user', { path: '/' })
       setLoginModalVisible(false)
     } else {
-      window.open('https://t.me/CoinRotator_bot?start=_','_blank');
+      let domain = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? 'coinrotator.app' : process.env.NEXT_PUBLIC_VERCEL_URL
+      domain = domain.replace(/\./g, '_') // TG URL encoding
+      window.open(`https://t.me/CoinRotator_bot?start=${domain}`, '_blank');
     }
   }, [telegramId, removeCookie])
 
