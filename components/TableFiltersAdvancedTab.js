@@ -1,17 +1,17 @@
 import { Row, Col, Switch, Divider } from 'antd'
 import classnames from 'classnames'
-import { useAccount } from 'wagmi'
 
 import indexStyles from '../styles/index.module.less'
 import NotConnected from './gating/NotConnected.js'
 import NoKeyPass from './gating/NoKeyPass.js'
+import useAccount from '../hooks/useAccount.js'
 import useKeyPass from '../hooks/useKeyPass.js'
 
 const TableFiltersAdvancedTab = ({
   formState,
   formDispatch,
  }) => {
-  const { address: walletAddress } = useAccount()
+  const walletAddress = useAccount()
   const hasKeyPass = useKeyPass()
   const hasWallet = Boolean(walletAddress)
 
