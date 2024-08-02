@@ -8,7 +8,7 @@ const handler = async (req, res) => {
   } else if (req.method !== 'GET') {
     res.status(400).send("Bad request")
   } else {
-    const coins = await sql`
+    let coins = await sql`
       SELECT id, name, symbol, images
       FROM "Coin"
       WHERE "closeTime" >= ${subDays(new Date(), 30)}
