@@ -321,7 +321,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const appData = await globalData();
-  let coinData = await sql`SELECT * FROM "Coin" WHERE id = ${params.id}`[0]
+  let coinData = (await sql`SELECT * FROM "Coin" WHERE id = ${params.id}`)[0]
   let similarCoins = []
   if (coinData.categories.length || coinData.coingeckoCategories.length) {
     const safeCategories = coinData.categories.length ? coinData.categories : ['xxxxxxxxxxxxx']
@@ -329,8 +329,8 @@ export async function getStaticProps({ params }) {
     similarCoins = await sql`
       SELECT id, images, name, count(*)
       FROM "Coin",
-      unnest(array[${sql([...safeCategories])}]) unnested_categories,
-      unnest(array[${sql([...safeCoingeckoCategories])}]) unnested_coingecko_categories
+      unnest(${sql.array(safeCategories)}) unnested_categories,
+      unnest(${sql.array(safeCoingeckoCategories)}) unnested_coingecko_categories
       WHERE (categories @> array[unnested_categories] OR "coingeckoCategories" @> array[unnested_coingecko_categories])
       AND id != ${coinData.id}
       GROUP BY id
