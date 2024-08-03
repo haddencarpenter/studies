@@ -143,8 +143,8 @@ export async function getStaticProps({ params }) {
       "id", "symbol", "name", "images", "marketCap", "marketCapRank", "categories", "tickers", "derivatives"
     FROM "Coin"
     WHERE
-      ("categories" @> ${sql.array([category.name])}::varchar[]) OR
-      ("coingeckoCategories" @> ${sql.array([category.name])}::varchar[])
+    ("categories" @> ${sql.array([category.name])}::text[]) OR
+    ("coingeckoCategories" @> ${sql.array([category.name])}::text[])
     ORDER BY "marketCapRank" ASC
     LIMIT ${process.env.NODE_ENV === 'development' ? 20 : 1000}
   `
