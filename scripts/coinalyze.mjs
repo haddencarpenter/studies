@@ -5,6 +5,7 @@ import sum from 'lodash/sum.js';
 import mean from 'lodash/mean.js';
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import { retry } from '@lifeomic/attempt'
 
 import prisma from '../lib/prisma.mjs';
 
@@ -119,7 +120,11 @@ const fetchCoinalyze = async () => {
     let futuresVolume24h = data.filter(data => data.futuresVolume24h)
     futuresVolume24h = sum(futuresVolume24h.map(data => data.futuresVolume24h))
     if (CME_SCRAPING_COINS.includes(coin.id)) {
-      const [scrapedOpenInterest, scrapedFuturesVolume24h] = await scrapeCoinData(coin.id, coin.symbol.toUpperCase())
+      const [scrapedOpenInterest, scrapedFuturesVolume24h] = await retry(() => scrapeCoinData(coin.id, coin.symbol.toUpperCase()), {
+        factor: 3,
+        maxAttempts: 6,
+        jitter: true
+      });
       openInterest = scrapedOpenInterest
       futuresVolume24h = scrapedFuturesVolume24h
     }
