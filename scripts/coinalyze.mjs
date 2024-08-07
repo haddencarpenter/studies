@@ -102,7 +102,7 @@ const fetchCoinalyze = async () => {
       const openInterestDenominationPriceFactor = getOpenInterestPriceFactorUSD(market, databaseCoins, coin)
       requests.push(
         getOpenInterest(market.symbol, market.exchange, openInterestDenominationPriceFactor),
-        getVolume24h(market.symbol, market.exchange)
+        getVolume24h(market.symbol, market.exchange, coin.currentPrice)
       )
       if (market.exchange === preferredFundingRateMarket.exchange) {
         requests.push(
