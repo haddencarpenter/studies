@@ -568,7 +568,7 @@ const CoinTable = ({
   if (showFundingRate) {
     columns.push(
       {
-        title: 'Funding Rate (1h)',
+        title: 'Funding Rate',
         dataIndex: 'fundingRate',
         width: 120,
         sorter: (a, b) => Number(a.fundingRate) - Number(b.fundingRate),
