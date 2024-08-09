@@ -204,13 +204,13 @@ const CoinTable = ({
     if (trends) {
       const dailyTrend = trends.daily[coinData.id]?.supersuperTrend
       if (dailyTrend) {
-        coinData.dailySuperSuperTrend = 'UP'
-        coinData.dailySuperSuperTrendStreak = 2
+        coinData.dailySuperSuperTrend = dailyTrend.trend
+        coinData.dailySuperSuperTrendStreak = dailyTrend.streak
       }
       const weeklyTrend = trends.weekly[coinData.id]?.supersuperTrend
       if (weeklyTrend) {
-        coinData.weeklySuperSuperTrend = 'UP'
-        coinData.weeklySuperSuperTrendStreak = 2
+        coinData.weeklySuperSuperTrend = weeklyTrend.trend
+        coinData.weeklySuperSuperTrendStreak = weeklyTrend.streak
       }
     }
     return coinData
