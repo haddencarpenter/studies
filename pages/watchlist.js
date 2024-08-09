@@ -18,7 +18,6 @@ import useVirtualTable from '../hooks/useVirtualTable'
 import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap } from '../utils/sharedColumns'
 import strapi from '../utils/strapi';
 import useSocketStore from '../hooks/useSocketStore'
-import sql from "../lib/database.mjs";
 
 import tableStyles from '../styles/table.module.less'
 import watchlistStyles from '../styles/watchlist.module.less'
