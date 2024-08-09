@@ -17,7 +17,7 @@ import sql from "../lib/database.mjs";
 import strapi from '../utils/strapi';
 
 export default function OldestTrends({ coinsData, hiddenCoins, appData, exchangeData, pageData }) {
-  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData, true)
+  const [formState, formDispatch, defaultFormState, portfolioInputValue, setPortfolioInputValue] = useTableFilters(coinsData)
   return (
     <>
       <Head>
@@ -41,18 +41,8 @@ export default function OldestTrends({ coinsData, hiddenCoins, appData, exchange
             coinsData={coinsData}
             hiddenCoins={hiddenCoins}
             exchangeData={exchangeData}
-            marketCapMax={formState.marketCapMax}
-            marketCapMin={formState.marketCapMin}
-            trendLengthMin={formState.trendLengthMin}
-            trendLengthMax={formState.trendLengthMax}
-            portfolio={formState.portfolio}
-            category={formState.category}
-            trendType={formState.trendType}
-            defaultCategory={defaultFormState.category}
-            exchanges={formState.exchanges}
-            derivatives={formState.derivatives}
-            showDerivatives={formState.showDerivatives}
-            superTrendFlavor={formState.superTrendFlavor}
+            formState={formState}
+            defaultFormState={defaultFormState}
             defaultSort={['dailySuperSuperTrendStreak', 'descend']}
           />
         </Row>
@@ -98,7 +88,7 @@ export async function getStaticProps() {
   )
   hiddenCoins = hiddenCoins.data.coins.data.map(coin => coin.attributes.slug)
   let coinsData = await sql`
-    SELECT id, symbol, name, images, "marketCap", "marketCapRank", categories, "coingeckoCategories", tickers, derivatives
+    SELECT id, symbol, name, images, "marketCap", "marketCapRank", categories, "coingeckoCategories", tickers, derivatives, "fullyDilutedValuation", "circulatingSupply", "totalSupply", "ath", "atl"
     FROM "Coin"
     ORDER BY "marketCapRank" ASC
     LIMIT ${process.env.NODE_ENV === 'development' ? 20 : 1000}
@@ -107,6 +97,11 @@ export async function getStaticProps() {
     coinData.exchanges = convertTickersToExchanges(coinData.tickers)
     coinData.imageSlug = getImageSlug(coinData.images.large)
     coinData.derivatives = coinData.derivatives?.slice(0, 5)
+    coinData.fullyDilutedValuation = Number(coinData.fullyDilutedValuation)
+    coinData.circulatingSupply = Number(coinData.circulatingSupply)
+    coinData.totalSupply = Number(coinData.totalSupply)
+    coinData.ath = Number(coinData.ath)
+    coinData.atl = Number(coinData.atl)
 
     coinData = pick(coinData, [
       'id',
@@ -114,6 +109,11 @@ export async function getStaticProps() {
       'name',
       'marketCap',
       'marketCapRank',
+      'fullyDilutedValuation',
+      'circulatingSupply',
+      'totalSupply',
+      'ath',
+      'atl',
       'categories',
       'coingeckoCategories',
       'exchanges',

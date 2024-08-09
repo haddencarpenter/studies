@@ -1,7 +1,6 @@
 import isEmpty from 'lodash/isEmpty'
 
 import sql from '../../lib/database.mjs'
-import convertTickersToExchanges from '../../utils/convertTickersToExchanges.js'
 
 const handler = async (req, res) => {
   let requestedCoins = req.query['coins[]']
@@ -15,17 +14,14 @@ const handler = async (req, res) => {
       requestedCoins = [requestedCoins]
     }
     let coins = await sql`
-      SELECT id, name, images, symbol, "marketCap", tickers
+      SELECT id, name, images, symbol, "marketCap"
       FROM "Coin"
       WHERE id IN ${sql([...requestedCoins])}
     `
     coins = await Promise.all(
       coins.map(async (coin) => {
-        const exchanges = convertTickersToExchanges(coin.tickers)
-        delete coin.tickers
         return {
           ...coin,
-          exchanges,
           marketCap: Number(coin.marketCap),
         }
       })
