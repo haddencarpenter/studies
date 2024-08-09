@@ -212,19 +212,19 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
       ]
     },
   ]
-  if (hasKeyPass) {
-    menuItems.unshift({
-      label: `🍄 KEY PASS 🍄`,
-      key: 'keypass',
-      children: [
-        {
-          label: 'Lower timeframes',
-          icon: <a href="https://coinrotator-git-websockt-candles-my-team-49a155bf.vercel.app/" target="_blank"><LinkOutlined className={styles.daybreakBlue} /></a>,
-          key: 'lowertimeframes'
-        }
-      ]
-    })
-  }
+  // if (hasKeyPass) {
+  //   menuItems.unshift({
+  //     label: `🍄 KEY PASS 🍄`,
+  //     key: 'keypass',
+  //     children: [
+  //       {
+  //         label: 'Lower timeframes',
+  //         icon: <a href="https://coinrotator-git-websockt-candles-my-team-49a155bf.vercel.app/" target="_blank"><LinkOutlined className={styles.daybreakBlue} /></a>,
+  //         key: 'lowertimeframes'
+  //       }
+  //     ]
+  //   })
+  // }
   if (collapsed) {
     menuItems = [
       {
