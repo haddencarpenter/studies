@@ -33,12 +33,9 @@ const fetchExchanges = async () => {
 
     let dbExchangeData = pick(exchangeDetailData, ['name', 'image', 'url', 'centralized'])
     dbExchangeData.centralized = Boolean(dbExchangeData.centralized)
+    dbExchangeData.id = exchange.id
 
-    await sql`
-      INSERT INTO exchange (id, ${sql(Object.keys(dbExchangeData))})
-      VALUES (${exchange.id}, ${sql(Object.values(dbExchangeData))})
-      ON CONFLICT (id) DO UPDATE SET ${sql(Object.entries(dbExchangeData).map(([key, value]) => `${key} = ${value}`))}
-    `;
+    await sql`INSERT INTO "Exchange" ${sql(dbExchangeData)} ON CONFLICT (id) DO UPDATE SET ${sql(dbExchangeData)}`;
   }
 }
 
