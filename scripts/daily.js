@@ -172,9 +172,11 @@ const fetchOhlcData = async (coinId, symbol) => {
     }
   }
 
-  await sql`INSERT INTO "Ohlc" ${sql(ohlcs)} ON CONFLICT DO NOTHING`
-  const dailyOhlcs = convertToDailySignals(ohlcs, true)
-  await saveDailyOhlcsToSupertrends(dailyOhlcs, coinId)
+  if (ohlcs.length) {
+    await sql`INSERT INTO "Ohlc" ${sql(ohlcs)} ON CONFLICT DO NOTHING`
+    const dailyOhlcs = convertToDailySignals(ohlcs, true)
+    await saveDailyOhlcsToSupertrends(dailyOhlcs, coinId)
+  }
 }
 
 const fetchCoinDataAndOhlcs = async () => {
