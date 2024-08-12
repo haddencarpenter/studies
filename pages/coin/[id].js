@@ -83,7 +83,8 @@ export default function Coin(coin) {
     if (socket) {
       socket.emit('get_trends', {
         coinId: coin.id,
-        flavor: SUPERTREND_FLAVOR.coinrotator
+        flavor: SUPERTREND_FLAVOR.coinrotator,
+        intervals: ['1d', '1w']
       }, (trends) => setTrends(trends))
     }
   }, [socket, coin.id])
@@ -258,7 +259,7 @@ export default function Coin(coin) {
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {dailySignalTag}
                 {Object.keys(trends?.daily || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
-                  const trend = trends.daily[trendKey]
+                  const trend = trends.daily[trendKey] || trends['1d'][trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
                     <Tag key={trendKey}>
@@ -286,7 +287,7 @@ export default function Coin(coin) {
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {weeklySignalTag}
                 {Object.keys(trends?.weekly || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
-                  const trend = trends.weekly[trendKey]
+                  const trend = trends.weekly[trendKey] || trends['1w'][trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
                     <Tag key={trendKey}>
