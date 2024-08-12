@@ -44,7 +44,8 @@ export default function Coin(coin) {
   let dailySignalTag
   const [trends, setTrends] = useState(null)
   const [liveCoinData, setLiveCoinData] = useState([])
-  switch (trends?.daily?.supersuperTrend?.trend) {
+  const dailyData = trends?.daily?.supersuperTrend?.trend || trends?.['1d']?.supersuperTrend?.trend
+  switch (dailyData) {
     case signals.buy:
       dailySignalTag = <a href="#markets"><UpTag /></a>
       break;
@@ -58,7 +59,8 @@ export default function Coin(coin) {
       dailySignalTag = <a href="#markets"><LoadingTag /></a>
   }
   let weeklySignalTag
-  switch (trends?.weekly?.supersuperTrend?.trend) {
+  const weeklyData = trends?.weekly?.supersuperTrend?.trend || trends?.['1w']?.supersuperTrend?.trend
+  switch (weeklyData) {
     case signals.buy:
       weeklySignalTag = <a href="#markets"><UpTag /></a>
       break;
@@ -96,12 +98,12 @@ export default function Coin(coin) {
   useEffect(() => {
     const localPrices = JSON.parse(localStorage.getItem("prices"))
     if (localPrices) {
-      const price = localPrices[coin.symbol]
+      const price = localPrices[coin.id] || localPrices[coin.symbol]
       if (price) {
         setPrice(price)
       }
     }
-  }, [coin.symbol, currencyFormatter])
+  }, [coin.symbol, coin.id, currencyFormatter])
   useEffect(() => {
     if (socket) {
       socket.on("i", (prices) => {
@@ -258,8 +260,8 @@ export default function Coin(coin) {
               </Space>
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {dailySignalTag}
-                {Object.keys(trends?.daily || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
-                  const trend = trends.daily[trendKey] || trends['1d'][trendKey]
+                {Object.keys(trends?.daily || trends?.['1d'] || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
+                  const trend = trends.daily?.[trendKey] || trends['1d']?.[trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
                     <Tag key={trendKey}>
@@ -286,8 +288,8 @@ export default function Coin(coin) {
               </Space>
               <Space size={12} className={coinStyles.trendTag} wrap>
                 {weeklySignalTag}
-                {Object.keys(trends?.weekly || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
-                  const trend = trends.weekly[trendKey] || trends['1w'][trendKey]
+                {Object.keys(trends?.weekly || trends?.['1w'] || {}).filter(key => !['supersuperTrend', 'historical'].includes(key)).map((trendKey) => {
+                  const trend = trends.weekly?.[trendKey] || trends['1w']?.[trendKey]
                   const trendText = `${trend.trend} (${trend.streak})`
                   return (
                     <Tag key={trendKey}>
