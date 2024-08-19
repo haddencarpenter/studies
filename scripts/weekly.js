@@ -12,7 +12,7 @@ const fetchCoinData = async (url, coin, page) => {
   console.log('Fetch dropstab data for', coin.symbol, 'from', url);
   await retry(
     () => page.goto(url, {waitUntil: 'domcontentloaded'}),
-    3
+    5
   )
 
   let launch_date_start
@@ -60,7 +60,7 @@ const fetchCoinData = async (url, coin, page) => {
   } else {
     await retry(
       () => page.goto(`${url}/fundraising`, {waitUntil: 'domcontentloaded'}),
-      3
+      5
     )
     launch_date_start = await page.evaluate(() => {
       const launchDateSection = Array.from(document.querySelectorAll('dt')).find(node => node.innerText === 'Trade Launch Date')
