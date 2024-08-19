@@ -86,14 +86,18 @@ const dropsTab = async () => {
     const coins = await sql`SELECT id, name, symbol FROM "Coin"`
 
     const page = await browser.newPage();
+    console.log('Opened browser')
     for (const coin of coins) {
       const url = await findMatchingDropstabUrl(coin);
       await fetchCoinData(url, coin, page);
     }
+    console.log('Done')
   } catch(e) {
     throw(e)
   } finally {
+    console.log('Closing browser')
     browser?.close();
+    console.log('Closed browser')
   }
 }
 
