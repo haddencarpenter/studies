@@ -3,6 +3,7 @@ import pick from 'lodash/pick.js'
 import minBy from 'lodash/minBy.js';
 import levenshtein from 'js-levenshtein';
 
+import '../lib/sentry.mjs'
 import sql from '../lib/database.mjs'
 import coinGecko, { getExchange } from '../lib/coinGecko.mjs';
 import { getCoin, getCoins } from '../lib/coinpaprika.mjs'

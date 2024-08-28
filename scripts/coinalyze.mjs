@@ -6,7 +6,9 @@ import mean from 'lodash/mean.js';
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { retry } from '@lifeomic/attempt'
+import * as Sentry from "@sentry/node";
 
+import '../lib/sentry.mjs'
 import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
 import { deformat } from '../utils/number.mjs';
 import sql from '../lib/database.mjs';
@@ -114,15 +116,24 @@ const fetchCoinalyze = async () => {
     let futuresVolume24h = data.filter(data => data.futuresVolume24h)
     futuresVolume24h = sum(futuresVolume24h.map(data => data.futuresVolume24h))
     if (CME_SCRAPING_COINS.includes(coin.id)) {
-      console.time(`Scraping ${coin.symbol}`)
-      const [scrapedOpenInterest, scrapedFuturesVolume24h] = await retry(() => scrapeCoinData(coin.id, coin.symbol.toUpperCase()), {
-        factor: 2,
-        maxAttempts: 6,
-        jitter: true
-      });
-      console.timeEnd(`Scraping ${coin.symbol}`)
-      openInterest = scrapedOpenInterest
-      futuresVolume24h = scrapedFuturesVolume24h
+      try {
+        console.time(`Scraping ${coin.symbol}`)
+        const [scrapedOpenInterest, scrapedFuturesVolume24h] = await retry(() => scrapeCoinData(coin.id, coin.symbol.toUpperCase()), {
+          factor: 2,
+          maxAttempts: 6,
+          jitter: true,
+          handleError: (e) => { console.error(e) }
+        });
+        console.timeEnd(`Scraping ${coin.symbol}`)
+        openInterest = scrapedOpenInterest
+        futuresVolume24h = scrapedFuturesVolume24h
+      } catch(e) {
+        console.error(e)
+        // In error case we don't want to save wrong data
+        openInterest = null
+        futuresVolume24h = null
+        throw(e) // Remove this ASAP to not break the script
+      }
     }
     if (coin.id === CME_SCRAPING_COINS[CME_SCRAPING_COINS.length - 1]) {
       console.log('Closing browser')
