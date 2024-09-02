@@ -23,7 +23,6 @@ const initializeScraping = async () => {
   browser = await puppeteer.launch({
     // headless: false,
     // devtools: true,
-    timeout: 100000
   })
   page = await browser.newPage()
   await page.setViewport({ width: 1200, height: 100080 })
@@ -122,6 +121,7 @@ const fetchCoinalyze = async () => {
           factor: 2,
           maxAttempts: 6,
           jitter: true,
+          timeout: 60000,
           handleError: (e) => { console.error(e) }
         });
         console.timeEnd(`Scraping ${coin.symbol}`)
