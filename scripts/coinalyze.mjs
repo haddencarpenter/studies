@@ -119,11 +119,16 @@ const fetchCoinalyze = async () => {
     if (CME_SCRAPING_COINS.includes(coin.id)) {
       try {
         console.time(`Scraping ${coin.symbol}`)
-        const [scrapedOpenInterest, scrapedFuturesVolume24h] = await retry(() => scrapeCoinData(coin.id, coin.symbol.toUpperCase()), {
+        const [scrapedOpenInterest, scrapedFuturesVolume24h] = await retry(async () => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 60000);
+          const result = await scrapeCoinData(coin.id, coin.symbol.toUpperCase());
+          clearTimeout(timeout);
+          return result;
+        }, {
           factor: 2,
           maxAttempts: 6,
           jitter: true,
-          timeout: 60000,
           handleError: (e) => { console.error(e) }
         });
         console.timeEnd(`Scraping ${coin.symbol}`)
