@@ -145,7 +145,6 @@ const fetchCoinalyze = async () => {
         // In error case we don't want to save wrong data
         openInterest = null
         futuresVolume24h = null
-        throw(e) // Remove this ASAP to not break the script
       }
     }
     if (coin.id === CME_SCRAPING_COINS[CME_SCRAPING_COINS.length - 1]) {
