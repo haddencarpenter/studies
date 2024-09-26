@@ -4,6 +4,8 @@ import { createContext, useEffect } from "react"
 import { Client } from "react-hydration-provider";
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { WagmiProvider } from 'wagmi'
 
 import { base } from 'wagmi/chains'
 
@@ -12,7 +14,6 @@ import Banner from '../components/Banner'
 import Sider from '../components/Sider'
 import useDarkMode from "../hooks/usedarkmode"
 import useBreakPoint from "../hooks/useBreakPoint"
-import useKeyPass from '../hooks/useKeyPass';
 import baseStyles from "../styles/base.module.less"
 import SharedLayout from "../layouts/shared"
 import variableStyles from '../styles/variables.module.less'
@@ -37,6 +38,7 @@ const config = defaultWagmiConfig({
   metadata,
   ssr: true
 })
+const queryClient = new QueryClient()
 
 export default function ScreenerLayout({ page, pageProps }) {
   const darkMode = useDarkMode();
@@ -61,33 +63,36 @@ export default function ScreenerLayout({ page, pageProps }) {
     html.dataset.theme = isDark ? 'theme-dark' : 'theme-light';
   }, [isDark])
   const screens = useBreakPoint();
-  const hasKeyPass = useKeyPass()
 
   const {topCategories,categories} = pageProps.appData
 
   return (
     <>
-      { hasKeyPass ? <></> : <Banner /> }
-      <Layout className={baseStyles.outerLayout}>
-        <SharedLayout pageProps={pageProps} />
-        <Head>
-          <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
-          <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
-        </Head>
-        <Client>
-          { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
-        </Client>
-        <Layout className={baseStyles.innerLayout}>
-          <Client>
-            <Header
-              categories={categories}
-              screens={screens}
-              topCategories={topCategories}
-            />
-          </Client>
-          {page}
-        </Layout>
-      </Layout>
+      <WagmiProvider config={config}>
+        <Banner />
+        <QueryClientProvider client={queryClient}>
+          <Layout className={baseStyles.outerLayout}>
+            <SharedLayout pageProps={pageProps} />
+            <Head>
+              <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
+              <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
+            </Head>
+            <Client>
+              { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
+            </Client>
+            <Layout className={baseStyles.innerLayout}>
+              <Client>
+                <Header
+                  categories={categories}
+                  screens={screens}
+                  topCategories={topCategories}
+                />
+              </Client>
+              {page}
+            </Layout>
+          </Layout>
+        </QueryClientProvider>
+      </WagmiProvider>
     </>
   )
 }

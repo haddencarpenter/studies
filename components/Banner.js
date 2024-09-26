@@ -1,7 +1,12 @@
 import { Button } from 'antd'
+import useKeyPass from '../hooks/useKeyPass';
 import headerStyles from '../styles/header.module.less'
 
 const Banner = () => {
+  const hasKeyPass = useKeyPass()
+  if (hasKeyPass) {
+    return <></>
+  }
   return (
     <div className={headerStyles.banner}>
       <span>Get Advanced Features by Minting our Key Pass</span>
