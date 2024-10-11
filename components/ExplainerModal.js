@@ -2,6 +2,7 @@ import { Modal } from 'antd'
 import { InfoCircleFilled } from "@ant-design/icons"
 import { useState, useEffect, useRef } from "react"
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useRouter } from 'next/router'
 
 import styles from "../styles/explainerModal.module.less"
@@ -40,7 +41,7 @@ const ExplainerModal = ({ title, explainer, showSource, lastUpdated }) => {
       </a>
       <Modal {...modalProps}>
         {lastUpdated ? <div className={styles.lastUpdated}>Last Data Update: {new Intl.DateTimeFormat([]).format(lastUpdated)}</div> : <></>}
-        <ReactMarkdown>{explainer}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{explainer}</ReactMarkdown>
         {showSource ? <ChatGPTSource /> : <></>}
       </Modal>
     </div>

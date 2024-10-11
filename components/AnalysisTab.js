@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import classnames from 'classnames';
 import { Card } from 'antd';
 import round from 'lodash/round';
@@ -88,7 +89,7 @@ const AnalysisTab = ({ coin, screens, price, shown }) => {
   return (<div style={{ display: shown ? 'block' : 'none' }}>
       {coin.description ? (
         <Card.Grid hoverable={false} className={classnames(coinStyles.section, coinStyles.sectionDescription)}>
-            <ReactMarkdown>{interpolatedCoinDescription}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{interpolatedCoinDescription}</ReactMarkdown>
             <ChatGPTSource />
         </Card.Grid>
       ) : <></>}
