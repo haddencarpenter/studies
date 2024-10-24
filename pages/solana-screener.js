@@ -89,7 +89,7 @@ export async function getStaticProps() {
   let coinsData = await sql`
     SELECT id, symbol, name, images, "marketCap", "marketCapRank", categories, "coingeckoCategories", tickers, derivatives, "fullyDilutedValuation", "circulatingSupply", "totalSupply", "ath", "atl"
     FROM "Coin"
-    WHERE categories @> '{"Solana Ecosystem"}'
+    WHERE "coingeckoCategories" @> '{"Solana Ecosystem"}'
     ORDER BY "marketCapRank" ASC
     LIMIT ${process.env.NODE_ENV === 'development' ? 20 : 1000}
   `
