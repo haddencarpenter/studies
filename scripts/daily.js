@@ -249,9 +249,9 @@ const fetchDerivativesData = async() => {
       }
     })
 
-    const coinToUpdate = await sql`SELECT * FROM "Coin" WHERE "symbol" = ${coinId.toLowerCase()}`[0]
+    const [coinToUpdate] = await sql`SELECT * FROM "Coin" WHERE "symbol" = ${coinId.toLowerCase()}`
     if (coinToUpdate) {
-      await sql`UPDATE "Coin" SET "derivatives" = ${sql(derivativesCoinData)} WHERE id = ${coinToUpdate.id}`
+      await sql`UPDATE "Coin" SET "derivatives" = ${sql.json(derivativesCoinData)} WHERE id = ${coinToUpdate.id}`
     }
   }
 }

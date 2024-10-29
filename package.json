@@ -22,7 +22,7 @@
     "fixTrends": "swc scripts/fixTrends.js -o dist/fixTrends.mjs",
     "start": "next start",
     "overrideCategories": "swc scripts/overrideCategories.js -o dist/overrideCategories.mjs",
-    "debbb": "node dist/daily.mjs"
+    "debbb": "node scripts/daily.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "4.8.2",
