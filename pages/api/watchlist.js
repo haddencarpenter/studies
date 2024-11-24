@@ -4,6 +4,7 @@ import sql from '../../lib/database.mjs'
 
 const handler = async (req, res) => {
   let requestedCoins = req.query['coins[]']
+  console.log('requestedCoins', requestedCoins)
   if (isEmpty(requestedCoins)) {
     requestedCoins = ['thisisneverevereverevergonnabeavalidcoinid']
   }
