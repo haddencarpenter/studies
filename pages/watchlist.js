@@ -9,6 +9,7 @@ import classnames from 'classnames'
 import Head from 'next/head'
 import { gql } from '@urql/core'
 import { SUPERTREND_FLAVOR } from 'coinrotator-utils/variables.mjs'
+import qs from 'qs'
 
 import globalData from '../lib/globalData'
 import { getWatchListCoins } from '../utils/watchlist'
@@ -96,7 +97,7 @@ export default function WatchList({ appData, pageData }) {
     watchlistCoins = compact(watchlistCoins)
 
     const fetchData = async () => {
-      let coins = (await axios.get('/api/watchlist', { params: { coins: watchlistCoins } })).data.coins;
+      let coins = (await axios.get('/api/watchlist', { params: { coins: watchlistCoins }, paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'comma' }) })).data.coins
       coins = coins.map(coin => {
         return {
           ...coin,

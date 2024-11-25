@@ -3,17 +3,15 @@ import isEmpty from 'lodash/isEmpty'
 import sql from '../../lib/database.mjs'
 
 const handler = async (req, res) => {
-  let requestedCoins = req.query['coins[]']
+  let requestedCoins = req.query['coins']
   console.log('requestedCoins', requestedCoins)
   if (isEmpty(requestedCoins)) {
-    requestedCoins = ['thisisneverevereverevergonnabeavalidcoinid']
+    requestedCoins = 'thisisneverevereverevergonnabeavalidcoinid'
   }
-  if (req.method !== 'GET' || !requestedCoins instanceof Array) {
+  if (req.method !== 'GET') {
     res.status(400)
   } else {
-    if (typeof requestedCoins === 'string') {
-      requestedCoins = [requestedCoins]
-    }
+    requestedCoins = requestedCoins.split(',')
     let coins = await sql`
       SELECT id, name, images, symbol, "marketCap"
       FROM "Coin"
