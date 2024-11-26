@@ -52,7 +52,7 @@ const Sider = ({ topCategories, categories }) => {
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />
       <div className={styles.footer}>
         <Socials collapsed={collapsed} />
-        { collapsed ? <></> : <Funders />}
+        {/* { collapsed ? <></> : <Funders />} */}
       </div>
     </Layout.Sider>
   );

@@ -25,7 +25,7 @@ const NavigationModal = ({ topCategories }) => {
       >
         <NavigationMenu topCategories={topCategories} onMenuItemSelected={() => setNavigationVisible(false)} />
         <Socials />
-        <Funders />
+        {/* <Funders /> */}
       </Modal>
     </>
   );
