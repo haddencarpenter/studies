@@ -46,8 +46,8 @@ const NavigationMenu = ({ collapsed = false , topCategories, onMenuItemSelected 
           icon: <HeartFilled className={styles.dustRed} />
         },
         {
-          label: <Link href="/todays-trends" prefetch={false}>Today&apos;s Trends</Link>,
-          key: '/todays-trends',
+          label: <Link href="/new-coins" prefetch={false}>New Coins</Link>,
+          key: '/new-coins',
           icon: <AlertFilled className={styles.daybreakBlue} />
         },
         {
