@@ -51,7 +51,7 @@ let moduleExports = {
       },
       {
         source: '/category/DeFi',
-        destination: '/category/Decentralized-Finance-(DeFi)',
+        destination: '/category/Decentralized-Finance-\\(DeFi\\)',
         permanent: true,
       },
       {
@@ -66,7 +66,7 @@ let moduleExports = {
       },
       {
         source: '/category/Identity',
-        destination: '/category/Decentralized-Identifier-(DID)',
+        destination: '/category/Decentralized-Identifier-\\(DID\\)',
         permanent: true,
       },
       {
