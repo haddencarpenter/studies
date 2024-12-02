@@ -51,7 +51,7 @@ let moduleExports = {
       },
       {
         source: '/category/DeFi',
-        destination: '/category/Decentralized-Finance-\\(DeFi\\)',
+        destination: '/category/Decentralized-Finance-%28DeFi%29',
         permanent: true,
       },
       {
@@ -66,7 +66,7 @@ let moduleExports = {
       },
       {
         source: '/category/Identity',
-        destination: '/category/Decentralized-Identifier-\\(DID\\)',
+        destination: '/category/Decentralized-Identifier-%28DID%29',
         permanent: true,
       },
       {
@@ -117,6 +117,11 @@ let moduleExports = {
       {
         source: '/category/Solana-Themed-Coins',
         destination: '/category/Solana-Themed',
+        permanent: true,
+      },
+      {
+        source: '/category/IOT',
+        destination: 'category/Internet-of-Things-(IOT)',
         permanent: true,
       },
     ]
