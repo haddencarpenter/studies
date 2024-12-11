@@ -45,6 +45,7 @@ export default function NewCoinsScreener({ coinsData, hiddenCoins, appData, exch
             defaultFormState={defaultFormState}
             showCreatedAt={true}
             defaultSort={['createdAt', 'descend']}
+            filter={coinData => coinData.createdAt.valueOf() > 1732688654000}
           />
         </Row>
       </Layout.Content>
