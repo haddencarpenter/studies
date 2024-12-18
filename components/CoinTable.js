@@ -427,7 +427,7 @@ const CoinTable = ({
     columns.push(
       {
         width: 300,
-        ...categories(router, isHoverable),
+        ...categories(),
       }
     )
   }

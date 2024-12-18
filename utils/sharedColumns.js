@@ -1,6 +1,8 @@
 import { Tooltip, Tag } from 'antd'
+import Link from 'next/link'
 import { QuestionCircleFilled } from '@ant-design/icons'
 import classnames from 'classnames'
+import slugify from 'slugify'
 
 import UpTag from '../components/UpTag'
 import DownTag from '../components/DownTag'
@@ -181,16 +183,20 @@ export function marketCap(router, hydrated) {
   }
 }
 
-export function categories(router) {
+export function categories() {
   return {
     title: 'Categories',
     dataIndex: 'categories',
-    onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
     render: (categories) => {
       if (!categories?.length) { return null }
       return <>
         {categories.map((category) => {
-          return <Tag key={category}>{category}</Tag>
+          const categorySlug = slugify(category);
+          return (
+            <Link href={`/category/${categorySlug}`} key={category} prefetch={false}>
+              <Tag>{category}</Tag>
+            </Link>
+          );
         })}
       </>
     }
