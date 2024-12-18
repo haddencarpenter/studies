@@ -357,10 +357,17 @@ const CoinTable = ({
     }
   })
 
+  let coinColumnWidth = 140
+  if (screens.sm) {
+    coinColumnWidth = 220
+  }
+  if (screens.md) {
+    coinColumnWidth = 240
+  }
   let columns = [
     {
       title: () => `Coin`,
-      width: screens.sm ? 200 : 140,
+      width: coinColumnWidth,
       dataIndex: 'coinData',
       onCell: ({ id }) => {
         return {
