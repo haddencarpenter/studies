@@ -76,7 +76,7 @@ const fetchCoinDataCoingecko = async (coinId) => {
     platforms,
     images: coinData.image,
     description: coinData.description.en,
-    homepage: coinData.links.homepage[0],
+    homepage: coinData.links.homepage[0] || null,
     twitter: coinData.links.twitter_screen_name || '',
     twitterFollowers: coinData.community_data.twitter_followers,
     ath: coinData.market_data.ath.usd,
