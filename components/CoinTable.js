@@ -5,10 +5,12 @@ import { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import intersection from 'lodash/intersection'
 import isEmpty from 'lodash/isEmpty'
 import round from 'lodash/round'
+import uniq from 'lodash/uniq'
 import isFinite from 'lodash/isFinite'
 import { useHydrated } from "react-hydration-provider";
 import BarChartOutlined from '@ant-design/icons/BarChartOutlined';
 import classnames from 'classnames';
+import { formatDistanceToNowStrict } from 'date-fns'
 
 import WatchlistStar from './WatchlistStar';
 import useIsHoverable from '../hooks/useIsHoverable';
@@ -18,7 +20,7 @@ import useBreakPoint from '../hooks/useBreakPoint.js';
 import { signals, preferredExchanges } from 'coinrotator-utils/variables.mjs'
 import { getWatchListCoins, addToWatchList, removeFromWatchList } from '../utils/watchlist';
 import { getImageURL } from '../utils/minifyImageURL';
-import { dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap } from '../utils/sharedColumns';
+import { categories, dailySuperSuperTrend, dailySuperSuperTrendStreak, weeklySuperSuperTrend, marketCap } from '../utils/sharedColumns';
 import { NotificationContext } from '../layouts/screener.js';
 
 import coinTableStyles from '../styles/table.module.less';
@@ -31,6 +33,10 @@ const CoinTable = ({
     defaultFormState,
     reverseMarketCapSort = false,
     showTrendStreak = true,
+    showWeeklySuperSuperTrend = true,
+    showLivePrice = true,
+    showCategories = false,
+    showCreatedAt = false,
     defaultSort = ['dailySuperSuperTrend', 'ascend'],
     filter,
     passTrends,
@@ -314,6 +320,9 @@ const CoinTable = ({
     if (coinData.totalSupply) { // Some coins have infinite supply and totalSupply is NULL for them
       circulatingSupplyPercentage = `${round((Number(coinData.circulatingSupply) / Number(coinData.totalSupply) * 100), 2)}%`
     }
+    const cat = coinData.categories || []
+    const cgCat = coinData.coingeckoCategories || []
+    const categories = uniq([...cat, ...cgCat])
     return {
       key: `${coinData.id}-${coinData.name}`,
       id: coinData.id,
@@ -323,6 +332,8 @@ const CoinTable = ({
         imageSlug: coinData.imageSlug,
         name: coinData.name
       },
+      categories,
+      createdAt: coinData.createdAt,
       derivatives: shownDerivatives,
       marketCap: coinData.marketCap,
       marketCapRank: coinData.marketCapRank,
@@ -346,10 +357,17 @@ const CoinTable = ({
     }
   })
 
+  let coinColumnWidth = 140
+  if (screens.sm) {
+    coinColumnWidth = 220
+  }
+  if (screens.md) {
+    coinColumnWidth = 240
+  }
   let columns = [
     {
       title: () => `Coin`,
-      width: screens.sm ? 200 : 140,
+      width: coinColumnWidth,
       dataIndex: 'coinData',
       onCell: ({ id }) => {
         return {
@@ -391,25 +409,37 @@ const CoinTable = ({
   if (showTrendStreak) {
     columns.push(
       {
-        width: 90,
         ...dailySuperSuperTrendStreak(router, isHoverable),
       }
     )
   }
 
-  columns.push(
-    {
-      width: 100,
-      ...weeklySuperSuperTrend(router, isHoverable),
-    }
-  )
+  if (showWeeklySuperSuperTrend) {
+    columns.push(
+      {
+        ...weeklySuperSuperTrend(router, isHoverable),
+        width: 100,
+      }
+    )
+  }
 
-  columns.push({
-    width: 125,
-    title: 'Live Price',
-    dataIndex: 'price',
-    render: (price) => price ? currencyFormatter.format(price) : null
-  })
+  if (showCategories) {
+    columns.push(
+      {
+        width: 300,
+        ...categories(),
+      }
+    )
+  }
+
+  if (showLivePrice) {
+    columns.push({
+      width: 125,
+      title: 'Live Price',
+      dataIndex: 'price',
+      render: (price) => price ? currencyFormatter.format(price) : null
+    })
+  }
 
   columns.push(
   {
@@ -631,6 +661,23 @@ const CoinTable = ({
         }
       }
     )
+  }
+  if (showCreatedAt) {
+    columns.push({
+      title: 'Added',
+      dataIndex: 'createdAt',
+      width: 140,
+      className: coinTableStyles.unclickableCell,
+      sorter: (a, b) => Number(a.createdAt) - Number(b.createdAt),
+      render: (createdAt) => {
+        if (!createdAt) { return null }
+        // 1732688654000 is when we added the createdAt column
+        if (createdAt.valueOf() <= 1732688654000) {
+          return `> ${formatDistanceToNowStrict(createdAt)} ago`
+        }
+        return `${formatDistanceToNowStrict(createdAt)} ago`
+      }
+    })
   }
   columns.find(column => column.dataIndex === defaultSort[0]).defaultSortOrder = defaultSort[1]
 

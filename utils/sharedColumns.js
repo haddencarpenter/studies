@@ -1,10 +1,13 @@
-import { Tooltip } from 'antd'
+import { Tooltip, Tag } from 'antd'
+import Link from 'next/link'
 import { QuestionCircleFilled } from '@ant-design/icons'
 import classnames from 'classnames'
+import slugify from 'slugify'
 
 import UpTag from '../components/UpTag'
 import DownTag from '../components/DownTag'
 import HodlTag from '../components/HodlTag'
+import UnavailableTag from '../components/UnavailableTag'
 import { signals } from 'coinrotator-utils/variables.mjs'
 import tableSort from '../utils/tableSort'
 
@@ -30,7 +33,10 @@ export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort, 
       compare: tableSort(reverseMarketCapSort),
       multiple: 1,
     },
-    render: (dailySuperSupertrend) => {
+    render: (dailySuperSupertrend, data) => {
+      if (dailySuperSupertrend && !data?.dailySuperSuperTrendStreak) {
+        return <UnavailableTag />
+      }
       let tag;
       switch (dailySuperSupertrend) {
         case signals.buy:
@@ -53,7 +59,7 @@ export function dailySuperSuperTrend(router, isHoverable, reverseMarketCapSort, 
 
 export function dailySuperSuperTrendStreak(router, isHoverable) {
   return {
-    width: 150,
+    width: 80,
     onCell: (data) => ({ onClick: () => router.push(`/coin/${data.id}`) }),
     title: <span className={coinTableStyles.columnTitle}>
       <span>Streak</span>
@@ -68,7 +74,7 @@ export function dailySuperSuperTrendStreak(router, isHoverable) {
     dataIndex: 'dailySuperSuperTrendStreak',
     sorter: (a, b) => Number(a.dailySuperSuperTrendStreak) - Number(b.dailySuperSuperTrendStreak),
     render: (dailySuperSuperTrendStreak) => {
-      return dailySuperSuperTrendStreak
+      return dailySuperSuperTrendStreak ? dailySuperSuperTrendStreak : null
     }
   }
 }
@@ -126,7 +132,10 @@ export function weeklySuperSuperTrend(router, isHoverable) {
       },
       multiple: 2,
     },
-    render: (weeklySuperSuperTrend) => {
+    render: (weeklySuperSuperTrend, data) => {
+      if (!data?.weeklySuperSuperTrendStreak) {
+        return null
+      }
       let tag;
       switch (weeklySuperSuperTrend) {
         case signals.buy:
@@ -170,6 +179,26 @@ export function marketCap(router, hydrated) {
           {hydrated ? numberFormatter.format(Number(marketCap)) : Number(marketCap)}
         </div>
       )
+    }
+  }
+}
+
+export function categories() {
+  return {
+    title: 'Categories',
+    dataIndex: 'categories',
+    render: (categories) => {
+      if (!categories?.length) { return null }
+      return <>
+        {categories.map((category) => {
+          const categorySlug = slugify(category);
+          return (
+            <Link href={`/category/${categorySlug}`} key={category} prefetch={false}>
+              <Tag>{category}</Tag>
+            </Link>
+          );
+        })}
+      </>
     }
   }
 }
