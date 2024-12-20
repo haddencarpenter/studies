@@ -149,7 +149,7 @@ const fetchOhlcData = async (coinId, symbol) => {
       let ohlcData = {}
       let response
       try {
-        response = await getOhlc(coinId, quoteSymbol, fetchOhlcDays)
+        response = await getOhlc(coinId, quoteSymbol, '4h', fetchOhlcDays * 6)
       } catch(e) {
         console.log(e.response?.status);
         console.log(e.response?.headers);
