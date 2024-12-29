@@ -22,6 +22,8 @@ const handler = async (req, res) => {
   const isPreview = req.headers?.referer?.includes(process.env.VERCEL_BRANCH_URL)
   const isProd = req.headers?.referer?.includes('coinrotator.app')
   const isCoinrotatorReferrer = isLocal || isPreview || isProd
+  console.dir(req.headers, { depth: null })
+  console.log(walletAddress, validWallet, isLocal, isPreview, isProd)
   if (req.method !== 'GET' || !validWallet || !isCoinrotatorReferrer) {
     res.status(400).json({ ok: false })
   } else {
