@@ -73,20 +73,25 @@ const Search = ({ categories, collapsed }) => {
     </div>
   }
   let coinOptions = null
-  const filteredCoins = new Fuse(
-    coins,
-    {
-      keys: [
-        { name: 'contract', weight: 0.1 },
-        { name: 'symbol', weight: 0.9 },
-        { name: 'name', weight: 0.1 }
-      ],
-      minMatchCharLength: 2,
-      threshold: 0.3,
-      distance: 0
-    },
-    fuseCoinIndex
-  ).search(query).map((result) => result.item)
+  let filteredCoins
+  if (query?.length === 2) {
+    filteredCoins = coins.filter(coin => coin.symbol.toLowerCase().startsWith(query.toLowerCase()))
+  } else {
+    filteredCoins = new Fuse(
+      coins,
+      {
+        keys: [
+          { name: 'contract', weight: 0.1 },
+          { name: 'symbol', weight: 0.9 },
+          { name: 'name', weight: 0.1 }
+        ],
+        minMatchCharLength: 2,
+        threshold: 0.3,
+        distance: 0
+      },
+      fuseCoinIndex
+    ).search(query).map((result) => result.item)
+  }
   if (filteredCoins.length > 0) {
     coinOptions = (
       <>
@@ -114,13 +119,19 @@ const Search = ({ categories, collapsed }) => {
   }
 
   let categoryOptions = null
-  const filteredCategories = new Fuse(
-    categories,
-    {
-      minMatchCharLength: 3,
-      threshold: 0.1
-    },
-    ).search(query).map((result) => result.item)
+  let filteredCategories
+  if (query?.length === 2) {
+    filteredCategories = categories.filter(category => category.toLowerCase().startsWith(query.toLowerCase()))
+  } else {
+    filteredCategories = new Fuse(
+      categories,
+      {
+        minMatchCharLength: 3,
+        threshold: 0.1,
+        ignoreLocation: true
+      },
+      ).search(query).map((result) => result.item)
+  }
   if (filteredCategories.length > 0) {
     categoryOptions = (
       <>
