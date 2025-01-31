@@ -162,8 +162,8 @@ const Search = ({ categories, collapsed }) => {
   </>
   if (query === '') {
     results = <div className={searchStyles.empty}>
-      Try&nbsp;
-      <span className={searchStyles.noQueryHighlight}>Ethereum, Bitcoin, DeFi, AI</span>
+      Search for&nbsp;
+      <span className={searchStyles.noQueryHighlight}>Coin name, Category, Contract Address</span>
     </div>
   } else if (filteredCoins.length === 0 && filteredCategories.length === 0) {
     results = <div className={searchStyles.empty}>
