@@ -18,7 +18,7 @@ const handler = async (req, res) => {
       res.status(500).json({ ok: false })
     }
     const completion = await aiClient.chat.completions.create({
-      model: "qwen/qwen-turbo",
+      model: "deepseek/deepseek-r1:online",
       messages: [
         {
           "role": "system",
