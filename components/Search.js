@@ -79,7 +79,7 @@ const Search = ({ categories, collapsed }) => {
 
   let aiSearch
   if (hasKeyPass) {
-    aiSearch = <Button onClick={askAi} loading={askingAI}>Ask AI</Button>
+    aiSearch = <Button onClick={askAi} loading={askingAI} disabled={askingAI}>Ask AI</Button>
   }
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
