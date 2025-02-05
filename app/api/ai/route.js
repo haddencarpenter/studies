@@ -25,7 +25,7 @@ export async function GET(req) {
     res.status(500).json({ ok: false })
   }
   const result = streamText({
-    model: openrouter('deepseek/deepseek-r1:online'),
+    model: openrouter('qwen/qwen-max:online'),
     messages: [
       {
         "role": "system",
