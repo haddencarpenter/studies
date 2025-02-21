@@ -40,6 +40,7 @@ export default async function auth(walletAddress) {
     console.log(contracts);
     return contracts?.includes(KEY_PASS_CONTRACT);
   } catch (e) {
+    console.log('Auth Error')
     console.error(e);
     return false;
   }

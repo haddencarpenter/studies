@@ -390,6 +390,8 @@ export async function POST(req) {
 
     return result.toDataStreamResponse();
   } catch(e) {
+    console.log('AI error')
+    console.log(process.env.OPEN_ROUTER_API_KEY)
     console.error(e);
     return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
   }
