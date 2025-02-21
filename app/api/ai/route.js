@@ -185,7 +185,7 @@ const openrouter = createOpenRouter({
 
 const tools = {
   getCoinByContract: tool({
-    description: "Retrieve coin and trend data using Coingecko-indexed contract address and chain.",
+    description: "When a user asks about a specific contract address (e.g., '0x123...') or mentions a blockchain contract, use this to fetch coin data. Example queries: 'What's the trend for contract 0x123...?' or 'Show me data for BSC contract: 0xabc...'. Returns: { coin: { id, marketCap, categories, coingeckoCategories, ath, atl, circulatingSupply, fullyDilutedValuation, totalSupply }, trends: [{ coinId, date, trend, streak }] }",
     parameters: z.object({
       contractAddress: z.string().describe("The contract address as indexed by Coingecko"),
       chain: z.string().describe("The blockchain network as indexed by Coingecko (e.g., 'ethereum', 'binance-smart-chain')"),
@@ -219,7 +219,7 @@ const tools = {
   }),
 
   getCoinBySymbol: tool({
-    description: "Retrieve coin and trend data using Coingecko coin symbol.",
+    description: "When a user mentions a cryptocurrency symbol/ticker (e.g., BTC, ETH, USDT) or asks about a coin using its symbol, use this to fetch coin data. Example queries: 'What's the trend for BTC?' or 'Show me ETH price'. Returns: { coin: { id, marketCap, categories, coingeckoCategories, ath, atl, circulatingSupply, fullyDilutedValuation, totalSupply }, trends: [{ coinId, date, trend, streak }] }",
     parameters: z.object({
       symbol: z.string().describe("The trading symbol as indexed by Coingecko (e.g., 'BTC', 'ETH')"),
       interval: z.string().describe("The interval for trend data (e.g., '1d', '4h')").default("1d")
@@ -252,7 +252,7 @@ const tools = {
   }),
 
   getCoinByName: tool({
-    description: "Retrieve coin and trend data using Coingecko coin name.",
+    description: "When a user mentions a cryptocurrency by its full name (e.g., Bitcoin, Ethereum) or asks about a coin using its name, use this to fetch coin data. Example queries: 'What's the trend for Bitcoin?' or 'Show me Ethereum data'. Returns: { coin: { id, marketCap, categories, coingeckoCategories, ath, atl, circulatingSupply, fullyDilutedValuation, totalSupply }, trends: [{ coinId, date, trend, streak }] }",
     parameters: z.object({
       name: z.string().describe("The coin name as indexed by Coingecko (e.g., 'Bitcoin', 'Ethereum')"),
       interval: z.string().describe("The interval for trend data (e.g., '1d', '4h')").default("1d")
