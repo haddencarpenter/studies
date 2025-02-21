@@ -211,32 +211,42 @@ const Search = ({ categories, collapsed }) => {
   }
 
   const aiTabContent = (
-    <div className={searchStyles.aiTab}>
-      <Input
-        className={searchStyles.searchSelect}
-        allowClear
-        suffix={<Button onClick={askAi} loading={isLoading} disabled={isLoading}>Ask AI</Button>}
-        value={input}
-        onChange={handleInputChange}
-        onPressEnter={askAi}
-        ref={searchInputRef}
-        spellCheck="false"
-      />
-      <div className={classnames(searchStyles.searchResults, searchStyles.aiAnswer)} ref={messagesEndRef}>
-        {messages.length > 0 ? (
-          <span className={searchStyles.ai}>
-            <ReactMarkdown>
-              {messages.filter(msg => msg.role === 'assistant').slice(-1)[0]?.content || (
-                isLoading ? 'Thinking...' : ''
-              )}
-            </ReactMarkdown>
-          </span>
-        ) : (
-          <div className={searchStyles.empty}>
-            Ask AI a question about crypto
+    <div className={classnames(searchStyles.aiTab, {
+      [searchStyles.aiTabPadding]: !walletAddress || !hasKeyPass
+    })}>
+      {!walletAddress ? (
+        <NotConnected />
+      ) : !hasKeyPass ? (
+        <NoKeyPass />
+      ) : (
+        <>
+          <Input
+            className={searchStyles.searchSelect}
+            allowClear
+            suffix={<Button onClick={askAi} loading={isLoading} disabled={isLoading}>Ask AI</Button>}
+            value={input}
+            onChange={handleInputChange}
+            onPressEnter={askAi}
+            ref={searchInputRef}
+            spellCheck="false"
+          />
+          <div className={classnames(searchStyles.searchResults, searchStyles.aiAnswer)} ref={messagesEndRef}>
+            {messages.length > 0 ? (
+              <span className={searchStyles.ai}>
+                <ReactMarkdown>
+                  {messages.filter(msg => msg.role === 'assistant').slice(-1)[0]?.content || (
+                    isLoading ? 'Thinking...' : ''
+                  )}
+                </ReactMarkdown>
+              </span>
+            ) : (
+              <div className={searchStyles.empty}>
+                Ask AI a question about crypto
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 
@@ -257,30 +267,6 @@ const Search = ({ categories, collapsed }) => {
     </>
   ) : aiTabContent;
 
-  const handleTabChange = useCallback((newTab) => {
-    if (newTab === 'ai') {
-      if (!walletAddress) {
-        // Show NotConnected modal when no wallet is connected
-        Modal.info({
-          content: <NotConnected />,
-          className: searchStyles.modal,
-          footer: null,
-        });
-        return;
-      }
-      if (!hasKeyPass) {
-        // Show NoKeyPass modal when wallet is connected but has no keypass
-        Modal.info({
-          content: <NoKeyPass />,
-          className: searchStyles.modal,
-          footer: null,
-        });
-        return;
-      }
-    }
-    setTab(newTab);
-  }, [hasKeyPass, walletAddress]);
-
   return (
     <div>
       {searchTrigger}
@@ -294,13 +280,13 @@ const Search = ({ categories, collapsed }) => {
         <div className={searchStyles.tabs}>
           <div
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'search'})}
-            onClick={() => handleTabChange('search')}
+            onClick={() => setTab('search')}
           >
             Search
           </div>
           <div
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'ai'})}
-            onClick={() => handleTabChange('ai')}
+            onClick={() => setTab('ai')}
           >
             AI
           </div>
