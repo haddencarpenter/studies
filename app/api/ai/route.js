@@ -1,7 +1,8 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { streamText } from 'ai';
+import { streamText, tool } from 'ai';
 import auth from '../../../utils/auth.js'
 import { sql } from '@vercel/postgres';
+import { z } from 'zod';
 
 export const runtime = 'edge';
 
@@ -182,42 +183,18 @@ const openrouter = createOpenRouter({
   apiKey: process.env.OPEN_ROUTER_API_KEY,
 });
 
-const functions = [{
-  type: "function",
-  function: {
-    name: "getCoinByContract",
+const functions = {
+  getCoinByContract: tool({
     description: "Retrieve coin and trend data using Coingecko-indexed contract address and chain.",
-    parameters: {
-      type: "object",
-      properties: {
-        contractAddress: {
-          type: "string",
-          description: "The contract address as indexed by Coingecko"
-        },
-        chain: {
-          type: "string",
-          description: "The blockchain network as indexed by Coingecko (e.g., 'ethereum', 'binance-smart-chain')"
-        },
-        interval: {
-          type: "string",
-          description: "The interval for trend data (e.g., '1d', '4h')",
-          default: "1d"
-        }
-      },
-      required: ["contractAddress", "chain"]
-    },
-    implementation: async ({ contractAddress, chain, interval = "1d" }) => {
+    parameters: z.object({
+      contractAddress: z.string().describe("The contract address as indexed by Coingecko"),
+      chain: z.string().describe("The blockchain network as indexed by Coingecko (e.g., 'ethereum', 'binance-smart-chain')"),
+      interval: z.string().describe("The interval for trend data (e.g., '1d', '4h')").default("1d")
+    }),
+    execute: async ({ contractAddress, chain, interval = "1d" }) => {
       const { rows: coin } = await sql`
-        SELECT
-          id,
-          "marketCap",
-          categories,
-          "coingeckoCategories",
-          ath,
-          atl,
-          "circulatingSupply",
-          "fullyDilutedValuation",
-          "totalSupply"
+        SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
+               "circulatingSupply", "fullyDilutedValuation", "totalSupply"
         FROM "Coin"
         WHERE platforms->>${chain} = ${contractAddress}
       `;
@@ -227,11 +204,7 @@ const functions = [{
       }
 
       const { rows: trends } = await sql`
-        SELECT
-          "coinId",
-          date,
-          trend,
-          streak
+        SELECT "coinId", date, trend, streak
         FROM "SuperTrend"
         WHERE "coinId" = ${coin[0].id}
           AND "quoteSymbol" IS NULL
@@ -243,28 +216,15 @@ const functions = [{
 
       return { coin: coin[0], trends };
     }
-  }
-}, {
-  type: "function",
-  function: {
-    name: "getCoinBySymbol",
+  }),
+
+  getCoinBySymbol: tool({
     description: "Retrieve coin and trend data using Coingecko coin symbol.",
-    parameters: {
-      type: "object",
-      properties: {
-        symbol: {
-          type: "string",
-          description: "The trading symbol as indexed by Coingecko (e.g., 'BTC', 'ETH')"
-        },
-        interval: {
-          type: "string",
-          description: "The interval for trend data (e.g., '1d', '4h')",
-          default: "1d"
-        }
-      },
-      required: ["symbol"]
-    },
-    implementation: async ({ symbol, interval = "1d" }) => {
+    parameters: z.object({
+      symbol: z.string().describe("The trading symbol as indexed by Coingecko (e.g., 'BTC', 'ETH')"),
+      interval: z.string().describe("The interval for trend data (e.g., '1d', '4h')").default("1d")
+    }),
+    execute: async ({ symbol, interval = "1d" }) => {
       const { rows: coin } = await sql`
         SELECT
           id,
@@ -301,28 +261,15 @@ const functions = [{
 
       return { coin: coin[0], trends };
     }
-  }
-}, {
-  type: "function",
-  function: {
-    name: "getCoinByName",
+  }),
+
+  getCoinByName: tool({
     description: "Retrieve coin and trend data using Coingecko coin name.",
-    parameters: {
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-          description: "The coin name as indexed by Coingecko (e.g., 'Bitcoin', 'Ethereum')"
-        },
-        interval: {
-          type: "string",
-          description: "The interval for trend data (e.g., '1d', '4h')",
-          default: "1d"
-        }
-      },
-      required: ["name"]
-    },
-    implementation: async ({ name, interval = "1d" }) => {
+    parameters: z.object({
+      name: z.string().describe("The coin name as indexed by Coingecko (e.g., 'Bitcoin', 'Ethereum')"),
+      interval: z.string().describe("The interval for trend data (e.g., '1d', '4h')").default("1d")
+    }),
+    execute: async ({ name, interval = "1d" }) => {
       const { rows: coin } = await sql`
         SELECT
           id,
@@ -359,45 +306,36 @@ const functions = [{
 
       return { coin: coin[0], trends };
     }
-  }
-}];
+  })
+};
 
 export async function POST(req) {
   const { messages, walletAddress } = await req.json();
-  console.dir(messages);
-  console.log(walletAddress)
   let hasKeyPass = false;
 
   try {
-    console.log('auth check')
     hasKeyPass = await auth(walletAddress);
     if (!hasKeyPass) {
-      console.log('auth check failed')
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    console.dir(process.env)
-    console.log('streaming in response')
+    console.log(process.env.OPEN_ROUTER_API_KEY)
     const result = streamText({
       model: openrouter('qwen/qwen-max:online'),
       tools: functions,
+      maxSteps: 3,
       messages: [
         {
           role: "system",
           content: systemPrompt
         },
         ...messages
-      ],
-      functions: functions.reduce((acc, f) => ({
-        ...acc,
-        [f.function.name]: f.function.implementation
-      }), {})
+      ]
     });
+    console.dir(result)
 
     return result.toDataStreamResponse();
   } catch(e) {
-    console.log('AI error')
-    console.log(process.env.OPEN_ROUTER_API_KEY)
     console.error(e);
     return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
   }
