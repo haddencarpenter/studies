@@ -1,30 +1,45 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { streamText, tool, jsonSchema } from 'ai';
 import auth from '../../../utils/auth.js'
-import { sql } from '@vercel/postgres';
+import { createPool } from '@vercel/postgres';
 
 export const runtime = 'edge';
 
-const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis agent. Your role is to analyze a provided dataset containing cryptocurrency trends and provide actionable insights. Use web search only when necessary to supplement or verify the information in the dataset. Follow these specific rules:
+const pool = createPool({
+  connectionString: process.env.DATABASE_URL,
+  maxUses: 1, // Required for edge functions
+  ssl: {
+    rejectUnauthorized: false // Often needed for Vercel Postgres
+  }
+});
+
+const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis agent. Your role is to analyze cryptocurrency trends using provided tools. Follow these specific rules:
 
 ---
 
 ### **Core Instructions**
 
-1. **Dataset as Primary Source**:
-   - Always prioritize the provided dataset for analysis.
-   - Extract trends, streaks, and relevant metrics for each cryptocurrency based on the dataset fields:
-     - \`coinId\` (e.g., HBAR, BTC)
-     - \`quoteSymbol\` (e.g., BTC, ETH, USD)
-     - \`trend\` (e.g., UP, DOWN, HODL)
-     - \`date\`
+1. **Data Analysis and Tool Usage (HIGHEST PRIORITY)**:
+   - When users provide any of these identifiers:
+     - Cryptocurrency symbol/ticker (e.g., "BTC", "ETH")
+     - Full coin name (e.g., "Bitcoin", "Ethereum")
+     - Contract address with chain (e.g., "ETH contract 0x123...")
+   - Respond generically while gathering data, like:
+     "Analyzing cryptocurrency data..."
+     "Gathering market information..."
+     "Retrieving trend data..."
+   - Never mention specific tools or functions in responses
+   - Each analysis returns:
+     - Coin metrics: marketCap, ATH/ATL, supply information, categories
+     - Recent trend data: date, trend, and streak information
+   - IMPORTANT: Only call each tool ONCE per user query
 
 2. **Trend Analysis**:
-   - Determine the overall trend by evaluating all trading pairs (\`BTC\`, \`ETH\`, \`USD\`):
-     - If all pairs are **UP** → Overall Trend = **UP**
-     - If all pairs are **DOWN** → Overall Trend = **DOWN**
-     - If mixed → Overall Trend = **HODL**
-   - Calculate streaks for trends (\`UP\`, \`DOWN\`, \`HODL\`) by grouping consecutive entries with the same trend. Record start and end dates for each streak.
+   - Analyze the returned trend data which includes:
+     - Date: When the trend was recorded
+     - Trend: The direction of movement
+     - Streak: Consecutive days in the current trend
+   - Consider market context using the coin's fundamental metrics
 
 3. **Web Search (Secondary Source)**:
    - Use web search only if:
@@ -33,15 +48,11 @@ const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis age
    - Clearly distinguish web-sourced information by labeling it as "Supplementary Information."
 
 4. **Response Format**:
-   - Present findings in a structured table format where applicable:
-     \`\`\`
-     Coin ID       Pair       Trend     Start Date    End Date    Streak Length
-     ---------------------------------------------------------------------------
-     HBAR          BTC        DOWN      2025-02-01    2025-02-04       4 days
-     \`\`\`
-   - Provide a concise summary of the analysis:
-     - "HBAR is in a **DOWN** trend across all pairs, with a streak of 4 days ending on 2025-02-04."
-   - If web search is used, include a section labeled "Supplementary Information" for additional insights.
+   - Present findings in a structured format:
+     - Coin Metrics: marketCap, ATH/ATL, supply information
+     - Recent Trends: Latest trend direction and streak
+     - Categories: Both standard and Coingecko categories
+   - Provide a concise summary of the analysis
 
 5. **Error Handling**:
    - If the dataset does not contain data for a requested coin or time frame:
@@ -53,11 +64,20 @@ const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis age
 
 ### **Example Query and Response**
 
-**Query**: "What is the trend for HBAR on 2025-02-04?"
+**Query**: "What's the trend for BTC?"
 
 **Response**:
+1. Coin Metrics:
+   - Market Cap: $X
+   - ATH: $Y
+   - Circulating Supply: Z
 
----
+2. Recent Trend:
+   - Current Direction: [UP/DOWN]
+   - Streak: X days
+   - Last Updated: [date]
+
+3. Categories: [list of categories]
 
 ### **Behavioral Guidelines**:
 1. Prioritize precision: Only use verified data from the dataset or web search.
@@ -205,36 +225,49 @@ const tools = {
       required: ['contractAddress', 'chain']
     }),
     execute: async ({ contractAddress, chain, interval = "1d" }) => {
-      console.log('Tool executed: getCoinByContract', { contractAddress, chain, interval });
+      let client;
+      try {
+        console.log('Tool executed: getCoinByContract', { contractAddress, chain, interval });
 
-      const { rows: coin } = await sql`
-        SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
-               "circulatingSupply", "fullyDilutedValuation", "totalSupply"
-        FROM "Coin"
-        WHERE platforms->>${chain} = ${contractAddress}
-      `;
+        client = await pool.connect();
+        const coinQuery = await client.sql`
+          SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
+                 "circulatingSupply", "fullyDilutedValuation", "totalSupply"
+          FROM "Coin"
+          WHERE platforms->>${chain} = ${contractAddress}
+        `;
+        console.log('getCoinByContract - Coin query results:', { rowCount: coinQuery.rows.length });
 
-      if (coin.length === 0) {
-        console.log('getCoinByContract: No coin found');
-        return { error: "Coin not found" };
+        if (coinQuery.rows.length === 0) {
+          console.log('getCoinByContract: No coin found');
+          return { error: "Coin not found" };
+        }
+
+        const trendsQuery = await client.sql`
+          SELECT "coinId", date, trend, streak
+          FROM "SuperTrend"
+          WHERE "coinId" = ${coinQuery.rows[0].id}
+            AND "quoteSymbol" IS NULL
+            AND flavor = 'CoinRotator'
+            AND interval = ${interval}
+          ORDER BY date DESC
+          LIMIT 10
+        `;
+        console.log('getCoinByContract - Trends query results:', { trendsCount: trendsQuery.rows.length });
+
+        return { coin: coinQuery.rows[0], trends: trendsQuery.rows };
+      } catch (error) {
+        console.error('getCoinByContract Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { contractAddress, chain, interval }
+        });
+        return { error: "Failed to fetch coin data" };
+      } finally {
+        if (client) {
+          await client.release();
+        }
       }
-
-      const { rows: trends } = await sql`
-        SELECT "coinId", date, trend, streak
-        FROM "SuperTrend"
-        WHERE "coinId" = ${coin[0].id}
-          AND "quoteSymbol" IS NULL
-          AND flavor = 'CoinRotator'
-          AND interval = ${interval}
-        ORDER BY date DESC
-        LIMIT 10
-      `;
-
-      console.log('getCoinByContract: Success', {
-        coinId: coin[0].id,
-        trendsCount: trends.length
-      });
-      return { coin: coin[0], trends };
     }
   }),
 
@@ -256,36 +289,55 @@ const tools = {
       required: ['symbol']
     }),
     execute: async ({ symbol, interval = "1d" }) => {
-      console.log('Tool executed: getCoinBySymbol', { symbol, interval });
+      let client;
+      try {
+        console.log('Tool executed: getCoinBySymbol - Starting', { symbol, interval });
 
-      const { rows: coin } = await sql`
-        SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
-               "circulatingSupply", "fullyDilutedValuation", "totalSupply"
-        FROM "Coin"
-        WHERE UPPER(symbol) = UPPER(${symbol})
-      `;
+        client = await pool.connect();
+        console.log('getCoinBySymbol - Connected to database');
 
-      if (coin.length === 0) {
-        console.log('getCoinBySymbol: No coin found');
-        return { error: "Coin not found" };
+        // Add test query to verify connection
+        const testQuery = await client.sql`SELECT COUNT(*) FROM "Coin"`;
+        console.log('getCoinBySymbol - Test query result:', testQuery.rows[0]);
+
+        const coinQuery = await client.sql`
+          SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
+                 "circulatingSupply", "fullyDilutedValuation", "totalSupply"
+          FROM "Coin"
+          WHERE UPPER(symbol) = UPPER(${symbol})
+        `;
+        console.log('getCoinBySymbol - Coin query results:', { rowCount: coinQuery.rows.length });
+
+        if (coinQuery.rows.length === 0) {
+          console.log('getCoinBySymbol: No coin found for symbol:', symbol);
+          return { error: "Coin not found" };
+        }
+
+        const trendsQuery = await client.sql`
+          SELECT "coinId", date, trend, streak
+          FROM "SuperTrend"
+          WHERE "coinId" = ${coinQuery.rows[0].id}
+            AND "quoteSymbol" IS NULL
+            AND flavor = 'CoinRotator'
+            AND interval = ${interval}
+          ORDER BY date DESC
+          LIMIT 10
+        `;
+        console.log('getCoinBySymbol - Trends query results:', { trendsCount: trendsQuery.rows.length });
+
+        return { coin: coinQuery.rows[0], trends: trendsQuery.rows };
+      } catch (error) {
+        console.error('getCoinBySymbol Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { symbol, interval }
+        });
+        return { error: "Failed to fetch coin data" };
+      } finally {
+        if (client) {
+          await client.release();
+        }
       }
-
-      const { rows: trends } = await sql`
-        SELECT "coinId", date, trend, streak
-        FROM "SuperTrend"
-        WHERE "coinId" = ${coin[0].id}
-          AND "quoteSymbol" IS NULL
-          AND flavor = 'CoinRotator'
-          AND interval = ${interval}
-        ORDER BY date DESC
-        LIMIT 10
-      `;
-
-      console.log('getCoinBySymbol: Success', {
-        coinId: coin[0].id,
-        trendsCount: trends.length
-      });
-      return { coin: coin[0], trends };
     }
   }),
 
@@ -307,47 +359,65 @@ const tools = {
       required: ['name']
     }),
     execute: async ({ name, interval = "1d" }) => {
-      console.log('Tool executed: getCoinByName', { name, interval });
+      let client;
+      try {
+        console.log('Tool executed: getCoinByName', { name, interval });
 
-      const { rows: coin } = await sql`
-        SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
-               "circulatingSupply", "fullyDilutedValuation", "totalSupply"
-        FROM "Coin"
-        WHERE name = ${name.toLowerCase()}
-      `;
+        client = await pool.connect();
+        const coinQuery = await client.sql`
+          SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
+                 "circulatingSupply", "fullyDilutedValuation", "totalSupply"
+          FROM "Coin"
+          WHERE name = ${name.toLowerCase()}
+        `;
+        console.log('getCoinByName - Coin query results:', { rowCount: coinQuery.rows.length });
 
-      if (coin.length === 0) {
-        console.log('getCoinByName: No coin found');
-        return { error: "Coin not found" };
+        if (coinQuery.rows.length === 0) {
+          console.log('getCoinByName: No coin found');
+          return { error: "Coin not found" };
+        }
+
+        const trendsQuery = await client.sql`
+          SELECT "coinId", date, trend, streak
+          FROM "SuperTrend"
+          WHERE "coinId" = ${coinQuery.rows[0].id}
+            AND "quoteSymbol" IS NULL
+            AND flavor = 'CoinRotator'
+            AND interval = ${interval}
+          ORDER BY date DESC
+          LIMIT 10
+        `;
+        console.log('getCoinByName - Trends query results:', { trendsCount: trendsQuery.rows.length });
+
+        return { coin: coinQuery.rows[0], trends: trendsQuery.rows };
+      } catch (error) {
+        console.error('getCoinByName Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { name, interval }
+        });
+        return { error: "Failed to fetch coin data" };
+      } finally {
+        if (client) {
+          await client.release();
+        }
       }
-
-      const { rows: trends } = await sql`
-        SELECT "coinId", date, trend, streak
-        FROM "SuperTrend"
-        WHERE "coinId" = ${coin[0].id}
-          AND "quoteSymbol" IS NULL
-          AND flavor = 'CoinRotator'
-          AND interval = ${interval}
-        ORDER BY date DESC
-        LIMIT 10
-      `;
-
-      console.log('getCoinByName: Success', {
-        coinId: coin[0].id,
-        trendsCount: trends.length
-      });
-      return { coin: coin[0], trends };
     }
   })
 };
 
 export async function POST(req) {
   const { messages, walletAddress } = await req.json();
+  console.log('Received POST request with messages:', JSON.stringify(messages, null, 2));
+
   let hasKeyPass = false;
 
   try {
     hasKeyPass = await auth(walletAddress);
+    console.log('Auth result:', hasKeyPass);
+
     if (!hasKeyPass) {
+      console.log('Authentication failed for wallet:', walletAddress);
       return new Response(JSON.stringify({
         error: 'Unauthorized',
         message: 'Invalid wallet address or authentication failed'
@@ -357,8 +427,7 @@ export async function POST(req) {
       });
     }
 
-    console.log(1)
-
+    console.log('Starting AI stream...');
     const response = streamText({
       model: openrouter('qwen/qwen-max:online'),
       messages: [
@@ -372,19 +441,9 @@ export async function POST(req) {
       maxSteps: 3
     });
 
-
-    // Add error checking for the response
-    if (!response || !response.toDataStreamResponse) {
-      throw new Error('Invalid response from AI model');
-    }
-
+    console.log('Stream created, converting to response...');
     const streamResponse = response.toDataStreamResponse();
-
-    // Add error checking for the stream response
-    if (!streamResponse || !streamResponse.body) {
-      throw new Error('Invalid stream response');
-    }
-
+    console.log('Returning stream response...');
     return streamResponse;
 
   } catch(e) {
