@@ -1,15 +1,14 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { streamText, tool, jsonSchema } from 'ai';
 import auth from '../../../utils/auth.js'
-import { createPool } from '@vercel/postgres';
+import { createClient } from '@vercel/postgres';
 
 export const runtime = 'edge';
 
-const pool = createPool({
+const client = createClient({
   connectionString: process.env.DATABASE_URL,
-  maxUses: 1, // Required for edge functions
   ssl: {
-    rejectUnauthorized: false // Often needed for Vercel Postgres
+    rejectUnauthorized: false
   }
 });
 
@@ -225,11 +224,10 @@ const tools = {
       required: ['contractAddress', 'chain']
     }),
     execute: async ({ contractAddress, chain, interval = "1d" }) => {
-      let client;
       try {
         console.log('Tool executed: getCoinByContract', { contractAddress, chain, interval });
 
-        client = await pool.connect();
+        await client.connect();
         const coinQuery = await client.sql`
           SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
                  "circulatingSupply", "fullyDilutedValuation", "totalSupply"
@@ -263,10 +261,6 @@ const tools = {
           params: { contractAddress, chain, interval }
         });
         return { error: "Failed to fetch coin data" };
-      } finally {
-        if (client) {
-          await client.release();
-        }
       }
     }
   }),
@@ -289,11 +283,10 @@ const tools = {
       required: ['symbol']
     }),
     execute: async ({ symbol, interval = "1d" }) => {
-      let client;
       try {
         console.log('Tool executed: getCoinBySymbol - Starting', { symbol, interval });
 
-        client = await pool.connect();
+        await client.connect();
         console.log('getCoinBySymbol - Connected to database');
 
         // Add test query to verify connection
@@ -333,10 +326,6 @@ const tools = {
           params: { symbol, interval }
         });
         return { error: "Failed to fetch coin data" };
-      } finally {
-        if (client) {
-          await client.release();
-        }
       }
     }
   }),
@@ -359,11 +348,12 @@ const tools = {
       required: ['name']
     }),
     execute: async ({ name, interval = "1d" }) => {
-      let client;
       try {
         console.log('Tool executed: getCoinByName', { name, interval });
 
-        client = await pool.connect();
+        await client.connect();
+        // Somehow the query doesn't run through. Even with a test query, I never get results...
+        // Maybe its the connection configuration or maybe
         const coinQuery = await client.sql`
           SELECT id, "marketCap", categories, "coingeckoCategories", ath, atl,
                  "circulatingSupply", "fullyDilutedValuation", "totalSupply"
@@ -397,10 +387,6 @@ const tools = {
           params: { name, interval }
         });
         return { error: "Failed to fetch coin data" };
-      } finally {
-        if (client) {
-          await client.release();
-        }
       }
     }
   })
