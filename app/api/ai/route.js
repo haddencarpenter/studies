@@ -5,7 +5,7 @@ import { createClient } from '@vercel/postgres';
 
 export const runtime = 'edge';
 
-const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis agent. Your role is to analyze cryptocurrency trends using provided tools. Follow these specific rules:
+const systemPrompt = `You are CoinRotatorAI, a cryptocurrency trend analysis agent. Your role is to analyze cryptocurrency trends using provided tools. Follow these specific rules:
 
 ---
 
