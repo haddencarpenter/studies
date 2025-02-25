@@ -5,13 +5,6 @@ import { createClient } from '@vercel/postgres';
 
 export const runtime = 'edge';
 
-const client = createClient({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
 const systemPrompt = `You are CoinRotatorAi, a cryptocurrency trend analysis agent. Your role is to analyze cryptocurrency trends using provided tools. Follow these specific rules:
 
 ---
