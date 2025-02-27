@@ -467,7 +467,7 @@ export async function POST(req) {
 
     // Try a different model from OpenRouter that might have better compatibility
     const response = streamText({
-      model: openrouter('openai/gpt-4o'),  // Try GPT-4o instead
+      model: openrouter('anthropic/claude-3.7-sonnet'),  // Try GPT-4o instead
       messages: [
         {
           role: "system",
@@ -476,7 +476,7 @@ export async function POST(req) {
         ...messages
       ],
       tools,
-      maxSteps: 2,
+      maxSteps: 3,
 
       // Keep your existing callbacks
       onFinish(result) {
