@@ -230,7 +230,7 @@ const Search = ({ categories, collapsed }) => {
             className={searchStyles.searchSelect}
             allowClear
             prefix={<MessageOutlined className={searchStyles.placeholderMagnifier}/>}
-            suffix={<Button onClick={askAi} loading={isLoading} disabled={isLoading}>Ask AI</Button>}
+            suffix={<Button type="primary" onClick={askAi} loading={isLoading} disabled={isLoading}>Ask Toad</Button>}
             value={input}
             onChange={handleInputChange}
             onPressEnter={askAi}
@@ -245,9 +245,11 @@ const Search = ({ categories, collapsed }) => {
                     [searchStyles.userMessage]: message.role === 'user',
                     [searchStyles.assistantMessage]: message.role === 'assistant'
                   })}>
-                    <div className={searchStyles.messageRole}>
-                      {message.role === 'user' ? 'You' : 'Toad AI 🍄'}:
-                    </div>
+                    {message.role === 'assistant' && (
+                      <div className={searchStyles.messageRole}>
+                        🍄 Toad AI
+                      </div>
+                    )}
                     <div className={searchStyles.messageContent}>
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
@@ -255,7 +257,7 @@ const Search = ({ categories, collapsed }) => {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === 'user' && (
                   <div className={searchStyles.assistantMessage}>
-                    <div className={searchStyles.messageRole}>Toad AI 🍄:</div>
+                    <div className={searchStyles.messageRole}>🍄 Toad AI</div>
                     <div className={searchStyles.messageContent}>Thinking...</div>
                   </div>
                 )}
@@ -317,7 +319,7 @@ const Search = ({ categories, collapsed }) => {
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'ai'})}
             onClick={() => setTab('ai')}
           >
-            Toad AI 🍄
+            🍄 Toad AI
           </div>
         </div>
         {content}

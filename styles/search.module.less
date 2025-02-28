@@ -90,11 +90,6 @@
 .aiAnswer {
   padding: 16px;
   &:extend(.markdown all);
-
-  p {
-    font-size: 14px;
-    line-height: 20px;
-  }
 }
 
 .ai {
@@ -261,24 +256,28 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background-color: var(--cr-secondary-bg) !important;
 }
 
 .messageContainer {
   display: flex;
   flex-direction: column;
-  padding: 8px 12px;
   border-radius: 4px;
+  background-color: var(--cr-secondary-bg) !important;
+  border: 0 !important;
+}
+
+.messageContent {
+  padding: 12px;
+  border: 1px solid var(--cr-primary-border);
 }
 
 .userMessage {
-  background-color: var(--cr-quintiary-bg);
   align-self: flex-end;
   max-width: 80%;
 }
 
 .assistantMessage {
-  background-color: var(--cr-primary-bg);
-  border: 1px solid var(--cr-primary-border);
   align-self: flex-start;
   max-width: 80%;
 }
@@ -287,12 +286,10 @@
   font-weight: bold;
   margin-bottom: 4px;
   font-size: 14px;
+  background-color: var(--cr-secondary-bg) !important;
 }
 
 .messageContent {
-  font-size: 14px;
-  line-height: 20px;
-
   p {
     margin-bottom: 8px;
 
