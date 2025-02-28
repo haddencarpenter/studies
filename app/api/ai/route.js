@@ -476,7 +476,7 @@ export async function POST(req) {
         ...messages
       ],
       tools,
-      maxSteps: 3,
+      maxSteps: 10,
 
       // Keep your existing callbacks
       onFinish(result) {
