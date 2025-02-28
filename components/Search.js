@@ -1,5 +1,5 @@
 import { Modal, Input, Button } from 'antd'
-import { SearchOutlined, MessageOutlined } from "@ant-design/icons";
+import { SearchOutlined, MessageOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
@@ -26,7 +26,7 @@ const Search = ({ categories, collapsed }) => {
   const searchInputRef = useRef(null)
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [AIAnswer, setAIAnswer] = useState('')
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } = useChat({
     api: '/api/ai',
     body: {
       walletAddress
@@ -73,6 +73,10 @@ const Search = ({ categories, collapsed }) => {
   const openSearchModal = useCallback(() => {
     setSearchModalVisible(true)
   }, []);
+  const clearChat = useCallback(() => {
+    setMessages([])
+    setInput('')
+  }, [setMessages, setInput])
   const onSearchValueChange = useCallback((e) => {
     setAIAnswer('')
     setSearchValue(e.target.value);
@@ -230,7 +234,12 @@ const Search = ({ categories, collapsed }) => {
             className={searchStyles.searchSelect}
             allowClear
             prefix={<MessageOutlined className={searchStyles.placeholderMagnifier}/>}
-            suffix={<Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toad</Button>}
+            suffix={
+              <>
+                <Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toad</Button>
+                <Button disabled={isLoading || !messages.length} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+              </>
+            }
             value={input}
             onChange={handleInputChange}
             onPressEnter={askAi}
