@@ -230,7 +230,7 @@ const Search = ({ categories, collapsed }) => {
             className={searchStyles.searchSelect}
             allowClear
             prefix={<MessageOutlined className={searchStyles.placeholderMagnifier}/>}
-            suffix={<Button type="primary" onClick={askAi} loading={isLoading} disabled={isLoading}>Ask Toad</Button>}
+            suffix={<Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toad</Button>}
             value={input}
             onChange={handleInputChange}
             onPressEnter={askAi}

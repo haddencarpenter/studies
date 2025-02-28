@@ -222,6 +222,10 @@
   padding: 16px;
 }
 
+.askToadButtonDisabled {
+  pointer-events: none;
+}
+
 /* Add these new styles for AI suggestions */
 .suggestions {
   background-color: var(--cr-secondary-bg) !important;
@@ -280,6 +284,11 @@
 .assistantMessage {
   align-self: flex-start;
   max-width: 80%;
+
+  .messageContent {
+    background-color: var(--cr-secondary-bg) !important;
+    border: 0 !important;
+  }
 }
 
 .messageRole {
