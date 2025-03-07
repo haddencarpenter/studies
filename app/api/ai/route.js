@@ -273,25 +273,61 @@ const callSocketServer = async (endpoint, params = {}) => {
 
     // Process the response to ensure it's in a format the AI can handle
     if (data && !data.error) {
-      // Ensure trends is always an array
-      data.trends = Array.isArray(data.trends) ? data.trends : [];
+      // Handle coin data responses
+      if (endpoint.startsWith('/api/coin/')) {
+        // Ensure trends is always an array
+        data.trends = Array.isArray(data.trends) ? data.trends : [];
 
-      // Add a clear message about trend data status
-      if (data.trends.length === 0 && data.coin) {
-        data.trendStatus = "No trend data available for this coin";
-        data.hasTrendData = false;
-      } else if (data.trends.length > 0) {
-        data.hasTrendData = true;
-        data.trendStatus = `Found ${data.trends.length} trend records`;
+        // Add a clear message about trend data status
+        if (data.trends.length === 0 && data.coin) {
+          data.trendStatus = "No trend data available for this coin";
+          data.hasTrendData = false;
+        } else if (data.trends.length > 0) {
+          data.hasTrendData = true;
+          data.trendStatus = `Found ${data.trends.length} trend records`;
+        }
+      }
+
+      // Handle array responses (categories, extreme trends, aligned trends, coins by category)
+      if (endpoint === '/api/categories' ||
+          endpoint === '/api/trends/extreme' ||
+          endpoint === '/api/trends/aligned' ||
+          endpoint === '/api/coins/category') {
+        // Ensure we always return an array
+        if (!Array.isArray(data)) {
+          return [];
+        }
+      }
+
+      // Handle market health response
+      if (endpoint === '/api/market/health' && !data.error) {
+        // Ensure trends object exists with all required properties
+        if (!data.trends) {
+          data.trends = { UP: 0, HODL: 0, DOWN: 0 };
+        } else {
+          // Ensure all trend types exist
+          if (typeof data.trends.UP === 'undefined') data.trends.UP = 0;
+          if (typeof data.trends.HODL === 'undefined') data.trends.HODL = 0;
+          if (typeof data.trends.DOWN === 'undefined') data.trends.DOWN = 0;
+        }
+
+        // Ensure extremes is an array
+        if (!Array.isArray(data.extremes)) {
+          data.extremes = [];
+        }
+      }
+
+      // Handle market crossing response
+      if (endpoint === '/api/market/crossing' && !data.error) {
+        // Add a formatted message if not present and we have crossing data
+        if (!data.message && data.overtaking && data.overtaken && data.date) {
+          data.message = `${data.overtaking} trend overtook ${data.overtaken} trend on ${new Date(data.date).toLocaleDateString()}`;
+        }
       }
     }
 
-    console.log('Processed API response:', {
-      hasCoin: !!data.coin,
-      trendsCount: data.trends?.length,
-      trendStatus: data.trendStatus,
-      hasTrendData: data.hasTrendData
-    });
+    // Simple logging of the response data
+    console.log(`API response from ${endpoint}:`, data);
 
     return data;
   } catch (error) {
@@ -338,11 +374,7 @@ const tools = {
           interval
         });
 
-        console.log('getCoinByContract - Result:', {
-          hasCoin: !!result.coin,
-          trendsCount: result.trends?.length,
-          trendStatus: result.trendStatus
-        });
+        console.log('getCoinByContract - Result:', result);
 
         if (result.error) {
           return { error: result.error };
@@ -392,11 +424,7 @@ const tools = {
           interval
         });
 
-        console.log('getCoinBySymbol - Result:', {
-          hasCoin: !!result.coin,
-          trendsCount: result.trends?.length,
-          trendStatus: result.trendStatus
-        });
+        console.log('getCoinBySymbol - Result:', result);
 
         if (result.error) {
           return { error: result.error };
@@ -446,11 +474,7 @@ const tools = {
           interval
         });
 
-        console.log('getCoinByName - Result:', {
-          hasCoin: !!result.coin,
-          trendsCount: result.trends?.length,
-          trendStatus: result.trendStatus
-        });
+        console.log('getCoinByName - Result:', result);
 
         if (result.error) {
           return { error: result.error };
@@ -469,6 +493,235 @@ const tools = {
           params: { name, interval }
         });
         return { error: "Failed to fetch coin data" };
+      }
+    }
+  }),
+
+  getAllCategories: tool({
+    description: "Use this when a user asks for all categories. Returns a list of all unique cryptocurrency categories across all coins in the database.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        // No additional parameters needed
+      },
+      required: []
+    }),
+    execute: async () => {
+      try {
+        console.log('Tool executed: getAllCategories');
+
+        // Call the socket server API endpoint for categories
+        const result = await callSocketServer('/api/categories');
+
+        console.log('getAllCategories - Result:', result);
+
+        return Array.isArray(result) ? result : [];
+      } catch (error) {
+        console.error('getAllCategories Error:', {
+          message: error.message,
+          stack: error.stack
+        });
+        return { error: "Failed to fetch categories" };
+      }
+    }
+  }),
+
+  getExtremeTrends: tool({
+    description: "Use this when a user asks about fresh or stale trends. 'Fresh' trends are those that just started (streak = 1), while 'stale' trends are those that have been ongoing for a long time (high streak value).",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        interval: {
+          type: 'string',
+          description: 'Trend data interval (1d, 4h)',
+          default: '1d'
+        },
+        type: {
+          type: 'string',
+          description: "Type of extreme trends to fetch ('fresh' or 'stale')",
+          enum: ['fresh', 'stale'],
+          default: 'fresh'
+        }
+      }
+    }),
+    execute: async ({ interval = "1d", type = "fresh" }) => {
+      try {
+        console.log('Tool executed: getExtremeTrends', { interval, type });
+
+        // Call the socket server API endpoint for extreme trends
+        const result = await callSocketServer('/api/trends/extreme', {
+          interval,
+          type
+        });
+
+        console.log('getExtremeTrends - Result:', result);
+
+        return Array.isArray(result) ? result : [];
+      } catch (error) {
+        console.error('getExtremeTrends Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { interval, type }
+        });
+        return { error: "Failed to fetch extreme trends" };
+      }
+    }
+  }),
+
+  getAlignedTrends: tool({
+    description: "Use this when a user asks about coins with aligned trends across all timeframes. Returns coins where the trend direction (UP, DOWN, HODL) is the same across all supported intervals.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        flavor: {
+          type: 'string',
+          description: 'The trend algorithm flavor to use',
+          default: 'CoinRotator'
+        }
+      }
+    }),
+    execute: async ({ flavor = "CoinRotator" }) => {
+      try {
+        console.log('Tool executed: getAlignedTrends', { flavor });
+
+        // Call the socket server API endpoint for aligned trends
+        const result = await callSocketServer('/api/trends/aligned', {
+          flavor
+        });
+
+        console.log('getAlignedTrends - Result:', result);
+
+        return Array.isArray(result) ? result : [];
+      } catch (error) {
+        console.error('getAlignedTrends Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { flavor }
+        });
+        return { error: "Failed to fetch aligned trends" };
+      }
+    }
+  }),
+
+  getCoinsByCategory: tool({
+    description: "Use this when a user asks about coins in a specific category. Returns a list of coins that belong to the specified category.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: 'The category name to search for'
+        }
+      },
+      required: ['category']
+    }),
+    execute: async ({ category }) => {
+      try {
+        console.log('Tool executed: getCoinsByCategory', { category });
+
+        // Call the socket server API endpoint for coins by category
+        const result = await callSocketServer('/api/coins/category', {
+          category
+        });
+
+        console.log('getCoinsByCategory - Result:', result);
+
+        return Array.isArray(result) ? result : [];
+      } catch (error) {
+        console.error('getCoinsByCategory Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { category }
+        });
+        return { error: "Failed to fetch coins by category" };
+      }
+    }
+  }),
+
+  getMarketHealth: tool({
+    description: "Use this when a user asks about overall market health or sentiment. Returns data about the distribution of UP, DOWN, and HODL trends across the market.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        interval: {
+          type: 'string',
+          description: 'Trend data interval (1d, 4h)',
+          default: '1d'
+        }
+      }
+    }),
+    execute: async ({ interval = "1d" }) => {
+      try {
+        console.log('Tool executed: getMarketHealth', { interval });
+
+        // Call the socket server API endpoint for market health
+        const result = await callSocketServer('/api/market/health', {
+          interval
+        });
+
+        console.log('getMarketHealth - Result:', result);
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return {
+          date: result.date,
+          trends: result.trends,
+          hasExtremes: result.hasExtremes,
+          extremes: result.extremes
+        };
+      } catch (error) {
+        console.error('getMarketHealth Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { interval }
+        });
+        return { error: "Failed to fetch market health data" };
+      }
+    }
+  }),
+
+  getMarketHealthCrossing: tool({
+    description: "Use this when a user asks about market trend crossings or shifts. Returns information about the most recent crossing where one trend type overtook another.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        interval: {
+          type: 'string',
+          description: 'Trend data interval (1d, 4h)',
+          default: '1d'
+        }
+      }
+    }),
+    execute: async ({ interval = "1d" }) => {
+      try {
+        console.log('Tool executed: getMarketHealthCrossing', { interval });
+
+        // Call the socket server API endpoint for market health crossing
+        const result = await callSocketServer('/api/market/crossing', {
+          interval
+        });
+
+        console.log('getMarketHealthCrossing - Result:', result);
+
+        if (result.error) {
+          return { error: result.error };
+        }
+
+        return {
+          date: result.date,
+          overtaking: result.overtaking,
+          overtaken: result.overtaken,
+          message: result.message
+        };
+      } catch (error) {
+        console.error('getMarketHealthCrossing Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { interval }
+        });
+        return { error: "Failed to fetch market health crossing data" };
       }
     }
   })
@@ -583,16 +836,42 @@ export async function POST(req) {
             ? `Found ${result.trends.length} trend records`
             : "No trend data available for this coin";
 
-          console.log('Normalized tool result:', {
-            toolName,
-            toolCallId,
-            resultSummary: {
-              hasCoin: !!result.coin,
-              trendsCount: result.trends.length,
-              hasTrendData: result.hasTrendData,
-              trendStatus: result.trendStatus
-            }
-          });
+          console.log('Tool call result:', { toolName, toolCallId, result });
+        }
+
+        // Handle array results for list-based tools
+        if (['getAllCategories', 'getExtremeTrends', 'getAlignedTrends', 'getCoinsByCategory'].includes(toolName)) {
+          // Ensure result is always an array
+          if (!Array.isArray(result)) {
+            result = [];
+          }
+
+          console.log('Tool call result:', { toolName, toolCallId, resultCount: result.length });
+        }
+
+        // Handle market health tools
+        if (toolName === 'getMarketHealth' && result && !result.error) {
+          // Ensure trends object exists
+          if (!result.trends) {
+            result.trends = { UP: 0, HODL: 0, DOWN: 0 };
+          }
+
+          // Ensure extremes is an array
+          if (!Array.isArray(result.extremes)) {
+            result.extremes = [];
+          }
+
+          console.log('Tool call result:', { toolName, toolCallId, result });
+        }
+
+        // Handle market health crossing tool
+        if (toolName === 'getMarketHealthCrossing' && result && !result.error) {
+          // Add a formatted message if not present
+          if (!result.message && result.overtaking && result.overtaken) {
+            result.message = `${result.overtaking} trend overtook ${result.overtaken} trend on ${new Date(result.date).toLocaleDateString()}`;
+          }
+
+          console.log('Tool call result:', { toolName, toolCallId, result });
         }
 
         // Add special handling for empty trends
@@ -604,13 +883,17 @@ export async function POST(req) {
           console.log('Empty trends detected, adding placeholder data');
         }
 
-        console.log('Tool call result:', {
-          toolName,
-          toolCallId,
-          result: typeof result === 'object' ?
-            JSON.stringify(result).substring(0, 100) + '...' :
-            String(result).substring(0, 100) + '...'
-        });
+        // For any other tools or if not handled above
+        if (!toolName.startsWith('getCoinBy') &&
+            !['getAllCategories', 'getExtremeTrends', 'getAlignedTrends', 'getCoinsByCategory', 'getMarketHealth', 'getMarketHealthCrossing'].includes(toolName)) {
+          console.log('Tool call result:', {
+            toolName,
+            toolCallId,
+            result: typeof result === 'object' ?
+              JSON.stringify(result).substring(0, 100) + '...' :
+              String(result).substring(0, 100) + '...'
+          });
+        }
       }
     });
 
