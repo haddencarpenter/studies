@@ -605,9 +605,8 @@ export async function POST(req) {
     // Create a collection to store all steps for debugging
     const allSteps = [];
 
-    // Try a different model from OpenRouter that might have better compatibility
     const response = streamText({
-      model: openrouter('anthropic/claude-3.7-sonnet'),  // Try GPT-4o instead
+      model: openrouter('anthropic/claude-3.7-sonnet:online'),
       messages: [
         {
           role: "system",
