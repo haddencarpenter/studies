@@ -8,6 +8,7 @@ import slugify from 'slugify'
 import Fuse from 'fuse.js'
 import { useChat } from '@ai-sdk/react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 import useKeyPass from '../hooks/useKeyPass';
 import useAccount from '../hooks/useAccount';
@@ -279,7 +280,7 @@ const Search = ({ categories, collapsed }) => {
                       </div>
                     )}
                     <div className={searchStyles.messageContent}>
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                     </div>
                   </div>
                 ))}
