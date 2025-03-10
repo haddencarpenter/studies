@@ -36,6 +36,7 @@ const Search = ({ categories, collapsed }) => {
     }
   })
   const messagesEndRef = useRef(null)
+  const [autoScroll, setAutoScroll] = useState(true);
 
   const aiSuggestions = [
     "What are some of the rising DeFi tokens right now?",
@@ -96,13 +97,47 @@ const Search = ({ categories, collapsed }) => {
   const router = useRouter()
 
   useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollTo({
-        top: messagesEndRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
+    // Only auto-scroll when new messages arrive if autoScroll is true
+    if (messages.length > 0 && autoScroll) {
+      // Use setTimeout to ensure this happens after render
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+        }
+      }, 0);
     }
-  }, [messages]);
+  }, [messages, autoScroll]);
+
+  // Separate effect to handle user scroll and detect when to enable/disable auto-scroll
+  useEffect(() => {
+    const messagesContainer = messagesEndRef.current;
+    if (!messagesContainer) return;
+
+    // When a new message is added, we want to enable auto-scroll
+    if (messages.length > 0) {
+      // Check if we're already at the bottom before enabling auto-scroll
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
+      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 20;
+
+      // Only set autoScroll to true if we're already at the bottom
+      if (isAtBottom) {
+        setAutoScroll(true);
+      }
+    }
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
+      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 20;
+
+      // Only update if we're changing the state
+      if (autoScroll !== isAtBottom) {
+        setAutoScroll(isAtBottom);
+      }
+    };
+
+    messagesContainer.addEventListener('scroll', handleScroll);
+    return () => messagesContainer.removeEventListener('scroll', handleScroll);
+  }, [messages, autoScroll]);
 
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
