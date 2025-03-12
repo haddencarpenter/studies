@@ -1,7 +1,6 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { streamText, tool, jsonSchema } from 'ai';
-import auth from '../../../utils/auth.js'
 
 export const runtime = 'edge';
 
@@ -608,23 +607,7 @@ export async function POST(req) {
     });
   }
 
-  let hasKeyPass = false;
-
   try {
-    hasKeyPass = await auth(walletAddress);
-    console.log('Auth result:', hasKeyPass);
-
-    if (!hasKeyPass) {
-      console.log('Authentication failed for wallet:', walletAddress);
-      return new Response(JSON.stringify({
-        error: 'Unauthorized',
-        message: 'Invalid wallet address or authentication failed'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
     console.log('Getting system prompt...');
     const systemPrompt = await getSystemPrompt();
     console.log('System prompt:', systemPrompt);
