@@ -17,6 +17,7 @@ import useBreakPoint from "../hooks/useBreakPoint"
 import baseStyles from "../styles/base.module.less"
 import SharedLayout from "../layouts/shared"
 import variableStyles from '../styles/variables.module.less'
+import { KeyPassProvider } from '../context/KeyPassContext'
 
 export const DarkModeContext = createContext(null);
 export const NotificationContext = createContext(null);
@@ -69,28 +70,30 @@ export default function ScreenerLayout({ page, pageProps }) {
   return (
     <>
       <WagmiProvider config={config}>
-        <Banner />
         <QueryClientProvider client={queryClient}>
-          <Layout className={baseStyles.outerLayout}>
-            <SharedLayout pageProps={pageProps} />
-            <Head>
-              <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
-              <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
-            </Head>
-            <Client>
-              { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
-            </Client>
-            <Layout className={baseStyles.innerLayout}>
+          <KeyPassProvider>
+            <Banner />
+            <Layout className={baseStyles.outerLayout}>
+              <SharedLayout pageProps={pageProps} />
+              <Head>
+                <title key="title">CoinRotator - Coin Screener for Bullish & Bearish Crypto Trends</title>
+                <meta name="description" key="description" content="A crypto screener spotting high momentum trades using the popular Supertrend. Check CoinRotator each day to ensure you are trading with the trend."/>
+              </Head>
               <Client>
-                <Header
-                  categories={categories}
-                  screens={screens}
-                  topCategories={topCategories}
-                />
+                { screens.lg && <Sider topCategories={topCategories} categories={categories} /> }
               </Client>
-              {page}
+              <Layout className={baseStyles.innerLayout}>
+                <Client>
+                  <Header
+                    categories={categories}
+                    screens={screens}
+                    topCategories={topCategories}
+                  />
+                </Client>
+                {page}
+              </Layout>
             </Layout>
-          </Layout>
+          </KeyPassProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </>

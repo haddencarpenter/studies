@@ -14,7 +14,15 @@ const handler = async (req, res) => {
   } else {
     try {
       const hasKeyPass = await auth(walletAddress)
-      res.setHeader('Cache-Control', 'max-age=3600')
+
+      // Set cache headers for better caching
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400')
+      // Add a cache tag for this specific wallet
+      res.setHeader('Cache-Tag', `wallet-${walletAddress}`)
+      // Add Vary header to ensure proper caching by wallet address
+      res.setHeader('Vary', 'Accept-Encoding, X-Wallet-Address')
+      res.setHeader('X-Wallet-Address', walletAddress)
+
       if (hasKeyPass) {
         res.status(200).json({ ok: true })
       } else {
