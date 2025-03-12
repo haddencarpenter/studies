@@ -45,6 +45,8 @@ const Search = ({ categories, collapsed }) => {
     "Show me fresh trends in the crypto market"
   ];
 
+  const router = useRouter()
+
   useEffect(() => {
     const fetchCoins = async () => {
       const res = await fetch('/api/search')
@@ -88,14 +90,20 @@ const Search = ({ categories, collapsed }) => {
     setSearchModalVisible(false)
     setSearchValue('')
     setQuery('')
-  }, []);
+
+    // Remove the hash from the URL when closing the modal
+    if (window.location.hash === '#toady') {
+      // Use Next.js router to remove the hash without page reload
+      const currentPath = router.pathname;
+      router.push(currentPath, undefined, { shallow: true });
+    }
+  }, [router]);
   const askAi = useCallback((e) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     handleSubmit(e);
   }, [handleSubmit, input]);
-  const router = useRouter()
 
   useEffect(() => {
     // Only auto-scroll when new messages arrive if autoScroll is true
@@ -139,6 +147,16 @@ const Search = ({ categories, collapsed }) => {
     messagesContainer.addEventListener('scroll', handleScroll);
     return () => messagesContainer.removeEventListener('scroll', handleScroll);
   }, [messages, autoScroll]);
+
+  // Add effect to check for hash in URL
+  useEffect(() => {
+    const path = router.asPath
+    const afterHash = path.split('#')[1]
+    if (afterHash === 'toady') {
+      setSearchModalVisible(true)
+      setTab('ai')
+    }
+  }, [router.asPath])
 
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
@@ -276,7 +294,7 @@ const Search = ({ categories, collapsed }) => {
                   })}>
                     {message.role === 'assistant' && (
                       <div className={searchStyles.messageRole}>
-                        <img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toad AI" width="18" height="18" />&nbsp;Toad AI
+                        <img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady
                       </div>
                     )}
                     <div className={searchStyles.messageContent}>
@@ -286,7 +304,7 @@ const Search = ({ categories, collapsed }) => {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === 'user' && (
                   <div className={searchStyles.assistantMessage}>
-                    <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toad AI" width="18" height="18" />&nbsp;Toad AI</div>
+                    <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady</div>
                     <div className={searchStyles.messageContent}>Thinking...</div>
                   </div>
                 )}
@@ -312,7 +330,7 @@ const Search = ({ categories, collapsed }) => {
             prefix={<MessageOutlined className={searchStyles.placeholderMagnifier}/>}
             suffix={
               <>
-                <Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toad</Button>
+                <Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toady</Button>
                 <Button disabled={isLoading || !messages.length} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
               </>
             }
@@ -349,7 +367,13 @@ const Search = ({ categories, collapsed }) => {
       {searchTrigger}
       <Modal
         open={searchModalVisible}
-        onCancel={() => setSearchModalVisible(false)}
+        onCancel={closeModal}
+        afterClose={() => {
+          if (window.location.hash === '#toady') {
+            const currentPath = router.pathname;
+            router.push(currentPath, undefined, { shallow: true });
+          }
+        }}
         className={searchStyles.modal}
         footer={null}
         closeIcon={null}
@@ -365,13 +389,13 @@ const Search = ({ categories, collapsed }) => {
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'ai'})}
             onClick={() => setTab('ai')}
           >
-            <img src="/toad-ai.png" alt="Toad AI" width="18" height="18" />&nbsp;Toad AI
+            <img src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady
           </div>
         </div>
         {content}
       </Modal>
     </div>
   );
-}
+};
 
 export default Search
