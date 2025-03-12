@@ -221,6 +221,8 @@ export default function Coin(coin) {
       <meta property="og:image:width" content="250" />
       <meta property="og:image:height" content="250" />
       <meta property="og:image:type" content="image/png" />
+      <meta property="x-cr-coin-name" content={coin.name} />
+      <meta property="x-cr-coin-symbol" content={coin.symbol} />
     </Head>
     <PageHeader
       title={coin.name}

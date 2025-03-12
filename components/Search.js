@@ -170,17 +170,11 @@ const Search = ({ categories, collapsed }) => {
 
   // Check if we're on a coin page and set the coin tag
   useEffect(() => {
-    if (searchModalVisible && router.asPath) {
-      const path = router.asPath;
-      if (path.includes('/coin/')) {
-        // Extract coinId from URL (part after /coin/ without hash parameters)
-        const coinId = path.split('/coin/')[1].split('#')[0];
-        if (coinId) {
-          setCoinTag(coinId);
-        }
-      }
+    const coinMetaTag = document.querySelector('meta[property="x-cr-coin-name"]');
+    if (coinMetaTag && coinMetaTag.content) {
+      setCoinTag(coinMetaTag.content);
     }
-  }, [searchModalVisible, router.asPath]);
+  }, [router.asPath]);
 
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
