@@ -335,6 +335,7 @@ setTimeout(async () => {
     setTimeout(async () => {
       await axios.get('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/zigJ5zntts')
       try {
+        await axios.post('https://api.vercel.com/v1/integrations/deploy/prj_uc9CaXrUEpspFxIJeoTgrrWqaIAY/zigJ5zntts')
         await axios.post('https://api.netlify.com/build_hooks/673aebced624ef0d703c7049')
       } catch(e) {}
       await createJob({ serviceId: 'crn-c8q7r2pg7hp6tkba3sj0', startCommand: 'node dist/bot.mjs' })
