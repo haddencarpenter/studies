@@ -28,7 +28,7 @@ const Search = ({ categories, collapsed }) => {
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [AIAnswer, setAIAnswer] = useState('')
   const [coinTag, setCoinTag] = useState(null);
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, setInput } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, stop, isLoading, setMessages, setInput } = useChat({
     api: '/api/ai',
     body: {
       walletAddress
@@ -102,10 +102,10 @@ const Search = ({ categories, collapsed }) => {
   }, [router]);
   const askAi = useCallback((e) => {
     e.preventDefault();
+
     if (!input.trim() && !coinTag) return;
     const coinId = document.querySelector('meta[property="x-cr-coin-id"]');
 
-    // Use the options parameter of handleSubmit to pass the coinTag
     handleSubmit(e, {
       data: coinTag ? { coinId } : undefined
     });
@@ -360,7 +360,15 @@ const Search = ({ categories, collapsed }) => {
             </>}
             suffix={
               <>
-                <Button type="primary" onClick={askAi} loading={isLoading} className={isLoading ? searchStyles.askToadButtonDisabled : ''}>Ask Toady</Button>
+                {isLoading ? (
+                  <Button type="primary" onClick={stop} className={searchStyles.stopButton}>
+                    Stop
+                  </Button>
+                ) : (
+                  <Button type="primary" onClick={askAi}>
+                    Ask Toady
+                  </Button>
+                )}
                 <Button disabled={isLoading || !messages.length} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
               </>
             }
