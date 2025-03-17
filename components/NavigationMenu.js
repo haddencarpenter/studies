@@ -32,8 +32,10 @@ const NavigationMenu = ({ collapsed = false, topCategories, onMenuItemSelected }
     e.preventDefault();
     e.stopPropagation();
 
-    const currentPath = router.pathname;
-    router.push(`${currentPath}#toady`);
+    const currentPath = router.asPath;
+
+    const pathWithoutHash = currentPath.split('#')[0];
+    router.push(`${pathWithoutHash}#toady`);
   }
 
   // Then use it in the menu items
@@ -327,8 +329,9 @@ const NavigationMenu = ({ collapsed = false, topCategories, onMenuItemSelected }
     if (e.key === 'toad-ai') {
       e.domEvent.preventDefault();
 
-      const currentPath = router.pathname;
-      router.push(`${currentPath}#toady`);
+      const currentPath = router.asPath;
+      const pathWithoutHash = currentPath.split('#')[0];
+      router.push(`${pathWithoutHash}#toady`);
     } else if (onMenuItemSelected) {
       onMenuItemSelected(e);
     }

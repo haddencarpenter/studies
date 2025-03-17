@@ -95,9 +95,10 @@ const Search = ({ categories, collapsed }) => {
 
     // Remove the hash from the URL when closing the modal
     if (window.location.hash === '#toady') {
+      // Get the current path without the hash
+      const pathWithoutHash = router.asPath.split('#')[0];
       // Use Next.js router to remove the hash without page reload
-      const currentPath = router.pathname;
-      router.push(currentPath, undefined, { shallow: true });
+      router.push(pathWithoutHash, undefined, { shallow: true });
     }
   }, [router]);
   const askAi = useCallback((e) => {
@@ -412,8 +413,8 @@ const Search = ({ categories, collapsed }) => {
         onCancel={closeModal}
         afterClose={() => {
           if (window.location.hash === '#toady') {
-            const currentPath = router.pathname;
-            router.push(currentPath, undefined, { shallow: true });
+            const pathWithoutHash = router.asPath.split('#')[0];
+            router.push(pathWithoutHash, undefined, { shallow: true });
           }
         }}
         className={searchStyles.modal}
