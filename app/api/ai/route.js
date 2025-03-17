@@ -602,6 +602,42 @@ const tools = {
         return { error: "Failed to fetch coin data" };
       }
     }
+  }),
+
+  getRecentTweets: tool({
+    description: "Use this when a user asks about recent tweets from a specific Twitter account. Returns the 10 most recent tweets from the specified Twitter handle.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        handle: {
+          type: 'string',
+          description: 'Twitter username without the @ symbol at the start'
+        }
+      },
+      required: ['handle']
+    }),
+    execute: async ({ handle }) => {
+      try {
+        console.log('Tool executed: getRecentTweets', { handle });
+
+        // Call the socket server API endpoint for tweets
+        const result = await callSocketServer('/api/twitter/tweets', {
+          handle
+        });
+
+        console.log('getRecentTweets - Result:', result);
+
+        // Ensure we always return an array
+        return Array.isArray(result) ? result : [];
+      } catch (error) {
+        console.error('getRecentTweets Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { handle }
+        });
+        return { error: "Failed to fetch tweets" };
+      }
+    }
   })
 };
 
