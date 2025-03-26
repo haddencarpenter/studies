@@ -601,7 +601,7 @@ const tools = {
 
         // Call the socket server API endpoint for coinId lookup
         const result = await callSocketServer('/api/coin/id', {
-          coinId,
+          id: coinId,
           interval,
           trendLimit
         });
