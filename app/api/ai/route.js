@@ -666,6 +666,142 @@ const tools = {
         return jsonToMarkdown({ error: "Failed to fetch tweets" });
       }
     }
+  }),
+
+  getFilteredCoins: tool({
+    description: "Use this when a user wants to filter coins by criteria like trend direction, market cap, categories, etc. Example: 'Show me uptrend coins in the DeFi category' or 'Find coins with market cap under 100M with strong uptrends'.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        trend: {
+          type: 'string',
+          description: 'Filter by trend direction: UP, HODL, or DOWN',
+          enum: ['UP', 'HODL', 'DOWN']
+        },
+        categories: {
+          type: 'array',
+          description: 'Filter by one or more categories (e.g., ["defi", "nft"])',
+          items: {
+            type: 'string'
+          }
+        },
+        marketCapMin: {
+          type: 'number',
+          description: 'Minimum market cap in USD'
+        },
+        marketCapMax: {
+          type: 'number',
+          description: 'Maximum market cap in USD'
+        },
+        streakMin: {
+          type: 'number',
+          description: 'Minimum trend streak length (absolute value)'
+        },
+        streakMax: {
+          type: 'number',
+          description: 'Maximum trend streak length (absolute value)'
+        },
+        exchanges: {
+          type: 'array',
+          description: 'Filter by one or more exchanges',
+          items: {
+            type: 'string'
+          }
+        },
+        cexOnly: {
+          type: 'boolean',
+          description: 'Only include coins listed on centralized exchanges'
+        },
+        dexOnly: {
+          type: 'boolean',
+          description: 'Only include coins listed on decentralized exchanges'
+        },
+        interval: {
+          type: 'string',
+          description: 'Trend data interval (1d, 4h)',
+          default: '1d'
+        },
+        flavor: {
+          type: 'string',
+          description: 'Trend algorithm flavor',
+          default: 'CoinRotator'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of results to return'
+        }
+      }
+    }),
+    execute: async ({ trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
+                     exchanges, cexOnly, dexOnly, interval = "1d", flavor = "CoinRotator", limit }) => {
+      try {
+        console.log('Tool executed: getFilteredCoins', {
+          trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
+          exchanges, cexOnly, dexOnly, interval, flavor, limit
+        });
+
+        // Convert boolean parameters to strings for query params
+        const cexOnlyParam = cexOnly === true ? 'true' : undefined;
+        const dexOnlyParam = dexOnly === true ? 'true' : undefined;
+
+        // Call the socket server API endpoint for filtered coins
+        const coinIds = await callSocketServer('/api/coins/filter', {
+          trend,
+          categories: Array.isArray(categories) ? categories : undefined,
+          marketCapMin,
+          marketCapMax,
+          streakMin,
+          streakMax,
+          exchanges: Array.isArray(exchanges) ? exchanges : undefined,
+          cexOnly: cexOnlyParam,
+          dexOnly: dexOnlyParam,
+          interval,
+          flavor,
+          limit
+        });
+
+        console.log('getFilteredCoins - Result:', coinIds);
+
+        // If no coins found, return a helpful message
+        if (!Array.isArray(coinIds) || coinIds.length === 0) {
+          return jsonToMarkdown({
+            message: "No coins match the specified criteria",
+            filters: {
+              trend,
+              categories: Array.isArray(categories) ? categories : undefined,
+              marketCapRange: marketCapMin || marketCapMax ? `${marketCapMin || 'min'} to ${marketCapMax || 'max'}` : undefined,
+              streakRange: streakMin || streakMax ? `${streakMin || 'min'} to ${streakMax || 'max'}` : undefined,
+              exchanges: Array.isArray(exchanges) ? exchanges : undefined,
+              cexOnly,
+              dexOnly
+            }
+          });
+        }
+
+        // Return the coin IDs with filter details
+        return jsonToMarkdown({
+          message: `Found ${coinIds.length} coins matching the criteria`,
+          filters: {
+            trend,
+            categories: Array.isArray(categories) ? categories : undefined,
+            marketCapRange: marketCapMin || marketCapMax ? `${marketCapMin || 'min'} to ${marketCapMax || 'max'}` : undefined,
+            streakRange: streakMin || streakMax ? `${streakMin || 'min'} to ${streakMax || 'max'}` : undefined,
+            exchanges: Array.isArray(exchanges) ? exchanges : undefined,
+            cexOnly,
+            dexOnly
+          },
+          coinIds
+        });
+      } catch (error) {
+        console.error('getFilteredCoins Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
+                    exchanges, cexOnly, dexOnly, interval, flavor, limit }
+        });
+        return jsonToMarkdown({ error: "Failed to filter coins" });
+      }
+    }
   })
 };
 
