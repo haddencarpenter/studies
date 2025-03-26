@@ -44,10 +44,17 @@ const trackMixpanelEvent = async (event, properties) => {
 const callSocketServer = async (endpoint, params = {}) => {
   const url = new URL(endpoint, process.env.NEXT_PUBLIC_SOCKET_SERVER_URL);
 
-  // Add query parameters
+  // Add query parameters - with special handling for arrays
   Object.keys(params).forEach(key => {
     if (params[key] !== undefined) {
-      url.searchParams.append(key, params[key]);
+      // Handle arrays with the proper [] notation
+      if (Array.isArray(params[key])) {
+        params[key].forEach(value => {
+          url.searchParams.append(`${key}[]`, value);
+        });
+      } else {
+        url.searchParams.append(key, params[key]);
+      }
     }
   });
 
