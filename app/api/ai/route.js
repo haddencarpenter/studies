@@ -1,5 +1,5 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { anthropic } from '@ai-sdk/anthropic';
 import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
 
@@ -39,10 +39,6 @@ const trackMixpanelEvent = async (event, properties) => {
     console.error('Error tracking event in Mixpanel:', error);
   }
 };
-
-const openrouter = createOpenRouter({
-  apiKey: process.env.OPEN_ROUTER_API_KEY,
-});
 
 // Replace the database helper with a function to call the socket server
 const callSocketServer = async (endpoint, params = {}) => {
@@ -777,15 +773,20 @@ export async function POST(req) {
     const allSteps = [];
 
     const response = streamText({
-      model: openrouter(modelId),
+      model: anthropic('claude-3-7-sonnet-20250219'),
+      tools,
       messages: [
         {
           role: "system",
-          content: systemPrompt
+          content: systemPrompt,
+          providerMetadata: {
+            anthropic: {
+              cacheControl: { type: 'ephemeral' },
+            }
+          }
         },
         ...processedMessages
       ],
-      tools,
       maxSteps: 10,
 
       // Keep your existing callbacks
