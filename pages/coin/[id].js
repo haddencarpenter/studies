@@ -4,7 +4,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import pick from 'lodash/pick';
 import uniq from 'lodash/uniq';
-import { useCallback, useEffect, useState, useContext, useRef, useMemo } from 'react';
+import { useCallback, useEffect, useState, useContext, useMemo } from 'react';
 import classnames from 'classnames';
 
 import sql from '../../lib/database.mjs'

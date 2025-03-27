@@ -28,7 +28,7 @@ const Search = ({ categories, collapsed }) => {
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [AIAnswer, setAIAnswer] = useState('')
   const [coinTag, setCoinTag] = useState(null);
-  const { messages, input, handleInputChange, handleSubmit, stop, isLoading, setMessages, setInput } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, stop, isLoading, setMessages, setInput, error, reload } = useChat({
     api: '/api/ai',
     body: {
       walletAddress
@@ -332,6 +332,19 @@ const Search = ({ categories, collapsed }) => {
                     <div className={searchStyles.messageContent}>Thinking...</div>
                   </div>
                 )}
+
+                {/* Add error display */}
+                {error && (
+                  <div className={searchStyles.assistantMessage}>
+                    <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady</div>
+                    <div className={searchStyles.messageContent}>
+                      <div>Something went wrong.</div>
+                      <Button type="primary" onClick={() => reload()} className={searchStyles.retryButton}>
+                        Try Again
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className={searchStyles.suggestions}>
@@ -370,11 +383,11 @@ const Search = ({ categories, collapsed }) => {
                     Stop
                   </Button>
                 ) : (
-                  <Button type="primary" onClick={askAi}>
+                  <Button type="primary" onClick={askAi} disabled={error != null}>
                     Ask Toady
                   </Button>
                 )}
-                <Button disabled={isLoading || !messages.length} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+                <Button disabled={isLoading || !messages.length || error != null} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
               </>
             }
             value={input}
@@ -382,6 +395,7 @@ const Search = ({ categories, collapsed }) => {
             onPressEnter={askAi}
             ref={searchInputRef}
             spellCheck="false"
+            disabled={error != null}
           />
         </>
       )}
