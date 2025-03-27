@@ -80,13 +80,6 @@ const callSocketServer = async (endpoint, params = {}) => {
       if (endpoint.startsWith('/api/coin/')) {
         // Ensure trends is always an array
         data.trends = Array.isArray(data.trends) ? data.trends : [];
-
-        // Add a clear message about trend data status
-        if (data.trends.length === 0 && data.coin) {
-          data.hasTrendData = false;
-        } else if (data.trends.length > 0) {
-          data.hasTrendData = true;
-        }
       }
 
       // Handle array responses (categories, extreme trends, aligned trends, coins by category)
@@ -205,8 +198,7 @@ const tools = {
 
         const data = {
           coin: result.coin,
-          trends: result.trends,
-          hasTrendData: result.hasTrendData
+          trends: result.trends
         };
 
         return jsonToMarkdown(data);
@@ -262,8 +254,7 @@ const tools = {
 
         const data = {
           coin: result.coin,
-          trends: result.trends,
-          hasTrendData: result.hasTrendData
+          trends: result.trends
         };
         return jsonToMarkdown(data);
       } catch (error) {
@@ -318,8 +309,7 @@ const tools = {
 
         const data = {
           coin: result.coin,
-          trends: result.trends,
-          hasTrendData: result.hasTrendData
+          trends: result.trends
         };
 
         return jsonToMarkdown(data);
@@ -484,7 +474,7 @@ const tools = {
   }),
 
   getMarketHealth: tool({
-    description: "Use this when a user asks about overall market health or sentiment. Returns data about the distribution of UP, DOWN, and HODL trends across the market. Returns an object with: date (timestamp), trends (object with counts of UP, HODL, and DOWN trends, e.g. { UP: 103, HODL: 462, DOWN: 409 }), hasExtremes (boolean), and extremes (array of extreme values for each trend).",
+    description: "Use this when a user asks about overall market health or sentiment. Returns data about the distribution of UP, DOWN, and HODL trends across the market. Returns an object with: date (timestamp), trends (object with counts of UP, HODL, and DOWN trends, e.g. { UP: 103, HODL: 462, DOWN: 409 }), extremes (array of extreme values for each trend).",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -513,7 +503,6 @@ const tools = {
         const data = {
           date: result.date,
           trends: result.trends,
-          hasExtremes: result.hasExtremes,
           extremes: result.extremes
         };
 
@@ -616,8 +605,7 @@ const tools = {
 
         const data = {
           coin: result.coin,
-          trends: result.trends,
-          hasTrendData: result.hasTrendData
+          trends: result.trends
         };
 
         return jsonToMarkdown(data);
