@@ -1,5 +1,6 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { anthropic } from '@ai-sdk/anthropic';
+import { vertex } from '@ai-sdk/google-vertex/edge';
 import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
 
@@ -836,8 +837,16 @@ const getSystemPrompt = async () => {
   return fetchR2FileContents('toadaiprompt.txt');
 }
 
+const getServerProvider = async () => {
+  return fetchR2FileContents('toadaiserverprovider.txt');
+}
+
 const getModelId = async () => {
   return fetchR2FileContents('toadaimodelid.txt');
+}
+
+const getVertexModelId = async () => {
+  return fetchR2FileContents('vertex-toadaimodelid.txt');
 }
 
 export async function POST(req) {
@@ -858,13 +867,16 @@ export async function POST(req) {
 
   try {
     console.log('Getting system prompt and model ID...');
-    const [systemPrompt, modelId] = await Promise.all([
+    const [systemPrompt, serverProvider, modelId, vertexModelId] = await Promise.all([
       getSystemPrompt(),
-      getModelId()
+      getServerProvider(),
+      getModelId(),
+      getVertexModelId()
     ]);
     console.log('System prompt:', systemPrompt);
+    console.log('Server Provider:', serverProvider);
     console.log('Model ID:', modelId);
-
+    console.log('Vertex Model ID:', vertexModelId);
     // Modify the messages array if coinId is present in data or to add timestamp
     let processedMessages = [...messages];
     if (userMessage && userMessage.role === 'user') {
@@ -897,9 +909,20 @@ export async function POST(req) {
 
     // Create a collection to store all steps for debugging
     const allSteps = [];
+    let model;
+
+    if (serverProvider === 'anthropic') {
+      console.log('Using Anthropic model:', modelId);
+      model = anthropic(modelId);
+    } else if (serverProvider === 'vertex') {
+      console.log('Using Vertex model:', vertexModelId);
+      model = vertex(vertexModelId);
+    } else {
+      throw new Error(`Unsupported AI provider: ${serverProvider}`);
+    }
 
     const response = streamText({
-      model: anthropic('claude-3-7-sonnet-20250219'),
+      model,
       tools,
       messages: [
         {
@@ -977,7 +1000,12 @@ export async function POST(req) {
     console.log('Stream created, converting to response...');
     const streamResponse = response.toDataStreamResponse({
       getErrorMessage: (error) => {
-        console.error('Stream error in response:', error);
+        console.error('Stream error in response:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause
+        });
 
         // Add more specific handling for type validation errors
         if (error.name === 'AI_TypeValidationError') {
