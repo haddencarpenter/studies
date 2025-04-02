@@ -105,7 +105,7 @@ const Search = ({ categories, collapsed }) => {
     e.preventDefault();
 
     if (!input.trim() && !coinTag) return;
-    const coinId = document.querySelector('meta[property="x-cr-coin-id"]');
+    const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
     const currentDateTime = new Date().toString();
 
     handleSubmit(e, {
