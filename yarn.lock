@@ -5330,6 +5330,11 @@ dotenv@^16.3.1:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.3.1.tgz#369034de7d7e5b120972693352a3bf112172cc3e"
   integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
 
+dotenv@^16.4.7:
+  version "16.4.7"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.7.tgz#0e20c5b82950140aa99be360a8a5f52335f53c26"
+  integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
+
 dotignore@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/dotignore/-/dotignore-0.1.2.tgz#f942f2200d28c3a76fbdd6f0ee9f3257c8a2e905"
@@ -6040,6 +6045,14 @@ eventsource-parser@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/eventsource-parser/-/eventsource-parser-3.0.1.tgz#5e358dba9a55ba64ca90da883c4ca35bd82467bd"
   integrity sha512-VARTJ9CYeuQYb0pZEPbzi740OWFgpHe7AYJ2WFZVnUDUQp5Dk2yJUgF36YsZ81cOyxT0QxmXD2EQpapAouzWVA==
+
+exa-js@^1.5.12:
+  version "1.5.12"
+  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.5.12.tgz#6a6619c7a95328f180c8fb8c12e053965837d7f4"
+  integrity sha512-Dvq+ab48ZJeuvoei9XcsbJQuwmAz2h1kCVyK9A9KlvbQNCmfAM2Gp/0m3rzRjnU/wSSEbkI0DBAXD2QkrgLbtg==
+  dependencies:
+    cross-fetch "^4.0.0"
+    dotenv "^16.4.7"
 
 execa@3.2.0:
   version "3.2.0"

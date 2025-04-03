@@ -3,6 +3,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { vertex } from '@ai-sdk/google-vertex/edge';
 import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
+import Exa from "exa-js"
 
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
@@ -152,6 +153,398 @@ const jsonToMarkdown = (data) => {
 };
 
 const tools = {
+  exaSearch: tool({
+    description: "Use this to search the web for information using the Exa API. Useful for finding current information or researching topics that aren't covered by the system's knowledge.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'The search query to find information on the web'
+        },
+        useAutoprompt: {
+          type: 'boolean',
+          description: 'Whether to use Exa\'s autoprompt feature to improve the search query',
+          default: false
+        },
+        numResults: {
+          type: 'number',
+          description: 'Number of search results to return',
+          default: 5
+        },
+        startPublishedDate: {
+          type: 'string',
+          description: 'Filter for content published after this date (YYYY-MM-DD)',
+        },
+        endPublishedDate: {
+          type: 'string',
+          description: 'Filter for content published before this date (YYYY-MM-DD)',
+        },
+        includeDomains: {
+          type: 'array',
+          description: 'List of domains to include in the search results',
+          items: {
+            type: 'string'
+          }
+        },
+        excludeDomains: {
+          type: 'array',
+          description: 'List of domains to exclude from the search results',
+          items: {
+            type: 'string'
+          }
+        }
+      },
+      required: ['query']
+    }),
+    execute: async ({ query, useAutoprompt = false, numResults = 5, startPublishedDate, endPublishedDate, includeDomains, excludeDomains }) => {
+      try {
+        console.log('Tool executed: exaSearch', {
+          query,
+          useAutoprompt,
+          numResults,
+          startPublishedDate,
+          endPublishedDate,
+          includeDomains,
+          excludeDomains
+        });
+
+        // Initialize the Exa client with API key from environment
+        const exa = new Exa(process.env.EXA_API_KEY);
+
+        // Build search options
+        const searchOptions = {
+          numResults,
+          useAutoprompt
+        };
+
+        // Add optional parameters if provided
+        if (startPublishedDate) searchOptions.startPublishedDate = startPublishedDate;
+        if (endPublishedDate) searchOptions.endPublishedDate = endPublishedDate;
+        if (includeDomains && includeDomains.length > 0) searchOptions.includeDomains = includeDomains;
+        if (excludeDomains && excludeDomains.length > 0) searchOptions.excludeDomains = excludeDomains;
+
+        // Execute the search
+        const searchResult = await exa.search(query, searchOptions);
+        console.log('exaSearch - Result count:', searchResult.results?.length || 0);
+
+        // Format the results for display
+        const formattedResults = searchResult.results?.map(result => ({
+          title: result.title,
+          url: result.url,
+          publishedDate: result.publishedDate,
+          score: result.score,
+          snippet: result.text || result.extract
+        })) || [];
+
+        return jsonToMarkdown({
+          query,
+          results: formattedResults
+        });
+      } catch (error) {
+        console.error('exaSearch Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { query, useAutoprompt, numResults }
+        });
+        return jsonToMarkdown({ error: "Failed to perform web search" });
+      }
+    }
+  }),
+
+  exaSearchWithContents: tool({
+    description: "Search the web and retrieve full text contents of the search results in a single operation. Useful when you need more context from search results beyond just snippets.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'The search query to find information on the web'
+        },
+        useAutoprompt: {
+          type: 'boolean',
+          description: 'Whether to use Exa\'s autoprompt feature to improve the search query',
+          default: false
+        },
+        numResults: {
+          type: 'number',
+          description: 'Number of search results to return',
+          default: 3
+        },
+        includeDomains: {
+          type: 'array',
+          description: 'List of domains to include in the search results',
+          items: {
+            type: 'string'
+          }
+        },
+        retrieveText: {
+          type: 'boolean',
+          description: 'Whether to retrieve full text of the search results',
+          default: true
+        },
+        retrieveHighlights: {
+          type: 'boolean',
+          description: 'Whether to retrieve highlights relevant to the query',
+          default: false
+        },
+        maxCharacters: {
+          type: 'number',
+          description: 'Maximum number of characters to retrieve for each result',
+          default: 5000
+        }
+      },
+      required: ['query']
+    }),
+    execute: async ({ query, useAutoprompt = false, numResults = 3, includeDomains, retrieveText = true, retrieveHighlights = false, maxCharacters = 5000 }) => {
+      try {
+        console.log('Tool executed: exaSearchWithContents', {
+          query,
+          useAutoprompt,
+          numResults,
+          includeDomains,
+          retrieveText,
+          retrieveHighlights
+        });
+
+        // Initialize the Exa client with API key from environment
+        const exa = new Exa(process.env.EXA_API_KEY);
+
+        // Set up search options
+        const searchOptions = {
+          useAutoprompt,
+          numResults
+        };
+
+        if (includeDomains && includeDomains.length > 0) searchOptions.includeDomains = includeDomains;
+
+        // Set up contents options
+        const contentsOptions = {};
+
+        if (retrieveText) {
+          contentsOptions.text = {
+            maxCharacters
+          };
+        }
+
+        if (retrieveHighlights) {
+          contentsOptions.highlights = {
+            highlightsPerUrl: 3,
+            numSentences: 2,
+            query
+          };
+        }
+
+        // Execute the search and retrieve contents
+        const result = await exa.searchAndContents(query, {
+          ...searchOptions,
+          ...contentsOptions
+        });
+
+        console.log('exaSearchWithContents - Result count:', result.results?.length || 0);
+
+        // Format the results for display
+        const formattedResults = result.results?.map(result => {
+          const formattedResult = {
+            title: result.title,
+            url: result.url,
+            publishedDate: result.publishedDate,
+            score: result.score
+          };
+
+          // Add text content if available
+          if (result.text) {
+            formattedResult.content = result.text.slice(0, maxCharacters);
+            if (result.text.length > maxCharacters) {
+              formattedResult.content += '... (content truncated)';
+            }
+          }
+
+          // Add highlights if available
+          if (result.highlights && result.highlights.length > 0) {
+            formattedResult.highlights = result.highlights;
+          }
+
+          return formattedResult;
+        }) || [];
+
+        return jsonToMarkdown({
+          query,
+          results: formattedResults
+        });
+      } catch (error) {
+        console.error('exaSearchWithContents Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { query, useAutoprompt, numResults, retrieveText, retrieveHighlights }
+        });
+        return jsonToMarkdown({ error: "Failed to perform web search with contents" });
+      }
+    }
+  }),
+
+  exaAnswer: tool({
+    description: "Generate an answer to a question using Exa's search and answer capabilities with citations to source material. Best for factual questions that require up-to-date information.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        question: {
+          type: 'string',
+          description: 'The question to answer'
+        },
+        model: {
+          type: 'string',
+          description: 'The model to use for generating the answer',
+          enum: ['exa', 'exa-pro'],
+          default: 'exa'
+        },
+        retrieveText: {
+          type: 'boolean',
+          description: 'Whether to include the full text of cited sources in the response',
+          default: false
+        }
+      },
+      required: ['question']
+    }),
+    execute: async ({ question, model = 'exa', retrieveText = false }) => {
+      try {
+        console.log('Tool executed: exaAnswer', {
+          question,
+          model,
+          retrieveText
+        });
+
+        // Initialize the Exa client with API key from environment
+        const exa = new Exa(process.env.EXA_API_KEY);
+
+        // Set options
+        const options = {
+          model,
+          text: retrieveText
+        };
+
+        // Generate answer
+        const answerResult = await exa.answer(question, options);
+        console.log('exaAnswer - Generated answer with citations');
+
+        // Format the result
+        const formattedResult = {
+          question,
+          answer: answerResult.answer
+        };
+
+        // Include citations if available
+        if (answerResult.citations && answerResult.citations.length > 0) {
+          formattedResult.citations = answerResult.citations.map(citation => ({
+            title: citation.title,
+            url: citation.url,
+            text: citation.text
+          }));
+        }
+
+        return jsonToMarkdown(formattedResult);
+      } catch (error) {
+        console.error('exaAnswer Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { question, model, retrieveText }
+        });
+        return jsonToMarkdown({ error: "Failed to generate answer from Exa" });
+      }
+    }
+  }),
+
+  exaFindSimilar: tool({
+    description: "Find web content similar to a specific URL. Useful for discovering related articles, research, or alternative viewpoints on a topic.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'The URL to find similar content for'
+        },
+        numResults: {
+          type: 'number',
+          description: 'Number of similar results to return',
+          default: 5
+        },
+        excludeSourceDomain: {
+          type: 'boolean',
+          description: 'Whether to exclude results from the same domain as the source URL',
+          default: true
+        },
+        retrieveText: {
+          type: 'boolean',
+          description: 'Whether to retrieve the full text of similar results',
+          default: false
+        }
+      },
+      required: ['url']
+    }),
+    execute: async ({ url, numResults = 5, excludeSourceDomain = true, retrieveText = false }) => {
+      try {
+        console.log('Tool executed: exaFindSimilar', {
+          url,
+          numResults,
+          excludeSourceDomain,
+          retrieveText
+        });
+
+        // Initialize the Exa client with API key from environment
+        const exa = new Exa(process.env.EXA_API_KEY);
+
+        // Set options
+        const options = {
+          numResults,
+          excludeSourceDomain
+        };
+
+        let result;
+        // Decide whether to get contents along with similar URLs
+        if (retrieveText) {
+          result = await exa.findSimilarAndContents(url, {
+            ...options,
+            text: true
+          });
+        } else {
+          result = await exa.findSimilar(url, options);
+        }
+
+        console.log('exaFindSimilar - Result count:', result.results?.length || 0);
+
+        // Format the results
+        const formattedResults = result.results?.map(result => {
+          const formattedResult = {
+            title: result.title,
+            url: result.url,
+            publishedDate: result.publishedDate,
+            score: result.score,
+            snippet: result.extract || result.text?.substring(0, 200) + '...'
+          };
+
+          // Add full text if requested and available
+          if (retrieveText && result.text) {
+            formattedResult.content = result.text;
+          }
+
+          return formattedResult;
+        }) || [];
+
+        return jsonToMarkdown({
+          sourceUrl: url,
+          similarResults: formattedResults
+        });
+      } catch (error) {
+        console.error('exaFindSimilar Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { url, numResults, excludeSourceDomain, retrieveText }
+        });
+        return jsonToMarkdown({ error: "Failed to find similar content" });
+      }
+    }
+  }),
+
   getCoinByContract: tool({
     description: "Use this when a user asks about a specific blockchain contract address. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({

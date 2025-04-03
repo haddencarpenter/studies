@@ -54,6 +54,7 @@
     "csvtojson": "^2.0.10",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
+    "exa-js": "^1.5.12",
     "fuse.js": "^7.0.0",
     "graphql": "^16.8.1",
     "hpagent": "^1.2.0",
