@@ -1185,6 +1185,37 @@ const tools = {
         return jsonToMarkdown({ error: "Failed to filter coins" });
       }
     }
+  }),
+
+  globalMarketData: tool({
+    description: "Use this when a user asks about global cryptocurrency market data. Returns the latest global market statistics including totalMarketCap (total cryptocurrency market capitalization), totalMarketVolume (24h trading volume), and marketCapPercentage (dominance percentages of top cryptocurrencies like Bitcoin).",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {},
+      required: []
+    }),
+    execute: async () => {
+      try {
+        console.log('Tool executed: globalMarketData');
+
+        // Call the socket server API endpoint for global market data
+        const result = await callSocketServer('/api/global/market');
+
+        console.log('globalMarketData - Result:', result);
+
+        if (result.error) {
+          return jsonToMarkdown({ error: result.error });
+        }
+
+        return jsonToMarkdown(result);
+      } catch (error) {
+        console.error('globalMarketData Error:', {
+          message: error.message,
+          stack: error.stack
+        });
+        return jsonToMarkdown({ error: "Failed to fetch global market data" });
+      }
+    }
   })
 };
 
