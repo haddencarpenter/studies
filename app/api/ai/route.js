@@ -46,7 +46,7 @@ const trackMixpanelEvent = async (event, properties) => {
 
 // Replace the database helper with a function to call the socket server
 const callSocketServer = async (endpoint, params = {}) => {
-  const url = new URL(endpoint, process.env.NEXT_PUBLIC_SOCKET_SERVER_URL);
+  const url = new URL(endpoint, process.env.AI_SERVER_URL);
 
   // Add query parameters - with special handling for arrays
   Object.keys(params).forEach(key => {
