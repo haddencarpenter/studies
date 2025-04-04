@@ -1,6 +1,7 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { anthropic } from '@ai-sdk/anthropic';
 import { vertex } from '@ai-sdk/google-vertex/edge';
+import { openrouter } from '@openrouter/ai-sdk-provider';
 import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
 import Exa from "exa-js"
@@ -1333,12 +1334,31 @@ export async function POST(req) {
     const allSteps = [];
     let model;
 
+    let providerMetadata = {};
     if (serverProvider === 'anthropic') {
       console.log('Using Anthropic model:', modelId);
       model = anthropic(modelId);
+      providerMetadata = {
+        anthropic: {
+          cacheControl: { type: 'ephemeral' },
+        }
+      };
     } else if (serverProvider === 'vertex') {
       console.log('Using Vertex model:', vertexModelId);
       model = vertex(vertexModelId);
+      providerMetadata = {
+        anthropic: {
+          cacheControl: { type: 'ephemeral' },
+        }
+      };
+    } else if (serverProvider === 'openrouter') {
+      console.log('Using OpenRouter model: anthropic/claude-3.7-sonnet');
+      model = openrouter('anthropic/claude-3.7-sonnet')
+      providerMetadata = {
+        openrouter: {
+          cacheControl: { type: 'ephemeral' },
+        }
+      };
     } else {
       throw new Error(`Unsupported AI provider: ${serverProvider}`);
     }
@@ -1350,15 +1370,11 @@ export async function POST(req) {
         {
           role: "system",
           content: systemPrompt,
-          providerMetadata: {
-            anthropic: {
-              cacheControl: { type: 'ephemeral' },
-            }
-          }
+          providerMetadata
         },
         ...processedMessages
       ],
-      maxSteps: 10,
+      maxSteps: 50,
 
       // Keep your existing callbacks
       onFinish(result) {
