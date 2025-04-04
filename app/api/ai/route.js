@@ -1258,19 +1258,19 @@ const fetchR2FileContents = async (fileName) => {
 }
 
 const getSystemPrompt = async () => {
-  return fetchR2FileContents('toadaiprompt.txt');
+  return fetchR2FileContents('playground-toadaiprompt.txt');
 }
 
 const getServerProvider = async () => {
-  return fetchR2FileContents('toadaiserverprovider.txt');
+  return fetchR2FileContents('playground-toadaiserverprovider.txt');
 }
 
 const getModelId = async () => {
-  return fetchR2FileContents('toadaimodelid.txt');
+  return fetchR2FileContents('playground-toadaimodelid.txt');
 }
 
 const getVertexModelId = async () => {
-  return fetchR2FileContents('vertex-toadaimodelid.txt');
+  return fetchR2FileContents('playground-vertex-toadaimodelid.txt');
 }
 
 export async function POST(req) {
