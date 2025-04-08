@@ -28,7 +28,7 @@ const Search = ({ categories, collapsed }) => {
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [AIAnswer, setAIAnswer] = useState('')
   const [coinTag, setCoinTag] = useState(null);
-  const { messages, input, handleInputChange, handleSubmit, stop, isLoading, setMessages, setInput, error, reload } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
     body: {
       walletAddress
@@ -39,6 +39,15 @@ const Search = ({ categories, collapsed }) => {
   })
   const messagesEndRef = useRef(null)
   const [autoScroll, setAutoScroll] = useState(true);
+
+  // Helper for checking if AI is generating a response
+  const isGenerating = status === 'streaming' || status === 'submitted';
+
+  // Check if the last message is from the assistant and is still incomplete (during tool calls)
+  const isProcessingToolCalls = status === 'streaming' &&
+    messages.length > 0 &&
+    messages[messages.length - 1]?.role === 'assistant' &&
+    !messages[messages.length - 1]?.content?.trim();
 
   const aiSuggestions = [
     "Show coins that just started an uptrend",
@@ -327,12 +336,12 @@ const Search = ({ categories, collapsed }) => {
                     </div>
                   </div>
                 ))}
-                {isLoading && messages[messages.length - 1]?.role === 'user' && (
+                {(status === 'submitted' && messages[messages.length - 1]?.role === 'user') || isProcessingToolCalls ? (
                   <div className={searchStyles.assistantMessage}>
                     <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady</div>
                     <div className={searchStyles.messageContent}>Thinking...</div>
                   </div>
-                )}
+                ) : null}
 
                 {/* Add error display */}
                 {error && (
@@ -379,7 +388,7 @@ const Search = ({ categories, collapsed }) => {
             </>}
             suffix={
               <>
-                {isLoading ? (
+                {isGenerating ? (
                   <Button type="primary" onClick={stop} className={searchStyles.stopButton}>
                     Stop
                   </Button>
@@ -388,7 +397,7 @@ const Search = ({ categories, collapsed }) => {
                     Ask Toady
                   </Button>
                 )}
-                <Button disabled={isLoading || !messages.length || error != null} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+                <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
               </>
             }
             value={input}
