@@ -1254,13 +1254,7 @@ const tools = {
               toolArguments: {
                 type: 'object',
                 description: 'Arguments to pass to the tool',
-                properties: {
-                  any: {
-                    type: 'object',
-                    description: 'Any arguments needed by the tool'
-                  }
-                },
-                required: ['any']
+                additionalProperties: true
               },
               label: {
                 type: 'string',
