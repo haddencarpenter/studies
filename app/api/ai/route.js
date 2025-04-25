@@ -1502,6 +1502,12 @@ export async function POST(req) {
         },
         ...processedMessages
       ],
+      experimental_telemetry: {
+        isEnabled: true,
+        metadata: {
+          userId: walletAddress
+        }
+      },
       maxSteps: 50,
 
       // Keep your existing callbacks
