@@ -13,9 +13,9 @@ import NoKeyPass from './gating/NoKeyPass'
 import NotConnected from './gating/NotConnected'
 
 const aiSuggestions = [
-  "Show coins that just started an uptrend",
+  "What are the top coins right now?",
   "Compare AI vs RWA trends today",
-  "Find coins under $100M market cap with a daily (1d) uptrend"
+  "Find coins under $100M market cap with a daily (1D) uptrend"
 ];
 
 const Toady = ({ isActive }) => {
