@@ -1,24 +1,15 @@
-import { Modal, Input, Button, Tag } from 'antd'
-import { SearchOutlined, MessageOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { Modal, Input, Tag } from 'antd'
+import { SearchOutlined } from "@ant-design/icons";
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
 import classnames from 'classnames'
 import slugify from 'slugify'
 import Fuse from 'fuse.js'
-import { useChat } from '@ai-sdk/react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-
-import useKeyPass from '../hooks/useKeyPass';
-import useAccount from '../hooks/useAccount';
 import searchStyles from '../styles/search.module.less'
-import NoKeyPass from './gating/NoKeyPass'
-import NotConnected from './gating/NotConnected'
+import Toady from './Toady'
 
 const Search = ({ categories, collapsed }) => {
-  const hasKeyPass = useKeyPass()
-  const walletAddress = useAccount()
   const [coins, setCoins] = useState([])
   const [tab, setTab] = useState('search');
   const [searchModalVisible, setSearchModalVisible] = useState(false);
@@ -26,62 +17,8 @@ const Search = ({ categories, collapsed }) => {
   const [query, setQuery] = useState(searchValue);
   const searchInputRef = useRef(null)
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
-  const [AIAnswer, setAIAnswer] = useState('')
-  const [coinTag, setCoinTag] = useState(null);
-  const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
-    api: '/api/ai',
-    body: {
-      walletAddress
-    },
-    query: {
-      walletAddress // Add this to pass wallet address as query param
-    }
-  })
-  const messagesEndRef = useRef(null)
-  const [autoScroll, setAutoScroll] = useState(true);
-
-  // Helper for checking if AI is generating a response
-  const isGenerating = status === 'streaming' || status === 'submitted';
-
-  // Check if the last message is from the assistant and is still incomplete (during tool calls)
-  const isProcessingToolCalls = status === 'streaming' &&
-    messages.length > 0 &&
-    messages[messages.length - 1]?.role === 'assistant' &&
-    !messages[messages.length - 1]?.content?.trim();
-
-  const aiSuggestions = [
-    "Show coins that just started an uptrend",
-    "Compare AI vs RWA trends today",
-    "Find coins under $100M market cap with a daily (1d) uptrend"
-  ];
 
   const router = useRouter()
-
-  // Store the processed messages
-  const [processedMessages, setProcessedMessages] = useState([]);
-
-  // Process messages once when they're received or changed
-  useEffect(() => {
-    // Only process when messages change
-    const newProcessedMessages = messages.map(message => {
-      if (message.role === 'assistant' && message.content) {
-        // Fix markdown headings after colons/periods only in assistant messages
-        return {
-          ...message,
-          // Only replace in content that actually has the pattern, which is rare
-          processedContent: message.content.includes(':#') || message.content.includes('.#')
-            ? message.content.replace(/([:.])(\s*)#/g, '$1\n\n#')
-            : message.content
-        };
-      }
-      return {
-        ...message,
-        processedContent: message.content
-      };
-    });
-
-    setProcessedMessages(newProcessedMessages);
-  }, [messages]);
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -91,132 +28,62 @@ const Search = ({ categories, collapsed }) => {
       setFuseCoinIndex(Fuse.createIndex(['name', 'symbol', 'contract'], coins))
     }
     fetchCoins()
-    const eventRef = document.addEventListener('keydown', (e) => {
-      if (e.key === '/') {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
         setSearchModalVisible(true)
       }
-    })
+      if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+         e.preventDefault();
+        setSearchModalVisible(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
     return () => {
-      document.removeEventListener('keydown', eventRef)
+      document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
   useEffect(() => {
     if (searchModalVisible) {
-      setTimeout(
-        () => searchInputRef.current.focus(),
-        100
-      )
+      if (tab === 'search' && searchInputRef.current) {
+        setTimeout(() => searchInputRef.current.focus(), 100)
+      }
     }
-  }, [searchModalVisible])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchModalVisible, tab])
+
   const setQueryDebounced = useCallback(debounce(setQuery, 250), []);
+
   const openSearchModal = useCallback(() => {
     setSearchModalVisible(true)
   }, []);
-  const clearChat = useCallback(() => {
-    setMessages([])
-    setInput('')
-  }, [setMessages, setInput])
+
   const onSearchValueChange = useCallback((e) => {
-    setAIAnswer('')
     setSearchValue(e.target.value);
     setQueryDebounced(e.target.value.trim().toLowerCase());
   }, [setSearchValue, setQueryDebounced]);
+
   const closeModal = useCallback(() => {
     setSearchModalVisible(false)
     setSearchValue('')
     setQuery('')
-    setCoinTag(null)
+    setTab('search');
 
-    // Remove the hash from the URL when closing the modal
     if (window.location.hash === '#toady') {
-      // Get the current path without the hash
       const pathWithoutHash = router.asPath.split('#')[0];
-      // Use Next.js router to remove the hash without page reload
       router.push(pathWithoutHash, undefined, { shallow: true });
     }
   }, [router]);
-  const askAi = useCallback((e) => {
-    e.preventDefault();
 
-    if (!input.trim() && !coinTag) return;
-    const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
-    // Get current date in ISO 8601 format (UTC-based)
-    const currentDateTime = new Date().toISOString();
-
-    handleSubmit(e, {
-      data: {
-        timestamp: currentDateTime,
-        ...(coinTag ? { coinId } : {})
-      }
-    });
-  }, [handleSubmit, input, coinTag]);
-
-  // Handle removing the coin tag
-  const handleRemoveCoinTag = useCallback(() => {
-    setCoinTag(null);
-  }, []);
-
-  useEffect(() => {
-    // Only auto-scroll when new messages arrive if autoScroll is true
-    if (messages.length > 0 && autoScroll) {
-      // Use setTimeout to ensure this happens after render
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-        }
-      }, 0);
-    }
-  }, [messages, autoScroll]);
-
-  // Separate effect to handle user scroll and detect when to enable/disable auto-scroll
-  useEffect(() => {
-    const messagesContainer = messagesEndRef.current;
-    if (!messagesContainer) return;
-
-    // When a new message is added, we want to enable auto-scroll
-    if (messages.length > 0) {
-      // Check if we're already at the bottom before enabling auto-scroll
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
-      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 20;
-
-      // Only set autoScroll to true if we're already at the bottom
-      if (isAtBottom) {
-        setAutoScroll(true);
-      }
-    }
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = messagesContainer;
-      const isAtBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 20;
-
-      // Only update if we're changing the state
-      if (autoScroll !== isAtBottom) {
-        setAutoScroll(isAtBottom);
-      }
-    };
-
-    messagesContainer.addEventListener('scroll', handleScroll);
-    return () => messagesContainer.removeEventListener('scroll', handleScroll);
-  }, [messages, autoScroll]);
-
-  // Add effect to check for hash in URL
   useEffect(() => {
     const path = router.asPath
     const afterHash = path.split('#')[1]
-    if (afterHash === 'toady') {
+    if (afterHash === 'toady' && !searchModalVisible) {
       setSearchModalVisible(true)
       setTab('ai')
+    } else if (afterHash !== 'toady' && searchModalVisible && tab === 'ai') {
     }
-  }, [router.asPath])
-
-  // Check if we're on a coin page and set the coin tag
-  useEffect(() => {
-    const coinMetaTag = document.querySelector('meta[property="x-cr-coin-name"]');
-    if (coinMetaTag && coinMetaTag.content) {
-      setCoinTag(coinMetaTag.content);
-    }
-  }, [router.asPath]);
+  }, [router.asPath, searchModalVisible, tab])
 
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
@@ -225,6 +92,7 @@ const Search = ({ categories, collapsed }) => {
         <SearchOutlined className={searchStyles.placeholderMagnifier} />
         <span className={searchStyles.placeholderText}>Search</span>
       </>}
+      suffix={<Tag className={searchStyles.shortcutTag}>⌘K</Tag>}
       disabled
     />
   </div>
@@ -258,7 +126,7 @@ const Search = ({ categories, collapsed }) => {
       <>
         <div className={searchStyles.optionTitle}>Coins</div>
         {
-          filteredCoins.map((coin) => {
+          filteredCoins.slice(0, 10).map((coin) => {
             return (
               <div
                 className={classnames(searchStyles.option, searchStyles.coinOption)}
@@ -298,14 +166,14 @@ const Search = ({ categories, collapsed }) => {
       <>
         <div className={searchStyles.optionTitle}>Categories</div>
         {
-          filteredCategories.map((category) => {
+          filteredCategories.slice(0, 5).map((category) => {
             return (
               <div
                 className={classnames(searchStyles.option, searchStyles.categoryOption)}
                 key={category}
                 onClick={() => {
                   closeModal();
-                  const categorySlug = slugify(category)
+                  const categorySlug = slugify(category, { lower: true, strict: true })
                   router.push(`/category/${categorySlug}`)}
                 }>
                 <span className={searchStyles.categoryOption}>{category}</span>
@@ -317,132 +185,20 @@ const Search = ({ categories, collapsed }) => {
     )
   }
 
-  let results = <>
+  let searchResultsContent = <>
     {coinOptions}
     {categoryOptions}
   </>
   if (query === '') {
-    results = <div className={searchStyles.empty}>
+    searchResultsContent = <div className={searchStyles.empty}>
       Search for&nbsp;
       <span className={searchStyles.noQueryHighlight}>Coin name, Category, Contract Address</span>
     </div>
-  } else if (AIAnswer) {
-    results = <span className={searchStyles.ai}>{AIAnswer}</span>
   } else if (filteredCoins.length === 0 && filteredCategories.length === 0) {
-    results = <div className={searchStyles.empty}>
-      No results.
+    searchResultsContent = <div className={searchStyles.empty}>
+      No results found for "{query}".
     </div>
   }
-
-  const aiTabContent = (
-    <div className={classnames(searchStyles.aiTab, {
-      [searchStyles.aiTabPadding]: !walletAddress || !hasKeyPass
-    })}>
-      {!walletAddress ? (
-        <NotConnected />
-      ) : !hasKeyPass ? (
-        <NoKeyPass />
-      ) : (
-        <>
-          <div className={classnames(searchStyles.searchResults, searchStyles.aiAnswer)} ref={messagesEndRef}>
-            {messages.length > 0 ? (
-              <div className={searchStyles.conversationHistory}>
-                {processedMessages.map((message, index) => (
-                  <div key={index} className={classnames(searchStyles.messageContainer, {
-                    [searchStyles.userMessage]: message.role === 'user',
-                    [searchStyles.assistantMessage]: message.role === 'assistant'
-                  })}>
-                    {message.role === 'assistant' && (
-                      <div className={searchStyles.messageRole}>
-                        <img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady
-                      </div>
-                    )}
-                    <div className={searchStyles.messageContent}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {message.processedContent}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                ))}
-                {/* Show "Thinking..." when waiting for response or during tool calls with empty content */}
-                {(status === 'submitted' || status === 'streaming') &&
-                 (messages[messages.length - 1]?.role === 'user' ||
-                  (messages[messages.length - 1]?.role === 'assistant' &&
-                   !messages[messages.length - 1]?.content?.trim())) ? (
-                  <div className={searchStyles.assistantMessage}>
-                    <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady</div>
-                    <div className={searchStyles.messageContent}>Thinking...</div>
-                  </div>
-                ) : null}
-
-                {/* Add error display */}
-                {error && (
-                  <div className={searchStyles.assistantMessage}>
-                    <div className={searchStyles.messageRole}><img className={searchStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady</div>
-                    <div className={searchStyles.messageContent}>
-                      <div>Something went wrong.</div>
-                      <Button type="primary" onClick={() => reload()} className={searchStyles.retryButton}>
-                        Try Again
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className={searchStyles.suggestions}>
-                <div className={searchStyles.suggestionTitle}>Suggestions:</div>
-                {aiSuggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className={searchStyles.suggestionButton}
-                    onClick={() => setInput(suggestion)}
-                  >
-                    {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <Input
-            className={searchStyles.searchSelect}
-            allowClear
-            prefix={<>
-              <MessageOutlined className={searchStyles.placeholderMagnifier}/>
-              {coinTag && (
-                <Tag
-                  className={searchStyles.coinTag}
-                  closable
-                  onClose={handleRemoveCoinTag}
-                >
-                  {coinTag}
-                </Tag>
-              )}
-            </>}
-            suffix={
-              <>
-                {isGenerating ? (
-                  <Button type="primary" onClick={stop} className={searchStyles.stopButton}>
-                    Stop
-                  </Button>
-                ) : (
-                  <Button type="primary" onClick={askAi} disabled={error != null}>
-                    Ask Toady
-                  </Button>
-                )}
-                <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={searchStyles.clearChatButton} icon={<PlusSquareOutlined />} />
-              </>
-            }
-            value={input}
-            onChange={handleInputChange}
-            onPressEnter={askAi}
-            ref={searchInputRef}
-            spellCheck="false"
-            disabled={error != null}
-          />
-        </>
-      )}
-    </div>
-  );
 
   const content = tab === 'search' ? (
     <>
@@ -454,15 +210,18 @@ const Search = ({ categories, collapsed }) => {
         onChange={onSearchValueChange}
         ref={searchInputRef}
         spellCheck="false"
+        placeholder="Search coins, categories..."
       />
       <div className={searchStyles.searchResults}>
-        {results}
+        {searchResultsContent}
       </div>
     </>
-  ) : aiTabContent;
+  ) : (
+    <Toady isActive={tab === 'ai'} />
+  );
 
   return (
-    <div>
+    <>
       {searchTrigger}
       <Modal
         open={searchModalVisible}
@@ -470,8 +229,11 @@ const Search = ({ categories, collapsed }) => {
         afterClose={() => {
           if (window.location.hash === '#toady') {
             const pathWithoutHash = router.asPath.split('#')[0];
-            router.push(pathWithoutHash, undefined, { shallow: true });
+            if (router.asPath !== pathWithoutHash) {
+                router.push(pathWithoutHash, undefined, { shallow: true });
+            }
           }
+          setTab('search');
         }}
         className={searchStyles.modal}
         footer={null}
@@ -488,12 +250,14 @@ const Search = ({ categories, collapsed }) => {
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'ai'})}
             onClick={() => setTab('ai')}
           >
-            <img src="/toad-ai.png" alt="Toady" width="18" height="18" />&nbsp;Toady
+            <img src="/toad-ai.png" alt="Toady" width="18" height="18" />Toady
           </div>
         </div>
-        {content}
+        <div className={searchStyles.contentWrapper}>
+            {content}
+        </div>
       </Modal>
-    </div>
+    </>
   );
 };
 
