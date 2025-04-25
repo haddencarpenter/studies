@@ -6,7 +6,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 let moduleExports = {
   experimental: {
     swcPlugins: [["next-superjson-plugin", {}]],
-    appDir: true
+    appDir: true,
+    instrumentationHook: true,
   },
   lessLoaderOptions: {
     /* ... */
