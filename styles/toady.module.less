@@ -39,6 +39,16 @@
   &:extend(.markdown all);
 }
 
+// Disable anchoring for all descendants within the scroll area
+.conversationArea * {
+  overflow-anchor: none;
+}
+
+// Enable anchoring only for the specific anchor element
+#toady-anchor {
+  overflow-anchor: auto;
+  height: 1px; // Must have size to work
+}
 
 // Styles for AI suggestions when chat history is empty
 .suggestions {
