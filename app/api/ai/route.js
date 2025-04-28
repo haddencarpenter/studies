@@ -1418,7 +1418,7 @@ export async function POST(req) {
 
   try {
     console.log('Getting system prompt and model ID...');
-    const [systemPrompt, serverProvider, modelId, vertexModelId, openRouterModelId] = await Promise.all([
+    const [systemPromptContent, serverProvider, modelId, vertexModelId, openRouterModelId] = await Promise.all([
       getSystemPrompt(),
       getServerProvider(),
       getModelId(),
@@ -1429,33 +1429,21 @@ export async function POST(req) {
     console.log('Model ID:', modelId);
     console.log('Vertex Model ID:', vertexModelId);
     console.log('OpenRouter Model ID:', openRouterModelId);
-    let processedMessages = [...messages];
-    // Modify the messages array if coinId is present in data or to add timestamp
-    if (userMessage && userMessage.role === 'user') {
-      // Find the last user message
-      const lastUserMessageIndex = processedMessages.findIndex(m => m.role === 'user');
-      if (lastUserMessageIndex !== -1) {
-        let modifiedContent = processedMessages[lastUserMessageIndex].content;
 
-        // Add coinId if present
-        if (data?.coinId) {
-          modifiedContent = `coinid:${data.coinId} | ${modifiedContent}`;
-        }
-
-        // Add timestamp (always included from frontend)
-        if (data?.timestamp) {
-          modifiedContent = `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp} | ${modifiedContent}`;
-        }
-
-        // Create a modified copy of the message
-        processedMessages[lastUserMessageIndex] = {
-          ...processedMessages[lastUserMessageIndex],
-          content: modifiedContent
-        };
-
-        console.log('Modified user message:', processedMessages[lastUserMessageIndex].content);
-      }
+    // Construct context string from data
+    let contextInformation = "";
+    if (data?.timestamp) {
+        contextInformation += `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp}\\n`;
     }
+    if (data?.coinId) {
+        contextInformation += `Current relevant coin ID for context: ${data.coinId}\\n`;
+    }
+    contextInformation = contextInformation.trim();
+
+    // Prepend context to the system prompt
+    const finalSystemPrompt = contextInformation
+        ? `${contextInformation}\\n\\n${systemPromptContent}`
+        : systemPromptContent;
 
     console.log('Starting AI stream...');
 
@@ -1498,10 +1486,10 @@ export async function POST(req) {
       messages: [
         {
           role: "system",
-          content: systemPrompt,
+          content: finalSystemPrompt,
           providerMetadata
         },
-        ...processedMessages
+        ...messages
       ],
       experimental_telemetry: {
         isEnabled: true,
