@@ -1070,7 +1070,7 @@ const tools = {
   }),
 
   getFilteredCoins: tool({
-    description: "Use this when a user wants to filter coins by criteria like trend direction, market cap, categories, etc. Example: 'Show me uptrend coins in the DeFi category' or 'Find coins with market cap under 100M with strong uptrends'.",
+    description: "Use this when a user wants to filter coins by criteria like trend direction, market cap, categories, etc. Example: 'Show me uptrend coins in the DeFi category' or 'Find coins with market cap under 100M with strong uptrends'. Returns a list of coin names, in order to get more information about a coin use the getCoinByName tool with this coin name as a parameter.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
