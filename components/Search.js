@@ -17,6 +17,7 @@ const Search = ({ categories, collapsed }) => {
   const [query, setQuery] = useState(searchValue);
   const searchInputRef = useRef(null)
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
+  const [modifierKey, setModifierKey] = useState('⌘')
 
   const router = useRouter()
 
@@ -85,6 +86,17 @@ const Search = ({ categories, collapsed }) => {
     }
   }, [router.asPath, searchModalVisible, tab])
 
+  useEffect(() => {
+    // Determine the modifier key based on the operating system
+    // Use navigator.userAgent as navigator.platform is deprecated and userAgentData has limited support
+    const userAgent = navigator?.userAgent?.toLowerCase() || '';
+    if (userAgent.includes('win') || userAgent.includes('linux')) {
+      setModifierKey('Ctrl+')
+    } else if (userAgent.includes('mac')) {
+      setModifierKey('⌘')
+    } // Keep default '⌘' if detection fails or for other OS
+  }, [])
+
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
       className={searchStyles.searchBar}
@@ -92,7 +104,11 @@ const Search = ({ categories, collapsed }) => {
         <SearchOutlined className={searchStyles.placeholderMagnifier} />
         <span className={searchStyles.placeholderText}>Search</span>
       </>}
-      suffix={<Tag className={searchStyles.shortcutTag}>⌘K</Tag>}
+      suffix={
+        <Tag className={searchStyles.shortcutTag}>
+          {modifierKey}K
+        </Tag>
+      }
       disabled
     />
   </div>
