@@ -6,11 +6,13 @@ import { openai } from '@ai-sdk/openai';
 import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
 import Exa from "exa-js"
+import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
 
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
 
 export const runtime = 'edge';
+export const preferredRegion = ['sfo1', 'fra1', 'sin1'];
 
 // Function to track events in Mixpanel using fetch (Edge runtime compatible)
 const trackMixpanelEvent = async (event, properties) => {
@@ -665,7 +667,7 @@ const tools = {
         },
         interval: {
           type: 'string',
-          description: 'Trend data interval (1d, 4h)',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         },
         trendLimit: {
@@ -743,7 +745,7 @@ const tools = {
       properties: {
         interval: {
           type: 'string',
-          description: 'Trend data interval (1d, 4h)',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         },
         type: {
@@ -897,7 +899,7 @@ const tools = {
       properties: {
         interval: {
           type: 'string',
-          description: 'Trend data interval',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         }
       }
@@ -942,7 +944,7 @@ const tools = {
       properties: {
         interval: {
           type: 'string',
-          description: 'Trend data interval (1d, 4h)',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         }
       }
@@ -992,7 +994,7 @@ const tools = {
         },
         interval: {
           type: 'string',
-          description: 'Trend data interval (1d, 4h)',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         },
         trendLimit: {
@@ -1070,7 +1072,7 @@ const tools = {
   }),
 
   getFilteredCoins: tool({
-    description: "Use this when a user wants to filter coins by criteria like trend direction, market cap, categories, etc. Example: 'Show me uptrend coins in the DeFi category' or 'Find coins with market cap under 100M with strong uptrends'.",
+    description: "Use this when a user wants to filter coins by criteria like trend direction, market cap, categories, etc. Example: 'Show me uptrend coins in the DeFi category' or 'Find coins with market cap under 100M with strong uptrends'. Returns a list of coin names, in order to get more information about a coin use the getCoinByName tool with this coin name as a parameter.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -1119,7 +1121,7 @@ const tools = {
         },
         interval: {
           type: 'string',
-          description: 'Trend data interval (1d, 4h)',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
           default: '1d'
         },
         flavor: {
@@ -1237,110 +1239,163 @@ const tools = {
     }
   }),
 
-//   batchParallel: tool({
-//     description: "Execute multiple operations in parallel to save time. Great for analyzing multiple coins at once, comparing different timeframes, or gathering varied market data in a single request. Use this when you need to perform multiple similar operations (like checking several coins) or want to collect different types of related data simultaneously.",
-//     parameters: jsonSchema({
-//       type: 'object',
-//       properties: {
-//         operations: {
-//           type: 'array',
-//           description: 'Array of operations to execute in parallel',
-//           items: {
-//             type: 'object',
-//             properties: {
-//               tool: {
-//                 type: 'string',
-//                 description: 'Name of the tool to execute (e.g., "getCoinBySymbol", "getMarketHealth")'
-//               },
-//               toolArguments: {
-//                 type: 'object',
-//                 description: 'Arguments to pass to the tool',
-//                 additionalProperties: true
-//               },
-//               label: {
-//                 type: 'string',
-//                 description: 'Optional label to identify this operation in the results'
-//               }
-//             },
-//             required: ['tool', 'toolArguments']
-//           }
-//         }
-//       },
-//       required: ['operations']
-//     }),
-//     execute: async ({ operations }) => {
-//       try {
-//         console.log('Tool executed: batchParallel', {
-//           operationCount: operations.length,
-//           operations: operations.map(op => ({ tool: op.tool, label: op.label }))
-//         });
+  batchParallel: tool({
+    description: "Execute multiple operations in parallel to save time. Great for analyzing multiple coins at once, comparing different timeframes, or gathering varied market data in a single request. Use this when you need to perform multiple similar operations (like checking several coins) or want to collect different types of related data simultaneously.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        operations: {
+          type: 'array',
+          description: 'Array of operations to execute in parallel',
+          items: {
+            type: 'object',
+            properties: {
+              tool: {
+                type: 'string',
+                description: 'Name of the tool to execute (e.g., "getCoinBySymbol", "getMarketHealth")'
+              },
+              toolArguments: {
+                type: 'object',
+                description: 'Arguments to pass to the tool',
+                additionalProperties: true
+              },
+              label: {
+                type: 'string',
+                description: 'Optional label to identify this operation in the results'
+              }
+            },
+            required: ['tool', 'toolArguments']
+          }
+        }
+      },
+      required: ['operations']
+    }),
+    execute: async ({ operations }) => {
+      try {
+        console.log('Tool executed: batchParallel', {
+          operationCount: operations.length,
+          operations: operations.map(op => ({ tool: op.tool, label: op.label }))
+        });
 
-//         if (!Array.isArray(operations) || operations.length === 0) {
-//           return jsonToMarkdown({ error: "No operations provided" });
-//         }
+        if (!Array.isArray(operations) || operations.length === 0) {
+          return jsonToMarkdown({ error: "No operations provided" });
+        }
 
-//         // Validate operations
-//         for (const op of operations) {
-//           if (!op.tool || !tools[op.tool]) {
-//             return jsonToMarkdown({
-//               error: `Invalid tool specified: ${op.tool}`,
-//               availableTools: Object.keys(tools).filter(t => t !== 'batchParallel')
-//             });
-//           }
-//         }
+        // Validate operations
+        for (const op of operations) {
+          if (!op.tool || !tools[op.tool]) {
+            return jsonToMarkdown({
+              error: `Invalid tool specified: ${op.tool}`,
+              availableTools: Object.keys(tools).filter(t => t !== 'batchParallel')
+            });
+          }
+        }
 
-//         // Execute all operations in parallel
-//         const results = await Promise.all(
-//           operations.map(async (op) => {
-//             try {
-//               // Get the tool's execute function
-//               const toolFn = tools[op.tool].execute;
-//               if (!toolFn) {
-//                 return {
-//                   label: op.label || op.tool,
-//                   error: `Tool ${op.tool} does not have an execute function`
-//                 };
-//               }
+        // Execute all operations in parallel
+        const results = await Promise.all(
+          operations.map(async (op) => {
+            try {
+              // Get the tool's execute function
+              const toolFn = tools[op.tool].execute;
+              if (!toolFn) {
+                return {
+                  label: op.label || op.tool,
+                  error: `Tool ${op.tool} does not have an execute function`
+                };
+              }
 
-//               // Execute the tool with the provided arguments
-//               const result = await toolFn(op.toolArguments || {});
-//               return {
-//                 label: op.label || op.tool,
-//                 tool: op.tool,
-//                 toolArguments: op.toolArguments,
-//                 result
-//               };
-//             } catch (error) {
-//               console.error(`Error executing operation ${op.tool}:`, error);
-//               return {
-//                 label: op.label || op.tool,
-//                 tool: op.tool,
-//                 toolArguments: op.toolArguments,
-//                 error: error.message || "Operation failed"
-//               };
-//             }
-//           })
-//         );
+              // Execute the tool with the provided arguments
+              const result = await toolFn(op.toolArguments || {});
+              return {
+                label: op.label || op.tool,
+                tool: op.tool,
+                toolArguments: op.toolArguments,
+                result
+              };
+            } catch (error) {
+              console.error(`Error executing operation ${op.tool}:`, error);
+              return {
+                label: op.label || op.tool,
+                tool: op.tool,
+                toolArguments: op.toolArguments,
+                error: error.message || "Operation failed"
+              };
+            }
+          })
+        );
 
-//         console.log('batchParallel - Completed all operations:', results.length);
+        console.log('batchParallel - Completed all operations:', results.length);
 
-//         // Return the combined results
-//         return jsonToMarkdown({
-//           batchResults: results.map(r => ({
-//             label: r.label,
-//             tool: r.tool,
-//             result: r.result || r.error
-//           }))
-//         });
-//       } catch (error) {
-//         console.error('batchParallel Error:', {
-//           message: error.message,
-//           stack: error.stack
-//         });
-//         return jsonToMarkdown({ error: "Failed to execute batch operations" });
-//       }
-//     }
-//   })
+        // Return the combined results
+        return jsonToMarkdown({
+          batchResults: results.map(r => ({
+            label: r.label,
+            tool: r.tool,
+            result: r.result || r.error
+          }))
+        });
+      } catch (error) {
+        console.error('batchParallel Error:', {
+          message: error.message,
+          stack: error.stack
+        });
+        return jsonToMarkdown({ error: "Failed to execute batch operations" });
+      }
+    }
+  }),
+
+  getCategoryTrends: tool({
+    description: "Use this when a user asks about trend distribution within a specific category. Returns the trend breakdown (UP, HODL, DOWN counts) for the specified category.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {
+        categoryName: {
+          type: 'string',
+          description: 'The name of the category to get trend data for'
+        },
+        interval: {
+          type: 'string',
+          description: `Trend data interval (${SUPPORTED_INTERVALS.join(', ')})`,
+          default: '1d'
+        }
+      },
+      required: ['categoryName']
+    }),
+    execute: async ({ categoryName, interval = "1d" }) => {
+      try {
+        console.log('Tool executed: getCategoryTrends', { categoryName, interval });
+
+        // Call the socket server API endpoint for category trends
+        const result = await callSocketServer('/api/category/trends', {
+          categoryName,
+          interval
+        });
+
+        console.log('getCategoryTrends - Result:', result);
+
+        if (result.error) {
+          return jsonToMarkdown({ error: result.error });
+        }
+
+        // Format the result, ensuring trends object is present
+        const data = {
+          categoryName,
+          interval,
+          trends: result.trends || { UP: 0, HODL: 0, DOWN: 0 },
+          coinCount: result.coinCount || 0
+        };
+
+        return jsonToMarkdown(data);
+      } catch (error) {
+        console.error('getCategoryTrends Error:', {
+          message: error.message,
+          stack: error.stack,
+          params: { categoryName, interval }
+        });
+        return jsonToMarkdown({ error: "Failed to fetch category trend data" });
+      }
+    }
+  })
 };
 
 const fetchR2FileContents = async (fileName) => {
@@ -1411,18 +1466,18 @@ export async function POST(req) {
 
   // Track the AI prompt in Mixpanel
   const userMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-  if (userMessage && userMessage.role === 'user') {
-    trackMixpanelEvent('AI Prompt', {
-      distinct_id: walletAddress || 'anonymous',
-      prompt: userMessage.content,
-      messageCount: messages.length,
-      time: Math.floor(Date.now() / 1000)
-    }).catch(err => console.error('Mixpanel tracking error:', err));
-  }
+  // if (userMessage && userMessage.role === 'user') {
+  //   trackMixpanelEvent('AI Prompt', {
+  //     distinct_id: walletAddress || 'anonymous',
+  //     prompt: userMessage.content,
+  //     messageCount: messages.length,
+  //     time: Math.floor(Date.now() / 1000)
+  //   }).catch(err => console.error('Mixpanel tracking error:', err));
+  // }
 
   try {
     console.log('Getting system prompt and model ID...');
-    const [systemPrompt, serverProvider, modelId, vertexModelId, openRouterModelId, openAiModelId] = await Promise.all([
+    const [systemPromptContent, serverProvider, modelId, vertexModelId, openRouterModelId, openAiModelId] = await Promise.all([
       getSystemPrompt(),
       getServerProvider(),
       getModelId(),
@@ -1435,33 +1490,21 @@ export async function POST(req) {
     console.log('Vertex Model ID:', vertexModelId);
     console.log('OpenRouter Model ID:', openRouterModelId);
     console.log('OpenAI Model ID:', openAiModelId);
-    let processedMessages = [...messages];
-    // Modify the messages array if coinId is present in data or to add timestamp
-    if (userMessage && userMessage.role === 'user') {
-      // Find the last user message
-      const lastUserMessageIndex = processedMessages.findIndex(m => m.role === 'user');
-      if (lastUserMessageIndex !== -1) {
-        let modifiedContent = processedMessages[lastUserMessageIndex].content;
 
-        // Add coinId if present
-        if (data?.coinId) {
-          modifiedContent = `coinid:${data.coinId} | ${modifiedContent}`;
-        }
-
-        // Add timestamp (always included from frontend)
-        if (data?.timestamp) {
-          modifiedContent = `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp} | ${modifiedContent}`;
-        }
-
-        // Create a modified copy of the message
-        processedMessages[lastUserMessageIndex] = {
-          ...processedMessages[lastUserMessageIndex],
-          content: modifiedContent
-        };
-
-        console.log('Modified user message:', processedMessages[lastUserMessageIndex].content);
-      }
+    // Construct context string from data
+    let contextInformation = "";
+    if (data?.timestamp) {
+        contextInformation += `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp}\\n`;
     }
+    if (data?.coinId) {
+        contextInformation += `Current relevant coin ID for context: ${data.coinId}\\n`;
+    }
+    contextInformation = contextInformation.trim();
+
+    // Prepend context to the system prompt
+    const finalSystemPrompt = contextInformation
+        ? `${contextInformation}\\n\\n${systemPromptContent}`
+        : systemPromptContent;
 
     console.log('Starting AI stream...');
 
@@ -1507,10 +1550,10 @@ export async function POST(req) {
       messages: [
         {
           role: "system",
-          content: systemPrompt,
+          content: finalSystemPrompt,
           providerMetadata
         },
-        ...processedMessages
+        ...messages
       ],
       experimental_telemetry: {
         isEnabled: true,

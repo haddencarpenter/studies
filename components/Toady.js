@@ -1,0 +1,234 @@
+import { Input, Button, Tag } from 'antd'
+import { MessageOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useChat } from '@ai-sdk/react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import classnames from 'classnames'
+
+import useKeyPass from '../hooks/useKeyPass';
+import useAccount from '../hooks/useAccount';
+import toadyStyles from '../styles/toady.module.less'
+import NoKeyPass from './gating/NoKeyPass'
+import NotConnected from './gating/NotConnected'
+
+const aiSuggestions = [
+  "What are the top coins right now?",
+  "Compare AI vs RWA trends today",
+  "Find coins under $100M market cap with a daily (1D) uptrend"
+];
+
+const Toady = ({ isActive }) => {
+  const hasKeyPass = useKeyPass()
+  const walletAddress = useAccount()
+  const [coinTag, setCoinTag] = useState(null);
+  const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
+    api: '/api/ai',
+    body: {
+      walletAddress
+    },
+    query: {
+      walletAddress // Add this to pass wallet address as query param
+    }
+  })
+  const messagesEndRef = useRef(null)
+  const aiInputRef = useRef(null)
+
+  // Helper for checking if AI is generating a response
+  const isGenerating = status === 'streaming' || status === 'submitted';
+
+  // Store the processed messages
+  const [processedMessages, setProcessedMessages] = useState([]);
+
+  // Process messages once when they're received or changed
+  useEffect(() => {
+    const newProcessedMessages = messages.map(message => {
+      if (message.role === 'assistant' && message.content) {
+        // Fix markdown headings after colons/periods only in assistant messages
+        return {
+          ...message,
+          // Only replace in content that actually has the pattern, which is rare
+          processedContent: message.content.includes(':#') || message.content.includes('.#')
+            ? message.content.replace(/([:.])(\s*)#/g, '$1\n\n#')
+            : message.content
+        };
+      }
+      return {
+        ...message,
+        processedContent: message.content
+      };
+    });
+
+    setProcessedMessages(newProcessedMessages);
+  }, [messages]);
+
+  // Focus input when tab becomes active
+  useEffect(() => {
+      if (isActive && aiInputRef.current) {
+          setTimeout(() => aiInputRef.current.focus(), 100)
+      }
+  }, [isActive]);
+
+  // Check if we're on a coin page and set the coin tag
+  useEffect(() => {
+    const coinMetaTag = document.querySelector('meta[property="x-cr-coin-name"]');
+    if (coinMetaTag && coinMetaTag.content) {
+      setCoinTag(coinMetaTag.content);
+    } else {
+      setCoinTag(null); // Clear tag if not on coin page
+    }
+    // Re-check when route changes (simulated by isActive for now, better would be router event)
+  }, [isActive]); // Dependency on isActive simulates route change check for now
+
+  const clearChat = useCallback(() => {
+    setMessages([])
+    setInput('')
+  }, [setMessages, setInput])
+
+  const askAi = useCallback((e) => {
+    e.preventDefault();
+
+    if (!input.trim() && !coinTag) return;
+    const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
+    // Get current date in ISO 8601 format (UTC-based)
+    const currentDateTime = new Date().toISOString();
+
+    handleSubmit(e, {
+      data: {
+        timestamp: currentDateTime,
+        ...(coinTag && coinId ? { coinId } : {}) // Only include coinId if coinTag is set
+      }
+    });
+  }, [handleSubmit, input, coinTag]);
+
+  // Handle removing the coin tag
+  const handleRemoveCoinTag = useCallback(() => {
+    setCoinTag(null);
+  }, []);
+
+  // Scroll to bottom when new messages are added
+  useEffect(() => {
+    if (messagesEndRef.current) {
+        // Simple scroll to bottom - relies on CSS overflow-anchor for pinning
+        messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
+    }
+  }, [messages]); // Run whenever messages change
+
+  // Render gating or chat UI
+  let content;
+  if (!walletAddress) {
+    content = <div className={toadyStyles.gatingContainer}><NotConnected feature='Toady AI'/></div>;
+  } else if (!hasKeyPass) {
+    content = <div className={toadyStyles.gatingContainer}><NoKeyPass /></div>;
+  } else {
+    content = (
+      <>
+        <div className={toadyStyles.conversationArea} ref={messagesEndRef}>
+          {messages.length > 0 ? (
+             <>
+               {processedMessages.map((message, index) => (
+                 <div key={index} className={classnames(toadyStyles.messageContainer, {
+                   [toadyStyles.userMessage]: message.role === 'user',
+                   [toadyStyles.assistantMessage]: message.role === 'assistant'
+                 })}>
+                   {message.role === 'assistant' && (
+                     <div className={toadyStyles.messageRole}>
+                       <img className={toadyStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />Toady
+                     </div>
+                   )}
+                   <div className={toadyStyles.messageContent}>
+                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                       {message.processedContent}
+                     </ReactMarkdown>
+                   </div>
+                 </div>
+               ))}
+               {/* Show "Thinking..." indicator */}
+               {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
+                 <div className={classnames(toadyStyles.messageContainer, toadyStyles.assistantMessage, toadyStyles.thinkingIndicator)}>
+                   <div className={toadyStyles.messageRole}><img className={toadyStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />Toady</div>
+                   <div className={toadyStyles.messageContent}>Thinking...</div>
+                 </div>
+               ) : null}
+
+               {/* Add error display */}
+               {error && (
+                 <div className={classnames(toadyStyles.messageContainer, toadyStyles.assistantMessage, toadyStyles.errorMessage)}>
+                   <div className={toadyStyles.messageRole}><img className={toadyStyles.toadAiIcon} src="/toad-ai.png" alt="Toady" width="18" height="18" />Toady</div>
+                   <div className={toadyStyles.messageContent}>
+                     <div>Something went wrong. Please try again.</div>
+                     <Button type="primary" onClick={() => reload()} className={toadyStyles.retryButton}>
+                       Try Again
+                     </Button>
+                   </div>
+                 </div>
+               )}
+                {/* Add the anchor element for CSS scroll pinning */}
+               <div id="toady-anchor" />
+             </>
+           ) : (
+             <div className={toadyStyles.suggestions}>
+               <div className={toadyStyles.suggestionTitle}>Suggestions:</div>
+               {aiSuggestions.map((suggestion, index) => (
+                 <div
+                   key={index}
+                   className={toadyStyles.suggestionButton}
+                   onClick={() => setInput(suggestion)} // Use setInput directly
+                 >
+                   {suggestion}
+                 </div>
+               ))}
+             </div>
+           )}
+        </div>
+        <div className={toadyStyles.inputArea}>
+          <Input
+            className={toadyStyles.aiInput}
+            allowClear
+            prefix={<>
+              <MessageOutlined className={toadyStyles.placeholderMagnifier}/>
+              {coinTag && (
+                <Tag
+                  className={toadyStyles.coinTag}
+                  closable
+                  onClose={handleRemoveCoinTag}
+                >
+                  {coinTag}
+                </Tag>
+              )}
+            </>}
+            suffix={
+              <>
+                {isGenerating ? (
+                  <Button type="primary" onClick={stop} className={toadyStyles.stopButton}>
+                    Stop
+                  </Button>
+                ) : (
+                  <Button type="primary" onClick={askAi} disabled={error != null || (!input.trim() && !coinTag)}>
+                    Ask Toady
+                  </Button>
+                )}
+                <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={toadyStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+              </>
+            }
+            value={input}
+            onChange={handleInputChange}
+            onPressEnter={askAi}
+            ref={aiInputRef} // Use the specific ref for AI input
+            spellCheck="false"
+            disabled={error != null} // Disable input on error
+            placeholder="Ask Toady anything..."
+          />
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <div className={toadyStyles.aiTab}>
+        {content}
+    </div>
+  );
+};
+
+export default Toady;
