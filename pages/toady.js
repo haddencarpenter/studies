@@ -17,6 +17,7 @@ export async function getStaticProps() {
             data {
               attributes {
                 title
+                content
                 metaTitle
                 metaDescription
               }
@@ -50,7 +51,7 @@ const ToadyPage = ({ pageData }) => {
         <title key="title">{pageData?.metaTitle}</title>
         <meta name="description" key="description" content={pageData?.metaDescription} />
       </Head>
-      <PageHeader title={pageData?.title} />
+      <PageHeader title={pageData?.title} explainer={pageData.content} />
       <ToadyComponent isActive={true} />
     </>
   );
