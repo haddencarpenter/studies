@@ -3,6 +3,7 @@ import { gql } from '@urql/core';
 import globalData from '../lib/globalData'
 import ToadyComponent from '../components/Toady';
 import strapi from '../utils/strapi';
+import PageHeader from '../components/PageHeader'
 
 export async function getStaticProps() {
   const appData = await globalData()
@@ -49,6 +50,7 @@ const ToadyPage = ({ pageData }) => {
         <title key="title">{pageData?.metaTitle}</title>
         <meta name="description" key="description" content={pageData?.metaDescription} />
       </Head>
+      <PageHeader title={pageData?.title} />
       <ToadyComponent isActive={true} />
     </>
   );
