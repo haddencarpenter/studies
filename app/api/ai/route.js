@@ -1402,7 +1402,7 @@ const getAiConfiguration = async () => {
   try {
     console.log('Fetching AI configuration from API server...');
     const url = new URL('/api/toady/config', process.env.AI_SERVER_URL);
-    url.searchParams.append('playground', 'true');
+    url.searchParams.append('playground', 'false');
 
     const response = await fetch(url.toString(), {
       method: 'GET',
