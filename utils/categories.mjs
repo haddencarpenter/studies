@@ -6,7 +6,7 @@ import slugify from 'slugify'
 import { gql } from '@urql/core'
 
 import sql from '../lib/database.mjs'
-import strapi from './strapi.js'
+import strapi from 'coinrotator-utils/strapi.mjs'
 
 let overrides, aliases
 

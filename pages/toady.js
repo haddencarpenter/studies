@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { gql } from '@urql/core';
 import globalData from '../lib/globalData'
 import ToadyComponent from '../components/Toady';
-import strapi from '../utils/strapi';
+import strapi from 'coinrotator-utils/strapi.mjs'
 import PageHeader from '../components/PageHeader'
 
 export async function getStaticProps() {

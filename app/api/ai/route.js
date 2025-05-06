@@ -6,8 +6,6 @@ import { streamText, tool, jsonSchema } from 'ai';
 import { Converter } from '@memochou1993/json2markdown';
 import Exa from "exa-js"
 import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
-import { gql } from '@urql/core';
-import strapi from '../../../utils/strapi';
 
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
@@ -1399,90 +1397,48 @@ const tools = {
   })
 };
 
-// Function to fetch AI configuration from Strapi
+// Function to fetch AI configuration from the API server
 const getAiConfiguration = async () => {
-  const { data, error } = await strapi.query(
-    gql`
-      query ToadyConfigs {
-        toadyConfigs(pagination: { page: 1, pageSize: 100000 }) {
-          data {
-            attributes {
-              key
-              playgroundValue
-            }
-          }
-        }
+  try {
+    console.log('Fetching AI configuration from API server...');
+    const url = new URL('/api/toady/config', process.env.AI_SERVER_URL);
+    url.searchParams.append('playground', 'true');
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
       }
-    `,
-    {},
-    { requestPolicy: 'network-only' } // Ensure fresh data, no caching
-  );
+    });
 
-  if (error) {
-    console.error('Strapi AI Configuration fetch error:', error);
-    throw new Error(`Failed to fetch AI configuration from Strapi: ${error.message}`);
-  }
-
-  if (!data || !data.toadyConfigs || !Array.isArray(data.toadyConfigs.data)) {
-    console.error('Strapi AI Configuration data is invalid or missing:', data);
-    throw new Error('Invalid or missing AI configuration data from Strapi. Expected an array of toadyConfigs.');
-  }
-
-  const rawConfigs = data.toadyConfigs.data;
-  const configMap = {};
-  for (const item of rawConfigs) {
-    if (item.attributes && typeof item.attributes.key === 'string') {
-      configMap[item.attributes.key] = item.attributes.playgroundValue;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API server returned ${response.status}: ${errorText}`);
     }
+
+    const data = await response.json();
+
+    // Log the fetched configuration
+    console.log('Fetched AI Configuration from API server:', {
+      serverProvider: data.serverProvider,
+      systemPromptLength: data.systemPrompt?.length || 0,
+    });
+
+    return {
+      systemPromptContent: data.systemPrompt,
+      serverProvider: data.serverProvider,
+      modelId: data.anthropicModelId,
+      vertexModelId: data.vertexModelId,
+      openRouterModelId: data.openRouterModelId,
+      openAiModelId: data.openAiModelId
+    };
+  } catch (error) {
+    console.error('API server configuration fetch error:', {
+      message: error.message,
+      stack: error.stack
+    });
+    throw new Error(`Failed to fetch AI configuration from API server: ${error.message}`);
   }
-
-  // Extract specific values, providing fallbacks or throwing errors if critical keys are missing
-  const systemPromptContent = configMap.systemPrompt;
-  const serverProvider = configMap.serverProvider;
-  const anthropicModelId = configMap.anthropicModelId;
-  const vertexModelId = configMap.vertexModelId;
-  const openRouterModelId = configMap.openRouterModelId;
-  const openAiModelId = configMap.openAiModelId;
-
-  // Validate that critical configurations are present
-  const criticalKeys = {
-    systemPrompt: systemPromptContent,
-    serverProvider: serverProvider,
-    // Add model IDs based on serverProvider if needed for validation, or ensure at least one is present
-  };
-
-  for (const [keyName, keyValue] of Object.entries(criticalKeys)) {
-    if (typeof keyValue === 'undefined') {
-      console.error(`Missing critical AI configuration key "${keyName}" from Strapi.`, configMap);
-      throw new Error(`Missing critical AI configuration key "${keyName}" from Strapi.`);
-    }
-  }
-
-  // Validate model ID based on server provider
-  if (serverProvider === 'anthropic' && !anthropicModelId) throw new Error('Missing anthropicModelId for anthropic provider.');
-  if (serverProvider === 'vertex' && !vertexModelId) throw new Error('Missing vertexModelId for vertex provider.');
-  if (serverProvider === 'openrouter' && !openRouterModelId) throw new Error('Missing openRouterModelId for openrouter provider.');
-  if (serverProvider === 'openai' && !openAiModelId) throw new Error('Missing openAiModelId for openai provider.');
-
-
-  // Log the fetched and mapped configuration
-  console.log('Fetched and Mapped AI Configuration from Strapi (toady-configs):', {
-    serverProvider,
-    systemPromptLength: systemPromptContent?.length || 0,
-    anthropicModelId,
-    vertexModelId,
-    openRouterModelId,
-    openAiModelId,
-  });
-
-  return {
-    systemPromptContent,
-    serverProvider,
-    modelId: anthropicModelId, // This is mapped to anthropicModelIdFromStrapi in POST handler
-    vertexModelId,
-    openRouterModelId,
-    openAiModelId
-  };
 };
 
 export async function POST(req) {
@@ -1502,7 +1458,7 @@ export async function POST(req) {
   // }
 
   try {
-    console.log('Getting AI configuration from Strapi...');
+    console.log('Getting AI configuration from API server...');
     const {
       systemPromptContent,
       serverProvider,
@@ -1514,10 +1470,10 @@ export async function POST(req) {
 
     // Log the specific model IDs after fetching
     console.log('Server Provider:', serverProvider);
-    console.log('Anthropic Model ID from Strapi:', anthropicModelIdFromStrapi);
-    console.log('Vertex Model ID from Strapi:', vertexModelId);
-    console.log('OpenRouter Model ID from Strapi:', openRouterModelId);
-    console.log('OpenAI Model ID from Strapi:', openAiModelId);
+    console.log('Anthropic Model ID from API server:', anthropicModelIdFromStrapi);
+    console.log('Vertex Model ID from API server:', vertexModelId);
+    console.log('OpenRouter Model ID from API server:', openRouterModelId);
+    console.log('OpenAI Model ID from API server:', openAiModelId);
 
     // Construct context string from data
     let contextInformation = "";
