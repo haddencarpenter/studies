@@ -12,16 +12,12 @@ import toadyStyles from '../styles/toady.module.less'
 import NoKeyPass from './gating/NoKeyPass'
 import NotConnected from './gating/NotConnected'
 
-const aiSuggestions = [
-  "What are the top coins right now?",
-  "Compare AI vs RWA trends today",
-  "Find coins under $100M market cap with a daily (1D) uptrend"
-];
 
-const Toady = ({ isActive }) => {
+const Toady = ({ isActive, initialSuggestions }) => {
   const hasKeyPass = useKeyPass()
   const walletAddress = useAccount()
   const [coinTag, setCoinTag] = useState(null);
+  const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
     body: {
@@ -61,6 +57,30 @@ const Toady = ({ isActive }) => {
 
     setProcessedMessages(newProcessedMessages);
   }, [messages]);
+
+  useEffect(() => {
+    if (initialSuggestions) {
+      setCurrentSuggestions(initialSuggestions.split('\n').filter(s => s.trim() !== ''));
+    } else {
+      const fetchDynamicSuggestions = async () => {
+        try {
+          console.log("Dynamically fetching suggestions...");
+          const response = await fetch('/api/toady-suggestions');
+          if (!response.ok) throw new Error('Network response was not ok.');
+          const data = await response.json();
+          if (data.suggestions) {
+            setCurrentSuggestions(data.suggestions.split('\n').filter(s => s.trim() !== ''));
+          } else {
+            setCurrentSuggestions([]); // Set to empty array if no suggestions
+          }
+        } catch (err) {
+          console.error("Failed to fetch dynamic suggestions:", err);
+          setCurrentSuggestions([]); // Set to empty array on error
+        }
+      };
+      fetchDynamicSuggestions();
+    }
+  }, [initialSuggestions]);
 
   // Focus input when tab becomes active
   useEffect(() => {
@@ -169,7 +189,7 @@ const Toady = ({ isActive }) => {
            ) : (
              <div className={toadyStyles.suggestions}>
                <div className={toadyStyles.suggestionTitle}>Suggestions:</div>
-               {aiSuggestions.map((suggestion, index) => (
+               {currentSuggestions.map((suggestion, index) => (
                  <div
                    key={index}
                    className={toadyStyles.suggestionButton}

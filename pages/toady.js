@@ -36,15 +36,37 @@ export async function getStaticProps() {
 
   const pageData = pageQuery?.data?.pages?.data[0]?.attributes || {};
 
+  let toadySuggestionsQuery = null;
+  try {
+    toadySuggestionsQuery = await strapi.query(
+      gql`
+        query ToadySuggestion {
+          toadySuggestion {
+            data {
+              attributes {
+                suggestions
+              }
+            }
+          }
+        }
+      `
+    );
+  } catch (error) {
+    console.error("Error fetching Toady suggestions from Strapi:", error);
+  }
+
+  const toadySuggestions = toadySuggestionsQuery?.data?.toadySuggestion?.data?.attributes?.suggestions || "";
+
   return {
     props: {
       appData,
       pageData,
+      toadySuggestions,
     },
   }
 }
 
-const ToadyPage = ({ pageData }) => {
+const ToadyPage = ({ pageData, toadySuggestions }) => {
   return (
     <>
       <Head>
@@ -52,7 +74,7 @@ const ToadyPage = ({ pageData }) => {
         <meta name="description" key="description" content={pageData?.metaDescription} />
       </Head>
       <PageHeader title={pageData?.title} explainer={pageData.content} />
-      <ToadyComponent isActive={true} />
+      <ToadyComponent isActive={true} initialSuggestions={toadySuggestions} />
     </>
   );
 };
