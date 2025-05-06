@@ -1,5 +1,5 @@
 import { gql } from '@urql/core';
-import strapi from '../../utils/strapi';
+import strapi from 'coinrotator-utils/strapi.mjs'
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
