@@ -1413,7 +1413,8 @@ Example JSON for TOP COINS (dynamic fanout):
 Make sure to specify dependencies between steps, identify which steps can run in parallel, and ALWAYS include parameters for each tool (use an empty object {} if no parameters are needed).
 `;
 
-    console.log('Classifier System Prompt:\n', classifierSystemPrompt);
+    console.log('Classifier System Prompt:\n');
+    console.dir(classifierSystemPrompt, { depth: null });
 
     // Use GPT-4.1 Mini for classification
     const { object } = await generateObject({
