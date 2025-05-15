@@ -6,7 +6,6 @@ import { streamText, tool, jsonSchema, generateObject } from 'ai';
 import Exa from "exa-js"
 import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
 import { z } from 'zod';
-import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
