@@ -7,10 +7,6 @@ import Exa from "exa-js"
 import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
 import { z } from 'zod';
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-})
-
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
 
@@ -49,6 +45,54 @@ const trackMixpanelEvent = async (event, properties) => {
     }
   } catch (error) {
     console.error('Error tracking event in Mixpanel:', error);
+  }
+};
+
+// Function to report errors to the API server for Bugsnag tracking
+const reportErrorToServer = async (error, context = {}) => {
+  try {
+    console.log('Reporting error to API server:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+
+    const errorData = {
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause ? {
+          name: error.cause.name,
+          message: error.cause.message,
+          stack: error.cause.stack
+        } : undefined
+      },
+      context,
+      timestamp: new Date().toISOString()
+    };
+
+    // Use the same base URL as other API calls
+    const url = new URL('/api/errors/report', process.env.AI_SERVER_URL);
+
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(errorData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error reporting API returned ${response.status}: ${errorText}`);
+    } else {
+      console.log('Error successfully reported to API server');
+    }
+  } catch (reportingError) {
+    // Don't throw here, just log - we don't want error reporting to cause more errors
+    console.error('Failed to report error to API server:', reportingError);
   }
 };
 
@@ -1202,10 +1246,12 @@ const getAiConfiguration = async () => {
     console.log('Fetched AI Configuration from API server:', {
       serverProvider: data.serverProvider,
       systemPromptLength: data.systemPrompt?.length || 0,
+      classificationPromptLength: data.classificationPromptContent?.length || 0,
     });
 
     return {
       systemPromptContent: data.systemPromptContent,
+      classificationPromptContent: data.classificationPromptContent,
       serverProvider: data.serverProvider,
       modelId: data.anthropicModelId,
       vertexModelId: data.vertexModelId,
@@ -1254,7 +1300,7 @@ const queryPlanSchema = z.object({
 });
 
 // Function to classify the query using GPT-4.1 Mini
-const classifyQuery = async (query) => {
+const classifyQuery = async (query, classificationPromptContent) => {
   try {
     console.log('Classifying query using GPT-4.1 Mini:', query);
 
@@ -1294,128 +1340,13 @@ const classifyQuery = async (query) => {
     }
     const toolDefinitionsJson = JSON.stringify(serializableTools, null, 2);
 
-    const classifierSystemPrompt = `Analyze this crypto-related query and create a detailed execution plan for retrieving the necessary data: "${query}"
+        // Use the API-provided classification prompt content
+    const classifierSystemPrompt = classificationPromptContent
+      .replace('${query}', query)
+      .replace('${categoriesStringForPrompt}', categoriesStringForPrompt)
+      .replace('${toolDefinitionsJson}', toolDefinitionsJson);
 
-Your plan should identify sequential dependencies between steps (e.g., first fetch categories, then fetch coins in a specific category) and opportunities for parallel execution.
-
-IMPORTANT: For EACH tool you must include a "parameters" object, even if it's empty {}. Parameters are REQUIRED for all tools.
-
-DYNAMIC FANOUT OPERATIONS:
-For operations where you need to get details for multiple coins:
-
-1. DIRECTLY SPECIFY THE COIN NAMES in your plan when they are known from the user query.
-   Example: If the user asks about BTC and ETH, specify bitcoin and ethereum directly.
-
-2. For top N coins or filtered coin lists, create TWO separate steps:
-   a. First step to get the list (like getFilteredCoins to get "Top coins")
-   b. Second step with "dynamicFanout: true" and "sourceStep" pointing to the first step
-
-3. The system will automatically use a set of popular coins for fanout operations:
-   bitcoin, ethereum, binancecoin, ripple, cardano
-
-4. In the fanout step, use "{item}" as a placeholder in parameters.
-
-**IMPORTANT INSTRUCTIONS FOR HANDLING CATEGORY-BASED QUERIES:**
-
-The following is a list of cryptocurrency categories currently recognized by the system.
-When your execution plan requires fetching trends for a specific category (i.e., using the 'getCategoryTrends' tool):
-1.  Identify the category mentioned or implied by the user's query.
-2.  You MUST then find the closest corresponding **EXACT category name** from the "System-Recognized Categories" list below.
-3.  Use this EXACT system-recognized category name as the value for the 'categoryName' parameter when defining the 'getCategoryTrends' tool in your plan.
-
-For example:
-- If the user asks: "What are the trends for RWA?"
-- And "System-Recognized Categories" includes: "- \"RWA (Real World Assets)\""
-- Your plan for 'getCategoryTrends' MUST use \`parameters: { categoryName: "RWA (Real World Assets)", ... }\`.
-- DO NOT use \`parameters: { categoryName: "RWA", ... }\` or \`parameters: { categoryName: "rwa", ... }\`.
-
-If the user asks for "all categories", the 'getAllCategories' tool is appropriate. The primary purpose of the list below is to ensure 'getCategoryTrends' uses precise names.
-
-${categoriesStringForPrompt}
-
-**Instructions for Comparing Multiple Category Trends:**
-When a user asks to compare trends between **multiple categories** (e.g., "Compare AI vs RWA trends", "What are the AI and DeFi trends?"), your plan should typically include:
-1.  A 'getCategoryTrends' step for EACH of the specified categories to get the overall trend distribution (UP/HODL/DOWN counts) for each. Remember to use the exact system-recognized category names.
-2.  Additionally, to provide insight into the coin-level trends contributing to these category sentiments, include a 'getFilteredCoins' step for EACH of the specified categories.
-    -   For 'getFilteredCoins', you might default to filtering for 'UP' trend coins or a sensible limit (e.g., 5 coins per category) unless the user query suggests other specific filters (like market cap, specific trend direction like 'DOWN', etc.).
-    -   Ensure you use the exact system-recognized category name in the 'categories' parameter (which expects an array, e.g., 'categories: ["AI"]').
-
-This dual approach helps the main AI model to provide a comprehensive answer by covering both the macro (category-level sentiment) and micro (examples of coins within those categories) perspectives of the trends.
-
-Here are the available tools you can use, defined in JSON format. Each tool has a 'description' and 'parameters' (using JSON Schema notation):
-${toolDefinitionsJson}
-
-Example JSON for SPECIFIC KNOWN COINS:
-{
-  "queryType": "multipleCoins",
-  "description": "Get information about Bitcoin and Ethereum",
-  "executionPlan": [
-    {
-      "stepId": "getCoinDetails",
-      "description": "Get details for Bitcoin and Ethereum",
-      "dependsOn": [],
-      "parallelizable": true,
-      "tools": [
-        {
-          "toolName": "getCoinByName",
-          "parameters": {
-            "name": "bitcoin",
-            "interval": "1d"
-          }
-        },
-        {
-          "toolName": "getCoinByName",
-          "parameters": {
-            "name": "ethereum",
-            "interval": "1d"
-          }
-        }
-      ]
-    }
-  ]
-}
-
-Example JSON for TOP COINS (dynamic fanout):
-{
-  "queryType": "multipleCoins",
-  "description": "Get top coins by market cap and their details",
-  "executionPlan": [
-    {
-      "stepId": "getTopCoins",
-      "description": "Get list of top coins by market cap",
-      "dependsOn": [],
-      "parallelizable": true,
-      "tools": [
-        {
-          "toolName": "getFilteredCoins",
-          "parameters": {
-            "marketCapMin": 1000000000,
-            "limit": 5
-          }
-        }
-      ]
-    },
-    {
-      "stepId": "getDetailsForEachCoin",
-      "description": "Get detailed information for each coin in the list",
-      "dependsOn": ["getTopCoins"],
-      "parallelizable": true,
-      "dynamicFanout": true,
-      "sourceStep": "getTopCoins",
-      "tools": [
-        {
-          "toolName": "getCoinByName",
-          "parameters": {
-            "name": "{item}"
-          }
-        }
-      ]
-    }
-  ]
-}
-
-Make sure to specify dependencies between steps, identify which steps can run in parallel, and ALWAYS include parameters for each tool (use an empty object {} if no parameters are needed).
-`;
+    console.log('Using classification prompt from API server');
 
     console.log('Classifier System Prompt:\n');
     console.dir(classifierSystemPrompt, { depth: null });
@@ -1695,9 +1626,22 @@ export async function POST(req) {
   // }
 
   try {
+    // First, get all the AI configuration we'll need throughout the process
+    console.log('Getting AI configuration from API server...');
+    const aiConfig = await getAiConfiguration();
+    const {
+      systemPromptContent,
+      classificationPromptContent,
+      serverProvider,
+      modelId: anthropicModelIdFromStrapi,
+      vertexModelId,
+      openRouterModelId,
+      openAiModelId
+    } = aiConfig;
+
     // STEP 1: Classify query and create a data retrieval plan using GPT-4.1 Mini
     console.log('Step 1: Classifying query...');
-    const queryPlan = await classifyQuery(userMessage.content);
+    const queryPlan = await classifyQuery(userMessage.content, classificationPromptContent);
     console.log('Query plan generated:', queryPlan);
 
     // STEP 2: Execute the tools specified in the plan to retrieve data
@@ -1705,17 +1649,6 @@ export async function POST(req) {
     const executionResults = await executeToolsFromPlan(queryPlan);
     console.log('Plan execution completed with results from steps:',
       executionResults.map(step => step.stepId));
-
-    // STEP 3: Prepare to send the original query and retrieved data to the complex model
-    console.log('Getting AI configuration from API server...');
-    const {
-      systemPromptContent,
-      serverProvider,
-      modelId: anthropicModelIdFromStrapi, // Renaming to avoid conflict if modelId variable is used generally
-      vertexModelId,
-      openRouterModelId,
-      openAiModelId
-    } = await getAiConfiguration();
 
     // Log the specific model IDs after fetching
     console.log('Server Provider:', serverProvider);
@@ -1829,6 +1762,18 @@ export async function POST(req) {
         // Log any errors
         if (result.finishReason === 'error') {
           console.error('Stream error:', result.error);
+
+          // Report finish errors to Bugsnag
+          reportErrorToServer(result.error || new Error('Unknown stream finish error'), {
+            errorType: 'StreamFinishError',
+            finishReason: result.finishReason,
+            walletAddress,
+            userMessage: userMessage?.content,
+            messageCount: messages.length,
+            timestamp: new Date().toISOString()
+          }).catch(reportError => {
+            console.error('Failed to report stream finish error:', reportError);
+          });
         }
       },
 
@@ -1845,6 +1790,16 @@ export async function POST(req) {
 
       onError(error) {
         console.error('Stream error:', error);
+        // Report stream errors to Bugsnag
+        reportErrorToServer(error, {
+          errorType: 'StreamError',
+          walletAddress,
+          userMessage: userMessage?.content,
+          messageCount: messages.length,
+          timestamp: new Date().toISOString()
+        }).catch(reportError => {
+          console.error('Failed to report stream error:', reportError);
+        });
       }
     });
 
@@ -1856,6 +1811,17 @@ export async function POST(req) {
           message: error.message,
           stack: error.stack,
           cause: error.cause
+        });
+
+        // Report response conversion errors to Bugsnag
+        reportErrorToServer(error, {
+          errorType: 'StreamResponseError',
+          walletAddress,
+          userMessage: userMessage?.content,
+          messageCount: messages.length,
+          timestamp: new Date().toISOString()
+        }).catch(reportError => {
+          console.error('Failed to report stream response error:', reportError);
         });
 
         // Return a user-friendly error message based on error type
@@ -1872,6 +1838,15 @@ export async function POST(req) {
       message: e.message,
       stack: e.stack,
       cause: e.cause
+    });
+
+    // Report the error to the API server for Bugsnag tracking
+    await reportErrorToServer(e, {
+      walletAddress,
+      userMessage: userMessage?.content,
+      messageCount: messages.length,
+      url: req.url,
+      timestamp: new Date().toISOString()
     });
 
     // Return a more detailed error response
