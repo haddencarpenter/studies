@@ -1245,7 +1245,7 @@ const getAiConfiguration = async () => {
     // Log the fetched configuration
     console.log('Fetched AI Configuration from API server:', {
       serverProvider: data.serverProvider,
-      systemPromptLength: data.systemPrompt?.length || 0,
+      systemPromptLength: data.systemPromptContent?.length || 0,
       classificationPromptLength: data.classificationPromptContent?.length || 0,
     });
 
@@ -1693,6 +1693,8 @@ export async function POST(req) {
       ? `${contextInformation}\n\n${systemPromptContent}`
       : systemPromptContent;
 
+    console.log('Final system prompt');
+    console.dir(finalSystemPrompt, { depth: null });
     console.log('Starting AI stream with pre-retrieved data...');
 
     // Create a collection to store all steps for debugging
