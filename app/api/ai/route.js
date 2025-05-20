@@ -587,7 +587,7 @@ const tools = {
   }),
 
   getCoinByContract: tool({
-    description: "Use this when a user asks about a specific blockchain contract address. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user asks about a specific blockchain contract address. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -638,7 +638,7 @@ const tools = {
   }),
 
   getCoinBySymbol: tool({
-    description: "Use this when a user mentions a crypto symbol/ticker. Example: 'What's the trend for BTC?' or 'Show ETH analysis'. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user mentions a crypto symbol/ticker. Example: 'What's the trend for BTC?' or 'Show ETH analysis'. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -684,7 +684,7 @@ const tools = {
   }),
 
   getCoinByName: tool({
-    description: "Use this when a user mentions a cryptocurrency's full name. Example: 'Show me Bitcoin trends' or 'What's the analysis for Ethereum?'. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user mentions a cryptocurrency's full name. Example: 'Show me Bitcoin trends' or 'What's the analysis for Ethereum?'. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -980,7 +980,7 @@ const tools = {
   }),
 
   getCoinById: tool({
-    description: "Use this when you have a specific coinId to look up. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when you have a specific coinId to look up. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
