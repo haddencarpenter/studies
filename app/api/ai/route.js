@@ -189,6 +189,40 @@ const callSocketServer = async (endpoint, params = {}) => {
 
 // Define tools first
 const tools = {
+  getCurrentMarketVibe: tool({
+    description: "Get the current market vibe. Returns the latest summary message.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {},
+      required: []
+    }),
+    execute: async () => {
+      try {
+        console.log('Tool executed: getCurrentMarketVibe');
+        const url = new URL('/api/alpha/messages', process.env.AI_SERVER_URL);
+        url.searchParams.append('channelName', 'summary');
+        url.searchParams.append('limit', '1');
+        const response = await fetch(url.toString(), {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`AI server returned ${response.status}: ${errorText}`);
+        }
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0 && data[0].message) {
+          return data[0].message;
+        } else {
+          return 'No market vibe message available.';
+        }
+      } catch (error) {
+        throw(error)
+      }
+    }
+  }),
   exaSearch: tool({
     description: "Use this to search the web for information using the Exa API. Useful for finding current information or researching topics that aren't covered by the system's knowledge.",
     parameters: jsonSchema({
