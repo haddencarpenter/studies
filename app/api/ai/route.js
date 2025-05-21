@@ -1693,8 +1693,8 @@ export async function POST(req) {
 
     // Construct context string from data
     let contextInformation = "";
-    if (data?.timestamp) {
-      contextInformation += `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp}\n`;
+    if (data?.browserDateTimeWithTimezone) {
+      contextInformation += `Current date and time: ${data.browserDateTimeWithTimezone}\n`;
     }
     if (data?.coinId) {
       contextInformation += `Current relevant coin ID for context: ${data.coinId}\n`;

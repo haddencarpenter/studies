@@ -110,12 +110,12 @@ const Toady = ({ isActive, initialSuggestions }) => {
 
     if (!input.trim() && !coinTag) return;
     const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
-    // Get current date in ISO 8601 format (UTC-based)
-    const currentDateTime = new Date().toISOString();
+    // Use browser's local time string with timezone
+    const browserDateTimeWithTimezone = new Date().toString();
 
     handleSubmit(e, {
       data: {
-        timestamp: currentDateTime,
+        browserDateTimeWithTimezone,
         ...(coinTag && coinId ? { coinId } : {}) // Only include coinId if coinTag is set
       }
     });
