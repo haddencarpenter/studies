@@ -32,6 +32,7 @@
     "@ant-design/icons": "4.8.2",
     "@ant-design/plots": "^1.2.5",
     "@lifeomic/attempt": "^3.1.0",
+    "@memochou1993/json2markdown": "^0.0.15",
     "@metamask/detect-provider": "2",
     "@next/bundle-analyzer": "^13.4.9",
     "@openrouter/ai-sdk-provider": "^0.4.5",
