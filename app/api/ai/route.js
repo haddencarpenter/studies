@@ -1397,7 +1397,6 @@ const classifyQuery = async (query, classificationPromptContent) => {
       prompt: classifierSystemPrompt
     });
 
-    console.log('Query classification result:', object);
     return object;
   } catch (error) {
     console.error('Error classifying query:', error);
@@ -1408,70 +1407,29 @@ const classifyQuery = async (query, classificationPromptContent) => {
 // Function to execute tools based on the query plan
 const executeToolsFromPlan = async (plan) => {
   console.log('Executing tools from plan:', plan);
+
+  // Sort the execution plan topologically before executing
+  const sortedPlan = sortPlanTopologically(plan.executionPlan);
+  console.log('Sorted execution plan:', sortedPlan.map(step => step.stepId));
+
   const results = {}; // This will store the final output for each step's execution.
   const stepResults = {}; // This is used to store results during execution and for cross-step parameter passing.
 
   try {
-    // Group steps by their dependencies to determine execution order
-    const stepsByDependencyLevel = {};
-    let currentLevel = 0;
-    let remainingSteps = [...plan.executionPlan];
-    const completedStepIdsForGrouping = new Set(); // New: Tracks completed step IDs for grouping/planning
+    // Execute steps in the topologically sorted order
+    for (const step of sortedPlan) {
+      console.log(`Executing step: ${step.stepId}`);
 
-    // Process steps level by level until all are processed for grouping
-    while (remainingSteps.length > 0) {
-      // Find steps at the current level (those with all dependencies already "conceptually" processed)
-      const stepsAtCurrentLevel = remainingSteps.filter(step => {
-        if (!step.dependsOn || step.dependsOn.length === 0) {
-          return true;
-        }
-        // Check if all dependencies have been "conceptually" processed for grouping
-        return step.dependsOn.every(depId =>
-          completedStepIdsForGrouping.has(depId) // Use the new Set for planning
-        );
-      });
-
-      if (stepsAtCurrentLevel.length === 0) {
-        // If no steps can be scheduled at this level, but there are remaining steps, it's a circular dependency or missing dependency
-        console.error('Circular dependency detected or unresolvable dependency in plan during grouping:', {
-          remainingSteps: remainingSteps.map(s => s.stepId),
-          completedInGrouping: Array.from(completedStepIdsForGrouping)
-        });
-        throw new Error('Circular dependency detected or unresolvable dependency in execution plan');
+      // Handle dynamic fanout steps
+      if (step.dynamicFanout === true && step.sourceStep) {
+        await processDynamicFanoutStep(step, stepResults, results);
+        continue;
       }
 
-      // Add these steps to the current level
-      stepsByDependencyLevel[currentLevel] = stepsAtCurrentLevel;
-
-      // Mark these steps as "conceptually" completed for the next iteration of grouping
-      stepsAtCurrentLevel.forEach(step => completedStepIdsForGrouping.add(step.stepId));
-
-      // Remove processed steps from the remaining list
-      remainingSteps = remainingSteps.filter(step =>
-        !stepsAtCurrentLevel.some(s => s.stepId === step.stepId)
-      );
-
-      currentLevel++;
-    }
-
-    // Execute steps level by level using the organized stepsByDependencyLevel
-    for (let level = 0; level < currentLevel; level++) {
-      console.log(`Executing steps at dependency level ${level}`);
-      const stepsToExecute = stepsByDependencyLevel[level];
-
-      // Process each step at this level
-      for (const step of stepsToExecute) {
-        // Handle dynamic fanout steps
-        if (step.dynamicFanout === true && step.sourceStep) {
-          await processDynamicFanoutStep(step, stepResults, results);
-          continue;
-        }
-
-        // Process regular steps
-        const stepPromise = processRegularStep(step, stepResults);
-        const completedStep = await stepPromise;
-        results[completedStep.stepId] = completedStep;
-      }
+      // Process regular steps
+      const stepPromise = processRegularStep(step, stepResults);
+      const completedStep = await stepPromise;
+      results[completedStep.stepId] = completedStep;
     }
 
     return Object.values(results);
@@ -1479,6 +1437,79 @@ const executeToolsFromPlan = async (plan) => {
     console.error('Error executing tools from plan:', error);
     throw error;
   }
+};
+
+// Simplified function to sort plan steps topologically
+const sortPlanTopologically = (executionPlan) => {
+  // Create a copy of the plan with normalized dependencies
+  const steps = executionPlan.map(step => ({
+    ...step,
+    dependencies: [...(step.dependsOn || [])],
+    // Add sourceStep as dependency for dynamic fanout steps
+    ...(step.dynamicFanout && step.sourceStep && { dependencies: [...(step.dependsOn || []), step.sourceStep] })
+  }));
+
+  // Build a map of steps by ID for quick lookup
+  const stepsById = Object.fromEntries(steps.map(step => [step.stepId, step]));
+
+  // Result array for sorted steps
+  const sorted = [];
+  // Set to track visited nodes (for cycle detection)
+  const visited = new Set();
+  // Set to track nodes in current recursion stack (for cycle detection)
+  const recursionStack = new Set();
+
+  // Depth-first search function to topologically sort
+  const visit = (stepId) => {
+    // If already in final sorted list, skip
+    if (visited.has(stepId)) return true;
+
+    // Check for cycle
+    if (recursionStack.has(stepId)) {
+      console.error(`Circular dependency detected involving step: ${stepId}`);
+      return false;
+    }
+
+    // Add to recursion stack
+    recursionStack.add(stepId);
+
+    // Visit all dependencies first
+    const step = stepsById[stepId];
+    const dependencies = step.dependencies || [];
+
+    // Process all dependencies recursively
+    for (const depId of dependencies) {
+      if (!stepsById[depId]) {
+        console.warn(`Warning: Dependency ${depId} referenced but not defined in plan`);
+        continue;
+      }
+      if (!visit(depId)) return false;
+    }
+
+    // Remove from recursion stack and mark as visited
+    recursionStack.delete(stepId);
+    visited.add(stepId);
+
+    // Add to sorted result
+    sorted.push(step);
+    return true;
+  };
+
+  // Process all steps
+  for (const step of steps) {
+    if (!visited.has(step.stepId)) {
+      visit(step.stepId);
+    }
+  }
+
+  // If we found a cycle, include any remaining unvisited nodes
+  if (sorted.length < steps.length) {
+    const remainingSteps = steps.filter(step => !visited.has(step.stepId));
+    console.warn(`Some steps couldn't be properly sorted due to circular dependencies. Adding ${remainingSteps.length} remaining steps.`);
+    sorted.push(...remainingSteps);
+  }
+
+  return sorted;
 };
 
 // Helper function to process a dynamic fanout step
