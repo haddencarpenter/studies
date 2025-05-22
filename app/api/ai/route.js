@@ -627,7 +627,7 @@ const tools = {
         console.log('getCoinByContract - Result:', result);
 
         if (result.error) {
-          throw(error)
+          throw(result.error)
         }
 
         return result;
@@ -673,7 +673,7 @@ const tools = {
         console.log('getCoinBySymbol - Result:', result);
 
         if (result.error) {
-          throw(error)
+          throw(result.error)
         }
 
         return result;
@@ -719,7 +719,7 @@ const tools = {
         console.log('getCoinByName - Result:', result);
 
         if (result.error) {
-          throw(error)
+          throw(result.error)
         }
 
         return result;
@@ -1015,7 +1015,7 @@ const tools = {
         console.log('getCoinById - Result:', result);
 
         if (result.error) {
-          throw(error)
+          throw(result.error)
         }
 
         return result;
