@@ -1646,7 +1646,8 @@ const processRegularStep = async (step, stepResults) => {
 
 export async function POST(req) {
   const { messages, walletAddress, data } = await req.json();
-  console.log('Received POST request with messages:', JSON.stringify(messages, null, 2));
+  const userMessages = messages.filter(message => message.role === 'user');
+  console.log('Received POST request with user messages:', JSON.stringify(userMessages, null, 2));
   console.log('Request data:', data);
 
   // Get the user message (last message in the array)
