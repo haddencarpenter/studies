@@ -1239,11 +1239,16 @@ const tools = {
   })
 };
 
-// Function to fetch AI configuration from the API server
-const getAiConfiguration = async () => {
+// Function to fetch AI configuration and cached classifier query from the API server
+const getAiConfiguration = async (sessionId = null) => {
+  let configData;
+
   try {
     console.log('Fetching AI configuration from API server...');
     const url = new URL('/api/toady/config', process.env.AI_SERVER_URL);
+    if (sessionId) {
+      url.searchParams.append('sessionId', sessionId);
+    }
     url.searchParams.append('playground', 'true');
 
     const response = await fetchWithTimeout(url.toString(), {
@@ -1260,28 +1265,64 @@ const getAiConfiguration = async () => {
 
     const data = await response.json();
 
-    // Log the fetched configuration
-    console.log('Fetched AI Configuration from API server:', {
-      serverProvider: data.serverProvider,
-      systemPromptLength: data.systemPromptContent?.length || 0,
-      classificationPromptLength: data.classificationPromptContent?.length || 0,
-    });
-
-    return {
+    configData = {
       systemPromptContent: data.systemPromptContent,
       classificationPromptContent: data.classificationPromptContent,
       serverProvider: data.serverProvider,
       modelId: data.anthropicModelId,
       vertexModelId: data.vertexModelId,
       openRouterModelId: data.openRouterModelId,
-      openAiModelId: data.openAiModelId
+      openAiModelId: data.openAiModelId,
+      sessionHistory: data.sessionHistory
     };
+
+    // Log the fetched configuration
+    console.log('Fetched AI Configuration:', {
+      serverProvider: data.serverProvider,
+      systemPromptLength: data.systemPromptContent?.length || 0,
+      classificationPromptLength: data.classificationPromptContent?.length || 0,
+      sessionHistoryCount: Array.isArray(data.sessionHistory) ? data.sessionHistory.length : 0
+    });
   } catch (error) {
     console.error('API server configuration fetch error:', {
       message: error.message,
       stack: error.stack
     });
     throw new Error(`Failed to fetch AI configuration from API server: ${error.message}`);
+  }
+
+  return configData;
+};
+
+// Function to save session data for debugging and analysis
+const saveSessionData = async (sessionId, walletAddress, userMessage, classifierQueryResult, finalPromptResult) => {
+  if (!sessionId || !userMessage) {
+    return;
+  }
+
+  try {
+    console.log('Saving session data for session:', sessionId);
+    const url = new URL('/api/sessions/tools', process.env.AI_SERVER_URL);
+
+    await fetchWithTimeout(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        message: userMessage,
+        classifierQueryResult,
+        finalPromptResult: finalPromptResult,
+        sessionId: sessionId,
+        walletAddress: walletAddress || 'anonymous'
+      })
+    });
+
+    console.log('Successfully saved session data');
+  } catch (error) {
+    console.error('Failed to save session data:', error);
+    // Don't throw - this is not critical
   }
 };
 
@@ -1318,9 +1359,10 @@ const queryPlanSchema = z.object({
 });
 
 // Function to classify the query using GPT-4.1 Mini
-const classifyQuery = async (query, classificationPromptContent) => {
+const classifyQuery = async (query, classificationPromptContent, sessionHistory = []) => {
   try {
     console.log('Classifying query using GPT-4.1 Mini:', query);
+    console.log('Session history available:', Array.isArray(sessionHistory) ? sessionHistory.length : 0);
 
     // Fetch available categories to provide to the classifier
     let availableCategories;
@@ -1358,13 +1400,51 @@ const classifyQuery = async (query, classificationPromptContent) => {
     }
     const toolDefinitionsJson = JSON.stringify(serializableTools, null, 2);
 
-        // Use the API-provided classification prompt content
+    // Prepare session history info for the classifier
+    let sessionHistoryInfo = '';
+    if (Array.isArray(sessionHistory) && sessionHistory.length > 0) {
+      sessionHistoryInfo = '\n\nSESSION HISTORY:\n';
+      sessionHistory.forEach((record, index) => {
+        sessionHistoryInfo += `\n--- Previous Interaction ${index + 1} ---\n`;
+        sessionHistoryInfo += `User Message: ${record.message}\n`;
+
+        if (Array.isArray(record.classifierQueryResult) && record.classifierQueryResult.length > 0) {
+          sessionHistoryInfo += `Execution Steps Performed:\n`;
+          record.classifierQueryResult.forEach((step, stepIndex) => {
+            sessionHistoryInfo += `  Step ${stepIndex + 1}: ${step.description || step.stepId}\n`;
+            step.tools.forEach((tool, toolIndex) => {
+              sessionHistoryInfo += `    Tool ${toolIndex + 1}: ${tool.toolName}`;
+              if (tool.parameters) {
+                sessionHistoryInfo += ` with params: ${JSON.stringify(tool.parameters)}\n`;
+              } else {
+                sessionHistoryInfo += `\n`;
+              }
+              if (tool.error) {
+                sessionHistoryInfo += `      Result: Error - ${tool.error}\n`;
+              } else if (tool.result) {
+                sessionHistoryInfo += `      Result: ${JSON.stringify(tool.result)}\n`;
+              }
+            });
+          });
+        }
+
+        if (record.finalPromptResult) {
+          sessionHistoryInfo += `Final Prompt: ${record.finalPromptResult.substring(0, 200)}${record.finalPromptResult.length > 200 ? '...' : ''}\n`;
+        }
+
+        sessionHistoryInfo += '\n';
+      });
+      sessionHistoryInfo += 'Consider the session history when creating your query plan. Look for patterns, similar queries, or opportunities to build upon previous interactions.\n';
+    }
+
+    // Use the API-provided classification prompt content
     const classifierSystemPrompt = classificationPromptContent
       .replace('${query}', query)
       .replace('${categoriesStringForPrompt}', categoriesStringForPrompt)
-      .replace('${toolDefinitionsJson}', toolDefinitionsJson);
+      .replace('${toolDefinitionsJson}', toolDefinitionsJson)
+      + sessionHistoryInfo; // Append session history info
 
-    console.log('Using classification prompt from API server');
+    console.log('Using classification prompt from API server with session history');
 
     console.log('Classifier System Prompt:\n');
     console.dir(classifierSystemPrompt, { depth: null });
@@ -1665,6 +1745,10 @@ export async function POST(req) {
     });
   }
 
+  // Extract session ID from request data
+  const sessionId = data?.sessionId;
+  console.log('Session ID:', sessionId);
+
   // Track the AI prompt in Mixpanel
   // if (userMessage) {
   //   trackMixpanelEvent('AI Prompt', {
@@ -1676,9 +1760,9 @@ export async function POST(req) {
   // }
 
   try {
-    // First, get all the AI configuration we'll need throughout the process
-    console.log('Getting AI configuration from API server...');
-    const aiConfig = await getAiConfiguration();
+    // First, get all the AI configuration and session history
+    console.log('Getting AI configuration and session history from API server...');
+    const aiConfig = await getAiConfiguration(sessionId);
     const {
       systemPromptContent,
       classificationPromptContent,
@@ -1686,19 +1770,24 @@ export async function POST(req) {
       modelId: anthropicModelIdFromStrapi,
       vertexModelId,
       openRouterModelId,
-      openAiModelId
+      openAiModelId,
+      sessionHistory
     } = aiConfig;
 
     // STEP 1: Classify query and create a data retrieval plan using GPT-4.1 Mini
     console.log('Step 1: Classifying query...');
-    const queryPlan = await classifyQuery(userMessage.content, classificationPromptContent);
+    const queryPlan = await classifyQuery(userMessage.content, classificationPromptContent, sessionHistory);
     console.log('Query plan generated:', queryPlan);
 
     // STEP 2: Execute the tools specified in the plan to retrieve data
     console.log('Step 2: Executing tools based on the plan...');
-    const executionResults = await executeToolsFromPlan(queryPlan);
+    const newExecutionResults = await executeToolsFromPlan(queryPlan);
     console.log('Plan execution completed with results from steps:',
-      executionResults.map(step => step.stepId));
+      newExecutionResults.map(step => step.stepId));
+
+    // Use the new execution results for context generation
+    const allExecutionResults = newExecutionResults;
+    console.log('Total execution results available:', allExecutionResults.length);
 
     // Log the specific model IDs after fetching
     console.log('Server Provider:', serverProvider);
@@ -1716,8 +1805,8 @@ export async function POST(req) {
       contextInformation += `Current relevant coin ID for context: ${data.coinId}\n`;
     }
 
-    // Add each step's results to the context
-    for (const step of executionResults) {
+    // Add each step's results to the context (using all execution results)
+    for (const step of allExecutionResults) {
       contextInformation += `## Step: ${step.description} (${step.stepId}) ##\n`;
 
       // Add each tool result from this step
@@ -1743,6 +1832,13 @@ export async function POST(req) {
     console.log('Final system prompt');
     console.dir(finalSystemPrompt, { depth: null });
     console.log('Starting AI stream with pre-retrieved data...');
+
+    // Save session data for debugging and analysis (async, don't wait)
+    if (sessionId) {
+      saveSessionData(sessionId, walletAddress, userMessage.content, newExecutionResults, finalSystemPrompt).catch(error => {
+        console.error('Failed to save session data (non-blocking):', error);
+      });
+    }
 
     // Create a collection to store all steps for debugging
     const allSteps = [];
@@ -1819,6 +1915,7 @@ export async function POST(req) {
             walletAddress,
             userMessage: userMessage?.content,
             messageCount: messages.length,
+            sessionId,
             timestamp: new Date().toISOString()
           }).catch(reportError => {
             console.error('Failed to report stream finish error:', reportError);
@@ -1845,6 +1942,7 @@ export async function POST(req) {
           walletAddress,
           userMessage: userMessage?.content,
           messageCount: messages.length,
+          sessionId,
           timestamp: new Date().toISOString()
         }).catch(reportError => {
           console.error('Failed to report stream error:', reportError);
@@ -1868,6 +1966,7 @@ export async function POST(req) {
           walletAddress,
           userMessage: userMessage?.content,
           messageCount: messages.length,
+          sessionId,
           timestamp: new Date().toISOString()
         }).catch(reportError => {
           console.error('Failed to report stream response error:', reportError);
@@ -1894,6 +1993,7 @@ export async function POST(req) {
       walletAddress,
       userMessage: userMessage?.content,
       messageCount: messages.length,
+      sessionId,
       url: req.url,
       timestamp: new Date().toISOString()
     });

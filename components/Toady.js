@@ -12,12 +12,18 @@ import toadyStyles from '../styles/toady.module.less'
 import NoKeyPass from './gating/NoKeyPass'
 import NotConnected from './gating/NotConnected'
 
+// Helper function to generate session ID
+const generateSessionId = () => {
+  return `session_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+};
 
 const Toady = ({ isActive, initialSuggestions }) => {
   const hasKeyPass = useKeyPass()
   const walletAddress = useAccount()
   const [coinTag, setCoinTag] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
+  const [sessionId, setSessionId] = useState(() => generateSessionId());
+
   const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
     body: {
@@ -103,6 +109,8 @@ const Toady = ({ isActive, initialSuggestions }) => {
   const clearChat = useCallback(() => {
     setMessages([])
     setInput('')
+    const newSessionId = generateSessionId();
+    setSessionId(newSessionId);
   }, [setMessages, setInput])
 
   const askAi = useCallback((e) => {
@@ -116,10 +124,11 @@ const Toady = ({ isActive, initialSuggestions }) => {
     handleSubmit(e, {
       data: {
         browserDateTimeWithTimezone,
+        sessionId,
         ...(coinTag && coinId ? { coinId } : {}) // Only include coinId if coinTag is set
       }
     });
-  }, [handleSubmit, input, coinTag]);
+  }, [handleSubmit, input, coinTag, sessionId]);
 
   // Handle removing the coin tag
   const handleRemoveCoinTag = useCallback(() => {
