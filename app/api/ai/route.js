@@ -7,12 +7,15 @@ import Exa from "exa-js"
 import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
 import { z } from 'zod';
 import { Converter } from '@memochou1993/json2markdown';
+import { Langfuse } from "langfuse";
 
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
 
 export const runtime = 'edge';
 export const preferredRegion = ['sfo1', 'fra1', 'sin1'];
+
+const langfuse = new Langfuse();
 
 // Helper function to add timeout to fetch requests
 const fetchWithTimeout = async (url, options = {}, timeoutMs = 60000) => {
@@ -1239,35 +1242,40 @@ const tools = {
   })
 };
 
-// Function to fetch AI configuration and cached classifier query from the API server
-const getAiConfiguration = async (sessionId = null) => {
-  let configData;
-
+// Function to fetch AI configuration and Langfuse prompts in parallel
+const getAiConfigurationAndPrompts = async (sessionId = null) => {
   try {
-    console.log('Fetching AI configuration from API server...');
+    console.log('Fetching AI configuration from API server and prompts from Langfuse in parallel...');
+
+    // Create the API URL
     const url = new URL('/api/toady/config', process.env.AI_SERVER_URL);
     if (sessionId) {
       url.searchParams.append('sessionId', sessionId);
     }
     url.searchParams.append('playground', 'true');
 
-    const response = await fetchWithTimeout(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
+    // Fetch API configuration, system prompt, and classifier prompt in parallel
+    const [apiResponse, langfuseSystemPrompt, langfuseClassifierPrompt] = await Promise.all([
+      fetchWithTimeout(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      }),
+      langfuse.getPrompt("System prompt", undefined, { label: "playground" }),
+      langfuse.getPrompt("Classification Prompt", undefined, { label: "playground" })
+    ]);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API server returned ${response.status}: ${errorText}`);
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
+      throw new Error(`API server returned ${apiResponse.status}: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await apiResponse.json();
 
-    configData = {
-      systemPromptContent: data.systemPromptContent,
-      classificationPromptContent: data.classificationPromptContent,
+    const configData = {
+      systemPromptContent: langfuseSystemPrompt.prompt, // Use Langfuse system prompt
+      classificationPromptContent: langfuseClassifierPrompt.prompt, // Use Langfuse classifier prompt
       serverProvider: data.serverProvider,
       modelId: data.anthropicModelId,
       vertexModelId: data.vertexModelId,
@@ -1277,21 +1285,23 @@ const getAiConfiguration = async (sessionId = null) => {
     };
 
     // Log the fetched configuration
-    console.log('Fetched AI Configuration:', {
+    console.log('Fetched AI Configuration and Langfuse Prompts:', {
       serverProvider: data.serverProvider,
-      systemPromptLength: data.systemPromptContent?.length || 0,
-      classificationPromptLength: data.classificationPromptContent?.length || 0,
-      sessionHistoryCount: Array.isArray(data.sessionHistory) ? data.sessionHistory.length : 0
+      systemPromptLength: langfuseSystemPrompt.prompt?.length || 0,
+      classificationPromptLength: langfuseClassifierPrompt.prompt?.length || 0,
+      sessionHistoryCount: Array.isArray(data.sessionHistory) ? data.sessionHistory.length : 0,
+      langfuseSystemPromptVersion: langfuseSystemPrompt.version || 'unknown',
+      langfuseClassifierPromptVersion: langfuseClassifierPrompt.version || 'unknown'
     });
+
+    return configData;
   } catch (error) {
-    console.error('API server configuration fetch error:', {
+    console.error('Error fetching AI configuration or Langfuse prompts:', {
       message: error.message,
       stack: error.stack
     });
-    throw new Error(`Failed to fetch AI configuration from API server: ${error.message}`);
+    throw new Error(`Failed to fetch AI configuration or Langfuse prompts: ${error.message}`);
   }
-
-  return configData;
 };
 
 // Function to save session data for debugging and analysis
@@ -1359,7 +1369,7 @@ const queryPlanSchema = z.object({
 });
 
 // Function to classify the query using GPT-4.1 Mini
-const classifyQuery = async (query, classificationPromptContent, sessionHistory = []) => {
+const classifyQuery = async (query, sessionId, classificationPromptContent, sessionHistory = []) => {
   try {
     console.log('Classifying query using GPT-4.1 Mini:', query);
     console.log('Session history available:', Array.isArray(sessionHistory) ? sessionHistory.length : 0);
@@ -1453,7 +1463,13 @@ const classifyQuery = async (query, classificationPromptContent, sessionHistory 
     const { object } = await generateObject({
       model: openrouter('openai/gpt-4.1-mini'),
       schema: queryPlanSchema,
-      prompt: classifierSystemPrompt
+      prompt: classifierSystemPrompt,
+      experimental_telemetry: {
+        isEnabled: true,
+        metadata: {
+          sessionId
+        }
+      },
     });
 
     return object;
@@ -1761,8 +1777,8 @@ export async function POST(req) {
 
   try {
     // First, get all the AI configuration and session history
-    console.log('Getting AI configuration and session history from API server...');
-    const aiConfig = await getAiConfiguration(sessionId);
+    console.log('Getting AI configuration from API server and prompts from Langfuse...');
+    const aiConfig = await getAiConfigurationAndPrompts(sessionId);
     const {
       systemPromptContent,
       classificationPromptContent,
@@ -1776,7 +1792,7 @@ export async function POST(req) {
 
     // STEP 1: Classify query and create a data retrieval plan using GPT-4.1 Mini
     console.log('Step 1: Classifying query...');
-    const queryPlan = await classifyQuery(userMessage.content, classificationPromptContent, sessionHistory);
+    const queryPlan = await classifyQuery(userMessage.content, sessionId, classificationPromptContent, sessionHistory);
     console.log('Query plan generated:', queryPlan);
 
     // STEP 2: Execute the tools specified in the plan to retrieve data
@@ -1892,7 +1908,8 @@ export async function POST(req) {
       experimental_telemetry: {
         isEnabled: true,
         metadata: {
-          userId: walletAddress
+          userId: walletAddress,
+          sessionId
         }
       },
       maxSteps: 10, // Reduced since we shouldn't need many steps with pre-retrieved data
