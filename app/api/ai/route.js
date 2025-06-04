@@ -2,22 +2,50 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { vertex } from '@ai-sdk/google-vertex/edge';
 import { openrouter } from '@openrouter/ai-sdk-provider';
 import { openai } from '@ai-sdk/openai';
-import { streamText, tool, jsonSchema } from 'ai';
-import { Converter } from '@memochou1993/json2markdown';
+import { streamText, tool, jsonSchema, generateObject } from 'ai';
 import Exa from "exa-js"
 import { SUPPORTED_INTERVALS } from 'coinrotator-utils/variables.mjs'
 import { z } from 'zod';
-import * as Sentry from "@sentry/nextjs";
-
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-})
+import { Converter } from '@memochou1993/json2markdown';
+import { Langfuse } from "langfuse";
 
 // Hardcoded because of ENV newline issue
 process.env.GOOGLE_PRIVATE_KEY = `-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQC7reXGCX4qCHvG\n6Z9RDOvOE/ip5wHCCa/eRTNvtwtQ9hdJDzP4nD3qMo4Ybgq/4NQBAXwo9DVX9zSk\nLl3Kme5XZvXEh26Xhz657nDiqT6JVJ4oPemNQrWuk7oZ4xbs2gM0ygx+jh3hQLW0\ni1dz1aS+vrF+LvNbdStnde/5TRSZV16dc8Imla34j/DpIn5osb+I/7hYJF314S4B\nZbwN5Dt5vzW0fBEhF4L9atntPNFQlPlvSYyv2RY7Gr0M5TTca3U0d/intZ1GiJps\nDewjxaoSjcQ3gAmBlMfPdKr7CHQu/buOdGohrs/uUhEFxBCcFA71EtuFJiQf+v/I\n3XgLjNgNAgMBAAECgf9CxjG6WXufTjq7yuNO3bSy3ZLbixVVCZ1JDStVKWByrcbF\nzQ2bUVELbRv2v9rolKrZW23mzvyBD7NAYZQn7Byg0ZZ1Fg/YWduMy7PeRoO5g3cX\nWkUpEqhm31NCDUoFezZ+Jw/K90V/n0ZcYOH8lJweQZAPv89V+u+LyqpW84B2DcMq\nxttBmYiaqaWd8/ZZN/kxcdM5gWOWOgJPBo5zhSSkU3/+hJ+vNSGPPpCW3tFsIi8E\ngHf8DS5i5gtxllLt8Ypt4DgFtjrfHNl3A5wf5CxBa5/WupI6ZhdLvRvM+FfpNAss\ngILf+rmN2PXMVB77CDE4g/BEmHFJE+yvvlatRgECgYEA8T2e1aNDMnw+TnODN93x\nREGnZlLBfaqKogGVQ6dUtjTeDPEoaP/Zt7LQoIebj42r0T8dOkQxbXPeWH6fuTSW\n5zvkNKAtxWTTAQL94TV1OtD2TxPxV14JaSQWW9QwGhe98r8TueWHyGkqU38+v5FO\naK9WnUCuuz1XjAqm9fETjgECgYEAxyliF0gwLK8PlQaObFcvEH02EsZjulNx6koy\nwJrPblQwoPP+Tdr7U47gI9kMFhOeJLf3bWTOTsd643n9/z02Tp8bMinr2Q17XEuz\nUQpqxJEynO4ZmxKH5YAMXgfxAiAEp6mKU9SnkZ1PhG91Yfk+fQrU21V3/T7c8qYV\npbGyog0CgYEAgMLHGHh/0V6HUxBMpXEM6cWxN+hL5ms0e6wko2uYx3gIXRgK3aBR\n8L68pDI9Ua3oW1M4onTrfOQvdUSAtDXhpaJN99jXFVjvVsbmA2KpI6+NCEA4vM0w\ncLIWTQVAd2zcschTGxHsG4gmU1LDhzRjiXSs4lo36TCgndrBqtv1+AECgYAsewyi\nYIgJ4stbIEy827fyOdTS2qY5XhuqFQpCxBCh9oGp4PSiFM9e+SEMQJSXdagzUTcc\nopAFPj4vAfb9g4FWi+h6CqzXHFC561pQNkBkSH2CWRc08C2Tz0Zz1dg4/ker3oy7\nblpChlzVGkOgLxeKu9mQZwVWdSzJsNhS2l4oHQKBgD4DjX/9alefFH4nGJ+lGl8s\n4i8Gw9lhMuhHpl1y1dCu5oPO5luVUTtcLnlsjOfd6YVAvb2Un7XN9Cl+fYgiBgW0\nJh95SMU8ryhQaa3109KqQAlI2eu6z3ubq93/BaKy5oRS18AJ+fKfhgUGKX1YOydu\nEz33m6tbTHD/abdmZPNE\n-----END PRIVATE KEY-----\n`;
 
 export const runtime = 'edge';
 export const preferredRegion = ['sfo1', 'fra1', 'sin1'];
+
+const langfuse = new Langfuse();
+
+// Helper function to add timeout to fetch requests
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 60000) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error(`Request timeout after ${timeoutMs}ms`);
+    }
+    throw error;
+  }
+};
+
+// Helper function to add timeout to any promise (for external API calls)
+const withTimeout = async (promise, timeoutMs = 60000) => {
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(`Operation timeout after ${timeoutMs}ms`)), timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]);
+};
 
 // Function to track events in Mixpanel using fetch (Edge runtime compatible)
 const trackMixpanelEvent = async (event, properties) => {
@@ -35,7 +63,7 @@ const trackMixpanelEvent = async (event, properties) => {
     const encodedData = Buffer.from(JSON.stringify(data)).toString('base64');
 
     // Send the event to Mixpanel
-    const response = await fetch('https://api.mixpanel.com/track', {
+    const response = await fetchWithTimeout('https://api.mixpanel.com/track', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -51,6 +79,54 @@ const trackMixpanelEvent = async (event, properties) => {
     }
   } catch (error) {
     console.error('Error tracking event in Mixpanel:', error);
+  }
+};
+
+// Function to report errors to the API server for Bugsnag tracking
+const reportErrorToServer = async (error, context = {}) => {
+  try {
+    console.log('Reporting error to API server:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+
+    const errorData = {
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause ? {
+          name: error.cause.name,
+          message: error.cause.message,
+          stack: error.cause.stack
+        } : undefined
+      },
+      context,
+      timestamp: new Date().toISOString()
+    };
+
+    // Use the same base URL as other API calls
+    const url = new URL('/api/errors/report', process.env.AI_SERVER_URL);
+
+    const response = await fetchWithTimeout(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(errorData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error reporting API returned ${response.status}: ${errorText}`);
+    } else {
+      console.log('Error successfully reported to API server');
+    }
+  } catch (reportingError) {
+    // Don't throw here, just log - we don't want error reporting to cause more errors
+    console.error('Failed to report error to API server:', reportingError);
   }
 };
 
@@ -73,7 +149,7 @@ const callSocketServer = async (endpoint, params = {}) => {
   });
 
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetchWithTimeout(url.toString(), {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
@@ -145,23 +221,38 @@ const callSocketServer = async (endpoint, params = {}) => {
   }
 };
 
-// Function to convert JSON data to markdown
-const jsonToMarkdown = (data) => {
-  try {
-    if (!data) return "No data available";
-
-    // If it's an error object, return it as a simple error message
-    if (data.error) return `**Error:** ${data.error}`;
-
-    // Convert to markdown using json2md
-    return Converter.toMarkdown(data);
-  } catch (error) {
-    console.error('Error converting JSON to markdown:', error);
-    return "Error formatting data";
-  }
-};
-
+// Define tools first
 const tools = {
+  getCurrentMarketVibe: tool({
+    description: "Get the current market vibe. Returns the latest summary message.",
+    parameters: jsonSchema({
+      type: 'object',
+      properties: {},
+      required: []
+    }),
+    execute: async () => {
+      console.log('Tool executed: getCurrentMarketVibe');
+      const url = new URL('/api/alpha/messages', process.env.AI_SERVER_URL);
+      url.searchParams.append('channelName', 'summary');
+      url.searchParams.append('limit', '1');
+      const response = await fetchWithTimeout(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`AI server returned ${response.status}: ${errorText}`);
+      }
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0 && data[0].message) {
+        return data[0].message;
+      } else {
+        return 'No market vibe message available.';
+      }
+    }
+  }),
   exaSearch: tool({
     description: "Use this to search the web for information using the Exa API. Useful for finding current information or researching topics that aren't covered by the system's knowledge.",
     parameters: jsonSchema({
@@ -207,57 +298,45 @@ const tools = {
       required: ['query']
     }),
     execute: async ({ query, useAutoprompt = false, numResults = 5, startPublishedDate, endPublishedDate, includeDomains, excludeDomains }) => {
-      try {
-        console.log('Tool executed: exaSearch', {
-          query,
-          useAutoprompt,
-          numResults,
-          startPublishedDate,
-          endPublishedDate,
-          includeDomains,
-          excludeDomains
-        });
+      console.log('Tool executed: exaSearch', {
+        query,
+        useAutoprompt,
+        numResults,
+        startPublishedDate,
+        endPublishedDate,
+        includeDomains,
+        excludeDomains
+      });
 
-        // Initialize the Exa client with API key from environment
-        const exa = new Exa(process.env.EXA_API_KEY);
+      // Initialize the Exa client with API key from environment
+      const exa = new Exa(process.env.EXA_API_KEY);
 
-        // Build search options
-        const searchOptions = {
-          numResults,
-          useAutoprompt
-        };
+      // Build search options
+      const searchOptions = {
+        numResults,
+        useAutoprompt
+      };
 
-        // Add optional parameters if provided
-        if (startPublishedDate) searchOptions.startPublishedDate = startPublishedDate;
-        if (endPublishedDate) searchOptions.endPublishedDate = endPublishedDate;
-        if (includeDomains && includeDomains.length > 0) searchOptions.includeDomains = includeDomains;
-        if (excludeDomains && excludeDomains.length > 0) searchOptions.excludeDomains = excludeDomains;
+      // Add optional parameters if provided
+      if (startPublishedDate) searchOptions.startPublishedDate = startPublishedDate;
+      if (endPublishedDate) searchOptions.endPublishedDate = endPublishedDate;
+      if (includeDomains && includeDomains.length > 0) searchOptions.includeDomains = includeDomains;
+      if (excludeDomains && excludeDomains.length > 0) searchOptions.excludeDomains = excludeDomains;
 
-        // Execute the search
-        const searchResult = await exa.search(query, searchOptions);
-        console.log('exaSearch - Result count:', searchResult.results?.length || 0);
+      // Execute the search
+      const searchResult = await withTimeout(exa.search(query, searchOptions));
+      console.log('exaSearch - Result count:', searchResult.results?.length || 0);
 
-        // Format the results for display
-        const formattedResults = searchResult.results?.map(result => ({
-          title: result.title,
-          url: result.url,
-          publishedDate: result.publishedDate,
-          score: result.score,
-          snippet: result.text || result.extract
-        })) || [];
+      // Format the results for display
+      const formattedResults = searchResult.results?.map(result => ({
+        title: result.title,
+        url: result.url,
+        publishedDate: result.publishedDate,
+        score: result.score,
+        snippet: result.text || result.extract
+      })) || [];
 
-        return jsonToMarkdown({
-          query,
-          results: formattedResults
-        });
-      } catch (error) {
-        console.error('exaSearch Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { query, useAutoprompt, numResults }
-        });
-        return jsonToMarkdown({ error: "Failed to perform web search" });
-      }
+      return { query, results: formattedResults };
     }
   }),
 
@@ -306,8 +385,7 @@ const tools = {
       required: ['query']
     }),
     execute: async ({ query, useAutoprompt = false, numResults = 3, includeDomains, retrieveText = true, retrieveHighlights = false, maxCharacters = 5000 }) => {
-      try {
-        console.log('Tool executed: exaSearchWithContents', {
+      console.log('Tool executed: exaSearchWithContents', {
           query,
           useAutoprompt,
           numResults,
@@ -345,10 +423,10 @@ const tools = {
         }
 
         // Execute the search and retrieve contents
-        const result = await exa.searchAndContents(query, {
+        const result = await withTimeout(exa.searchAndContents(query, {
           ...searchOptions,
           ...contentsOptions
-        });
+        }));
 
         console.log('exaSearchWithContents - Result count:', result.results?.length || 0);
 
@@ -377,18 +455,7 @@ const tools = {
           return formattedResult;
         }) || [];
 
-        return jsonToMarkdown({
-          query,
-          results: formattedResults
-        });
-      } catch (error) {
-        console.error('exaSearchWithContents Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { query, useAutoprompt, numResults, retrieveText, retrieveHighlights }
-        });
-        return jsonToMarkdown({ error: "Failed to perform web search with contents" });
-      }
+        return { query, results: formattedResults };
     }
   }),
 
@@ -416,50 +483,41 @@ const tools = {
       required: ['question']
     }),
     execute: async ({ question, model = 'exa', retrieveText = false }) => {
-      try {
-        console.log('Tool executed: exaAnswer', {
-          question,
-          model,
-          retrieveText
-        });
+      console.log('Tool executed: exaAnswer', {
+        question,
+        model,
+        retrieveText
+      });
 
-        // Initialize the Exa client with API key from environment
-        const exa = new Exa(process.env.EXA_API_KEY);
+      // Initialize the Exa client with API key from environment
+      const exa = new Exa(process.env.EXA_API_KEY);
 
-        // Set options
-        const options = {
-          model,
-          text: retrieveText
-        };
+      // Set options
+      const options = {
+        model,
+        text: retrieveText
+      };
 
-        // Generate answer
-        const answerResult = await exa.answer(question, options);
-        console.log('exaAnswer - Generated answer with citations');
+      // Generate answer
+      const answerResult = await withTimeout(exa.answer(question, options));
+      console.log('exaAnswer - Generated answer with citations');
 
-        // Format the result
-        const formattedResult = {
-          question,
-          answer: answerResult.answer
-        };
+      // Format the result
+      const formattedResult = {
+        question,
+        answer: answerResult.answer
+      };
 
-        // Include citations if available
-        if (answerResult.citations && answerResult.citations.length > 0) {
-          formattedResult.citations = answerResult.citations.map(citation => ({
-            title: citation.title,
-            url: citation.url,
-            text: citation.text
-          }));
-        }
-
-        return jsonToMarkdown(formattedResult);
-      } catch (error) {
-        console.error('exaAnswer Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { question, model, retrieveText }
-        });
-        return jsonToMarkdown({ error: "Failed to generate answer from Exa" });
+      // Include citations if available
+      if (answerResult.citations && answerResult.citations.length > 0) {
+        formattedResult.citations = answerResult.citations.map(citation => ({
+          title: citation.title,
+          url: citation.url,
+          text: citation.text
+        }));
       }
+
+      return formattedResult;
     }
   }),
 
@@ -491,8 +549,7 @@ const tools = {
       required: ['url']
     }),
     execute: async ({ url, numResults = 5, excludeSourceDomain = true, retrieveText = false }) => {
-      try {
-        console.log('Tool executed: exaFindSimilar', {
+      console.log('Tool executed: exaFindSimilar', {
           url,
           numResults,
           excludeSourceDomain,
@@ -511,12 +568,12 @@ const tools = {
         let result;
         // Decide whether to get contents along with similar URLs
         if (retrieveText) {
-          result = await exa.findSimilarAndContents(url, {
+          result = await withTimeout(exa.findSimilarAndContents(url, {
             ...options,
             text: true
-          });
+          }));
         } else {
-          result = await exa.findSimilar(url, options);
+          result = await withTimeout(exa.findSimilar(url, options));
         }
 
         console.log('exaFindSimilar - Result count:', result.results?.length || 0);
@@ -539,23 +596,12 @@ const tools = {
           return formattedResult;
         }) || [];
 
-        return jsonToMarkdown({
-          sourceUrl: url,
-          similarResults: formattedResults
-        });
-      } catch (error) {
-        console.error('exaFindSimilar Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { url, numResults, excludeSourceDomain, retrieveText }
-        });
-        return jsonToMarkdown({ error: "Failed to find similar content" });
-      }
+        return { sourceUrl: url, similarResults: formattedResults };
     }
   }),
 
   getCoinByContract: tool({
-    description: "Use this when a user asks about a specific blockchain contract address. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user asks about a specific blockchain contract address. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -581,37 +627,28 @@ const tools = {
       required: ['contractAddress', 'chain']
     }),
     execute: async ({ contractAddress, chain, interval = "1d", trendLimit = 5 }) => {
-      try {
-        console.log('Tool executed: getCoinByContract', { contractAddress, chain, interval, trendLimit });
+      console.log('Tool executed: getCoinByContract', { contractAddress, chain, interval, trendLimit });
 
-        // Call the socket server API endpoint for contract lookup
-        const result = await callSocketServer('/api/coin/contract', {
-          contractAddress,
-          chain,
-          interval,
-          trendLimit
-        });
+      // Call the socket server API endpoint for contract lookup
+      const result = await callSocketServer('/api/coin/contract', {
+        contractAddress,
+        chain,
+        interval,
+        trendLimit
+      });
 
-        console.log('getCoinByContract - Result:', result);
+      console.log('getCoinByContract - Result:', result);
 
-        if (result.error) {
-          return jsonToMarkdown({ error: result.error });
-        }
-
-        return jsonToMarkdown(result);
-      } catch (error) {
-        console.error('getCoinByContract Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { contractAddress, chain, interval, trendLimit }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch coin data" });
+      if (result.error) {
+        throw(result.error)
       }
+
+      return result;
     }
   }),
 
   getCoinBySymbol: tool({
-    description: "Use this when a user mentions a crypto symbol/ticker. Example: 'What's the trend for BTC?' or 'Show ETH analysis'. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user mentions a crypto symbol/ticker. Example: 'What's the trend for BTC?' or 'Show ETH analysis'. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -633,36 +670,27 @@ const tools = {
       required: ['symbol']
     }),
     execute: async ({ symbol, interval = "1d", trendLimit = 5 }) => {
-      try {
-        console.log('Tool executed: getCoinBySymbol - Starting', { symbol, interval, trendLimit });
+      console.log('Tool executed: getCoinBySymbol - Starting', { symbol, interval, trendLimit });
 
-        // Call the socket server API endpoint for symbol lookup
-        const result = await callSocketServer('/api/coin/symbol', {
-          symbol,
-          interval,
-          trendLimit
-        });
+      // Call the socket server API endpoint for symbol lookup
+      const result = await callSocketServer('/api/coin/symbol', {
+        symbol,
+        interval,
+        trendLimit
+      });
 
-        console.log('getCoinBySymbol - Result:', result);
+      console.log('getCoinBySymbol - Result:', result);
 
-        if (result.error) {
-          return jsonToMarkdown({ error: result.error });
-        }
-
-        return jsonToMarkdown(result);
-      } catch (error) {
-        console.error('getCoinBySymbol Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { symbol, interval, trendLimit }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch coin data" });
+      if (result.error) {
+        throw(result.error)
       }
+
+      return result;
     }
   }),
 
   getCoinByName: tool({
-    description: "Use this when a user mentions a cryptocurrency's full name. Example: 'Show me Bitcoin trends' or 'What's the analysis for Ethereum?'. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when a user mentions a cryptocurrency's full name. Example: 'Show me Bitcoin trends' or 'What's the analysis for Ethereum?'. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -684,36 +712,27 @@ const tools = {
       required: ['name']
     }),
     execute: async ({ name, interval = "1d", trendLimit = 5 }) => {
-      try {
-        console.log('Tool executed: getCoinByName', { name, interval, trendLimit });
+      console.log('Tool executed: getCoinByName', { name, interval, trendLimit });
 
-        // Call the socket server API endpoint for name lookup
-        const result = await callSocketServer('/api/coin/name', {
-          name,
-          interval,
-          trendLimit
-        });
+      // Call the socket server API endpoint for name lookup
+      const result = await callSocketServer('/api/coin/name', {
+        name,
+        interval,
+        trendLimit
+      });
 
-        console.log('getCoinByName - Result:', result);
+      console.log('getCoinByName - Result:', result);
 
-        if (result.error) {
-          return jsonToMarkdown({ error: result.error });
-        }
-
-        return jsonToMarkdown(result);
-      } catch (error) {
-        console.error('getCoinByName Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { name, interval, trendLimit }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch coin data" });
+      if (result.error) {
+        throw(result.error)
       }
+
+      return result;
     }
   }),
 
   getAllCategories: tool({
-    description: "Use this when a user asks for all categories. Returns a list of all unique cryptocurrency categories across all coins in the database.",
+    description: "Use this when a user asks for all categories. Or before you call getCategoryTrends to cross-reference the list of available categories. Returns a list of all unique cryptocurrency categories across all coins in the database. This means that a user query might contain a category that is not an exact match to the list of available categories, so you need to make sure that you use the correct category name. For example the user asking about the 'RWA' category actually means our 'RWA (Real World Assets)' category from the getAllCategories tool.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -722,24 +741,16 @@ const tools = {
       required: []
     }),
     execute: async () => {
-      try {
-        console.log('Tool executed: getAllCategories');
+      console.log('Tool executed: getAllCategories');
 
-        // Call the socket server API endpoint for categories
-        const result = await callSocketServer('/api/categories');
+      // Call the socket server API endpoint for categories
+      const result = await callSocketServer('/api/categories');
 
-        console.log('getAllCategories - Result:', result);
+      console.log('getAllCategories - Result:', result);
 
-        const categories = Array.isArray(result) ? result : [];
+      const categories = Array.isArray(result) ? result : [];
 
-        return jsonToMarkdown({ categories });
-      } catch (error) {
-        console.error('getAllCategories Error:', {
-          message: error.message,
-          stack: error.stack
-        });
-        return jsonToMarkdown({ error: "Failed to fetch categories" });
-      }
+      return categories;
     }
   }),
 
@@ -774,30 +785,21 @@ const tools = {
       }
     }),
     execute: async ({ interval = "1d", type = "fresh", limit = 10, coinNames }) => {
-      try {
-        console.log('Tool executed: getExtremeTrends', { interval, type, limit, coinNames });
+      console.log('Tool executed: getExtremeTrends', { interval, type, limit, coinNames });
 
-        // Call the socket server API endpoint for extreme trends
-        const result = await callSocketServer('/api/trends/extreme', {
-          interval,
-          type,
-          limit,
-          coinNames
-        });
+      // Call the socket server API endpoint for extreme trends
+      const result = await callSocketServer('/api/trends/extreme', {
+        interval,
+        type,
+        limit,
+        coinNames
+      });
 
-        console.log('getExtremeTrends - Result:', result);
+      console.log('getExtremeTrends - Result:', result);
 
-        const trends = Array.isArray(result) ? result : [];
+      const trends = Array.isArray(result) ? result : [];
 
-        return jsonToMarkdown({ trends });
-      } catch (error) {
-        console.error('getExtremeTrends Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { interval, type, limit, coinNames }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch extreme trends" });
-      }
+      return trends;
     }
   }),
 
@@ -833,30 +835,21 @@ const tools = {
       }
     }),
     execute: async ({ flavor = "CoinRotator", intervals, limit = 10, coinNames }) => {
-      try {
-        console.log('Tool executed: getAlignedTrends', { flavor, intervals, limit, coinNames });
+      console.log('Tool executed: getAlignedTrends', { flavor, intervals, limit, coinNames });
 
-        // Call the socket server API endpoint for aligned trends
-        const result = await callSocketServer('/api/trends/aligned', {
-          flavor,
-          intervals,
-          limit,
-          coinNames
-        });
+      // Call the socket server API endpoint for aligned trends
+      const result = await callSocketServer('/api/trends/aligned', {
+        flavor,
+        intervals,
+        limit,
+        coinNames
+      });
 
-        console.log('getAlignedTrends - Result:', result);
+      console.log('getAlignedTrends - Result:', result);
 
-        const alignedTrends = Array.isArray(result) ? result : [];
+      const alignedTrends = Array.isArray(result) ? result : [];
 
-        return jsonToMarkdown({ alignedTrends });
-      } catch (error) {
-        console.error('getAlignedTrends Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { flavor, intervals, limit, coinNames }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch aligned trends" });
-      }
+      return alignedTrends;
     }
   }),
 
@@ -873,27 +866,21 @@ const tools = {
       required: ['category']
     }),
     execute: async ({ category }) => {
-      try {
-        console.log('Tool executed: getCoinsByCategory', { category });
+      console.log('Tool executed: getCoinsByCategory', { category });
 
-        // Call the socket server API endpoint for coins by category
-        const result = await callSocketServer('/api/coins/category', {
-          category
-        });
+      // Call the socket server API endpoint for coins by category
+      const result = await callSocketServer('/api/coins/category', {
+        category
+      });
 
-        console.log('getCoinsByCategory - Result:', result);
+      console.log('getCoinsByCategory - Result:', result);
 
-        const coins = Array.isArray(result) ? result : [];
+      const coins = Array.isArray(result) ? result : [];
 
-        return jsonToMarkdown({ categoryName: category, coins });
-      } catch (error) {
-        console.error('getCoinsByCategory Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { category }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch coins by category" });
-      }
+      // Extract coin IDs for fanout operations
+      const coinIds = coins.map(coin => coin.id || coin.coinId || coin.symbol);
+
+      return coinIds;
     }
   }),
 
@@ -910,35 +897,26 @@ const tools = {
       }
     }),
     execute: async ({ interval = "1d" }) => {
-      try {
-        console.log('Tool executed: getMarketHealth', { interval });
+      console.log('Tool executed: getMarketHealth', { interval });
 
-        // Call the socket server API endpoint for market health
-        const result = await callSocketServer('/api/market/health', {
-          interval
-        });
+      // Call the socket server API endpoint for market health
+      const result = await callSocketServer('/api/market/health', {
+        interval
+      });
 
-        console.log('getMarketHealth - Result:', result);
+      console.log('getMarketHealth - Result:', result);
 
-        if (result.error) {
-          return jsonToMarkdown({ error: result.error });
-        }
-
-        const data = {
-          date: result.date,
-          trends: result.trends,
-          extremes: result.extremes
-        };
-
-        return jsonToMarkdown(data);
-      } catch (error) {
-        console.error('getMarketHealth Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { interval }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch market health data" });
+      if (result.error) {
+        throw(result.error)
       }
+
+      const data = {
+        date: result.date,
+        trends: result.trends,
+        extremes: result.extremes
+      };
+
+      return data;
     }
   }),
 
@@ -966,7 +944,7 @@ const tools = {
         console.log('getMarketHealthCrossing - Result:', result);
 
         if (result.error) {
-          return jsonToMarkdown({ error: result.error });
+          throw(result.error)
         }
 
         const data = {
@@ -976,20 +954,15 @@ const tools = {
           message: result.message
         };
 
-        return jsonToMarkdown(data);
+        return data;
       } catch (error) {
-        console.error('getMarketHealthCrossing Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { interval }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch market health crossing data" });
+        throw(error)
       }
     }
   }),
 
   getCoinById: tool({
-    description: "Use this when you have a specific coinId to look up. Returns coin metadata, trend history with streaks, and band-based support/resistance zones.",
+    description: "Use this when you have a specific coinId to look up. Returns coin metadata (including futures data as open Interest, futures volume of the last 24 hours and funding rate), trend history with streaks, and band-based support/resistance zones.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -1024,17 +997,12 @@ const tools = {
         console.log('getCoinById - Result:', result);
 
         if (result.error) {
-          return jsonToMarkdown({ error: result.error });
+          throw(result.error)
         }
 
-        return jsonToMarkdown(result);
+        return result;
       } catch (error) {
-        console.error('getCoinById Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { coinId, interval, trendLimit }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch coin data" });
+        throw(error)
       }
     }
   }),
@@ -1064,14 +1032,9 @@ const tools = {
 
         const tweets = Array.isArray(result) ? result : [];
 
-        return jsonToMarkdown({ handle, tweets });
+        return tweets;
       } catch (error) {
-        console.error('getRecentTweets Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { handle }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch tweets" });
+        throw(error)
       }
     }
   }),
@@ -1138,15 +1101,31 @@ const tools = {
           type: 'number',
           description: 'Maximum number of results to return',
           default: 10
+        },
+        sortBy: {
+          type: 'string',
+          enum: ['marketCap'],
+          description: 'Sort results by this field',
+          default: 'marketCap'
+        },
+        sortOrder: {
+          type: 'string',
+          enum: ['asc', 'desc'],
+          description: 'Sort order for results',
+          default: 'desc'
+        },
+        withPerps: {
+          type: 'boolean',
+          description: 'Only include coins that are traded in futures/perpetual markets (perps)'
         }
       }
     }),
     execute: async ({ trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
-                     exchanges, cexOnly, dexOnly, interval = "1d", flavor = "CoinRotator", limit = 10 }) => {
+                     exchanges, cexOnly, dexOnly, interval = "1d", flavor = "CoinRotator", limit = 10, sortBy = 'marketCap', sortOrder = 'desc', withPerps }) => {
       try {
         console.log('Tool executed: getFilteredCoins', {
           trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
-          exchanges, cexOnly, dexOnly, interval, flavor, limit
+          exchanges, cexOnly, dexOnly, interval, flavor, limit, sortBy, sortOrder, withPerps
         });
 
         // Convert boolean parameters to strings for query params
@@ -1166,49 +1145,23 @@ const tools = {
           dexOnly: dexOnlyParam,
           interval,
           flavor,
-          limit
+          limit,
+          sortBy,
+          sortOrder,
+          withPerps
         });
 
         console.log('getFilteredCoins - Result:', coinIds);
 
         // If no coins found, return a helpful message
         if (!Array.isArray(coinIds) || coinIds.length === 0) {
-          return jsonToMarkdown({
-            message: "No coins match the specified criteria",
-            filters: {
-              trend,
-              categories: Array.isArray(categories) ? categories : undefined,
-              marketCapRange: marketCapMin || marketCapMax ? `${marketCapMin || 'min'} to ${marketCapMax || 'max'}` : undefined,
-              streakRange: streakMin || streakMax ? `${streakMin || 'min'} to ${streakMax || 'max'}` : undefined,
-              exchanges: Array.isArray(exchanges) ? exchanges : undefined,
-              cexOnly,
-              dexOnly
-            }
-          });
+          return [];
         }
 
-        // Return the coin IDs with filter details
-        return jsonToMarkdown({
-          message: `Found ${coinIds.length} coins matching the criteria`,
-          filters: {
-            trend,
-            categories: Array.isArray(categories) ? categories : undefined,
-            marketCapRange: marketCapMin || marketCapMax ? `${marketCapMin || 'min'} to ${marketCapMax || 'max'}` : undefined,
-            streakRange: streakMin || streakMax ? `${streakMin || 'min'} to ${streakMax || 'max'}` : undefined,
-            exchanges: Array.isArray(exchanges) ? exchanges : undefined,
-            cexOnly,
-            dexOnly
-          },
-          coinIds
-        });
+        // Return the coin IDs with filter details and explicitly include items field
+        return coinIds;
       } catch (error) {
-        console.error('getFilteredCoins Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { trend, categories, marketCapMin, marketCapMax, streakMin, streakMax,
-                    exchanges, cexOnly, dexOnly, interval, flavor, limit }
-        });
-        return jsonToMarkdown({ error: "Failed to filter coins" });
+        throw(error)
       }
     }
   }),
@@ -1230,127 +1183,18 @@ const tools = {
         console.log('globalMarketData - Result:', result);
 
         if (result.error) {
-          return jsonToMarkdown({ error: result.error });
+          throw(result.error)
         }
 
-        return jsonToMarkdown(result);
+        return result;
       } catch (error) {
-        console.error('globalMarketData Error:', {
-          message: error.message,
-          stack: error.stack
-        });
-        return jsonToMarkdown({ error: "Failed to fetch global market data" });
-      }
-    }
-  }),
-
-  batchParallel: tool({
-    description: "Execute multiple operations in parallel to save time. Great for analyzing multiple coins at once, comparing different timeframes, or gathering varied market data in a single request. Use this when you need to perform multiple similar operations (like checking several coins) or want to collect different types of related data simultaneously.",
-    parameters: jsonSchema({
-      type: 'object',
-      properties: {
-        operations: {
-          type: 'array',
-          description: 'Array of operations to execute in parallel',
-          items: {
-            type: 'object',
-            properties: {
-              tool: {
-                type: 'string',
-                description: 'Name of the tool to execute (e.g., "getCoinBySymbol", "getMarketHealth")'
-              },
-              toolArguments: {
-                type: 'object',
-                description: 'Arguments to pass to the tool',
-                additionalProperties: true
-              },
-              label: {
-                type: 'string',
-                description: 'Optional label to identify this operation in the results'
-              }
-            },
-            required: ['tool', 'toolArguments']
-          }
-        }
-      },
-      required: ['operations']
-    }),
-    execute: async ({ operations }) => {
-      try {
-        console.log('Tool executed: batchParallel', {
-          operationCount: operations.length,
-          operations: operations.map(op => ({ tool: op.tool, label: op.label }))
-        });
-
-        if (!Array.isArray(operations) || operations.length === 0) {
-          return jsonToMarkdown({ error: "No operations provided" });
-        }
-
-        // Validate operations
-        for (const op of operations) {
-          if (!op.tool || !tools[op.tool]) {
-            return jsonToMarkdown({
-              error: `Invalid tool specified: ${op.tool}`,
-              availableTools: Object.keys(tools).filter(t => t !== 'batchParallel')
-            });
-          }
-        }
-
-        // Execute all operations in parallel
-        const results = await Promise.all(
-          operations.map(async (op) => {
-            try {
-              // Get the tool's execute function
-              const toolFn = tools[op.tool].execute;
-              if (!toolFn) {
-                return {
-                  label: op.label || op.tool,
-                  error: `Tool ${op.tool} does not have an execute function`
-                };
-              }
-
-              // Execute the tool with the provided arguments
-              const result = await toolFn(op.toolArguments || {});
-              return {
-                label: op.label || op.tool,
-                tool: op.tool,
-                toolArguments: op.toolArguments,
-                result
-              };
-            } catch (error) {
-              console.error(`Error executing operation ${op.tool}:`, error);
-              return {
-                label: op.label || op.tool,
-                tool: op.tool,
-                toolArguments: op.toolArguments,
-                error: error.message || "Operation failed"
-              };
-            }
-          })
-        );
-
-        console.log('batchParallel - Completed all operations:', results.length);
-
-        // Return the combined results
-        return jsonToMarkdown({
-          batchResults: results.map(r => ({
-            label: r.label,
-            tool: r.tool,
-            result: r.result || r.error
-          }))
-        });
-      } catch (error) {
-        console.error('batchParallel Error:', {
-          message: error.message,
-          stack: error.stack
-        });
-        return jsonToMarkdown({ error: "Failed to execute batch operations" });
+        throw(error)
       }
     }
   }),
 
   getCategoryTrends: tool({
-    description: "Use this when a user asks about trend distribution within a specific category. Returns the trend breakdown (UP, HODL, DOWN counts) for the specified category.",
+    description: "Use this when a user asks about trend distribution within a specific category. Returns the trend breakdown (UP, HODL, DOWN counts) for the specified category. Make sure that before you call this tool, you cross-referenced the list of available categories using the getAllCategories tool. This means that a user query might contain a category that is not an exact match to the list of available categories, so you need to make sure that you use the correct category name. For example the user asking about the 'RWA' category actually means our 'RWA (Real World Assets)' category from the getAllCategories tool.",
     parameters: jsonSchema({
       type: 'object',
       properties: {
@@ -1379,7 +1223,7 @@ const tools = {
         console.log('getCategoryTrends - Result:', result);
 
         if (result.error) {
-          return jsonToMarkdown({ error: result.error });
+          throw(result.error)
         }
 
         // Format the result, ensuring trends object is present
@@ -1390,71 +1234,539 @@ const tools = {
           coinCount: result.coinCount || 0
         };
 
-        return jsonToMarkdown(data);
+        return data;
       } catch (error) {
-        console.error('getCategoryTrends Error:', {
-          message: error.message,
-          stack: error.stack,
-          params: { categoryName, interval }
-        });
-        return jsonToMarkdown({ error: "Failed to fetch category trend data" });
+        throw(error)
       }
     }
   })
 };
 
-// Function to fetch AI configuration from the API server
-const getAiConfiguration = async () => {
+// Function to fetch AI configuration and Langfuse prompts in parallel
+const getAiConfigurationAndPrompts = async (sessionId = null) => {
   try {
-    console.log('Fetching AI configuration from API server...');
+    console.log('Fetching AI configuration from API server and prompts from Langfuse in parallel...');
+
+    // Create the API URL
     const url = new URL('/api/toady/config', process.env.AI_SERVER_URL);
+    if (sessionId) {
+      url.searchParams.append('sessionId', sessionId);
+    }
     url.searchParams.append('playground', 'false');
 
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
-    });
+    // Fetch API configuration, system prompt, and classifier prompt in parallel
+    const [apiResponse, langfuseSystemPrompt, langfuseClassifierPrompt] = await Promise.all([
+      fetchWithTimeout(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      }),
+      langfuse.getPrompt("System prompt"),
+      langfuse.getPrompt("Classification Prompt")
+    ]);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API server returned ${response.status}: ${errorText}`);
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
+      throw new Error(`API server returned ${apiResponse.status}: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = await apiResponse.json();
 
-    // Log the fetched configuration
-    console.log('Fetched AI Configuration from API server:', {
-      serverProvider: data.serverProvider,
-      systemPromptLength: data.systemPrompt?.length || 0,
-    });
-
-    return {
-      systemPromptContent: data.systemPromptContent,
+    const configData = {
+      systemPromptContent: langfuseSystemPrompt.prompt, // Use Langfuse system prompt
+      classificationPromptContent: langfuseClassifierPrompt.prompt, // Use Langfuse classifier prompt
       serverProvider: data.serverProvider,
       modelId: data.anthropicModelId,
       vertexModelId: data.vertexModelId,
       openRouterModelId: data.openRouterModelId,
-      openAiModelId: data.openAiModelId
+      openAiModelId: data.openAiModelId,
+      sessionHistory: data.sessionHistory
     };
+
+    // Log the fetched configuration
+    console.log('Fetched AI Configuration and Langfuse Prompts:', {
+      serverProvider: data.serverProvider,
+      systemPromptLength: langfuseSystemPrompt.prompt?.length || 0,
+      classificationPromptLength: langfuseClassifierPrompt.prompt?.length || 0,
+      sessionHistoryCount: Array.isArray(data.sessionHistory) ? data.sessionHistory.length : 0,
+      langfuseSystemPromptVersion: langfuseSystemPrompt.version || 'unknown',
+      langfuseClassifierPromptVersion: langfuseClassifierPrompt.version || 'unknown'
+    });
+
+    return configData;
   } catch (error) {
-    console.error('API server configuration fetch error:', {
+    console.error('Error fetching AI configuration or Langfuse prompts:', {
       message: error.message,
       stack: error.stack
     });
-    throw new Error(`Failed to fetch AI configuration from API server: ${error.message}`);
+    throw new Error(`Failed to fetch AI configuration or Langfuse prompts: ${error.message}`);
   }
+};
+
+// Function to save session data for debugging and analysis
+const saveSessionData = async (sessionId, walletAddress, userMessage, classifierQueryResult, finalPromptResult) => {
+  if (!sessionId || !userMessage) {
+    return;
+  }
+
+  try {
+    console.log('Saving session data for session:', sessionId);
+    const url = new URL('/api/sessions/tools', process.env.AI_SERVER_URL);
+
+    await fetchWithTimeout(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        message: userMessage,
+        classifierQueryResult,
+        finalPromptResult: finalPromptResult,
+        sessionId: sessionId,
+        walletAddress: walletAddress || 'anonymous'
+      })
+    });
+
+    console.log('Successfully saved session data');
+  } catch (error) {
+    console.error('Failed to save session data:', error);
+    // Don't throw - this is not critical
+  }
+};
+
+// Query classification schema for GPT-4.1 Mini
+const queryPlanSchema = z.object({
+  queryType: z.enum([
+    'coinInfo',
+    'marketHealth',
+    'categoryInfo',
+    'trendAnalysis',
+    'multipleCoins',
+    'factualQuestion',
+    'other'
+  ]).describe('The type of information the user is requesting'),
+  description: z.string().describe('Brief description of what the user is asking for'),
+  executionPlan: z.array(
+    z.object({
+      stepId: z.string().describe('Unique identifier for this step'),
+      description: z.string().describe('What this step accomplishes'),
+      dependsOn: z.array(z.string()).optional().describe('IDs of steps that must complete before this one can run'),
+      parallelizable: z.boolean().describe('Whether this step can run in parallel with other non-dependent steps'),
+      dynamicFanout: z.boolean().optional().describe('Whether this step should be dynamically applied to each item in a list from a source step'),
+      sourceStep: z.string().optional().describe('ID of the step containing the list to fan out over (required when dynamicFanout is true)'),
+      tools: z.array(
+        z.object({
+          toolName: z.string().describe('Name of the tool to be called'),
+          parameters: z.record(z.any()).describe('Parameters to pass to the tool. Use an empty object {} if no parameters are needed.'),
+          usesResultFrom: z.string().optional().describe('If this tool uses the result from another tool, specify the step ID')
+        })
+      ).describe('Tools to execute in this step')
+    })
+  ).describe('Ordered plan for executing tools, with dependencies and parallel execution information'),
+  additionalContext: z.string().optional().describe('Any additional information that might help in answering the query')
+});
+
+// Function to classify the query using GPT-4.1 Mini
+const classifyQuery = async (query, sessionId, classificationPromptContent, sessionHistory = []) => {
+  try {
+    console.log('Classifying query using GPT-4.1 Mini:', query);
+    console.log('Session history available:', Array.isArray(sessionHistory) ? sessionHistory.length : 0);
+
+    // Fetch available categories to provide to the classifier
+    let availableCategories;
+    let categoriesStringForPrompt;
+
+    try {
+      console.log('Fetching categories for classifier prompt...');
+      const fetchedCategories = await callSocketServer('/api/categories');
+
+      if (Array.isArray(fetchedCategories) && fetchedCategories.length > 0) {
+        availableCategories = fetchedCategories; // Store for potential other uses if needed
+        categoriesStringForPrompt = "System-Recognized Categories (use these exact names for 'getCategoryTrends'):\n" + fetchedCategories.map(cat => `- "${cat}"`).join('\n');
+        console.log('Successfully fetched categories for classifier prompt:', availableCategories);
+      } else {
+        // This case handles if the API returns an empty array or an unexpected non-error response.
+        console.error('API server returned no categories or an invalid category list format. Count:', fetchedCategories?.length);
+        throw new Error('Failed to fetch a valid, non-empty list of categories from the API server.');
+      }
+    } catch (catError) {
+      console.error('Critical error fetching categories for classifier prompt:', catError);
+      // Re-throw to ensure the main process stops if categories are not available.
+      throw new Error(`Critical failure: Unable to fetch categories required for query classification. Original error: ${catError.message}`);
+    }
+
+    // Prepare tool definitions for the prompt by extracting relevant parts
+    const serializableTools = {};
+    for (const toolName in tools) {
+        if (Object.hasOwnProperty.call(tools, toolName)) {
+            const toolDefinition = tools[toolName];
+            serializableTools[toolName] = {
+                description: toolDefinition.description,
+                parameters: toolDefinition.parameters // This is the JSON schema object
+            };
+        }
+    }
+    const toolDefinitionsJson = JSON.stringify(serializableTools, null, 2);
+
+    // Prepare session history info for the classifier
+    let sessionHistoryInfo = '';
+    if (Array.isArray(sessionHistory) && sessionHistory.length > 0) {
+      sessionHistoryInfo = '\n\nSESSION HISTORY:\n';
+      sessionHistory.forEach((record, index) => {
+        sessionHistoryInfo += `\n--- Previous Interaction ${index + 1} ---\n`;
+        sessionHistoryInfo += `User Message: ${record.message}\n`;
+
+        if (Array.isArray(record.classifierQueryResult) && record.classifierQueryResult.length > 0) {
+          sessionHistoryInfo += `Execution Steps Performed:\n`;
+          record.classifierQueryResult.forEach((step, stepIndex) => {
+            sessionHistoryInfo += `  Step ${stepIndex + 1}: ${step.description || step.stepId}\n`;
+            step.tools.forEach((tool, toolIndex) => {
+              sessionHistoryInfo += `    Tool ${toolIndex + 1}: ${tool.toolName}`;
+              if (tool.parameters) {
+                sessionHistoryInfo += ` with params: ${JSON.stringify(tool.parameters)}\n`;
+              } else {
+                sessionHistoryInfo += `\n`;
+              }
+              if (tool.error) {
+                sessionHistoryInfo += `      Result: Error - ${tool.error}\n`;
+              } else if (tool.result) {
+                sessionHistoryInfo += `      Result: ${JSON.stringify(tool.result)}\n`;
+              }
+            });
+          });
+        }
+
+        if (record.finalPromptResult) {
+          sessionHistoryInfo += `Final Prompt: ${record.finalPromptResult.substring(0, 200)}${record.finalPromptResult.length > 200 ? '...' : ''}\n`;
+        }
+
+        sessionHistoryInfo += '\n';
+      });
+      sessionHistoryInfo += 'Consider the session history when creating your query plan. Look for patterns, similar queries, or opportunities to build upon previous interactions.\n';
+    }
+
+    // Use the API-provided classification prompt content
+    const classifierSystemPrompt = classificationPromptContent
+      .replace('${query}', query)
+      .replace('${categoriesStringForPrompt}', categoriesStringForPrompt)
+      .replace('${toolDefinitionsJson}', toolDefinitionsJson)
+      + sessionHistoryInfo; // Append session history info
+
+    console.log('Using classification prompt from API server with session history');
+
+    console.log('Classifier System Prompt:\n');
+    console.dir(classifierSystemPrompt, { depth: null });
+
+    // Use GPT-4.1 Mini for classification
+    const { object } = await generateObject({
+      model: openrouter('openai/gpt-4.1-mini'),
+      schema: queryPlanSchema,
+      prompt: classifierSystemPrompt,
+      experimental_telemetry: {
+        isEnabled: true,
+        metadata: {
+          sessionId
+        }
+      },
+    });
+
+    return object;
+  } catch (error) {
+    console.error('Error classifying query:', error);
+    throw error; // Let it fail instead of providing a fallback
+  }
+};
+
+// Function to execute tools based on the query plan
+const executeToolsFromPlan = async (plan) => {
+  console.log('Executing tools from plan:', plan);
+
+  // Sort the execution plan topologically before executing
+  const sortedPlan = sortPlanTopologically(plan.executionPlan);
+  console.log('Sorted execution plan:', sortedPlan.map(step => step.stepId));
+
+  const results = {}; // This will store the final output for each step's execution.
+  const stepResults = {}; // This is used to store results during execution and for cross-step parameter passing.
+
+  try {
+    // Execute steps in the topologically sorted order
+    for (const step of sortedPlan) {
+      console.log(`Executing step: ${step.stepId}`);
+
+      // Handle dynamic fanout steps
+      if (step.dynamicFanout === true && step.sourceStep) {
+        await processDynamicFanoutStep(step, stepResults, results);
+        continue;
+      }
+
+      // Process regular steps
+      const stepPromise = processRegularStep(step, stepResults);
+      const completedStep = await stepPromise;
+      results[completedStep.stepId] = completedStep;
+    }
+
+    return Object.values(results);
+  } catch (error) {
+    console.error('Error executing tools from plan:', error);
+    throw error;
+  }
+};
+
+// Simplified function to sort plan steps topologically
+const sortPlanTopologically = (executionPlan) => {
+  // Create a copy of the plan with normalized dependencies
+  const steps = executionPlan.map(step => ({
+    ...step,
+    dependencies: [...(step.dependsOn || [])],
+    // Add sourceStep as dependency for dynamic fanout steps
+    ...(step.dynamicFanout && step.sourceStep && { dependencies: [...(step.dependsOn || []), step.sourceStep] })
+  }));
+
+  // Build a map of steps by ID for quick lookup
+  const stepsById = Object.fromEntries(steps.map(step => [step.stepId, step]));
+
+  // Result array for sorted steps
+  const sorted = [];
+  // Set to track visited nodes (for cycle detection)
+  const visited = new Set();
+  // Set to track nodes in current recursion stack (for cycle detection)
+  const recursionStack = new Set();
+
+  // Depth-first search function to topologically sort
+  const visit = (stepId) => {
+    // If already in final sorted list, skip
+    if (visited.has(stepId)) return true;
+
+    // Check for cycle
+    if (recursionStack.has(stepId)) {
+      console.error(`Circular dependency detected involving step: ${stepId}`);
+      return false;
+    }
+
+    // Add to recursion stack
+    recursionStack.add(stepId);
+
+    // Visit all dependencies first
+    const step = stepsById[stepId];
+    const dependencies = step.dependencies || [];
+
+    // Process all dependencies recursively
+    for (const depId of dependencies) {
+      if (!stepsById[depId]) {
+        console.warn(`Warning: Dependency ${depId} referenced but not defined in plan`);
+        continue;
+      }
+      if (!visit(depId)) return false;
+    }
+
+    // Remove from recursion stack and mark as visited
+    recursionStack.delete(stepId);
+    visited.add(stepId);
+
+    // Add to sorted result
+    sorted.push(step);
+    return true;
+  };
+
+  // Process all steps
+  for (const step of steps) {
+    if (!visited.has(step.stepId)) {
+      visit(step.stepId);
+    }
+  }
+
+  // If we found a cycle, include any remaining unvisited nodes
+  if (sorted.length < steps.length) {
+    const remainingSteps = steps.filter(step => !visited.has(step.stepId));
+    console.warn(`Some steps couldn't be properly sorted due to circular dependencies. Adding ${remainingSteps.length} remaining steps.`);
+    sorted.push(...remainingSteps);
+  }
+
+  return sorted;
+};
+
+// Helper function to process a dynamic fanout step
+const processDynamicFanoutStep = async (step, stepResults, results) => {
+  console.log(`Processing dynamic fanout step: ${step.stepId}, source: ${step.sourceStep}`);
+
+  // Ensure we have a source step and it's been processed
+  if (!step.sourceStep || !stepResults[step.sourceStep]) {
+    console.error(`Source step ${step.sourceStep} not found for dynamic fanout step ${step.stepId}`);
+    throw new Error(`Source step not found for dynamic fanout`);
+  }
+
+  // Ensure the step has exactly one tool template
+  if (!step.tools || step.tools.length !== 1) {
+    console.error(`Dynamic fanout step must have exactly one tool template`);
+    throw new Error(`Dynamic fanout step must have exactly one tool template`);
+  }
+
+  const sourceStep = stepResults[step.sourceStep];
+  const toolTemplate = step.tools[0];
+
+  // Directly use the array of coin names from the source step's tool result
+  let fanoutItems = [];
+  if (Array.isArray(sourceStep.tools) && sourceStep.tools.length > 0) {
+    // The tool result is expected to be an array of strings (coin names)
+    const toolResult = sourceStep.tools[0].result;
+    if (Array.isArray(toolResult)) {
+      fanoutItems = toolResult;
+    }
+  }
+
+  if (!fanoutItems || fanoutItems.length === 0) {
+    console.error('No items found for dynamic fanout step:', step.stepId);
+    return;
+  }
+
+  console.log(`Fanning out to ${fanoutItems.length} items: ${fanoutItems.join(', ')}`);
+
+  // Create and execute a tool for each item
+  const toolPromises = fanoutItems.map(async (item) => {
+    // Clone the tool template and replace {item} placeholder in parameters
+    const toolConfig = { ...toolTemplate };
+    toolConfig.parameters = { ...toolTemplate.parameters };
+
+    // Replace {item} placeholder in all parameter values
+    Object.keys(toolConfig.parameters).forEach(paramKey => {
+      const paramValue = toolConfig.parameters[paramKey];
+      if (typeof paramValue === 'string' && paramValue.includes('{item}')) {
+        toolConfig.parameters[paramKey] = paramValue.replace('{item}', item);
+      }
+    });
+
+    // Execute the tool
+    const { toolName, parameters } = toolConfig;
+
+    if (!tools[toolName]) {
+      console.error(`Tool not found: ${toolName}`);
+      return {
+        toolName,
+        parameters,
+        error: `Tool "${toolName}" not found`
+      };
+    }
+
+    try {
+      console.log(`Executing fanout tool: ${toolName} with parameters:`, parameters);
+      const result = await tools[toolName].execute(parameters);
+      return {
+        toolName,
+        parameters,
+        result
+      };
+    } catch (toolError) {
+      console.error(`Error executing tool processDynamicFanoutStep ${toolName}:`, toolError);
+      return {
+        toolName,
+        parameters,
+        error: toolError.message
+      };
+    }
+  });
+
+  // Execute all tools for this fanout step
+  const toolResults = await Promise.all(toolPromises);
+
+  // Store the results
+  stepResults[step.stepId] = {
+    stepId: step.stepId,
+    description: step.description,
+    fanoutSource: step.sourceStep,
+    fanoutItems: fanoutItems,
+    tools: toolResults
+  };
+
+  results[step.stepId] = stepResults[step.stepId];
+  return stepResults[step.stepId];
+};
+
+// Helper function to process a regular step
+const processRegularStep = async (step, stepResults) => {
+  console.log(`Processing regular step: ${step.stepId}`);
+
+  // For each step, process the tools
+  const toolPromises = step.tools.map(async (toolConfig) => {
+    const { toolName, parameters, usesResultFrom } = toolConfig;
+
+    // Prepare the actual parameters to use
+    let finalParameters = { ...parameters };
+
+    // Apply parameter updates based on dependencies if specified
+    if (usesResultFrom && stepResults[usesResultFrom]) {
+      // Simply pass the dependency information to the GPT model in the next phase
+      // The complex model will interpret this raw data appropriately
+      console.log(`Tool ${toolName} using results from step ${usesResultFrom}`);
+    }
+
+    if (!tools[toolName]) {
+      console.error(`Tool not found: ${toolName}`);
+      return {
+        toolName,
+        error: `Tool "${toolName}" not found`
+      };
+    }
+
+    try {
+      console.log(`Executing tool: ${toolName} with parameters:`, finalParameters);
+      const result = await tools[toolName].execute(finalParameters);
+      return {
+        toolName,
+        parameters: finalParameters,
+        result
+      };
+    } catch (toolError) {
+      console.error(`Error executing tool processRegularStep ${toolName}:`, toolError);
+      return {
+        toolName,
+        parameters: finalParameters,
+        error: toolError.message
+      };
+    }
+  });
+
+  // Execute all tools in this step
+  const toolResults = await Promise.all(toolPromises);
+
+  // Store the results from this step
+  stepResults[step.stepId] = {
+    stepId: step.stepId,
+    description: step.description,
+    tools: toolResults
+  };
+
+  return stepResults[step.stepId];
 };
 
 export async function POST(req) {
   const { messages, walletAddress, data } = await req.json();
-  console.log('Received POST request with messages:', JSON.stringify(messages, null, 2));
+  const userMessages = messages.filter(message => message.role === 'user');
+  console.log('Received POST request with user messages:', JSON.stringify(userMessages, null, 2));
   console.log('Request data:', data);
 
-  // Track the AI prompt in Mixpanel
+  // Get the user message (last message in the array)
   const userMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-  // if (userMessage && userMessage.role === 'user') {
+  if (!userMessage || userMessage.role !== 'user') {
+    return new Response(JSON.stringify({
+      error: 'Invalid request',
+      message: 'No user message found in the request'
+    }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+  }
+
+  // Extract session ID from request data
+  const sessionId = data?.sessionId;
+  console.log('Session ID:', sessionId);
+
+  // Track the AI prompt in Mixpanel
+  // if (userMessage) {
   //   trackMixpanelEvent('AI Prompt', {
   //     distinct_id: walletAddress || 'anonymous',
   //     prompt: userMessage.content,
@@ -1464,15 +1776,34 @@ export async function POST(req) {
   // }
 
   try {
-    console.log('Getting AI configuration from API server...');
+    // First, get all the AI configuration and session history
+    console.log('Getting AI configuration from API server and prompts from Langfuse...');
+    const aiConfig = await getAiConfigurationAndPrompts(sessionId);
     const {
       systemPromptContent,
+      classificationPromptContent,
       serverProvider,
-      modelId: anthropicModelIdFromStrapi, // Renaming to avoid conflict if modelId variable is used generally
+      modelId: anthropicModelIdFromStrapi,
       vertexModelId,
       openRouterModelId,
-      openAiModelId
-    } = await getAiConfiguration();
+      openAiModelId,
+      sessionHistory
+    } = aiConfig;
+
+    // STEP 1: Classify query and create a data retrieval plan using GPT-4.1 Mini
+    console.log('Step 1: Classifying query...');
+    const queryPlan = await classifyQuery(userMessage.content, sessionId, classificationPromptContent, sessionHistory);
+    console.log('Query plan generated:', queryPlan);
+
+    // STEP 2: Execute the tools specified in the plan to retrieve data
+    console.log('Step 2: Executing tools based on the plan...');
+    const newExecutionResults = await executeToolsFromPlan(queryPlan);
+    console.log('Plan execution completed with results from steps:',
+      newExecutionResults.map(step => step.stepId));
+
+    // Use the new execution results for context generation
+    const allExecutionResults = newExecutionResults;
+    console.log('Total execution results available:', allExecutionResults.length);
 
     // Log the specific model IDs after fetching
     console.log('Server Provider:', serverProvider);
@@ -1483,25 +1814,53 @@ export async function POST(req) {
 
     // Construct context string from data
     let contextInformation = "";
-    if (data?.timestamp) {
-        contextInformation += `Current date and time (ISO 8601 format, UTC-based): ${data.timestamp}\\n`;
+    if (data?.browserDateTimeWithTimezone) {
+      contextInformation += `Current date and time: ${data.browserDateTimeWithTimezone}\n`;
     }
     if (data?.coinId) {
-        contextInformation += `Current relevant coin ID for context: ${data.coinId}\\n`;
+      contextInformation += `Current relevant coin ID for context: ${data.coinId}\n`;
     }
+
+    // Add each step's results to the context (using all execution results)
+    for (const step of allExecutionResults) {
+      contextInformation += `## Step: ${step.description} (${step.stepId}) ##\n`;
+
+      // Add each tool result from this step
+      for (const toolResult of step.tools) {
+        contextInformation += `### Information from ${toolResult.toolName}: ###\n`;
+        if (toolResult.error) {
+          contextInformation += `Error: ${toolResult.error}\n\n`;
+        } else if (typeof toolResult.result === 'object') {
+          contextInformation += Converter.toMarkdown(toolResult.result);
+        } else {
+          contextInformation += `${toolResult.result}\n\n`;
+        }
+      }
+    }
+
     contextInformation = contextInformation.trim();
 
     // Prepend context to the system prompt
     const finalSystemPrompt = contextInformation
-        ? `${contextInformation}\\n\\n${systemPromptContent}`
-        : systemPromptContent;
+      ? `${contextInformation}\n\n${systemPromptContent}`
+      : systemPromptContent;
 
-    console.log('Starting AI stream...');
+    console.log('Final system prompt');
+    console.dir(finalSystemPrompt, { depth: null });
+    console.log('Starting AI stream with pre-retrieved data...');
+
+    // Save session data for debugging and analysis (async, don't wait)
+    if (sessionId) {
+      saveSessionData(sessionId, walletAddress, userMessage.content, newExecutionResults, finalSystemPrompt).catch(error => {
+        console.error('Failed to save session data (non-blocking):', error);
+      });
+    }
 
     // Create a collection to store all steps for debugging
     const allSteps = [];
     let model;
 
+    // Select the appropriate model based on the server provider
     let providerMetadata = {};
     if (serverProvider === 'anthropic') {
       console.log('Using Anthropic model:', anthropicModelIdFromStrapi);
@@ -1534,55 +1893,56 @@ export async function POST(req) {
       throw new Error(`Unsupported AI provider: ${serverProvider}`);
     }
 
+    // Use the complex model to generate the final response based on the retrieved data
+    // The complex model doesn't need to call tools itself, as all necessary data is provided in advance
     const response = streamText({
       model,
-      tools,
       messages: [
         {
           role: "system",
           content: finalSystemPrompt,
           providerMetadata
         },
-        ...messages
+        ...messages // Include all previous messages for context
       ],
       experimental_telemetry: {
         isEnabled: true,
         metadata: {
-          userId: walletAddress
+          userId: walletAddress,
+          sessionId
         }
       },
-      maxSteps: 50,
+      maxSteps: 10, // Reduced since we shouldn't need many steps with pre-retrieved data
 
-      // Keep your existing callbacks
       onFinish(result) {
         console.log('Stream finished:', {
           finishReason: result.finishReason,
           usage: result.usage,
-          messageCount: result.messages?.length || 0,
-          allSteps: allSteps.length
+          messageCount: result.messages?.length || 0
         });
 
         // Log any errors
         if (result.finishReason === 'error') {
           console.error('Stream error:', result.error);
+
+          // Report finish errors to Bugsnag
+          reportErrorToServer(result.error || new Error('Unknown stream finish error'), {
+            errorType: 'StreamFinishError',
+            finishReason: result.finishReason,
+            walletAddress,
+            userMessage: userMessage?.content,
+            messageCount: messages.length,
+            sessionId,
+            timestamp: new Date().toISOString()
+          }).catch(reportError => {
+            console.error('Failed to report stream finish error:', reportError);
+          });
         }
       },
 
-      // Add onStepFinish callback to log each step
-      onStepFinish({ text, toolCalls, toolResults, finishReason, usage }) {
+      onStepFinish({ text, finishReason, usage }) {
         const stepInfo = {
           text,
-          toolCalls: toolCalls.map(call => ({
-            toolName: call.toolName,
-            args: call.args,
-            id: call.toolCallId
-          })),
-          toolResults: toolResults.map(result => ({
-            toolCallId: result.toolCallId,
-            result: typeof result.result === 'object' ?
-              JSON.stringify(result.result).substring(0, 100) + '...' :
-              String(result.result).substring(0, 100) + '...'
-          })),
           finishReason,
           usage
         };
@@ -1591,28 +1951,19 @@ export async function POST(req) {
         console.log('Step finished:', JSON.stringify(stepInfo, null, 2));
       },
 
-      // Add onToolCall callback for more detailed logging
-      onToolCall({ toolName, toolCallId, args }) {
-        console.log('Tool call initiated:', { toolName, toolCallId, args: JSON.stringify(args) });
-        return { toolCallId };
-      },
-
-      // Add onToolCallResult callback to log results
-      onToolCallResult({ toolName, toolCallId, result }) {
-        // Log the result
-        console.log('Tool call result:', {
-          toolName,
-          toolCallId,
-          result: typeof result === 'string'
-            ? (result.length > 100 ? result.substring(0, 100) + '...' : result)
-            : 'Non-string result'
-        });
-
-        // No need for the tool-specific handling since we're returning markdown strings directly
-      },
-
       onError(error) {
         console.error('Stream error:', error);
+        // Report stream errors to Bugsnag
+        reportErrorToServer(error, {
+          errorType: 'StreamError',
+          walletAddress,
+          userMessage: userMessage?.content,
+          messageCount: messages.length,
+          sessionId,
+          timestamp: new Date().toISOString()
+        }).catch(reportError => {
+          console.error('Failed to report stream error:', reportError);
+        });
       }
     });
 
@@ -1626,22 +1977,20 @@ export async function POST(req) {
           cause: error.cause
         });
 
-        // Add more specific handling for type validation errors
-        if (error.name === 'AI_TypeValidationError') {
-          console.error('Type validation error details:', error.cause);
-          return "There was an error processing the AI response format. Please try again with a different query.";
-        }
+        // Report response conversion errors to Bugsnag
+        reportErrorToServer(error, {
+          errorType: 'StreamResponseError',
+          walletAddress,
+          userMessage: userMessage?.content,
+          messageCount: messages.length,
+          sessionId,
+          timestamp: new Date().toISOString()
+        }).catch(reportError => {
+          console.error('Failed to report stream response error:', reportError);
+        });
 
         // Return a user-friendly error message based on error type
-        if (error.name === 'NoSuchToolError') {
-          return "The AI tried to use a tool that doesn't exist. Please try again with a different query.";
-        } else if (error.name === 'InvalidToolArgumentsError') {
-          return "The AI provided invalid arguments to a tool. Please try again with a more specific query.";
-        } else if (error.name === 'ToolExecutionError') {
-          return "There was an error executing the tool. Please try again later.";
-        } else {
-          return "An error occurred while processing your request. Please try again later.";
-        }
+        return "An error occurred while processing your request. Please try again later.";
       }
     });
 
@@ -1654,6 +2003,16 @@ export async function POST(req) {
       message: e.message,
       stack: e.stack,
       cause: e.cause
+    });
+
+    // Report the error to the API server for Bugsnag tracking
+    await reportErrorToServer(e, {
+      walletAddress,
+      userMessage: userMessage?.content,
+      messageCount: messages.length,
+      sessionId,
+      url: req.url,
+      timestamp: new Date().toISOString()
     });
 
     // Return a more detailed error response
