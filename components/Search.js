@@ -266,7 +266,7 @@ const Search = ({ categories, collapsed }) => {
             className={classnames(searchStyles.tab, {[searchStyles.active]: tab === 'ai'})}
             onClick={() => setTab('ai')}
           >
-            <img src="/shumi-ai.png" alt="Shumi" width="18" height="18" />Shumi
+            <img src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi
           </div>
         </div>
         <div className={searchStyles.contentWrapper}>
