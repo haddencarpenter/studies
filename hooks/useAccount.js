@@ -1,13 +1,36 @@
-import { useAccount as useNativeAccount } from 'wagmi'
 import { useCookies } from 'react-cookie';
+import { useWeb3Auth } from '../contexts/Web3AuthContext';
+import { useState, useEffect } from 'react';
 
 const useAccount = () => {
-  const { address: nativeWalletAddress } = useNativeAccount()
-
+  const { loggedIn, getAccounts } = useWeb3Auth();
   const [cookies] = useCookies(['user']);
-  const telegramWalletAddress = cookies?.user?.walletAddress
+  const [walletAddress, setWalletAddress] = useState(null);
 
-  return nativeWalletAddress || telegramWalletAddress
+  // Get wallet address from Web3Auth
+  useEffect(() => {
+    const fetchAddress = async () => {
+      if (loggedIn) {
+        try {
+          const accounts = await getAccounts();
+          if (accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+          }
+        } catch (error) {
+          console.error('Error fetching wallet address:', error);
+        }
+      } else {
+        setWalletAddress(null);
+      }
+    };
+
+    fetchAddress();
+  }, [loggedIn, getAccounts]);
+
+  // Fallback to cookie data for backward compatibility during migration
+  const cookieWalletAddress = cookies?.user?.walletAddress;
+  
+  return walletAddress || cookieWalletAddress;
 }
 
 export default useAccount
