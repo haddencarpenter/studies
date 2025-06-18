@@ -25,7 +25,7 @@ const TableFiltersAdvancedTab = ({
   if (!isClient) {
     return (
       <div className={indexStyles.modalContent}>
-        <div>Loading...</div>
+        <div></div>
       </div>
     )
   }

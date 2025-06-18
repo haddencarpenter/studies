@@ -1,46 +1,34 @@
 import { Button, Modal } from 'antd'
 import classnames from 'classnames';
-import { useWeb3Modal } from '@web3modal/wagmi/react'
-import { useAccount, useDisconnect } from 'wagmi'
 import { useCallback, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { useWeb3Auth } from '../contexts/Web3AuthContext';
+import useAccount from '../hooks/useAccount';
 
 import connectButtonStyles from '../styles/connectButton.module.less';
 
 const ConnectButton = ({ collapsed }) => {
   const [loginModalVisible, setLoginModalVisible] = useState(false)
-  const { open: openNativeWalletConnect } = useWeb3Modal()
-  const { address: nativeWalletAddress } = useAccount()
-  const { disconnect: nativeDisconnect } = useDisconnect()
-  const [cookies, , removeCookie] = useCookies(['user']);
-  let telegramId, telegramWalletAddress
-  if (cookies.user) {
-    ({ telegramId, walletAddress: telegramWalletAddress } = cookies.user);
-  }
-  const finalWalletAddress = nativeWalletAddress || telegramWalletAddress
+  const { login, logout, loggedIn } = useWeb3Auth();
+  const walletAddress = useAccount();
+  const finalWalletAddress = walletAddress;
 
   const openModalOrDisconnect = useCallback(() => {
     setLoginModalVisible(true)
   }, [setLoginModalVisible])
-  const nativeConnectOrDisconnect = useCallback(() => {
-    if (nativeWalletAddress) {
-      nativeDisconnect()
-      setLoginModalVisible(false)
+  
+  const connectOrDisconnect = useCallback(async () => {
+    if (loggedIn && walletAddress) {
+      await logout();
+      setLoginModalVisible(false);
     } else {
-      openNativeWalletConnect()
+      try {
+        await login();
+        setLoginModalVisible(false);
+      } catch (error) {
+        console.error('Login failed:', error);
+      }
     }
-  }, [nativeWalletAddress, nativeDisconnect, openNativeWalletConnect])
-  const telegramConnectOrDisconnect = useCallback(() => {
-    if (telegramId) {
-      removeCookie('user', { path: '/' })
-      setLoginModalVisible(false)
-    } else {
-      let domain = process.env.NEXT_PUBLIC_SITE_URL
-      domain = domain?.replace('https://', '')?.replace('http://', '')
-      domain = domain?.replace(/\./g, '_') // TG URL encoding
-      window.open(`https://t.me/CoinRotator_bot?start=${domain}`, '_blank');
-    }
-  }, [telegramId, removeCookie])
+  }, [loggedIn, walletAddress, login, logout])
 
   let text, modalDescription
   if (collapsed) {
@@ -55,9 +43,9 @@ const ConnectButton = ({ collapsed }) => {
     }
   }
   if (finalWalletAddress) {
-    modalDescription = "After you are disconnect, you will be able to reconnect here with your wallet directly or through Telegram."
+    modalDescription = "After you disconnect, you will be able to reconnect with Web3Auth."
   } else {
-    modalDescription = "Connect your wallet directly or through Telegram to access advanced features and use your Key Pass."
+    modalDescription = "Connect your wallet with Web3Auth to access advanced features."
   }
 
   return (
@@ -83,23 +71,13 @@ const ConnectButton = ({ collapsed }) => {
       >
         <p className={connectButtonStyles.modalDescription}>{modalDescription}</p>
         <div className={connectButtonStyles.modalButtons}>
-          {!telegramWalletAddress && (
-            <Button
-              type="primary"
-              className={{ [connectButtonStyles.connected]: Boolean(finalWalletAddress)}}
-              onClick={nativeConnectOrDisconnect}
-            >
-              {nativeWalletAddress ? `Disconnect` : `Connect Wallet`}
-            </Button>
-          )}
-          {!nativeWalletAddress && (
-            <Button
-              onClick={telegramConnectOrDisconnect}
-              className={{ [connectButtonStyles.connected]: Boolean(finalWalletAddress)}}
-            >
-              {telegramId ? `Disconnect` : `Connect Telegram`}
-            </Button>
-          )}
+          <Button
+            type="primary"
+            className={{ [connectButtonStyles.connected]: Boolean(finalWalletAddress)}}
+            onClick={connectOrDisconnect}
+          >
+            {finalWalletAddress ? `Disconnect` : `Connect Wallet`}
+          </Button>
         </div>
       </Modal>
     </>

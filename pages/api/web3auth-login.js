@@ -19,7 +19,7 @@ const onSuccess = (res, user) => {
   twentyYearsFromNow.setFullYear(twentyYearsFromNow.getFullYear() + 20);
   twentyYearsFromNow = twentyYearsFromNow.toUTCString();
   
-  res.setHeader('Set-Cookie', `user=${JSON.stringify(relevantUserData)};Expires=${twentyYearsFromNow};Secure;SameSite=Strict;Path=/;`);
+  res.setHeader('Set-Cookie', `user=${JSON.stringify(relevantUserData)};Expires=${twentyYearsFromNow};Secure;SameSite=Strict;`);
   res.status(200).json({ success: true, user: relevantUserData });
 };
 
@@ -82,11 +82,11 @@ const handler = async (req, res) => {
         const updatedUser = (await sql`
           UPDATE "User"
           SET
-            "web3authId" = ${web3auth_id},
-            "provider" = ${provider},
-            "email" = ${email || existingUser.email},
-            "name" = ${name || existingUser.name},
-            "profileImage" = ${profile_image || existingUser.profileImage},
+            "web3authId" = ${web3auth_id || null},
+            "provider" = ${provider || null},
+            "email" = ${email || existingUser.email || null},
+            "name" = ${name || existingUser.name || null},
+            "profileImage" = ${profile_image || existingUser.profileImage || null},
             "authMethod" = 'web3auth',
             "updatedAt" = NOW()
           WHERE "id" = ${existingUser.id}
