@@ -41,7 +41,7 @@ export async function getStaticProps() {
     shumiSuggestionsQuery = await strapi.query(
       gql`
         query ShumiSuggestion {
-          shumiSuggestion {
+          todaySuggestion {
             data {
               attributes {
                 suggestions
@@ -55,7 +55,7 @@ export async function getStaticProps() {
     console.error("Error fetching Shumi suggestions from Strapi:", error);
   }
 
-  const shumiSuggestions = shumiSuggestionsQuery?.data?.shumiSuggestion?.data?.attributes?.suggestions || "";
+  const shumiSuggestions = shumiSuggestionsQuery?.data?.todaySuggestion?.data?.attributes?.suggestions || "";
 
   return {
     props: {
