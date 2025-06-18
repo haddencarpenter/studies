@@ -19,6 +19,25 @@ let moduleExports = {
   env: {
     'TZ': 'UTC',
   },
+  webpack: (config, { isServer }) => {
+    // Handle React Native dependencies for Web3Auth
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@react-native-async-storage/async-storage': false,
+      'react-native': false,
+    };
+
+    // Ignore React Native modules
+    config.externals = config.externals || [];
+    if (!isServer) {
+      config.externals.push({
+        '@react-native-async-storage/async-storage': 'false',
+        'react-native': 'false',
+      });
+    }
+
+    return config;
+  },
   async headers() {
     return [
       {

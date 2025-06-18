@@ -9,7 +9,6 @@ import classnames from 'classnames'
 import useKeyPass from '../hooks/useKeyPass';
 import useAccount from '../hooks/useAccount';
 import toadyStyles from '../styles/toady.module.less'
-import NoKeyPass from './gating/NoKeyPass'
 import NotConnected from './gating/NotConnected'
 
 // Helper function to generate session ID
@@ -23,6 +22,12 @@ const Toady = ({ isActive, initialSuggestions }) => {
   const [coinTag, setCoinTag] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const [sessionId, setSessionId] = useState(() => generateSessionId());
+  const [isClient, setIsClient] = useState(false);
+
+  // Handle client-side hydration to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
@@ -145,11 +150,14 @@ const Toady = ({ isActive, initialSuggestions }) => {
 
   // Render gating or chat UI
   let content;
-  if (!walletAddress) {
+  
+  // Show loading state during hydration to prevent hydration mismatch
+  if (!isClient) {
+    content = <div className={toadyStyles.gatingContainer}><div>Loading...</div></div>;
+  } else if (!walletAddress) {
     content = <div className={toadyStyles.gatingContainer}><NotConnected feature='Toady AI'/></div>;
-  } else if (!hasKeyPass) {
-    content = <div className={toadyStyles.gatingContainer}><NoKeyPass /></div>;
   } else {
+    // All authenticated users now have access (no KeyPass check needed)
     content = (
       <>
         <div className={toadyStyles.conversationArea} ref={messagesEndRef}>

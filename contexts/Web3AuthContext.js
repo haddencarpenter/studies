@@ -14,7 +14,7 @@ export const useWeb3Auth = () => {
   return context;
 };
 
-const clientId = "BGkgGCsO6v6Uve1k6glWCNKU2ims2t1Ljc9tU9HKUO5me2OTlxXP-bhY9OU7PPuBeT0FQ8qAZPU_ArEoLpSeeEU";
+const clientId = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ";
 
 const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -27,79 +27,125 @@ const chainConfig = {
   logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
 };
 
-const privateKeyProvider = new EthereumPrivateKeyProvider({
-  config: { chainConfig },
-});
-
-const web3auth = new Web3Auth({
-  clientId,
-  web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-  privateKeyProvider,
-  uiConfig: {
-    appName: "CoinRotator",
-    mode: "light",
-    logoLight: "https://coinrotator.app/coin.svg",
-    logoDark: "https://coinrotator.app/coin.svg",
-    defaultLanguage: "en",
-    theme: {
-      primary: "#1890ff",
-    },
-  },
-});
-
 export const Web3AuthProvider = ({ children }) => {
+  const [web3auth, setWeb3auth] = useState(null);
   const [web3authProvider, setWeb3authProvider] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const init = async () => {
       try {
-        await web3auth.initModal();
-        setWeb3authProvider(web3auth.provider);
+        // Only initialize after client-side hydration
+        if (isClient) {
+          const privateKeyProvider = new EthereumPrivateKeyProvider({
+            config: { chainConfig },
+          });
 
-        if (web3auth.connected) {
-          setLoggedIn(true);
-          const user = await web3auth.getUserInfo();
-          setUser(user);
+          const web3authInstance = new Web3Auth({
+            clientId,
+            web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+            privateKeyProvider,
+            uiConfig: {
+              appName: "CoinRotator",
+              mode: "light",
+              logoLight: "https://coinrotator.app/coin.svg",
+              logoDark: "https://coinrotator.app/coin.svg",
+              defaultLanguage: "en",
+              theme: {
+                primary: "#1890ff",
+              },
+            },
+          });
+
+          console.log('Web3Auth initialized with SAPPHIRE_MAINNET');
+
+          await web3authInstance.init();
+          setWeb3auth(web3authInstance);
+          setWeb3authProvider(web3authInstance.provider);
+
+          if (web3authInstance.connected) {
+            setLoggedIn(true);
+            const user = await web3authInstance.getUserInfo();
+            setUser(user);
+          }
         }
       } catch (error) {
         console.error("Web3Auth initialization error:", error);
+        console.error("Error details:", error.message, error.stack);
       } finally {
-        setIsLoading(false);
+        if (isClient) {
+          setIsLoading(false);
+        }
       }
     };
 
-    init();
-  }, []);
+    if (isClient) {
+      init();
+    }
+  }, [isClient]);
 
-  const login = async (loginProvider) => {
+  const login = async () => {
     try {
+      console.log('Starting Web3Auth login...');
+      
+      if (!web3auth) {
+        console.error("Web3Auth not initialized");
+        throw new Error("Web3Auth not initialized");
+      }
+      
+      console.log('Web3Auth instance available, attempting to connect...');
       const web3authProvider = await web3auth.connect();
+      console.log('Web3Auth connect successful, provider:', !!web3authProvider);
+      
       setWeb3authProvider(web3authProvider);
       
       if (web3auth.connected) {
+        console.log('Web3Auth connected, getting user info...');
         const user = await web3auth.getUserInfo();
+        console.log('User info received:', { name: user?.name, email: user?.email, provider: user?.typeOfLogin });
+        
         setUser(user);
         setLoggedIn(true);
         
         // Get wallet address
-        const ethProvider = new ethers.providers.Web3Provider(web3authProvider);
-        const signer = ethProvider.getSigner();
+        console.log('Getting wallet address...');
+        const ethProvider = new ethers.BrowserProvider(web3authProvider);
+        const signer = await ethProvider.getSigner();
         const address = await signer.getAddress();
+        console.log('Wallet address obtained:', address);
         
-        // Save user data to database
-        await saveUserToDatabase({
-          ...user,
-          walletAddress: address,
-          provider: loginProvider || user.typeOfLogin,
-        });
+        // Try to save user data to database, but don't fail the login if this fails
+        try {
+          console.log('Saving user data to database...');
+          await saveUserToDatabase({
+            ...user,
+            walletAddress: address,
+            provider: user.typeOfLogin,
+          });
+          console.log('Database save completed successfully');
+        } catch (dbError) {
+          console.error('Database save failed, but login was successful:', dbError);
+          // Don't throw here - the login was successful even if DB save failed
+        }
         
+        console.log('Login process completed successfully');
         return { user, address };
+      } else {
+        console.error('Web3Auth connection failed - not connected after connect()');
+        throw new Error('Web3Auth connection failed');
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error details:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
       throw error;
     }
   };
@@ -122,8 +168,8 @@ export const Web3AuthProvider = ({ children }) => {
       return [];
     }
     
-    const ethProvider = new ethers.providers.Web3Provider(web3authProvider);
-    const signer = ethProvider.getSigner();
+    const ethProvider = new ethers.BrowserProvider(web3authProvider);
+    const signer = await ethProvider.getSigner();
     const address = await signer.getAddress();
     return [address];
   };
@@ -134,15 +180,22 @@ export const Web3AuthProvider = ({ children }) => {
       return "0";
     }
     
-    const ethProvider = new ethers.providers.Web3Provider(web3authProvider);
-    const signer = ethProvider.getSigner();
+    const ethProvider = new ethers.BrowserProvider(web3authProvider);
+    const signer = await ethProvider.getSigner();
     const address = await signer.getAddress();
     const balance = await ethProvider.getBalance(address);
-    return ethers.utils.formatEther(balance);
+    return ethers.formatEther(balance);
   };
 
   const saveUserToDatabase = async (userData) => {
     try {
+      console.log('Saving user data to database:', {
+        walletAddress: userData.walletAddress,
+        provider: userData.provider,
+        email: userData.email,
+        name: userData.name
+      });
+
       const response = await fetch('/api/web3auth-login', {
         method: 'POST',
         headers: {
@@ -152,10 +205,14 @@ export const Web3AuthProvider = ({ children }) => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to save user data');
+        const errorText = await response.text();
+        console.error('Database save failed:', response.status, errorText);
+        throw new Error(`Failed to save user data: ${response.status}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      console.log('User data saved successfully:', result);
+      return result;
     } catch (error) {
       console.error('Error saving user to database:', error);
       throw error;
@@ -167,7 +224,7 @@ export const Web3AuthProvider = ({ children }) => {
     web3authProvider,
     user,
     loggedIn,
-    isLoading,
+    isLoading: isLoading || !isClient,
     login,
     logout,
     getAccounts,

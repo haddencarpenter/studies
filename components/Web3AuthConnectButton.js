@@ -1,87 +1,83 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Button, Modal, Space, Avatar, Tooltip } from 'antd';
-import { GoogleOutlined, TwitterOutlined, GithubOutlined, FacebookOutlined, AppleOutlined, DiscordOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Button, Modal, Space, Avatar, message } from 'antd';
+import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import connectButtonStyles from '../styles/connectButton.module.less';
 
-const socialProviders = [
-  {
-    key: 'google',
-    name: 'Google',
-    icon: <GoogleOutlined />,
-    color: '#db4437'
-  },
-  {
-    key: 'twitter',
-    name: 'Twitter',
-    icon: <TwitterOutlined />,
-    color: '#1da1f2'
-  },
-  {
-    key: 'discord',
-    name: 'Discord',
-    icon: <DiscordOutlined />,
-    color: '#7289da'
-  },
-  {
-    key: 'github',
-    name: 'GitHub',
-    icon: <GithubOutlined />,
-    color: '#333'
-  },
-  {
-    key: 'facebook',
-    name: 'Facebook',
-    icon: <FacebookOutlined />,
-    color: '#4267b2'
-  },
-  {
-    key: 'apple',
-    name: 'Apple',
-    icon: <AppleOutlined />,
-    color: '#000'
-  }
-];
-
 const Web3AuthConnectButton = ({ collapsed }) => {
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [accountModalVisible, setAccountModalVisible] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { user, loggedIn, isLoading, login, logout, getAccounts } = useWeb3Auth();
   const [walletAddress, setWalletAddress] = useState(null);
 
-  const handleLogin = useCallback(async (provider) => {
+  const handleLogin = useCallback(async () => {
     setIsLoggingIn(true);
+    
+    // Show immediate feedback
+    message.loading({ content: 'Connecting...', key: 'login', duration: 0 });
+    
     try {
-      const result = await login(provider);
+      console.log('Starting login process...');
+      
+      // Web3Auth will show its own modal for provider selection
+      const result = await login();
+      
       if (result?.address) {
         setWalletAddress(result.address);
+        console.log('Login successful, wallet address:', result.address);
       }
-      setLoginModalVisible(false);
+      
+      // Check if we're actually connected (even if DB save might have failed)
+      if (loggedIn || result?.address) {
+        // Update message to success
+        message.success({ content: 'Successfully connected!', key: 'login', duration: 3 });
+      } else {
+        throw new Error('Connection verification failed');
+      }
+      
     } catch (error) {
       console.error('Login failed:', error);
-      // You might want to show an error notification here
+      
+      // Check if we're actually connected despite the error
+      if (loggedIn) {
+        message.warning({
+          content: 'Connected successfully, but some features may be limited due to database sync issues.',
+          key: 'login',
+          duration: 5
+        });
+      } else {
+        // Update message to error
+        message.error({
+          content: `Connection failed: ${error.message || 'Please try again.'}`,
+          key: 'login',
+          duration: 5
+        });
+      }
+      
     } finally {
       setIsLoggingIn(false);
     }
-  }, [login]);
+  }, [login, loggedIn]);
 
   const handleLogout = useCallback(async () => {
     try {
       await logout();
       setWalletAddress(null);
-      setLoginModalVisible(false);
+      setAccountModalVisible(false);
+      message.success('Disconnected successfully');
     } catch (error) {
       console.error('Logout failed:', error);
+      message.error('Logout failed. Please try again.');
     }
   }, [logout]);
 
-  const openModal = useCallback(() => {
-    setLoginModalVisible(true);
+  const openAccountModal = useCallback(() => {
+    setAccountModalVisible(true);
   }, []);
 
-  const closeModal = useCallback(() => {
-    setLoginModalVisible(false);
+  const closeAccountModal = useCallback(() => {
+    setAccountModalVisible(false);
   }, []);
 
   // Get display text for button
@@ -140,7 +136,8 @@ const Web3AuthConnectButton = ({ collapsed }) => {
   return (
     <>
       <Button
-        onClick={openModal}
+        onClick={loggedIn ? openAccountModal : handleLogin}
+        loading={isLoggingIn}
         className={classnames(connectButtonStyles.button, { 
           [connectButtonStyles.connected]: loggedIn, 
           [connectButtonStyles.collapsed]: collapsed 
@@ -163,99 +160,65 @@ const Web3AuthConnectButton = ({ collapsed }) => {
         )}
       </Button>
 
+      {/* Account Modal - only shown when logged in */}
       <Modal
-        open={loginModalVisible}
-        onCancel={closeModal}
+        open={accountModalVisible}
+        onCancel={closeAccountModal}
         footer={null}
-        title={loggedIn ? "Account" : "Connect to CoinRotator"}
+        title="Account"
         zIndex={500}
         className={connectButtonStyles.modal}
         centered
         width={400}
       >
-        {loggedIn ? (
-          <div className={connectButtonStyles.userInfo}>
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              <div style={{ textAlign: 'center' }}>
-                {user?.profileImage && (
-                  <Avatar size={64} src={user.profileImage} style={{ marginBottom: 16 }} />
+        <div className={connectButtonStyles.userInfo}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div style={{ textAlign: 'center' }}>
+              {user?.profileImage ? (
+                <Avatar size={64} src={user.profileImage} style={{ marginBottom: 16 }} />
+              ) : (
+                <Avatar size={64} icon={<UserOutlined />} style={{ marginBottom: 16 }} />
+              )}
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: 4 }}>
+                  {user?.name || 'Anonymous User'}
+                </div>
+                {user?.email && (
+                  <div style={{ color: '#666', fontSize: '14px', marginBottom: 8 }}>
+                    {user.email}
+                  </div>
                 )}
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: 4 }}>
-                    {user?.name || 'Anonymous User'}
-                  </div>
-                  {user?.email && (
-                    <div style={{ color: '#666', fontSize: '14px', marginBottom: 8 }}>
-                      {user.email}
-                    </div>
-                  )}
-                  <div style={{ fontSize: '12px', color: '#999' }}>
-                    Connected via {user?.typeOfLogin || 'Social Login'}
-                  </div>
+                <div style={{ fontSize: '12px', color: '#999' }}>
+                  Connected via {user?.typeOfLogin || 'Social Login'}
                 </div>
               </div>
-              
-              {walletAddress && (
-                <div style={{ 
-                  background: '#f5f5f5', 
-                  padding: '12px', 
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  fontFamily: 'monospace',
-                  wordBreak: 'break-all'
-                }}>
-                  <div style={{ marginBottom: '4px', fontWeight: 'bold' }}>Wallet Address:</div>
-                  {walletAddress}
-                </div>
-              )}
-
-              <Button 
-                type="primary" 
-                danger 
-                icon={<LogoutOutlined />}
-                onClick={handleLogout}
-                block
-              >
-                Disconnect
-              </Button>
-            </Space>
-          </div>
-        ) : (
-          <div>
-            <p className={connectButtonStyles.modalDescription}>
-              Connect your account using one of the social providers below to access advanced features and use your Key Pass.
-            </p>
-            <div className={connectButtonStyles.socialProviders}>
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                {socialProviders.map((provider) => (
-                  <Button
-                    key={provider.key}
-                    type="default"
-                    size="large"
-                    icon={provider.icon}
-                    onClick={() => handleLogin(provider.key)}
-                    loading={isLoggingIn}
-                    disabled={isLoggingIn}
-                    style={{
-                      width: '100%',
-                      height: '48px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      paddingLeft: '20px',
-                      borderColor: provider.color,
-                      color: provider.color
-                    }}
-                  >
-                    <span style={{ marginLeft: '12px' }}>
-                      Continue with {provider.name}
-                    </span>
-                  </Button>
-                ))}
-              </Space>
             </div>
-          </div>
-        )}
+            
+            {walletAddress && (
+              <div style={{ 
+                background: '#f5f5f5', 
+                padding: '12px', 
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+                wordBreak: 'break-all'
+              }}>
+                <div style={{ marginBottom: '4px', fontWeight: 'bold' }}>Wallet Address:</div>
+                {walletAddress}
+              </div>
+            )}
+
+            <Button 
+              type="primary" 
+              danger 
+              icon={<LogoutOutlined />}
+              onClick={handleLogout}
+              block
+            >
+              Disconnect
+            </Button>
+          </Space>
+        </div>
       </Modal>
     </>
   );
