@@ -6,7 +6,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import classnames from 'classnames'
 
-import useAccount from '../hooks/useAccount';
+import useKeyPass from '../hooks/useKeyPass';
+import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
 
@@ -16,7 +17,9 @@ const generateSessionId = () => {
 };
 
 const Shumi = ({ isActive, initialSuggestions }) => {
-  const walletAddress = useAccount()
+  const hasKeyPass = useKeyPass()
+  const { loggedIn, getAccounts } = useWeb3Auth()
+  const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const [sessionId, setSessionId] = useState(() => generateSessionId());
@@ -26,6 +29,27 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  // Get wallet address from Web3Auth
+  useEffect(() => {
+    const fetchWalletAddress = async () => {
+      if (loggedIn && getAccounts) {
+        try {
+          const accounts = await getAccounts();
+          if (accounts && accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+          }
+        } catch (error) {
+          console.error('Error getting wallet address:', error);
+          setWalletAddress(null);
+        }
+      } else {
+        setWalletAddress(null);
+      }
+    };
+
+    fetchWalletAddress();
+  }, [loggedIn, getAccounts]);
 
   const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
@@ -182,7 +206,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                   <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>
                     <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi-ai.png" alt="Shumi" width="18" height="18" />Shumi</div>
                     <div className={shumiStyles.messageContent}>Thinking...</div>
-                 </div>
+                  </div>
                ) : null}
 
                {/* Add error display */}
