@@ -15,7 +15,10 @@ export const useWeb3Auth = () => {
   return context;
 };
 
-const clientId = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ";
+const clientId = "BGSAe0KHRjYU77EJ4ha84Vy_aalV4ld1tleSsz1V2OITE28JUJcbnsxjtMorTWL4BBItqSP4WfkMF6G7QXkBvSQ";
+
+// Environment detection for better development experience
+const isDevelopment = process.env.NODE_ENV === 'development' || typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
 // Multi-chain configuration
 const chainConfigs = {
@@ -110,7 +113,7 @@ export const Web3AuthProvider = ({ children }) => {
 
           const web3authInstance = new Web3Auth({
             clientId,
-            web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+            web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET, // Use your configured Sapphire Mainnet
             privateKeyProvider,
             uiConfig: {
               appName: "CoinRotator",
@@ -121,6 +124,7 @@ export const Web3AuthProvider = ({ children }) => {
               theme: {
                 primary: "#1890ff",
               },
+              loginMethodsOrder: ["google", "discord", "twitter", "github"],
             },
           });
 
@@ -160,8 +164,14 @@ export const Web3AuthProvider = ({ children }) => {
         throw new Error("Web3Auth not initialized");
       }
       
+      // Add connection timeout for better error handling
+      const connectPromise = web3auth.connect();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout - please check your internet connection')), 30000)
+      );
+      
       console.log('Web3Auth instance available, attempting to connect...');
-      const web3authProvider = await web3auth.connect();
+      const web3authProvider = await Promise.race([connectPromise, timeoutPromise]);
       console.log('Web3Auth connect successful, provider:', !!web3authProvider);
       
       setWeb3authProvider(web3authProvider);
@@ -205,6 +215,22 @@ export const Web3AuthProvider = ({ children }) => {
       console.error("Login error details:", error);
       console.error("Error message:", error.message);
       console.error("Error stack:", error.stack);
+      
+      // Enhanced error messages for better user experience
+      if (error.message?.includes('timeout')) {
+        throw new Error('Connection timed out. Please check your internet connection and try again.');
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else if (error.message?.includes('cors')) {
+        throw new Error('Configuration error. Please contact support.');
+      } else if (error.message?.includes('unauthorized') || error.message?.includes('access_denied')) {
+        throw new Error('Authentication failed. Please try a different login method.');
+      } else if (error.message?.includes('popup_blocked')) {
+        throw new Error('Popup blocked. Please allow popups for this site and try again.');
+      } else if (error.message?.includes('user_cancelled') || error.message?.includes('user_denied')) {
+        throw new Error('Login cancelled by user.');
+      }
+      
       throw error;
     }
   };
