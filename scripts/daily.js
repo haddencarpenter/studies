@@ -18,7 +18,7 @@ import { getAllCoins } from '../lib/lunr.mjs'
 import { hasPlatforms } from '../utils/coingecko.mjs';
 import convertToDailySignals from '../utils/convertToDailySignals.mjs';
 import { saveDailyOhlcsToSupertrends } from '../utils/ohlc.mjs';
-import { overrideCoinCategories, aliasCoinCategories } from '../utils/categories.mjs';
+import { overrideCoinCategories, aliasCoinCategories, createCategoriesPromptInLangfuse } from '../utils/categories.mjs';
 
 dotenv.config();
 
@@ -252,6 +252,13 @@ const fetchCoinDataAndOhlcs = async () => {
 
   for (let chunk of chunkedOhlcRequests) {
     await Promise.all(chunk.map(({ coinId, symbol }) => fetchOhlcData(coinId, symbol)))
+  }
+
+  try {
+    const promptResult = await createCategoriesPromptInLangfuse();
+    console.log('Langfuse categories prompt created:', promptResult?.id || promptResult);
+  } catch (e) {
+    console.error('Failed to create categories prompt in Langfuse:', e);
   }
 }
 

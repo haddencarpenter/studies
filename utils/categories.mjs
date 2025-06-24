@@ -4,6 +4,7 @@ import uniq from 'lodash/fp/uniq.js'
 import flatMap from 'lodash/fp/flatMap.js'
 import slugify from 'slugify'
 import { gql } from '@urql/core'
+import { Langfuse } from 'langfuse'
 
 import sql from '../lib/database.mjs'
 import strapi from './strapi.js'
@@ -95,4 +96,53 @@ export async function getCategories() {
   })
 
   return categories
+}
+
+/**
+ * Creates a Langfuse prompt with all unique categories and coingeckoCategories from the Coin table.
+ *
+ * @param {Object} options - Options for the prompt creation.
+ * @param {string} [options.name] - Name of the prompt (default: 'all-categories-list')
+ * @param {string} [options.type] - Type of the prompt (default: 'text')
+ * @param {string[]} [options.labels] - Labels for the prompt (default: ['production'])
+ * @param {Object} [options.config] - Config for the prompt (default: { model: 'gpt-4o', temperature: 0.7, supported_languages: ['en'] })
+ * @returns {Promise<Object>} The created prompt object from Langfuse
+ *
+ * Usage:
+ *   await createCategoriesPromptInLangfuse();
+ */
+export async function createCategoriesPromptInLangfuse(options = {}) {
+  const langfuse = new Langfuse();
+  const {
+    name = 'all-categories-list',
+    type = 'text',
+    labels = ['production'],
+    config = { model: 'gpt-4o', temperature: 0.7, supported_languages: ['en'] },
+  } = options;
+
+  // Fetch all unique categories and coingeckoCategories from the Coin table
+  let categories = await sql`SELECT "categories", "coingeckoCategories" FROM "Coin"`;
+  let allCategories = [];
+  for (const coin of Array.from(categories)) {
+    coin.categories ||= [];
+    coin.coingeckoCategories ||= [];
+    allCategories.push(...coin.categories, ...coin.coingeckoCategories);
+  }
+  // Deduplicate and sort
+  allCategories = Array.from(new Set(allCategories)).filter(Boolean).sort((a, b) => a.localeCompare(b));
+
+  // Build the prompt string
+  const prompt =
+    'System-Recognized Categories (use these exact names for category-based queries):\n' +
+    allCategories.map(cat => `- "${cat}"`).join('\n');
+
+  // Create the prompt in Langfuse
+  const createdPrompt = await langfuse.createPrompt({
+    name,
+    type,
+    prompt,
+    labels,
+    config,
+  });
+  return createdPrompt;
 }
