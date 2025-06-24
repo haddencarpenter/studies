@@ -121,11 +121,6 @@ export const Web3AuthProvider = ({ children }) => {
             clientId,
             web3AuthNetwork: isDevelopment ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
             chainConfig: defaultChainConfig,
-            uiConfig: {
-              appName: "CoinRotator",
-              mode: "light",
-              uxMode: "popup",
-            },
           });
 
           console.log('Initializing Web3Auth modal...');
