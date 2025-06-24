@@ -103,6 +103,7 @@ export const Web3AuthProvider = ({ children }) => {
   const [currentChain, setCurrentChain] = useState('base'); // Track current chain
   const [initializationError, setInitializationError] = useState(null);
   const [initializationComplete, setInitializationComplete] = useState(false);
+  const [hasStoredSession, setHasStoredSession] = useState(false); // Track if there's a stored session
 
   // Handle client-side hydration
   useEffect(() => {
@@ -132,13 +133,28 @@ export const Web3AuthProvider = ({ children }) => {
 
           setWeb3auth(web3authInstance);
 
+          // Check for existing session after initialization
+          console.log('Checking for existing session...');
+          console.log('Connected status:', web3authInstance.connected);
+          console.log('Provider status:', !!web3authInstance.provider);
+          
+          // Add a small delay to ensure Web3Auth has fully initialized
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Re-check after delay
+          console.log('Re-checking after delay...');
+          console.log('Connected status:', web3authInstance.connected);
+          console.log('Provider status:', !!web3authInstance.provider);
+          
+          // Check for session - either connected OR provider available indicates a stored session
           if (web3authInstance.connected && web3authInstance.provider) {
-            console.log('Existing session found, restoring...');
+            console.log('Full session found, restoring...');
             try {
               setLoggedIn(true);
               setWeb3authProvider(web3authInstance.provider);
               const user = await web3authInstance.getUserInfo();
               setUser(user);
+              setHasStoredSession(true);
               console.log('✅ Session restored for user:', user?.email || user?.name);
             } catch (sessionError) {
               console.warn('⚠️ Session restoration failed, clearing state:', sessionError.message);
@@ -146,10 +162,17 @@ export const Web3AuthProvider = ({ children }) => {
               setLoggedIn(false);
               setWeb3authProvider(null);
               setUser(null);
-              console.log('No valid session, ready for login');
+              setHasStoredSession(false);
+              console.log('Session restoration failed, ready for login');
             }
+          } else if (web3authInstance.provider && !web3authInstance.connected) {
+            console.log('Stored session detected but not fully connected - will auto-connect on user action');
+            setHasStoredSession(true);
+            setLoggedIn(false); // Keep UI showing disconnected until user clicks
+            console.log('✅ Stored session ready for auto-connect');
           } else {
             console.log('No existing session, ready for login');
+            setHasStoredSession(false);
           }
         }
       } catch (error) {
@@ -175,7 +198,13 @@ export const Web3AuthProvider = ({ children }) => {
         throw new Error("Web3Auth not initialized");
       }
 
-      console.log('Connecting to Web3Auth...');
+      // Check if we have a stored session that can be auto-connected
+      if (hasStoredSession && !loggedIn) {
+        console.log('📱 Auto-connecting with stored session...');
+      } else {
+        console.log('Connecting to Web3Auth...');
+      }
+      
       const web3authProvider = await web3auth.connect();
       if (!web3authProvider) {
         throw new Error('No provider returned from Web3Auth connection');
@@ -184,6 +213,7 @@ export const Web3AuthProvider = ({ children }) => {
       console.log('✅ Web3Auth connection successful');
       setWeb3authProvider(web3authProvider);
       setLoggedIn(true);
+      setHasStoredSession(true);
       
       const user = await web3auth.getUserInfo();
       setUser(user);
@@ -211,13 +241,48 @@ export const Web3AuthProvider = ({ children }) => {
       return { user, address };
 
     } catch (error) {
-      console.error("❌ Login failed:", error);
-      console.error("Error details:", {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
-      throw error;
+      // Handle user cancellation gracefully without logging as error
+      const errorMsg = error.message?.toLowerCase() || '';
+      const errorString = error?.toString()?.toLowerCase() || '';
+      const errorCode = error.code;
+      
+      const isUserCancellation =
+        errorMsg.includes('wallet popup has been closed by the user') ||
+        errorMsg.includes('popup_closed') ||
+        errorMsg.includes('user_closed_popup') ||
+        errorMsg.includes('cancelled') ||
+        errorMsg.includes('user_cancelled') ||
+        errorMsg.includes('user cancelled') ||
+        errorMsg.includes('user denied') ||
+        errorMsg.includes('user rejected') ||
+        errorMsg.includes('popup closed') ||
+        errorMsg.includes('modal closed') ||
+        errorMsg.includes('user closed the modal') ||
+        errorMsg.includes('authentication cancelled') ||
+        errorString.includes('popup closed') ||
+        errorString.includes('popup_closed') ||
+        errorString.includes('user_cancelled') ||
+        errorString.includes('user cancelled') ||
+        errorString.includes('user aborted') ||
+        errorString.includes('user closed the modal') ||
+        errorCode === 4001 || // User rejected request
+        errorCode === 'ACTION_REJECTED' ||
+        errorCode === 'USER_CANCELLED';
+      
+      if (isUserCancellation) {
+        console.log('ℹ️ User cancelled login process');
+        // Return a special object to indicate user cancellation
+        return { success: false, error, shouldShowError: false };
+      } else {
+        console.error("❌ Login failed:", error);
+        console.error("Error details:", {
+          message: error.message,
+          code: error.code,
+          stack: error.stack
+        });
+        // Return error object for legitimate errors
+        return { success: false, error, shouldShowError: true };
+      }
     }
   };
 
@@ -230,6 +295,7 @@ export const Web3AuthProvider = ({ children }) => {
       setWeb3authProvider(null);
       setUser(null);
       setLoggedIn(false);
+      setHasStoredSession(false);
       setCurrentChain('base'); // Reset to default chain
       
       // Clear user cookie safely using react-cookie
@@ -247,6 +313,7 @@ export const Web3AuthProvider = ({ children }) => {
       setWeb3authProvider(null);
       setUser(null);
       setLoggedIn(false);
+      setHasStoredSession(false);
       setCurrentChain('base');
       
       // Clear user cookie safely using react-cookie
@@ -378,6 +445,7 @@ export const Web3AuthProvider = ({ children }) => {
     web3authProvider,
     user,
     loggedIn,
+    hasStoredSession,
     isLoading: isLoading || !isClient,
     currentChain,
     initializationComplete,

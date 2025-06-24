@@ -11,6 +11,7 @@ const Web3AuthConnectButton = ({ collapsed }) => {
   const {
     user,
     loggedIn,
+    hasStoredSession,
     isLoading,
     login,
     logout,
@@ -22,7 +23,7 @@ const Web3AuthConnectButton = ({ collapsed }) => {
 
   const handleLogin = useCallback(async () => {
     setIsLoggingIn(true);
-    message.loading({ content: 'Connecting...', key: 'login' });
+    // Don't show loading message immediately - let user see the modal first
 
     try {
       if (initializationError) {
@@ -33,34 +34,54 @@ const Web3AuthConnectButton = ({ collapsed }) => {
       }
 
       const result = await login();
-      if (result?.address) {
+      
+      // Handle the new return format from login method
+      if (result && result.success === false) {
+        // Login returned an error object instead of throwing
+        const error = result.error;
+        const shouldShowError = result.shouldShowError;
+        
+        console.error('Login failed:', error);
+        
+        if (shouldShowError) {
+          // Enhanced user-friendly error handling for legitimate errors
+          let errorMessage = 'Connection failed. Please try again.';
+          const errorMsg = error.message?.toLowerCase() || '';
+          
+          if (errorMsg.includes('popup_blocked') || errorMsg.includes('popup')) {
+            errorMessage = 'Popup was blocked. Please allow popups for this site and try again.';
+          } else if (error.message?.includes('initializing') || error.message?.includes('not initialized')) {
+            errorMessage = 'Please wait a moment for the system to initialize, then try again.';
+          } else if (error.message?.includes('network') || error.message?.includes('connection')) {
+            errorMessage = 'Network connection issue. Please check your internet and try again.';
+          } else if (error.message?.includes('JWT') || error.message?.includes('token')) {
+            errorMessage = 'Authentication session expired. Please try again.';
+          } else if (error.code === 4001) {
+            errorMessage = 'Connection was declined. Please try again if you want to connect.';
+          } else if (error.code === -32002) {
+            errorMessage = 'A connection request is already pending. Please check your wallet.';
+          } else if (error.message?.includes('No provider returned')) {
+            errorMessage = 'Connection setup failed. Please try again.';
+          }
+          
+          message.error({ content: errorMessage, key: 'login', duration: 4 });
+        } else {
+          // User cancellation - clear any existing loading messages silently
+          console.log('ℹ️ User cancelled login - no error shown');
+          message.destroy('login');
+        }
+      } else if (result?.address) {
+        // Successful login
         setWalletAddress(result.address);
         message.success({ content: 'Successfully connected!', key: 'login', duration: 3 });
       } else {
-        throw new Error('Connection failed. Please try again.');
+        // Fallback error case
+        message.error({ content: 'Connection failed. Please try again.', key: 'login', duration: 4 });
       }
     } catch (error) {
-      console.error('Login failed:', error);
-      let errorMessage = 'Connection failed. Please try again.';
-      
-      // Enhanced error handling based on Web3Auth documentation
-      if (error.message?.includes('cancelled') || error.message?.includes('user_cancelled')) {
-        errorMessage = 'Connection cancelled by user.';
-      } else if (error.message?.includes('popup_blocked') || error.message?.includes('popup')) {
-        errorMessage = 'Popup blocked. Please allow popups for this site and try again.';
-      } else if (error.message?.includes('initializing') || error.message?.includes('not initialized')) {
-        errorMessage = 'Web3Auth is still initializing. Please wait a moment and try again.';
-      } else if (error.message?.includes('network') || error.message?.includes('connection')) {
-        errorMessage = 'Network error. Please check your internet connection and try again.';
-      } else if (error.message?.includes('JWT') || error.message?.includes('token')) {
-        errorMessage = 'Authentication token error. Please try logging in again.';
-      } else if (error.code === 4001) {
-        errorMessage = 'User rejected the connection request.';
-      } else if (error.code === -32002) {
-        errorMessage = 'Connection request already pending. Please check your wallet.';
-      }
-      
-      message.error({ content: errorMessage, key: 'login', duration: 5 });
+      // Handle any unexpected errors that are still thrown
+      console.error('Unexpected login error:', error);
+      message.error({ content: 'Connection failed. Please try again.', key: 'login', duration: 4 });
     } finally {
       setIsLoggingIn(false);
     }
@@ -132,6 +153,7 @@ const Web3AuthConnectButton = ({ collapsed }) => {
     if (isLoading) return 'Loading...';
     if (initializationError) return 'Error';
     if (!initializationComplete) return 'Initializing...';
+    if (hasStoredSession && !loggedIn) return 'Reconnect';
     return displayText;
   };
 
