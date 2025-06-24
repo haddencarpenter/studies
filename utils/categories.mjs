@@ -132,9 +132,7 @@ export async function createCategoriesPromptInLangfuse(options = {}) {
   allCategories = Array.from(new Set(allCategories)).filter(Boolean).sort((a, b) => a.localeCompare(b));
 
   // Build the prompt string
-  const prompt =
-    'System-Recognized Categories (use these exact names for category-based queries):\n' +
-    allCategories.map(cat => `- "${cat}"`).join('\n');
+  const prompt = allCategories.map(cat => `- "${cat}"`).join('\n');
 
   // Create the prompt in Langfuse
   const createdPrompt = await langfuse.createPrompt({
