@@ -6,7 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 let moduleExports = {
   experimental: {
     swcPlugins: [["next-superjson-plugin", {}]],
-    appDir: true,
+    // `appDir` is enabled by default in Next 13; keep config clean
     instrumentationHook: true,
   },
   lessLoaderOptions: {
@@ -19,6 +19,25 @@ let moduleExports = {
   env: {
     'TZ': 'UTC',
   },
+  webpack: (config, { isServer }) => {
+    // Handle React Native dependencies for Web3Auth
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@react-native-async-storage/async-storage': false,
+      'react-native': false,
+    };
+
+    // Ignore React Native modules
+    config.externals = config.externals || [];
+    if (!isServer) {
+      config.externals.push({
+        '@react-native-async-storage/async-storage': 'false',
+        'react-native': 'false',
+      });
+    }
+
+    return config;
+  },
   async headers() {
     return [
       {
@@ -29,6 +48,16 @@ let moduleExports = {
             key: 'Cache-Control',
             value: 'public, max-age=9999999999, must-revalidate',
           }
+        ],
+      },
+      {
+        // Fix Web3Auth COOP issues for social login
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
         ],
       }
     ]

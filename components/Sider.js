@@ -13,7 +13,7 @@ import Funders from './Funders'
 import Socials from './Socials'
 import NavigationMenu from './NavigationMenu'
 import DarkModeSwitch from './DarkModeSwitch'
-import ConnectButton from './ConnectButton.js'
+import Web3AuthConnectButton from './Web3AuthConnectButton.js'
 import { DarkModeContext } from '../layouts/screener.js'
 import styles from "../styles/sider.module.less"
 
@@ -53,7 +53,7 @@ const Sider = ({ topCategories, categories }) => {
         { collapsed ? <></> : <DarkModeSwitch darkMode={darkMode} setDarkMode={setDarkMode} />}
       </Space>
       <Space size={12} className={styles.connect}>
-        { collapsed ? <></> : <ConnectButton /> }
+        <Web3AuthConnectButton collapsed={collapsed} />
       </Space>
       <NavigationMenu topCategories={topCategories} collapsed={collapsed} />
       <div className={styles.footer}>

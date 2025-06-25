@@ -7,9 +7,8 @@ import remarkGfm from 'remark-gfm'
 import classnames from 'classnames'
 
 import useKeyPass from '../hooks/useKeyPass';
-import useAccount from '../hooks/useAccount';
-import toadyStyles from '../styles/toady.module.less'
-import NoKeyPass from './gating/NoKeyPass'
+import { useWeb3Auth } from '../contexts/Web3AuthContext';
+import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
 
 // Helper function to generate session ID
@@ -17,12 +16,40 @@ const generateSessionId = () => {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 };
 
-const Toady = ({ isActive, initialSuggestions }) => {
+const Shumi = ({ isActive, initialSuggestions }) => {
   const hasKeyPass = useKeyPass()
-  const walletAddress = useAccount()
+  const { loggedIn, getAccounts } = useWeb3Auth()
+  const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const [sessionId, setSessionId] = useState(() => generateSessionId());
+  const [isClient, setIsClient] = useState(false);
+
+  // Handle client-side hydration to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Get wallet address from Web3Auth
+  useEffect(() => {
+    const fetchWalletAddress = async () => {
+      if (loggedIn && getAccounts) {
+        try {
+          const accounts = await getAccounts();
+          if (accounts && accounts.length > 0) {
+            setWalletAddress(accounts[0]);
+          }
+        } catch (error) {
+          console.error('Error getting wallet address:', error);
+          setWalletAddress(null);
+        }
+      } else {
+        setWalletAddress(null);
+      }
+    };
+
+    fetchWalletAddress();
+  }, [loggedIn, getAccounts]);
 
   const { messages, input, handleInputChange, handleSubmit, stop, setMessages, setInput, error, reload, status } = useChat({
     api: '/api/ai',
@@ -71,7 +98,7 @@ const Toady = ({ isActive, initialSuggestions }) => {
       const fetchDynamicSuggestions = async () => {
         try {
           console.log("Dynamically fetching suggestions...");
-          const response = await fetch('/api/toady-suggestions');
+          const response = await fetch('/api/shumi-suggestions');
           if (!response.ok) throw new Error('Network response was not ok.');
           const data = await response.json();
           if (data.suggestions) {
@@ -145,27 +172,29 @@ const Toady = ({ isActive, initialSuggestions }) => {
 
   // Render gating or chat UI
   let content;
-  if (!walletAddress) {
-    content = <div className={toadyStyles.gatingContainer}><NotConnected feature='Shumi AI'/></div>;
-  } else if (!hasKeyPass) {
-    content = <div className={toadyStyles.gatingContainer}><NoKeyPass /></div>;
+  // Show loading state during hydration to prevent hydration mismatch
+  if (!isClient) {
+    content = <div className={shumiStyles.gatingContainer}><div>Loading...</div></div>;
+  } else if (!walletAddress) {
+    content = <div className={shumiStyles.gatingContainer}><NotConnected feature='Shumi AI'/></div>;
   } else {
+    // All authenticated users now have access (no KeyPass check needed)
     content = (
       <>
-        <div className={toadyStyles.conversationArea} ref={messagesEndRef}>
+        <div className={shumiStyles.conversationArea} ref={messagesEndRef}>
           {messages.length > 0 ? (
              <>
                {processedMessages.map((message, index) => (
-                 <div key={index} className={classnames(toadyStyles.messageContainer, {
-                   [toadyStyles.userMessage]: message.role === 'user',
-                   [toadyStyles.assistantMessage]: message.role === 'assistant'
+                 <div key={index} className={classnames(shumiStyles.messageContainer, {
+                   [shumiStyles.userMessage]: message.role === 'user',
+                   [shumiStyles.assistantMessage]: message.role === 'assistant'
                  })}>
                    {message.role === 'assistant' && (
-                     <div className={toadyStyles.messageRole}>
-                       <img className={toadyStyles.toadAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi
+                      <div className={shumiStyles.messageRole}>
+                        <img className={shumiStyles.shumiAiIcon} src="/shumi-ai.png" alt="Shumi" width="18" height="18" />Shumi
                      </div>
                    )}
-                   <div className={toadyStyles.messageContent}>
+                   <div className={shumiStyles.messageContent}>
                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
                        {message.processedContent}
                      </ReactMarkdown>
@@ -174,34 +203,34 @@ const Toady = ({ isActive, initialSuggestions }) => {
                ))}
                {/* Show "Thinking..." indicator */}
                {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
-                 <div className={classnames(toadyStyles.messageContainer, toadyStyles.assistantMessage, toadyStyles.thinkingIndicator)}>
-                   <div className={toadyStyles.messageRole}><img className={toadyStyles.toadAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi</div>
-                   <div className={toadyStyles.messageContent}>Thinking...</div>
-                 </div>
+                  <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>
+                    <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi-ai.png" alt="Shumi" width="18" height="18" />Shumi</div>
+                    <div className={shumiStyles.messageContent}>Thinking...</div>
+                  </div>
                ) : null}
 
                {/* Add error display */}
                {error && (
-                 <div className={classnames(toadyStyles.messageContainer, toadyStyles.assistantMessage, toadyStyles.errorMessage)}>
-                   <div className={toadyStyles.messageRole}><img className={toadyStyles.toadAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi</div>
-                   <div className={toadyStyles.messageContent}>
+                  <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.errorMessage)}>
+                    <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi-ai.png" alt="Shumi" width="18" height="18" />Shumi</div>
+                    <div className={shumiStyles.messageContent}>
                      <div>Something went wrong. Please try again.</div>
-                     <Button type="primary" onClick={() => reload()} className={toadyStyles.retryButton}>
+                     <Button type="primary" onClick={() => reload()} className={shumiStyles.retryButton}>
                        Try Again
                      </Button>
                    </div>
                  </div>
                )}
                 {/* Add the anchor element for CSS scroll pinning */}
-               <div id="toady-anchor" />
+               <div id="shumi-anchor" />
              </>
            ) : (
-             <div className={toadyStyles.suggestions}>
-               <div className={toadyStyles.suggestionTitle}>Suggestions:</div>
+             <div className={shumiStyles.suggestions}>
+               <div className={shumiStyles.suggestionTitle}>Suggestions:</div>
                {currentSuggestions.map((suggestion, index) => (
                  <div
                    key={index}
-                   className={toadyStyles.suggestionButton}
+                   className={shumiStyles.suggestionButton}
                    onClick={() => setInput(suggestion)} // Use setInput directly
                  >
                    {suggestion}
@@ -210,15 +239,15 @@ const Toady = ({ isActive, initialSuggestions }) => {
              </div>
            )}
         </div>
-        <div className={toadyStyles.inputArea}>
+        <div className={shumiStyles.inputArea}>
           <Input
-            className={toadyStyles.aiInput}
+            className={shumiStyles.aiInput}
             allowClear
             prefix={<>
-              <MessageOutlined className={toadyStyles.placeholderMagnifier}/>
+              <MessageOutlined className={shumiStyles.placeholderMagnifier}/>
               {coinTag && (
                 <Tag
-                  className={toadyStyles.coinTag}
+                  className={shumiStyles.coinTag}
                   closable
                   onClose={handleRemoveCoinTag}
                 >
@@ -229,7 +258,7 @@ const Toady = ({ isActive, initialSuggestions }) => {
             suffix={
               <>
                 {isGenerating ? (
-                  <Button type="primary" onClick={stop} className={toadyStyles.stopButton}>
+                  <Button type="primary" onClick={stop} className={shumiStyles.stopButton}>
                     Stop
                   </Button>
                 ) : (
@@ -237,7 +266,7 @@ const Toady = ({ isActive, initialSuggestions }) => {
                     Ask Shumi
                   </Button>
                 )}
-                <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={toadyStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+                <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={shumiStyles.clearChatButton} icon={<PlusSquareOutlined />} />
               </>
             }
             value={input}
@@ -254,10 +283,10 @@ const Toady = ({ isActive, initialSuggestions }) => {
   }
 
   return (
-    <div className={toadyStyles.aiTab}>
+    <div className={shumiStyles.aiTab}>
         {content}
     </div>
   );
 };
 
-export default Toady;
+export default Shumi;

@@ -522,11 +522,13 @@ const toolImplementations = {
   },
 
   getAllCategories: {
-    execute: async () => {
-      console.log('Tool executed: getAllCategories');
+    execute: async ({ limit } = {}) => {
+      console.log('Tool executed: getAllCategories', { limit });
 
-      // Call the socket server API endpoint for categories
-      const result = await callSocketServer('/api/categories');
+      // Call the socket server API endpoint for categories, with optional limit
+      const params = {};
+      if (typeof limit !== 'undefined') params.limit = limit;
+      const result = await callSocketServer('/api/categories', params);
 
       console.log('getAllCategories - Result:', result);
 
@@ -765,29 +767,27 @@ const toolImplementations = {
     }
   },
 
-  getCategoryTrends: {
+  getCategory: {
     execute: async ({ categoryName, interval = "1d" }) => {
       try {
-        console.log('Tool executed: getCategoryTrends', { categoryName, interval });
+        console.log('Tool executed: getCategory', { categoryName, interval });
 
         // Call the socket server API endpoint for category trends
-        const result = await callSocketServer('/api/category/trends', {
+        const result = await callSocketServer('/api/category', {
           categoryName,
           interval
         });
 
-        console.log('getCategoryTrends - Result:', result);
+        console.log('getCategoryData - Result:', result);
 
         if (result.error) {
           throw(result.error)
         }
 
-        // Format the result, ensuring trends object is present
         const data = {
+          ...result,
           categoryName,
           interval,
-          trends: result.trends || { UP: 0, HODL: 0, DOWN: 0 },
-          coinCount: result.coinCount || 0
         };
 
         return data;
@@ -1317,6 +1317,21 @@ export async function POST(req) {
   const userMessages = messages.filter(message => message.role === 'user');
   console.log('Received POST request with user messages:', JSON.stringify(userMessages, null, 2));
   console.log('Request data:', data);
+
+  // AUTHENTICATION GATING: Require wallet address for Shumi AI access
+  if (!walletAddress || !walletAddress.startsWith('0x')) {
+    console.log('Shumi AI access denied: No valid wallet address provided');
+    return new Response(JSON.stringify({
+      error: 'Authentication required',
+      message: 'Wallet connection required to access Shumi AI'
+    }), {
+      status: 401,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      }
+    });
+  }
 
   // Get the user message (last message in the array)
   const userMessage = messages.length > 0 ? messages[messages.length - 1] : null;
