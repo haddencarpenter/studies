@@ -1,10 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Button, Modal, Space, Avatar, message, Divider, Card, Typography, Switch } from 'antd';
-import { UserOutlined, LogoutOutlined, LinkOutlined, CheckCircleOutlined, ExclamationCircleOutlined, LoginOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, LinkOutlined, CheckCircleOutlined, ExclamationCircleOutlined, LoginOutlined, CopyOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import { useCookies } from 'react-cookie';
 import connectButtonStyles from '../styles/connectButton.module.less';
+import modernModalStyles from '../styles/modernModal.module.less';
+import '../styles/overlay.css'; // Import the overlay CSS
 
 const { Text, Title } = Typography;
 
@@ -12,6 +14,7 @@ const Web3AuthConnectButton = ({ collapsed }) => {
   const [accountModalVisible, setAccountModalVisible] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [userTelegramData, setUserTelegramData] = useState(null);
+  const [copied, setCopied] = useState(false);
   const [cookies] = useCookies(['telegram_verified']);
   const {
     user,
@@ -183,6 +186,20 @@ const Web3AuthConnectButton = ({ collapsed }) => {
     }
   }, [walletAddress]);
 
+  const copyToClipboard = useCallback(async () => {
+    if (!walletAddress) return;
+    
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      message.success('Address copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      message.error('Failed to copy address');
+    }
+  }, [walletAddress]);
+
   const openAccountModal = useCallback(() => {
     setAccountModalVisible(true);
     fetchUserTelegramData();
@@ -267,6 +284,7 @@ const Web3AuthConnectButton = ({ collapsed }) => {
 
   return (
     <>
+      {isLoggingIn && <div className="overlay" />}
       <Button
         onClick={handleButtonClick}
         loading={false}
@@ -277,9 +295,10 @@ const Web3AuthConnectButton = ({ collapsed }) => {
           [connectButtonStyles.collapsed]: collapsed,
         })}
         style={{
-          // Ensure button is visible on mobile
           minWidth: collapsed ? '28px' : '210px',
-          display: 'flex !important'
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
         {loggedIn && user?.profileImage && !collapsed && (
@@ -302,168 +321,122 @@ const Web3AuthConnectButton = ({ collapsed }) => {
         )}
       </Button>
 
-      {/* Enhanced Account Settings Modal */}
+      {/* Modern Account Settings Modal */}
       <Modal
         open={accountModalVisible}
         onCancel={closeAccountModal}
         footer={null}
-        title={
-          <div style={{ textAlign: 'center' }}>
-            <Title level={4} style={{ margin: 0 }}>Account Settings</Title>
-          </div>
-        }
+        title="Account Settings"
         zIndex={500}
-        className={connectButtonStyles.modal}
+        className={modernModalStyles.modernModal}
         centered
         width={500}
       >
-        <div className={connectButtonStyles.userInfo}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {/* User Profile Section */}
-            <Card style={{ textAlign: 'center', border: '1px solid var(--cr-secondary-border)', background: 'var(--cr-card-bg)' }}>
-              <div className={connectButtonStyles.userProfile}>
-                {user?.profileImage ? (
-                  <Avatar size={80} src={user.profileImage} style={{ marginBottom: 16 }} />
-                ) : (
-                  <Avatar size={80} icon={<UserOutlined />} style={{ marginBottom: 16 }} />
-                )}
-                <div>
-                  <Title level={4} style={{ margin: '0 0 8px 0' }}>
-                    {user?.name || (walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'User')}
-                  </Title>
-                  {user?.email && (
-                    <Text type="secondary" style={{ fontSize: '14px' }}>
-                      {user.email}
-                    </Text>
-                  )}
-                </div>
-              </div>
-            </Card>
-
-            {/* Wallet Information */}
-            {walletAddress && (
-              <Card size="small" style={{ background: 'var(--cr-secondary-bg)', border: '1px solid var(--cr-secondary-border)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text strong style={{ color: '#1890ff', fontSize: '14px' }}>
-                      💼 Wallet Address
-                    </Text>
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                        </svg>
-                      }
-                      onClick={() => {
-                        navigator.clipboard.writeText(walletAddress);
-                        message.success('Address copied to clipboard!');
-                      }}
-                      style={{ color: '#1890ff' }}
-                    />
-                  </div>
-                  <div style={{
-                    background: 'var(--cr-card-bg)',
-                    border: '1px solid var(--cr-secondary-border)',
-                    borderRadius: '6px',
-                    padding: '12px',
-                    fontFamily: 'Monaco, Consolas, "Courier New", monospace',
-                    fontSize: '13px',
-                    wordBreak: 'break-all',
-                    lineHeight: '1.4',
-                    color: 'var(--cr-primary-text)'
-                  }}>
-                    {walletAddress}
-                  </div>
-                </div>
-              </Card>
+        {/* Profile Section */}
+        <div className={modernModalStyles.profileSection}>
+          <div className={modernModalStyles.profileAvatar}>
+            {user?.profileImage ? (
+              <Avatar size={80} src={user.profileImage} />
+            ) : (
+              <Avatar size={80} icon={<UserOutlined />} />
             )}
+          </div>
+          <div className={modernModalStyles.profileInfo}>
+            <h4>
+              {walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : 'User'}
+            </h4>
+            <p>Wallet Account</p>
+          </div>
+        </div>
 
-            {/* Telegram Integration Section */}
-            <Card size="small" style={{ background: 'var(--cr-secondary-bg)', border: '1px solid var(--cr-secondary-border)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <img
-                    src="/telegram.svg"
-                    alt="Telegram"
-                    width="20"
-                    height="20"
-                    style={{ flexShrink: 0 }}
-                  />
-                  <Text strong style={{ color: '#0088cc', fontSize: '14px' }}>
-                    Telegram Integration
-                  </Text>
-                </div>
-                
+        <Divider className={modernModalStyles.separator} />
+
+        {/* Wallet Address Section */}
+        {walletAddress && (
+          <div className={modernModalStyles.walletSection}>
+            <div className={modernModalStyles.sectionHeader}>
+              <div className={modernModalStyles.indicator}></div>
+              <h3>Wallet Address</h3>
+            </div>
+            <div className={modernModalStyles.walletAddressContainer}>
+              <p className={modernModalStyles.walletAddress}>{walletAddress}</p>
+              <button
+                className={`${modernModalStyles.copyButton} ${copied ? modernModalStyles.copied : ''}`}
+                onClick={copyToClipboard}
+              >
+                {copied ? <CheckCircleOutlined /> : <CopyOutlined />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <Divider className={modernModalStyles.separator} />
+
+        {/* Telegram Integration Section */}
+        <div className={modernModalStyles.telegramSection}>
+          <div className={modernModalStyles.sectionHeader}>
+            <div className={modernModalStyles.indicator}></div>
+            <h3>Telegram Integration</h3>
+          </div>
+
+          <div className={modernModalStyles.telegramCard}>
+            <div className={modernModalStyles.telegramStatus}>
+              <div className={modernModalStyles.statusIcon}>
                 {userTelegramData?.telegramId ? (
-                  <div style={{
-                    background: 'var(--cr-card-bg)',
-                    border: '1px solid var(--cr-secondary-border)',
-                    borderRadius: '6px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '16px' }} />
-                      <Text strong style={{ color: '#52c41a' }}>Connected</Text>
-                    </div>
-                    <div style={{ marginBottom: '16px' }}>
-                      <Text style={{ color: 'var(--cr-secondary-text)' }}>Username: </Text>
-                      <Text strong style={{ color: 'var(--cr-primary-text)' }}>@{userTelegramData.telegramUserName}</Text>
-                    </div>
-                    <Button
-                      type="default"
-                      danger
-                      size="small"
-                      onClick={handleTelegramUnlink}
-                      style={{ borderRadius: '6px' }}
-                    >
-                      Unlink Telegram
-                    </Button>
-                  </div>
+                  <CheckCircleOutlined style={{ color: '#16a34a', fontSize: '20px' }} />
                 ) : (
-                  <div style={{
-                    background: 'var(--cr-card-bg)',
-                    border: '1px solid var(--cr-secondary-border)',
-                    borderRadius: '6px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <ExclamationCircleOutlined style={{ color: '#faad14', fontSize: '16px' }} />
-                      <Text strong>Not Connected</Text>
+                  <ExclamationCircleOutlined style={{ color: '#d97706', fontSize: '20px' }} />
+                )}
+              </div>
+              <div className={modernModalStyles.statusContent}>
+                <div className={`${modernModalStyles.statusBadge} ${userTelegramData?.telegramId ? modernModalStyles.connected : modernModalStyles.notConnected}`}>
+                  {userTelegramData?.telegramId ? 'Connected' : 'Not Connected'}
+                </div>
+                <p className={modernModalStyles.statusDescription}>
+                  {userTelegramData?.telegramId
+                    ? 'Your Telegram account is successfully linked.'
+                    : 'Link your Telegram account to receive notifications and access exclusive features.'
+                  }
+                </p>
+                {userTelegramData?.telegramId && (
+                  <div className={modernModalStyles.connectedInfo}>
+                    <div className={modernModalStyles.telegramUsername}>
+                      <span>Username: </span>@{userTelegramData.telegramUserName}
                     </div>
-                    <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '16px', lineHeight: '1.4' }}>
-                      Link your Telegram account to receive notifications and access exclusive features.
-                    </Text>
-                    <Button
-                      type="primary"
-                      icon={<LinkOutlined />}
-                      onClick={handleTelegramLink}
-                      size="small"
-                      style={{ borderRadius: '6px' }}
-                    >
-                      Link Telegram
-                    </Button>
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
 
-            <Divider />
-
-            {/* Disconnect Button */}
-            <Button
-              type="primary"
-              danger
-              icon={<LogoutOutlined />}
-              onClick={handleLogout}
-              block
-              size="large"
-            >
-              Disconnect Wallet
-            </Button>
-          </Space>
+            {userTelegramData?.telegramId ? (
+              <Button
+                className={`${modernModalStyles.telegramButton} ${modernModalStyles.unlinkButton}`}
+                onClick={handleTelegramUnlink}
+              >
+                Unlink Telegram
+              </Button>
+            ) : (
+              <Button
+                className={`${modernModalStyles.telegramButton} ${modernModalStyles.linkButton}`}
+                onClick={handleTelegramLink}
+                icon={<LinkOutlined />}
+              >
+                Link Telegram
+              </Button>
+            )}
+          </div>
         </div>
+
+        <Divider className={modernModalStyles.separator} />
+
+        {/* Disconnect Button */}
+        <Button
+          className={modernModalStyles.disconnectButton}
+          onClick={handleLogout}
+          icon={<LogoutOutlined />}
+        >
+          Disconnect Wallet
+        </Button>
       </Modal>
     </>
   );
