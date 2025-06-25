@@ -120,19 +120,30 @@ export async function createCategoriesPromptInLangfuse(options = {}) {
     config = { model: 'gpt-4o', temperature: 0.7, supported_languages: ['en'] },
   } = options;
 
-  // Fetch all unique categories and coingeckoCategories from the Coin table
-  let categories = await sql`SELECT "categories", "coingeckoCategories" FROM "Coin"`;
-  let allCategories = [];
-  for (const coin of Array.from(categories)) {
+  // Fetch all categories, coingeckoCategories, and volume from the Coin table
+  let coins = await sql`SELECT "categories", "coingeckoCategories", "volume" FROM "Coin"`;
+  // Map: category name -> total volume
+  const categoryVolumeMap = new Map();
+
+  for (const coin of coins) {
     coin.categories ||= [];
     coin.coingeckoCategories ||= [];
-    allCategories.push(...coin.categories, ...coin.coingeckoCategories);
+    const allCategories = [...coin.categories, ...coin.coingeckoCategories];
+    for (const category of allCategories) {
+      if (!category) continue;
+      const prev = categoryVolumeMap.get(category) || 0;
+      categoryVolumeMap.set(category, prev + Number(coin.volume || 0));
+    }
   }
-  // Deduplicate and sort
-  allCategories = Array.from(new Set(allCategories)).filter(Boolean).sort((a, b) => a.localeCompare(b));
+
+  // Only include categories with total volume >= 100000
+  let filteredCategories = Array.from(categoryVolumeMap.entries())
+    .filter(([_, volume]) => volume >= 100000)
+    .map(([category]) => category)
+    .sort((a, b) => a.localeCompare(b));
 
   // Build the prompt string
-  const prompt = allCategories.map(cat => `- "${cat}"`).join('\n');
+  const prompt = filteredCategories.map(cat => `- "${cat}"`).join('\n');
 
   // Create the prompt in Langfuse
   const createdPrompt = await langfuse.createPrompt({
