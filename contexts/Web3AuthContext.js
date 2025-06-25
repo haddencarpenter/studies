@@ -150,7 +150,15 @@ export const Web3AuthProvider = ({ children }) => {
               const user = await web3authInstance.getUserInfo();
               setUser(user);
               setHasStoredSession(true);
-              console.log('✅ Session restored for user:', user?.email || user?.name);
+              console.log('✅ Session restored for user:', {
+                email: user?.email,
+                name: user?.name,
+                profileImage: user?.profileImage,
+                picture: user?.picture,
+                avatar: user?.avatar,
+                photo: user?.photo,
+                allFields: Object.keys(user || {})
+              });
             } catch (sessionError) {
               console.warn('⚠️ Session restoration failed, clearing state:', sessionError.message);
               // Clear any invalid session state
@@ -212,7 +220,15 @@ export const Web3AuthProvider = ({ children }) => {
       
       const user = await web3auth.getUserInfo();
       setUser(user);
-      console.log('✅ User info retrieved:', { email: user?.email, name: user?.name });
+      console.log('✅ User info retrieved:', {
+        email: user?.email,
+        name: user?.name,
+        profileImage: user?.profileImage,
+        picture: user?.picture,
+        avatar: user?.avatar,
+        photo: user?.photo,
+        allFields: Object.keys(user || {})
+      });
 
       // Create ethers provider using the Web3Auth provider
       const ethProvider = new ethers.BrowserProvider(web3authProvider);

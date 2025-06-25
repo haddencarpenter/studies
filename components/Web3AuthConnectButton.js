@@ -301,10 +301,10 @@ const Web3AuthConnectButton = ({ collapsed }) => {
           alignItems: 'center'
         }}
       >
-        {loggedIn && user?.profileImage && !collapsed && (
+        {loggedIn && (user?.profileImage || user?.picture) && !collapsed && (
           <Avatar
             size="small"
-            src={user.profileImage}
+            src={user.profileImage || user.picture}
             style={{ marginRight: 8 }}
           />
         )}
@@ -335,8 +335,8 @@ const Web3AuthConnectButton = ({ collapsed }) => {
         {/* Profile Section */}
         <div className={modernModalStyles.profileSection}>
           <div className={modernModalStyles.profileAvatar}>
-            {user?.profileImage ? (
-              <Avatar size={80} src={user.profileImage} />
+            {(user?.profileImage || user?.picture) ? (
+              <Avatar size={80} src={user.profileImage || user.picture} />
             ) : (
               <Avatar size={80} icon={<UserOutlined />} />
             )}
