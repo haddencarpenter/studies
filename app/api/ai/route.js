@@ -522,11 +522,13 @@ const toolImplementations = {
   },
 
   getAllCategories: {
-    execute: async () => {
-      console.log('Tool executed: getAllCategories');
+    execute: async ({ limit } = {}) => {
+      console.log('Tool executed: getAllCategories', { limit });
 
-      // Call the socket server API endpoint for categories
-      const result = await callSocketServer('/api/categories');
+      // Call the socket server API endpoint for categories, with optional limit
+      const params = {};
+      if (typeof limit !== 'undefined') params.limit = limit;
+      const result = await callSocketServer('/api/categories', params);
 
       console.log('getAllCategories - Result:', result);
 
