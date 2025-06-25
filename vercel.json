@@ -1,7 +1,13 @@
 {
-  "regions": [
-    "sfo1",
-    "fra1",
-    "sin1"
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "unsafe-none"
+        }
+      ]
+    }
   ]
 }
