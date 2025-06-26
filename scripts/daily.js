@@ -97,12 +97,12 @@ const fetchCoinDataCoingecko = async (coinId) => {
     INSERT INTO "Coin" (
       id, symbol, name, "defaultPlatform", platforms, images, description, homepage, twitter, "twitterFollowers",
       ath, atl, "marketCap", "marketCapRank", "fullyDilutedValuation", "currentPrice", "circulatingSupply", "totalSupply",
-      "maxSupply", tickers, "coingeckoCategories"
+      "maxSupply", tickers, "coingeckoCategories", "volume"
     ) VALUES (
       ${coinId}, ${dbCoinData.symbol}, ${dbCoinData.name}, ${dbCoinData.defaultPlatform}, ${dbCoinData.platforms}, ${dbCoinData.images},
       ${dbCoinData.description}, ${dbCoinData.homepage}, ${dbCoinData.twitter}, ${dbCoinData.twitterFollowers}, ${dbCoinData.ath}, ${dbCoinData.atl},
       ${dbCoinData.marketCap}, ${dbCoinData.marketCapRank}, ${dbCoinData.fullyDilutedValuation}, ${dbCoinData.currentPrice}, ${dbCoinData.circulatingSupply},
-      ${dbCoinData.totalSupply}, ${dbCoinData.maxSupply}, ${dbCoinData.tickers}, ${dbCoinData.coingeckoCategories}
+      ${dbCoinData.totalSupply}, ${dbCoinData.maxSupply}, ${dbCoinData.tickers}, ${dbCoinData.coingeckoCategories}, ${dbCoinData.volume}
     ) ON CONFLICT (id) DO UPDATE SET
       symbol = EXCLUDED.symbol,
       name = EXCLUDED.name,
@@ -123,7 +123,8 @@ const fetchCoinDataCoingecko = async (coinId) => {
       "totalSupply" = EXCLUDED."totalSupply",
       "maxSupply" = EXCLUDED."maxSupply",
       tickers = EXCLUDED.tickers,
-      "coingeckoCategories" = EXCLUDED."coingeckoCategories"
+      "coingeckoCategories" = EXCLUDED."coingeckoCategories",
+      "volume" = EXCLUDED."volume"
   `
 
   await sql`INSERT INTO "CoinTime" ("coinId", "date", "marketCap", "volume") VALUES (${coinId}, ${new Date()}, ${marketCap}, ${volume})`
