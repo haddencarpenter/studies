@@ -117,25 +117,25 @@ export const Web3AuthProvider = ({ children }) => {
           console.log('Starting Web3Auth initialization...');
           setInitializationError(null);
 
+          // Detect if mobile device
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
           const web3authInstance = new Web3Auth({
             clientId,
             web3AuthNetwork: isDevelopment ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
             chainConfig: defaultChainConfig,
             uiConfig: {
-              appName: "CoinRotator",
               mode: "light",
-              logoLight: "https://web3auth.io/images/web3authlog.png",
-              logoDark: "https://web3auth.io/images/web3authlogodark.png",
               defaultLanguage: "en",
-              loginMethodsOrder: ["google", "facebook", "twitter"],
-              modalZIndex: "99999",
-              // Disable wallet UI completely
-              uxMode: "popup",
-              displayErrorsOnModal: false
+              loginMethodsOrder: ["google", "twitter", "discord", "apple", "github", "reddit", "farcaster", "wechat"],
+              uxMode: isMobile ? "redirect" : "popup", // Use redirect for mobile, popup for desktop
+              appLogo: "https://web3auth.io/images/web3auth-logo.svg",
+              theme: {
+                primary: "#768729"
+              }
             },
-            // Disable wallet services and UI
-            enableLogging: false,
-            sessionTime: 86400, // 1 day
+            enableLogging: isDevelopment,
+            storageKey: "local"
           });
 
           console.log('Initializing Web3Auth modal...');
@@ -209,12 +209,15 @@ export const Web3AuthProvider = ({ children }) => {
     }
   }, [isClient]);
 
-  const login = async () => {
+  const login = async (loginProvider = null) => {
     try {
       console.log('🚀 Starting Web3Auth login...');
       if (!web3auth) {
         throw new Error("Web3Auth not initialized");
       }
+
+      // Detect if mobile device for specific handling
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
       // Check if we have a stored session that can be auto-connected
       if (hasStoredSession && !loggedIn) {
@@ -223,7 +226,20 @@ export const Web3AuthProvider = ({ children }) => {
         console.log('Connecting to Web3Auth...');
       }
       
-      const web3authProvider = await web3auth.connect();
+      // For mobile devices, use specific login options
+      const connectOptions = isMobile ? {
+        loginProvider: loginProvider || undefined,
+        extraLoginOptions: {
+          domain: window.location.origin,
+          verifierIdField: "sub",
+          connection: "",
+          isVerifierIdCaseSensitive: false
+        }
+      } : {
+        loginProvider: loginProvider || undefined
+      };
+
+      const web3authProvider = await web3auth.connect(connectOptions);
       if (!web3authProvider) {
         throw new Error('No provider returned from Web3Auth connection');
       }
