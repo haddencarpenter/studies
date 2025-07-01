@@ -125,7 +125,10 @@ export const Web3AuthProvider = ({ children }) => {
             web3AuthNetwork: isDevelopment ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
             chainConfig: defaultChainConfig,
             enableLogging: isDevelopment,
-            storageKey: "local"
+            storageKey: "local",
+            modalConfig: {
+              loginMethodsOrder: ['google','twitter','discord','farcaster','apple']
+            }
           });
 
           console.log('Initializing Web3Auth modal...');
@@ -222,7 +225,7 @@ export const Web3AuthProvider = ({ children }) => {
         extraLoginOptions: {
           domain: window.location.origin,
           verifierIdField: "sub",
-          connection: "",
+          connection: loginProvider || "",
           isVerifierIdCaseSensitive: false
         }
       } : {
