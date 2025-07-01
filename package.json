@@ -8,7 +8,7 @@
     "url": "https://saschamayr.com"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "render-build": "vercel pull --environment=production --yes --token 2EUiAIbl6KE29YR2DP79LdNM && vercel build --yes --token 2EUiAIbl6KE29YR2DP79LdNM --prod && vercel deploy --prod --yes --prebuilt --archive=tgz --token 2EUiAIbl6KE29YR2DP79LdNM",
     "vercel-build": "next build && next-sitemap",
