@@ -139,27 +139,50 @@ export const Web3AuthProvider = ({ children }) => {
               appLogo: "https://coinrotator.io/logo.png", // Your app logo
               modalZIndex: "99999",
               // Mobile-specific settings for better Twitter auth
+              displayErrorsOnModal: false,
+              logLevel: isDevelopment ? "debug" : "error",
+              // Force redirect mode for mobile to prevent raw HTML issues
               ...(isMobile && {
-                displayErrorsOnModal: true,
-                logLevel: "debug",
-                // Twitter mobile auth improvements
-                socialLoginConfig: {
-                  twitter: {
-                    name: "twitter",
-                    typeOfLogin: "twitter",
-                    description: "Login with Twitter",
-                    clientId: "", // Will use Web3Auth's default
-                    logoHover: "",
-                    logoLight: "",
-                    logoDark: "",
-                    mainOption: true,
-                    showOnModal: true,
-                    showOnDesktop: true,
-                    showOnMobile: true
+                // Use redirect mode for mobile instead of popup to avoid raw HTML
+                mode: "redirect",
+                // Set proper redirect URL for mobile
+                redirectUrl: window.location.origin,
+                // Ensure mobile compatibility
+                mobileRedirectUrl: window.location.origin,
+              }),
+              // Fix Twitter authentication by using proper social login configuration
+              socialLoginConfig: {
+                twitter: {
+                  name: "twitter",
+                  typeOfLogin: "twitter",
+                  description: "Login with Twitter",
+                  clientId: "", // Let Web3Auth use default Twitter configuration
+                  logoHover: "",
+                  logoLight: "",
+                  logoDark: "",
+                  mainOption: true,
+                  showOnModal: true,
+                  showOnDesktop: true,
+                  showOnMobile: true,
+                  // Mobile-specific Twitter configuration
+                  ...(isMobile && {
+                    // Force proper mobile Twitter handling
+                    customQueryParams: {
+                      prompt: "login",
+                      display: "touch"
+                    }
+                  }),
+                  // Ensure proper Twitter OAuth flow
+                  jwtParameters: {
+                    domain: window.location.origin,
+                    verifierIdField: "sub",
+                    isVerifierIdCaseSensitive: false
                   }
                 }
-              })
+              }
             },
+            // Add sessionTime to prevent session timeout issues
+            sessionTime: 86400, // 24 hours
           });
 
           console.log('Initializing Web3Auth modal...');
@@ -250,31 +273,26 @@ export const Web3AuthProvider = ({ children }) => {
         console.log('Connecting to Web3Auth...');
       }
 
-      // For mobile devices, use specific login options with improved Twitter handling
-      const connectOptions = isMobile ? {
+      // Configure login options based on device and provider
+      let connectOptions = {
         loginProvider: loginProvider || undefined,
-        mfaLevel: "none", // Disable MFA for smoother mobile experience
-        extraLoginOptions: {
-          domain: window.location.origin,
-          verifierIdField: "sub",
-          connection: loginProvider || "",
-          isVerifierIdCaseSensitive: false,
-          // Fix for Twitter showing raw HTML on mobile
-          display: loginProvider === "twitter" ? "page" : "popup",
-          prompt: "login",
-          // Twitter-specific mobile fixes
-          ...(loginProvider === "twitter" && {
-            response_type: "code",
-            scope: "openid profile email",
-            redirect_uri: window.location.origin,
-            // Force mobile-friendly Twitter auth
-            mobile: "true",
-            ui_locales: "en"
-          })
-        }
-      } : {
-        loginProvider: loginProvider || undefined
+        mfaLevel: "none", // Disable MFA for smoother experience
       };
+
+      // Special mobile handling for Twitter to prevent raw HTML issues
+      if (isMobile && loginProvider === "twitter") {
+        connectOptions.extraLoginOptions = {
+          // Force proper mobile Twitter authentication
+          display: "touch",
+          prompt: "login",
+          // Ensure proper redirect handling
+          redirect_uri: window.location.origin,
+          // Use mobile-optimized flow
+          response_mode: "fragment",
+          // Prevent raw HTML display
+          ui_locales: "en"
+        };
+      }
 
       const web3authProvider = await web3auth.connect(connectOptions);
       if (!web3authProvider) {
