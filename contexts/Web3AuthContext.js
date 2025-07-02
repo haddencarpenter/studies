@@ -131,12 +131,6 @@ export const Web3AuthProvider = ({ children }) => {
               loginMethodsOrder: ["google", "twitter", "github", "apple", "email_passwordless"],
               // Hide specific login methods
               hideExternalWallets: true,
-              // Customize appearance
-              theme: {
-                primary: "#0364ff",
-              },
-              // Customize login modal
-              appLogo: "https://coinrotator.io/logo.png", // Your app logo
               modalZIndex: "99999",
               // Mobile-specific settings for better Twitter auth
               displayErrorsOnModal: false,
