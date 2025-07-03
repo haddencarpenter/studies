@@ -5,7 +5,6 @@ import sum from 'lodash/sum.js';
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { retry } from '@lifeomic/attempt'
-import * as Sentry from "@sentry/node";
 
 import '../lib/sentry.mjs'
 import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
