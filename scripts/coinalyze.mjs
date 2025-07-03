@@ -6,7 +6,6 @@ import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { retry } from '@lifeomic/attempt'
 
-import '../lib/sentry.mjs'
 import { getSupportedExchanges, getSupportedFutureMarkets, getOpenInterest, getFundingRate, getVolume24h } from '../lib/coinalyze.mjs';
 import { deformat } from '../utils/number.mjs';
 import sql from '../lib/database.mjs';
@@ -134,7 +133,6 @@ const fetchCoinalyze = async () => {
         futuresVolume24h = scrapedFuturesVolume24h
       } catch(e) {
         console.error(e)
-        Sentry.captureException(e);
         // In error case we don't want to save wrong data
         openInterest = null
         futuresVolume24h = null
@@ -154,15 +152,6 @@ const fetchCoinalyze = async () => {
     } catch(e) {
       console.log(coin.id, openInterest, fundingRate, futuresVolume24h)
       console.error(e)
-      Sentry.captureException(e, {
-        extra: {
-          coinId: coin.id,
-          openInterest,
-          fundingRate,
-          futuresVolume24h,
-          now,
-        },
-      });
     }
   }
 }
@@ -193,11 +182,6 @@ setTimeout(async () => {
     console.log('Global data stored in database')
   } catch (e) {
     console.error('Error fetching or storing global data:', e)
-    Sentry.captureException(e, {
-      extra: {
-        context: 'Global data fetch and storage',
-      },
-    });
   }
 
   if (process.env.NODE_ENV === 'production') {
