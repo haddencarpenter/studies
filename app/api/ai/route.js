@@ -699,6 +699,30 @@ const toolImplementations = {
         throw(error)
       }
     }
+  },
+
+  getCoinHistoricalMetaData: {
+    execute: async ({ coinId, timestamp }) => {
+      try {
+        console.log('Tool executed: getCoinHistoricalMetaData', { coinId, timestamp });
+
+        // Call the socket server API endpoint for historical metadata
+        const result = await callSocketServer('/api/coin/historical-metadata', {
+          coinId,
+          timestamp
+        });
+
+        console.log('getCoinHistoricalMetaData - Result:', result);
+
+        if (result.error) {
+          throw(result.error)
+        }
+
+        return result;
+      } catch (error) {
+        throw(error)
+      }
+    }
   }
 };
 
