@@ -327,6 +327,7 @@ const NavigationMenu = ({ collapsed = false, topCategories, onMenuItemSelected }
       items={menuItems}
       className={styles.menu}
       selectedKeys={[selectedKey]}
+      onClick={handleMenuClick}
       {...props}
     />
   );
