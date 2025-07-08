@@ -737,7 +737,6 @@ const getAiConfigurationAndPrompts = async (sessionId = null) => {
     if (sessionId) {
       url.searchParams.append('sessionId', sessionId);
     }
-    url.searchParams.append('playground', 'false');
 
     // Fetch API configuration, system prompt, and classifier prompt in parallel
     const [apiResponse, langfuseSystemPrompt, langfuseClassifierPrompt] = await Promise.all([
@@ -747,8 +746,8 @@ const getAiConfigurationAndPrompts = async (sessionId = null) => {
           'Accept': 'application/json'
         }
       }),
-      langfuse.getPrompt("System prompt", undefined, { label: 'playground' }),
-      langfuse.getPrompt("Classification Prompt", undefined, { label: 'playground' })
+      langfuse.getPrompt("System prompt", undefined, { label: 'beta' }),
+      langfuse.getPrompt("Classification Prompt", undefined, { label: 'beta' })
     ]);
 
     if (!apiResponse.ok) {
