@@ -52,16 +52,10 @@
         }
 
         .logo {
-            width: 104px;
-            height: 32px;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-            -webkit-backface-visibility: hidden;
-            -moz-backface-visibility: hidden;
-            -ms-transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            display: flex;
+            align-items: center;
+            font-family: 'Tektur', monospace;
+            text-transform: lowercase;
         }
 
         .connect-btn {
@@ -335,7 +329,10 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <img src="./assets/images/img_header_logo.png" alt="Shumi Logo" class="logo" />
+                <div class="logo">
+                    <span style="font-size: 20px;">🍄</span>
+                    <span style="font-size: 18px; font-weight: 600; margin-left: 8px; color: #ffffff;">shumi</span>
+                </div>
                 <button class="connect-btn" onclick="connectToShumi()">Connect to Shumi</button>
             </div>
         </header>
