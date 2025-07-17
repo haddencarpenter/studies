@@ -82,7 +82,7 @@ export async function POST(req) {
   }
 
   try {
-    const response = await shumi({ messages, walletAddress, data });
+    const response = await shumi({ messages, walletAddress, data, promptVersion: 'playground' });
     const streamResponse = response.toDataStreamResponse({
       getErrorMessage: (error) => {
         reportErrorToServer(error, {

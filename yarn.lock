@@ -6373,8 +6373,8 @@ code-block-writer@^10.1.1:
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
-  version "1.7.7"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#62c4b2bb7f6b2d9c0590cfb7c6e228193b0af908"
+  version "2.0.0"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#f0b4d3ad9c0dc1478ea04e391f23787a11c407fd"
   dependencies:
     "@ai-sdk/anthropic" "^1.2.12"
     "@ai-sdk/google-vertex" "^2.2.27"
@@ -7848,9 +7848,9 @@ eventsource-parser@^3.0.0:
   integrity sha512-nVpZkTMM9rF6AQ9gPJpFsNAMt48wIzB5TQgiTLdHiuO8XEDhUgZEhqKlZWXbIzo9VmJ/HvysHqEaVeD5v9TPvA==
 
 exa-js@^1.8.20:
-  version "1.8.20"
-  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.8.20.tgz#03b565c00d3b081ca6023301a679580fc0185320"
-  integrity sha512-FNxoaBOmGyfb4NoWn3Bf5QQGOeKGW7SZ0z4p7qRyoFueH8671XQ6VkYLLriaWSZQ42h7+7O9bAjLXBdYuQ2XMw==
+  version "1.8.21"
+  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.8.21.tgz#c0550ffb45eacd83b849111e38e32e7b4f79f8d7"
+  integrity sha512-W1yR4OifvKL/gIxUh4DusvdfGtCXngGEX+JpleAEWtDLZJlH9dq/TX7UDkIbuCgFHN9m6dMwdp/8nKvnfsmKbw==
   dependencies:
     cross-fetch "~4.1.0"
     dotenv "~16.4.7"
@@ -8177,9 +8177,9 @@ form-data-encoder@1.7.2:
   integrity sha512-qfqtYan3rxrnCk1VYaA4H+Ms9xdpPqvLZa6xmMgFvhO32x7/3J/ExcTd6qpxM0vH2GdMI+poehyBZvqfMTto8A==
 
 form-data@^4.0.0:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.3.tgz#608b1b3f3e28be0fccf5901fc85fb3641e5cf0ae"
-  integrity sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.4.tgz#784cdcce0669a9d68e94d11ac4eea98088edd2c4"
+  integrity sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==
   dependencies:
     asynckit "^0.4.0"
     combined-stream "^1.0.8"
@@ -11019,9 +11019,9 @@ openai@^4.47.3:
     node-fetch "^2.6.7"
 
 openai@^5.0.1:
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-5.10.0.tgz#e33f4c32dc6188e272a192dc0e80f5b8a5f86df9"
-  integrity sha512-x7/GCuL2RZD024MEcGWvB8NpDJ+4wtwQ0OygKKbdr302r7xFNWHRk885NJvILe2ThArPKi6T7tlfIjQT5/i2ng==
+  version "5.10.1"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-5.10.1.tgz#4535a9603f4d03b2392bb2ca41a618a80fdcfacd"
+  integrity sha512-fq6xVfv1/gpLbsj8fArEt3b6B9jBxdhAK+VJ+bDvbUvNd+KTLlA3bnDeYZaBsGH9LUhJ1M1yXfp9sEyBLMx6eA==
 
 openapi-fetch@^0.13.5:
   version "0.13.8"
