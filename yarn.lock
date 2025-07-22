@@ -6373,8 +6373,8 @@ code-block-writer@^10.1.1:
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
-  version "1.7.7"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#62c4b2bb7f6b2d9c0590cfb7c6e228193b0af908"
+  version "2.0.1"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#790406de6f9c3de5695b8ea8230d28b1837b28a4"
   dependencies:
     "@ai-sdk/anthropic" "^1.2.12"
     "@ai-sdk/google-vertex" "^2.2.27"
@@ -7848,9 +7848,9 @@ eventsource-parser@^3.0.0:
   integrity sha512-nVpZkTMM9rF6AQ9gPJpFsNAMt48wIzB5TQgiTLdHiuO8XEDhUgZEhqKlZWXbIzo9VmJ/HvysHqEaVeD5v9TPvA==
 
 exa-js@^1.8.20:
-  version "1.8.20"
-  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.8.20.tgz#03b565c00d3b081ca6023301a679580fc0185320"
-  integrity sha512-FNxoaBOmGyfb4NoWn3Bf5QQGOeKGW7SZ0z4p7qRyoFueH8671XQ6VkYLLriaWSZQ42h7+7O9bAjLXBdYuQ2XMw==
+  version "1.8.23"
+  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.8.23.tgz#6eacac2394a46ea602bb83c5545054a96f6e7754"
+  integrity sha512-46l66SJM5HuaRTc9Nf9Rz4FCaq3xBjrecgDEjq6P05B7qZXpEBjSuW24ra5ppBaauzgzGiS0FdeVMFCEvulpPQ==
   dependencies:
     cross-fetch "~4.1.0"
     dotenv "~16.4.7"
@@ -11019,9 +11019,9 @@ openai@^4.47.3:
     node-fetch "^2.6.7"
 
 openai@^5.0.1:
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/openai/-/openai-5.10.0.tgz#e33f4c32dc6188e272a192dc0e80f5b8a5f86df9"
-  integrity sha512-x7/GCuL2RZD024MEcGWvB8NpDJ+4wtwQ0OygKKbdr302r7xFNWHRk885NJvILe2ThArPKi6T7tlfIjQT5/i2ng==
+  version "5.10.2"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-5.10.2.tgz#5391ac067bc0a96fc6d2909bed86630960d0041c"
+  integrity sha512-n+vi74LzHtvlKcDPn9aApgELGiu5CwhaLG40zxLTlFQdoSJCLACORIPC2uVQ3JEYAbqapM+XyRKFy2Thej7bIw==
 
 openapi-fetch@^0.13.5:
   version "0.13.8"
