@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import classnames from 'classnames'
 
-import useKeyPass from '../hooks/useKeyPass';
 import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
@@ -17,7 +16,6 @@ const generateSessionId = () => {
 };
 
 const Shumi = ({ isActive, initialSuggestions }) => {
-  const hasKeyPass = useKeyPass()
   const { loggedIn, getAccounts } = useWeb3Auth()
   const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
