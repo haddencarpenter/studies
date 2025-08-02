@@ -25,6 +25,18 @@ const productionClientId = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "BGSAe0
 
 const clientId = isDevelopment ? developmentClientId : productionClientId;
 
+// 🔍 DEBUG: Web3Auth Configuration
+console.log('🔍 Web3Auth Debug Info:');
+console.log('isDevelopment:', isDevelopment);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('hostname:', typeof window !== 'undefined' ? window.location.hostname : 'server');
+console.log('developmentClientId:', developmentClientId);
+console.log('productionClientId:', productionClientId);
+console.log('NEXT_PUBLIC_WEB3AUTH_CLIENT_ID env var:', process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID);
+console.log('clientId being used:', clientId);
+console.log('network:', isDevelopment ? 'SAPPHIRE_DEVNET' : 'SAPPHIRE_MAINNET');
+console.log('🔍 End Debug Info');
+
 // Multi-chain configuration
 const chainConfigs = {
   base: {
