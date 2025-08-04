@@ -25,6 +25,18 @@ const productionClientId = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "BGSAe0
 
 const clientId = isDevelopment ? developmentClientId : productionClientId;
 
+// 🔍 DEBUG: Web3Auth Configuration
+console.log('🔍 Web3Auth Debug Info:');
+console.log('isDevelopment:', isDevelopment);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('hostname:', typeof window !== 'undefined' ? window.location.hostname : 'server');
+console.log('developmentClientId:', developmentClientId);
+console.log('productionClientId:', productionClientId);
+console.log('NEXT_PUBLIC_WEB3AUTH_CLIENT_ID env var:', process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID);
+console.log('clientId being used:', clientId);
+console.log('network:', isDevelopment ? 'SAPPHIRE_DEVNET' : 'SAPPHIRE_MAINNET');
+console.log('🔍 End Debug Info');
+
 // Multi-chain configuration
 const chainConfigs = {
   base: {
@@ -117,8 +129,19 @@ export const Web3AuthProvider = ({ children }) => {
           console.log('Starting Web3Auth initialization...');
           setInitializationError(null);
 
-          // Detect if mobile device
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+          // Enhanced mobile detection with more comprehensive user agent check
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|mobi/i.test(navigator.userAgent) || window.innerWidth <= 768;
+          console.log('Device detected as:', isMobile ? 'Mobile' : 'Desktop');
+
+          // Enhanced OAuth redirect detection for mobile
+          const urlParams = new URLSearchParams(window.location.search);
+          const hasOAuthParams = urlParams.has('code') || urlParams.has('state') || urlParams.has('oauth_token') ||
+                                urlParams.has('oauth_verifier') || urlParams.has('access_token') ||
+                                window.location.hash.includes('access_token') || window.location.hash.includes('code');
+          
+          if (hasOAuthParams) {
+            console.log('🔄 OAuth redirect detected, Web3Auth will handle automatically');
+          }
 
           const web3authInstance = new Web3Auth({
             clientId,
@@ -126,6 +149,10 @@ export const Web3AuthProvider = ({ children }) => {
             chainConfig: defaultChainConfig,
             enableLogging: isDevelopment,
             storageKey: "local",
+            // Add redirectUrl for proper mobile redirect handling
+            redirectUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
+            // CRITICAL: Add replaceUrlOnRedirect for mobile OAuth flow
+            replaceUrlOnRedirect: true,
             uiConfig: {
               // Only show these login methods
               loginMethodsOrder: ["google", "twitter", "github", "apple", "email_passwordless"],
@@ -135,8 +162,8 @@ export const Web3AuthProvider = ({ children }) => {
               // Mobile-specific settings for better Twitter auth
               displayErrorsOnModal: false,
               logLevel: isDevelopment ? "debug" : "error",
-              // Force redirect mode for mobile to prevent raw HTML issues
-              uxMode: isMobile ? "redirect" : "popup",
+              // Force redirect mode for all devices to ensure consistent behavior
+              uxMode: "redirect",
             },
             // Add sessionTime to prevent session timeout issues
             sessionTime: 86400, // 24 hours
@@ -220,8 +247,9 @@ export const Web3AuthProvider = ({ children }) => {
         throw new Error("Web3Auth not initialized");
       }
 
-      // Detect if mobile device for specific handling
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      // Enhanced mobile detection with more comprehensive user agent check
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|mobi/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      console.log('Device detected as:', isMobile ? 'Mobile' : 'Desktop');
 
       // Check if we have a stored session that can be auto-connected
       if (hasStoredSession && !loggedIn) {
@@ -236,6 +264,11 @@ export const Web3AuthProvider = ({ children }) => {
         mfaLevel: "none", // Disable MFA for smoother experience
       };
 
+      // For mobile devices, ensure we're using the correct redirect mode
+      if (isMobile) {
+        console.log('📱 Using mobile-optimized login flow with redirect mode');
+        // The redirectUrl and replaceUrlOnRedirect are already set in the Web3Auth config
+      }
 
       const web3authProvider = await web3auth.connect(connectOptions);
       if (!web3authProvider) {
