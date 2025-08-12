@@ -157,8 +157,8 @@ export const Web3AuthProvider = ({ children }) => {
               metadata: {
                 name: "CoinRotator",
                 description: "Crypto screening and analysis platform",
-                url: typeof window !== 'undefined' ? window.location.origin : 'https://coinrotator.app',
-                icons: [typeof window !== 'undefined' ? `${window.location.origin}/favicon-32x32.png` : 'https://coinrotator.app/favicon-32x32.png']
+                url: typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL,
+                icons: [typeof window !== 'undefined' ? `${window.location.origin}/favicon-32x32.png` : `${process.env.NEXT_PUBLIC_SITE_URL}/favicon-32x32.png`]
               },
               // Increase timeout to prevent "Proposal expired" errors
               timeout: 60000, // 60 seconds
