@@ -10,6 +10,25 @@ import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
 
+// Animated thinking indicator component
+const ThinkingIndicator = () => {
+  const [dots, setDots] = useState('.');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === '.') return '..';
+        if (prev === '..') return '...';
+        return '.';
+      });
+    }, 400); // Switch every 400ms for a nice rhythm
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return `Thinking${dots}`;
+};
+
 // Helper function to generate session ID
 const generateSessionId = () => {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
@@ -224,7 +243,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
                   <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>
                     <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi</div>
-                    <div className={shumiStyles.messageContent}>Thinking...</div>
+                    <div className={shumiStyles.messageContent}><ThinkingIndicator /></div>
                   </div>
                ) : null}
 
@@ -292,7 +311,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
             ref={aiInputRef} // Use the specific ref for AI input
             spellCheck="false"
             disabled={error != null || disableInput} // Disable input on error OR during submission
-            placeholder={disableInput ? "Generating response..." : "Ask anything..."}
+            placeholder="Ask anything..."
             />
           </div>
         </div>

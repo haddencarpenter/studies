@@ -9,9 +9,11 @@
   overflow: hidden; // Prevent overflow within the tab itself
   background-color: var(--cr-secondary-bg); // Consistent background
   height: calc(100% - 91px); // Default height for desktop
+  min-height: 400px; // Minimum height to ensure proper display in modals
 
   @media (max-width: @screen-lg) {
     height: calc(100vh - 52px - 91px); // Apply calc height only on smaller screens
+    min-height: 300px; // Smaller minimum height on mobile
   }
 }
 
@@ -53,31 +55,31 @@
 }
 
 // Floating container that holds both suggestions and input
-.floatingContainer {
-  position: absolute;
-  bottom: 21px; // Default margin bottom when chat exists
-  left: 32px;
-  right: 32px;
-  max-width: 750px;
-  margin: 0 auto; // Center horizontally within the left/right constraints
-  z-index: 10; // Ensure it floats above content
-  display: flex;
-  flex-direction: column;
-  gap: 12px; // Space between suggestions and input
+.aiTab .floatingContainer {
+  position: absolute !important;
+  bottom: 21px !important; // Default margin bottom when chat exists
+  left: 32px !important;
+  right: 32px !important;
+  max-width: 750px !important;
+  margin: 0 auto !important; // Center horizontally within the left/right constraints
+  z-index: 10 !important; // Ensure it floats above content
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important; // Space between suggestions and input
 
   // Responsive margins for mobile
   @media (max-width: @screen-lg) {
-    left: 16px; // Smaller side margins on mobile
-    right: 16px; // Smaller side margins on mobile
-    bottom: 46px; // Proper bottom margin on mobile
+    left: 16px !important; // Smaller side margins on mobile
+    right: 16px !important; // Smaller side margins on mobile
+    bottom: 46px !important; // Proper bottom margin on mobile
   }
 }
 
 // Modifier for centered container when no chat content
-.floatingContainerCentered {
-  top: 50%;
-  bottom: auto;
-  transform: translateY(-50%); // Center vertically
+.aiTab .floatingContainer.floatingContainerCentered {
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important; // Center vertically
 }
 
 // Styles for AI suggestions within the floating container
