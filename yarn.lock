@@ -6397,8 +6397,8 @@ code-block-writer@^10.1.1:
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
-  version "2.6.1"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#fced89616e4e423715eb63d2f14ce645031c4007"
+  version "2.9.1"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#c7fdbc1ef39688639686658403b59406217ba88e"
   dependencies:
     "@ai-sdk/anthropic" "^1.2.12"
     "@ai-sdk/google-vertex" "^2.2.27"
@@ -7881,9 +7881,9 @@ eventsource-parser@^3.0.0:
   integrity sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==
 
 exa-js@^1.8.20:
-  version "1.9.3"
-  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.9.3.tgz#60a363f10a339600e136aa6fdfaf26c3ff5e2cb0"
-  integrity sha512-4u8vO5KHstifBz6fcwcBVvU62zfwsWFpD8qomU2zQ+lLRYCwOh2Rz04xSSqEeoHrkCypGjy2VHez7elBt6ibQQ==
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.10.2.tgz#92147c6da879d177d3eea675ac20d032b011b2ba"
+  integrity sha512-nObBipoXKL5uL6Dc8Q3c9GA4xEfunQMdGGqtcCkQSNilzR6AExyVkBxTdpWqC20jKa3/dvXu6otXQLaRyZNqGw==
   dependencies:
     cross-fetch "~4.1.0"
     dotenv "~16.4.7"
@@ -9633,10 +9633,10 @@ langfuse-core@^3.37.5:
   dependencies:
     mustache "^4.2.0"
 
-langfuse-core@^3.38.5:
-  version "3.38.5"
-  resolved "https://registry.yarnpkg.com/langfuse-core/-/langfuse-core-3.38.5.tgz#4b07a4b5434cb0bdaa81cd0a59fca7fcd0375fe1"
-  integrity sha512-vf/4zxv7/mz97yOpQiCJ7Mok8YZt9a52nn3XWTj+qxll4zenHT+wfAHwvfJ4BnVjK54GbEmP7IB524f/5ltq7g==
+langfuse-core@^3.38.6:
+  version "3.38.6"
+  resolved "https://registry.yarnpkg.com/langfuse-core/-/langfuse-core-3.38.6.tgz#6ad5aefda9372dc52ac3f2b093e71940efafcd9d"
+  integrity sha512-EcZXa+DK9FJdi1I30+u19eKjuBJ04du6j2Nybk19KKCuraLczg/ppkTQcGvc4QOk//OAi3qUHrajUuV74RXsBQ==
   dependencies:
     mustache "^4.2.0"
 
@@ -9656,11 +9656,11 @@ langfuse@^3.37.5:
     langfuse-core "^3.37.5"
 
 langfuse@^3.38.4:
-  version "3.38.5"
-  resolved "https://registry.yarnpkg.com/langfuse/-/langfuse-3.38.5.tgz#a43ceb4495aa9dbd3ac8bc8559d6f76132ddc1c5"
-  integrity sha512-pvcq9qJh/q/OFGPET4/sFfXRhCcEgONx1NTqZ8bu/hnorD5xZ/qpS+er0esXJ5cuRILEGw9ydKezAeULf8tpyQ==
+  version "3.38.6"
+  resolved "https://registry.yarnpkg.com/langfuse/-/langfuse-3.38.6.tgz#67098d7ceace2aef0a36fc0416043e1dd741c5d8"
+  integrity sha512-mtwfsNGIYvObRh+NYNGlJQJDiBN+Wr3Hnr++wN25mxuOpSTdXX+JQqVCyAqGL5GD2TAXRZ7COsN42Vmp9krYmg==
   dependencies:
-    langfuse-core "^3.38.5"
+    langfuse-core "^3.38.6"
 
 langsmith@^0.1.56-rc.1:
   version "0.1.68"
