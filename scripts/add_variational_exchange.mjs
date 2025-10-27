@@ -54,8 +54,8 @@ async function addVariationalExchange() {
   for (const ticker of tickerData.tickers) {
     const symbol = ticker.symbol.toUpperCase();
     
-    // Check if coin exists in database
-    const coin = await sandboxSql`SELECT id, name, symbol FROM "Coin" WHERE symbol = ${symbol} LIMIT 1`;
+    // Check if coin exists in database (case-insensitive match)
+    const coin = await sandboxSql`SELECT id, name, symbol FROM "Coin" WHERE LOWER(symbol) = LOWER(${symbol}) LIMIT 1`;
     
     if (coin.length > 0) {
       const coinId = coin[0].id;
