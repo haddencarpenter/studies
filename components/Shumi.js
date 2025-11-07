@@ -299,30 +299,32 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                           <img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi
                        </div>
                      )}
-                     <div className={shumiStyles.messageContent}>
-                     <ReactMarkdown
-                       remarkPlugins={[remarkGfm]}
-                       components={{
-                         a: ({ href, children, ...props }) => (
-                           <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
-                             {children}
-                           </a>
-                         )
-                       }}
-                     >
-                       {message.processedContent}
-                     </ReactMarkdown>
-                   </div>
-                     {/* Only show copy button if message is not currently streaming */}
-                     {!(status === 'streaming' && index === messages.length - 1 && message.role === 'assistant') && (
-                       <div className={shumiStyles.messageCopyButton}>
-                         <ShumiCopyButton
-                           text={message.content || message.processedContent}
-                           position={message.role === 'assistant' ? 'left' : 'right'}
-                           className="shumi-copy-button"
-                         />
+                     <div className={shumiStyles.messageContentWrapper}>
+                       <div className={shumiStyles.messageContent}>
+                         <ReactMarkdown
+                           remarkPlugins={[remarkGfm]}
+                           components={{
+                             a: ({ href, children, ...props }) => (
+                               <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                                 {children}
+                               </a>
+                             )
+                           }}
+                         >
+                           {message.processedContent}
+                         </ReactMarkdown>
                        </div>
-                     )}
+                       {/* Only show copy button if message is not currently streaming */}
+                       {!(status === 'streaming' && index === messages.length - 1 && message.role === 'assistant') && (
+                         <div className={shumiStyles.messageCopyButton}>
+                           <ShumiCopyButton
+                             text={message.content || message.processedContent}
+                             position={message.role === 'assistant' ? 'left' : 'right'}
+                             className="shumi-copy-button"
+                           />
+                         </div>
+                       )}
+                     </div>
                    </div>
                  </div>
                ))}

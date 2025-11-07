@@ -127,6 +127,11 @@
   color: var(--cr-secondary-text) !important;
 }
 
+.messageContentWrapper {
+  position: relative; // Positioning context for copy button
+  width: fit-content;
+}
+
 .messageContent {
   padding: 12px; // Reverted to original value
   border-radius: 4px; // Reverted to match container
@@ -172,7 +177,7 @@
 }
 
 .messageCopyButton {
-  position: relative; // Allow the CopyButton to position itself absolutely
+  // Container for absolutely positioned copy button
 }
 
 .userMessage {
