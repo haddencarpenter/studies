@@ -1,33 +1,55 @@
+import { useState, useEffect } from 'react';
 import { Card, Space, Progress } from 'antd';
 import shumiStyles from '../styles/shumi.module.less';
 
 /**
- * ShumiThoughtProcess - Crypto-native thinking display
+ * ShumiThoughtProcess - Crypto-native thinking display with animated progress
  * 
  * @param {Array} thinking - Array of thinking steps
  * @param {boolean} isStreaming - Whether AI is currently thinking
- * 
- * Example thinking format:
- * [
- *   {
- *     step: 1,
- *     title: "Reading the signals",
- *     emoji: "🔍",
- *     status: "complete",
- *     duration: 342
- *   },
- *   ...
- * ]
  */
 const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
+  const [currentProgress, setCurrentProgress] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  
   if (!thinking || thinking.length === 0) return null;
   
-  // Calculate progress
-  const doneSteps = thinking.filter(t => t.status === 'complete').length;
-  const progress = (doneSteps / thinking.length) * 100;
+  // Animate progress while streaming
+  useEffect(() => {
+    if (!isStreaming) {
+      setCurrentProgress(100);
+      return;
+    }
+    
+    // Start from 10% and gradually increase
+    setCurrentProgress(10);
+    
+    let progress = 10;
+    let stepIndex = 0;
+    
+    const interval = setInterval(() => {
+      // Increment progress
+      progress += Math.random() * 8 + 2; // Random between 2-10% per tick
+      
+      if (progress >= 100) {
+        progress = 95; // Cap at 95% until truly complete
+      }
+      
+      setCurrentProgress(Math.min(progress, 95));
+      
+      // Advance steps as progress increases
+      const newStepIndex = Math.floor((progress / 100) * thinking.length);
+      if (newStepIndex !== stepIndex && newStepIndex < thinking.length) {
+        stepIndex = newStepIndex;
+        setCurrentStepIndex(stepIndex);
+      }
+    }, 400); // Update every 400ms
+    
+    return () => clearInterval(interval);
+  }, [isStreaming, thinking.length]);
   
-  // Find active step
-  const activeStep = thinking.find(s => s.status === 'active') || thinking[doneSteps];
+  // Get current step to display
+  const currentStep = thinking[currentStepIndex] || thinking[0];
   
   return (
     <Card
@@ -44,9 +66,9 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
           </span>
         </Space>
         
-        {/* Progress bar with gradient */}
+        {/* Animated progress bar with gradient */}
         <Progress
-          percent={progress}
+          percent={currentProgress}
           showInfo={false}
           strokeColor={{
             '0%': '#ff4d4d',
@@ -58,10 +80,10 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
         />
         
         {/* Current step */}
-        {activeStep && (
+        {currentStep && (
           <div className={shumiStyles.currentStep}>
-            {activeStep.emoji && <span>{activeStep.emoji}</span>}
-            <span>{activeStep.title}</span>
+            {currentStep.emoji && <span>{currentStep.emoji}</span>}
+            <span>{currentStep.title}</span>
           </div>
         )}
       </Space>
