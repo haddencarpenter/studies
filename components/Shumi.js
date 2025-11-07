@@ -10,6 +10,7 @@ import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
 import ShumiCopyButton from './ShumiCopyButton'
+import ThinkingBlock from './ThinkingBlock'
 
 // Animated thinking indicator component
 const ThinkingIndicator = () => {
@@ -92,6 +93,39 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
   // Store the processed messages
   const [processedMessages, setProcessedMessages] = useState([]);
+  
+  // Mock thinking data for testing Chain of Thought UI
+  // TODO: Replace with real thinking data from backend API
+  const mockThinking = [
+    {
+      step: 1,
+      title: "Understanding your query",
+      description: "Analyzing the question and identifying key parameters",
+      status: "complete",
+      duration: 127
+    },
+    {
+      step: 2,
+      title: "Fetching market data",
+      description: "Retrieving latest prices, volumes, and trends from CoinGecko",
+      status: "complete",
+      duration: 342
+    },
+    {
+      step: 3,
+      title: "Analyzing sentiment",
+      description: "Processing social signals and news sentiment for relevant coins",
+      status: "complete",
+      duration: 1247
+    },
+    {
+      step: 4,
+      title: "Generating insights",
+      description: "Synthesizing data into actionable recommendations",
+      status: "complete",
+      duration: 89
+    }
+  ];
 
   // Process messages once when they're received or changed
   useEffect(() => {
@@ -255,16 +289,25 @@ const Shumi = ({ isActive, initialSuggestions }) => {
           {messages.length > 0 ? (
              <>
                {processedMessages.map((message, index) => (
-                 <div key={index} className={classnames(shumiStyles.messageContainer, {
-                   [shumiStyles.userMessage]: message.role === 'user',
-                   [shumiStyles.assistantMessage]: message.role === 'assistant'
-                 })}>
+                 <div key={index}>
+                   {/* Show thinking block for assistant messages (mock data for testing) */}
                    {message.role === 'assistant' && (
-                      <div className={shumiStyles.messageRole}>
-                        <img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi
-                     </div>
+                     <ThinkingBlock 
+                       thinking={mockThinking}
+                       isStreaming={false}
+                     />
                    )}
-                   <div className={shumiStyles.messageContent}>
+                   
+                   <div className={classnames(shumiStyles.messageContainer, {
+                     [shumiStyles.userMessage]: message.role === 'user',
+                     [shumiStyles.assistantMessage]: message.role === 'assistant'
+                   })}>
+                     {message.role === 'assistant' && (
+                        <div className={shumiStyles.messageRole}>
+                          <img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi
+                       </div>
+                     )}
+                     <div className={shumiStyles.messageContent}>
                      <ReactMarkdown
                        remarkPlugins={[remarkGfm]}
                        components={{
@@ -278,18 +321,27 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                        {message.processedContent}
                      </ReactMarkdown>
                    </div>
-                   {/* Only show copy button if message is not currently streaming */}
-                   {!(status === 'streaming' && index === messages.length - 1 && message.role === 'assistant') && (
-                     <div className={shumiStyles.messageCopyButton}>
-                       <ShumiCopyButton
-                         text={message.content || message.processedContent}
-                         position={message.role === 'assistant' ? 'left' : 'right'}
-                         className="shumi-copy-button"
-                       />
-                     </div>
-                   )}
+                     {/* Only show copy button if message is not currently streaming */}
+                     {!(status === 'streaming' && index === messages.length - 1 && message.role === 'assistant') && (
+                       <div className={shumiStyles.messageCopyButton}>
+                         <ShumiCopyButton
+                           text={message.content || message.processedContent}
+                           position={message.role === 'assistant' ? 'left' : 'right'}
+                           className="shumi-copy-button"
+                         />
+                       </div>
+                     )}
+                   </div>
                  </div>
                ))}
+               {/* Show Chain of Thought thinking block while AI is processing */}
+               {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) && (
+                 <ThinkingBlock 
+                   thinking={mockThinking}
+                   isStreaming={true}
+                 />
+               )}
+               
                {/* Show "Thinking..." indicator */}
                {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
                   <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>

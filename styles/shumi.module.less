@@ -286,3 +286,127 @@
         color: var(--cr-error-color); // Use error color
     }
 }
+
+// Chain of Thought Thinking Block styles
+.thinkingBlock {
+  margin: 12px 0;
+  background-color: var(--cr-secondary-bg);
+  border: 1px solid var(--cr-primary-border);
+  border-radius: 8px;
+  padding: 8px;
+  transition: all 0.3s ease;
+  max-width: 80%;
+  align-self: flex-start;
+  
+  &:hover {
+    border-color: var(--cr-primary-color);
+  }
+}
+
+.thinkingPanel {
+  :global(.ant-collapse-content-box) {
+    padding: 8px 0 !important;
+  }
+}
+
+.thinkingHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.thinkingIcon {
+  font-size: 16px;
+  color: var(--cr-primary-color);
+  
+  // Pulse animation when thinking
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.thinkingTitle {
+  font-weight: 500;
+  color: var(--cr-primary-text);
+  font-size: 14px;
+  flex: 1;
+}
+
+.stepCount {
+  margin-left: auto;
+  background-color: var(--cr-quintiary-bg);
+  color: var(--cr-primary-color);
+  border: 1px solid var(--cr-primary-color);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.expandIcon {
+  color: var(--cr-secondary-text);
+  font-size: 12px;
+}
+
+.timeline {
+  margin-top: 8px;
+  padding-left: 8px;
+  
+  :global(.ant-timeline-item-tail) {
+    border-left-color: var(--cr-primary-border);
+  }
+  
+  :global(.ant-timeline-item-content) {
+    margin-left: 24px;
+  }
+}
+
+.timelineItem {
+  padding: 4px 0;
+}
+
+.stepTitle {
+  font-weight: 500;
+  color: var(--cr-primary-text);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.stepDescription {
+  color: var(--cr-secondary-text);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.duration {
+  font-size: 11px;
+  color: var(--cr-secondary-text);
+  background-color: transparent;
+  border: 1px solid var(--cr-primary-border);
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+// Dark theme adjustments
+:root[data-theme="theme-dark"] {
+  .thinkingBlock {
+    background-color: var(--cr-tertiary-bg);
+  }
+  
+  .thinkingIcon {
+    filter: brightness(1.2);
+  }
+}
