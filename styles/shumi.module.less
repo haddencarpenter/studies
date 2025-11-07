@@ -289,23 +289,19 @@
 
 // Chain of Thought Thinking Block - Minimal "Shumi is cooking" style
 .thinkingBlock {
-  background-color: var(--cr-secondary-bg) !important; // Use native background
-  border: 0 !important; // No border, match assistant messages
-  border-radius: 4px; // Match message containers
+  background-color: var(--cr-secondary-bg);
+  border-radius: 4px;
+  padding: 12px;
   margin-bottom: 12px;
   max-width: 80%;
   align-self: flex-start;
-  
-  // Ant Design Card overrides
-  :global(.ant-card-body) {
-    padding: 12px; // Match message padding
-  }
+  width: fit-content; // Don't stretch full width
 }
 
 .thinkingTitle {
   color: var(--cr-primary-text);
-  font-weight: normal; // Not bold, match existing text
-  font-size: 13px; // Match message font size
+  font-weight: normal;
+  font-size: 13px;
   opacity: 0.9;
 }
 

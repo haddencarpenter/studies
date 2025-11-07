@@ -52,11 +52,7 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
   const currentStep = thinking[currentStepIndex] || thinking[0];
   
   return (
-    <Card
-      className={shumiStyles.thinkingBlock}
-      bordered={false}
-      bodyStyle={{ padding: 16 }}
-    >
+    <div className={shumiStyles.thinkingBlock}>
       <Space direction="vertical" size={12} style={{ width: '100%' }}>
         {/* Header with mushroom emoji */}
         <Space>
@@ -87,7 +83,7 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
           </div>
         )}
       </Space>
-    </Card>
+    </div>
   );
 };
 
