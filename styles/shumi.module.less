@@ -289,49 +289,35 @@
 
 // Chain of Thought Thinking Block - Minimal "Shumi is cooking" style
 .thinkingBlock {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
+  background-color: var(--cr-secondary-bg) !important; // Use native background
+  border: 0 !important; // No border, match assistant messages
+  border-radius: 4px; // Match message containers
   margin-bottom: 12px;
   max-width: 80%;
   align-self: flex-start;
   
   // Ant Design Card overrides
   :global(.ant-card-body) {
-    padding: 16px;
+    padding: 12px; // Match message padding
   }
 }
 
 .thinkingTitle {
-  color: #e5e5e5;
-  font-weight: 600;
-  font-size: 14px;
+  color: var(--cr-primary-text);
+  font-weight: normal; // Not bold, match existing text
+  font-size: 13px; // Match message font size
+  opacity: 0.9;
 }
 
 .currentStep {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #a1a1a1;
+  gap: 6px;
+  color: var(--cr-secondary-text);
   font-size: 12px;
+  opacity: 0.8;
   
   span:first-child {
     font-size: 14px; // Emoji size
-  }
-}
-
-// Light theme adjustments
-:root[data-theme="theme-light"] {
-  .thinkingBlock {
-    background: #ffffff;
-    border: 1px solid #e5e5e5;
-  }
-  
-  .thinkingTitle {
-    color: #262626;
-  }
-  
-  .currentStep {
-    color: #737373;
   }
 }
