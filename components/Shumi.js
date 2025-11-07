@@ -94,35 +94,35 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   // Store the processed messages
   const [processedMessages, setProcessedMessages] = useState([]);
   
-  // Mock thinking data for testing Chain of Thought UI
+  // Mock thinking data for testing Chain of Thought UI - Crypto-native language
   // TODO: Replace with real thinking data from backend API
   const mockThinking = [
     {
       step: 1,
-      title: "Understanding your query",
-      description: "Analyzing the question and identifying key parameters",
+      title: "Reading the signals",
+      emoji: "🔍",
       status: "complete",
       duration: 127
     },
     {
       step: 2,
-      title: "Fetching market data",
-      description: "Retrieving latest prices, volumes, and trends from CoinGecko",
+      title: "Fetching fresh data",
+      emoji: "📊",
       status: "complete",
       duration: 342
     },
     {
       step: 3,
-      title: "Analyzing sentiment",
-      description: "Processing social signals and news sentiment for relevant coins",
-      status: "complete",
+      title: "Checking the vibes",
+      emoji: "🌊",
+      status: "active",
       duration: 1247
     },
     {
       step: 4,
-      title: "Generating insights",
-      description: "Synthesizing data into actionable recommendations",
-      status: "complete",
+      title: "Finding the alpha",
+      emoji: "💡",
+      status: "pending",
       duration: 89
     }
   ];

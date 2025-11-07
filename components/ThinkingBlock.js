@@ -1,17 +1,8 @@
-import { useState } from 'react';
-import { Collapse, Timeline } from 'antd';
-import { 
-  BulbOutlined, 
-  LoadingOutlined, 
-  CheckCircleOutlined,
-  DownOutlined 
-} from '@ant-design/icons';
+import { Card, Space, Progress } from 'antd';
 import shumiStyles from '../styles/shumi.module.less';
 
-const { Panel } = Collapse;
-
 /**
- * ThinkingBlock - Displays AI's reasoning process
+ * ShumiThoughtProcess - Crypto-native thinking display
  * 
  * @param {Array} thinking - Array of thinking steps
  * @param {boolean} isStreaming - Whether AI is currently thinking
@@ -20,8 +11,8 @@ const { Panel } = Collapse;
  * [
  *   {
  *     step: 1,
- *     title: "Fetching Solana ecosystem coins",
- *     description: "Retrieved 247 coins from CoinGecko API",
+ *     title: "Reading the signals",
+ *     emoji: "🔍",
  *     status: "complete",
  *     duration: 342
  *   },
@@ -29,87 +20,52 @@ const { Panel } = Collapse;
  * ]
  */
 const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
-  const [expanded, setExpanded] = useState(false);
-  
   if (!thinking || thinking.length === 0) return null;
   
-  const completedSteps = thinking.filter(t => t.status === 'complete').length;
-  const totalSteps = thinking.length;
+  // Calculate progress
+  const doneSteps = thinking.filter(t => t.status === 'complete').length;
+  const progress = (doneSteps / thinking.length) * 100;
+  
+  // Find active step
+  const activeStep = thinking.find(s => s.status === 'active') || thinking[doneSteps];
   
   return (
-    <div className={shumiStyles.thinkingBlock}>
-      <Collapse 
-        ghost
-        activeKey={expanded ? ['1'] : []}
-        onChange={() => setExpanded(!expanded)}
-        expandIcon={({ isActive }) => (
-          <DownOutlined 
-            className={shumiStyles.expandIcon}
-            style={{ 
-              transform: `rotate(${isActive ? 180 : 0}deg)`,
-              transition: 'transform 0.3s'
-            }} 
-          />
+    <Card
+      className={shumiStyles.thinkingBlock}
+      bordered={false}
+      bodyStyle={{ padding: 16 }}
+    >
+      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        {/* Header with mushroom emoji */}
+        <Space>
+          <span style={{ fontSize: 20 }}>🍄</span>
+          <span className={shumiStyles.thinkingTitle}>
+            Shumi is cooking...
+          </span>
+        </Space>
+        
+        {/* Progress bar with gradient */}
+        <Progress
+          percent={progress}
+          showInfo={false}
+          strokeColor={{
+            '0%': '#ff4d4d',
+            '100%': '#ff8a8a',
+          }}
+          trailColor="rgba(255, 77, 77, 0.1)"
+          strokeWidth={6}
+          style={{ margin: 0 }}
+        />
+        
+        {/* Current step */}
+        {activeStep && (
+          <div className={shumiStyles.currentStep}>
+            {activeStep.emoji && <span>{activeStep.emoji}</span>}
+            <span>{activeStep.title}</span>
+          </div>
         )}
-      >
-        <Panel
-          header={
-            <div className={shumiStyles.thinkingHeader}>
-              {isStreaming ? (
-                <LoadingOutlined className={shumiStyles.thinkingIcon} />
-              ) : (
-                <BulbOutlined className={shumiStyles.thinkingIcon} />
-              )}
-              <span className={shumiStyles.thinkingTitle}>
-                {isStreaming ? 'Thinking...' : 'Thought Process'}
-              </span>
-              <span className={shumiStyles.stepCount}>
-                {completedSteps}/{totalSteps} steps
-              </span>
-            </div>
-          }
-          key="1"
-          className={shumiStyles.thinkingPanel}
-        >
-          <Timeline
-            pending={isStreaming}
-            className={shumiStyles.timeline}
-          >
-            {thinking.map((step, index) => (
-              <Timeline.Item
-                key={index}
-                dot={
-                  step.status === 'complete' ? (
-                    <CheckCircleOutlined 
-                      style={{ 
-                        color: 'var(--cr-success-color)',
-                        fontSize: '14px'
-                      }} 
-                    />
-                  ) : (
-                    <LoadingOutlined style={{ fontSize: '14px' }} />
-                  )
-                }
-              >
-                <div className={shumiStyles.timelineItem}>
-                  <div className={shumiStyles.stepTitle}>{step.title}</div>
-                  {step.description && (
-                    <div className={shumiStyles.stepDescription}>
-                      {step.description}
-                    </div>
-                  )}
-                  {step.duration && (
-                    <div className={shumiStyles.duration}>
-                      {step.duration}ms
-                    </div>
-                  )}
-                </div>
-              </Timeline.Item>
-            ))}
-          </Timeline>
-        </Panel>
-      </Collapse>
-    </div>
+      </Space>
+    </Card>
   );
 };
 
