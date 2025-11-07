@@ -113,15 +113,15 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     },
     {
       step: 3,
-      title: "Checking the vibes",
-      emoji: "🌊",
+      title: "Analyzing sentiment",
+      emoji: "📈",
       status: "active",
       duration: 1247
     },
     {
       step: 4,
       title: "Finding the alpha",
-      emoji: "💡",
+      emoji: "💎",
       status: "pending",
       duration: 89
     }
@@ -290,14 +290,6 @@ const Shumi = ({ isActive, initialSuggestions }) => {
              <>
                {processedMessages.map((message, index) => (
                  <div key={index}>
-                   {/* Show thinking block for assistant messages (mock data for testing) */}
-                   {message.role === 'assistant' && (
-                     <ThinkingBlock 
-                       thinking={mockThinking}
-                       isStreaming={false}
-                     />
-                   )}
-                   
                    <div className={classnames(shumiStyles.messageContainer, {
                      [shumiStyles.userMessage]: message.role === 'user',
                      [shumiStyles.assistantMessage]: message.role === 'assistant'
