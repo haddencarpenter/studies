@@ -341,14 +341,6 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                    isStreaming={true}
                  />
                )}
-               
-               {/* Show "Thinking..." indicator */}
-               {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
-                  <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>
-                    <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi</div>
-                    <div className={shumiStyles.messageContent}><ThinkingIndicator /></div>
-                  </div>
-               ) : null}
 
                {/* Add error display */}
                {error && (
