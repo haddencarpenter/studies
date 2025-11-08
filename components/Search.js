@@ -20,8 +20,10 @@ const Search = ({ categories, collapsed }) => {
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [modifierKey, setModifierKey] = useState('⌘')
   const [coinData, setCoinData] = useState({}) // Stores fetched price/trend data by coin.id
+  const [categoryData, setCategoryData] = useState({}) // Stores market cap by category name
   const [loadingData, setLoadingData] = useState(false)
   const coinDataCacheRef = useRef({}) // Cache with timestamps
+  const categoryDataCacheRef = useRef({}) // Cache for category data
 
   const router = useRouter()
   
@@ -179,6 +181,61 @@ const Search = ({ categories, collapsed }) => {
     setCoinData(prevData => ({ ...prevData, ...newCoinData }))
   }, [])
 
+  // Fetch category data from AI API (on-demand)
+  const fetchCategoryData = useCallback(async (categoryNames) => {
+    const CACHE_DURATION = 30000 // 30 seconds
+    const now = Date.now()
+    const newCategoryData = {}
+    const categoriesToFetch = []
+
+    // Check cache first
+    for (const name of categoryNames) {
+      const cached = categoryDataCacheRef.current[name]
+      if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+        newCategoryData[name] = cached.data
+      } else {
+        categoriesToFetch.push(name)
+      }
+    }
+
+    // Fetch uncached categories in parallel
+    if (categoriesToFetch.length > 0) {
+      try {
+        const results = await Promise.all(
+          categoriesToFetch.map(name =>
+            fetch(`https://coinrotator-ai.onrender.com/api/category?categoryName=${encodeURIComponent(name)}`)
+              .then(res => res.ok ? res.json() : null)
+              .catch(() => null)
+          )
+        )
+
+        results.forEach((result, index) => {
+          if (result) {
+            const categoryName = categoriesToFetch[index]
+            
+            const data = {
+              trend: result.trend,
+              streak: result.streak || 0,
+              marketCap: result.marketCap || 0
+            }
+
+            newCategoryData[categoryName] = data
+            
+            // Update cache
+            categoryDataCacheRef.current[categoryName] = {
+              data,
+              timestamp: now
+            }
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching category data:', error)
+      }
+    }
+
+    setCategoryData(prevData => ({ ...prevData, ...newCategoryData }))
+  }, [])
+
   // Fetch coin data when filtered results change
   useEffect(() => {
     let filteredCoins
@@ -214,6 +271,35 @@ const Search = ({ categories, collapsed }) => {
       return () => clearTimeout(timeoutId)
     }
   }, [query, coins, fuseCoinIndex, fetchCoinData])
+
+  // Fetch category data when filtered categories change
+  useEffect(() => {
+    let filteredCategories
+    if (query?.length === 2) {
+      filteredCategories = categories.filter(category => category.toLowerCase().startsWith(query.toLowerCase()))
+    } else if (query?.length > 2) {
+      filteredCategories = new Fuse(
+        categories,
+        {
+          minMatchCharLength: 3,
+          threshold: 0.1,
+          ignoreLocation: true
+        }
+      ).search(query).map((result) => result.item)
+    }
+
+    if (filteredCategories && filteredCategories.length > 0) {
+      // Limit to top 5 for performance
+      const topCategories = filteredCategories.slice(0, 5)
+      
+      // Debounce the fetch
+      const timeoutId = setTimeout(() => {
+        fetchCategoryData(topCategories)
+      }, 300)
+
+      return () => clearTimeout(timeoutId)
+    }
+  }, [query, categories, fetchCategoryData])
 
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
@@ -350,6 +436,29 @@ const Search = ({ categories, collapsed }) => {
         <div className={searchStyles.optionTitle}>Categories</div>
         {
           filteredCategories.slice(0, 5).map((category) => {
+            // Get fetched data for this category
+            const data = categoryData[category]
+            
+            // Calculate trend indicator
+            let trendIndicator = null
+            if (data?.trend && data.trend !== 'HODL') {
+              const isUp = data.trend === 'UP'
+              const isDown = data.trend === 'DOWN'
+              const streak = data.streak || 0
+              
+              if (isUp || isDown) {
+                trendIndicator = (
+                  <span className={classnames(searchStyles.trendIndicator, {
+                    [searchStyles.trendUp]: isUp,
+                    [searchStyles.trendDown]: isDown
+                  })}>
+                    {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                    {streak > 1 && <span className={searchStyles.streak}>{streak}</span>}
+                  </span>
+                )
+              }
+            }
+
             return (
               <div
                 className={classnames(searchStyles.option, searchStyles.categoryOption)}
@@ -359,7 +468,17 @@ const Search = ({ categories, collapsed }) => {
                   const categorySlug = slugify(category)
                   router.push(`/category/${categorySlug}`)}
                 }>
-                <span className={searchStyles.categoryOption}>{category}</span>
+                <span className={searchStyles.categoryName}>{category}</span>
+                {(trendIndicator || data?.marketCap) && (
+                  <div className={searchStyles.categoryMetadata}>
+                    {trendIndicator}
+                    {data?.marketCap > 0 && (
+                      <span className={searchStyles.categoryMarketCap}>
+                        {numberFormatter.format(data.marketCap)}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             )
           })

@@ -272,10 +272,37 @@
 }
 
 .categoryOption {
-  padding-left: 4px; // Keep specific padding if needed
-   white-space: nowrap; // Prevent wrapping
-    overflow: hidden; // Hide overflow
-    text-overflow: ellipsis; // Add ellipsis
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 8px !important;
+  gap: 8px;
+
+  &:hover {
+    padding: 7px !important;
+  }
+
+  .categoryName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .categoryMetadata {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .categoryMarketCap {
+    color: @cr-gray-7;
+    font-size: 12px;
+    font-weight: 500;
+  }
 }
 
 .tabs {
