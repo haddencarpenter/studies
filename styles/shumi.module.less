@@ -63,6 +63,10 @@
   height: calc(100% - 91px); // Default height for desktop
   min-height: 400px; // Minimum height to ensure proper display in modals
 
+  // Override CSS variables for Shumi red branding
+  --shumi-border: rgba(255, 77, 77, 0.3);
+  --shumi-border-hover: rgba(255, 77, 77, 0.6);
+
   @media (max-width: @screen-lg) {
     height: calc(100vh - 52px - 91px); // Apply calc height only on smaller screens
     min-height: 300px; // Smaller minimum height on mobile
@@ -145,13 +149,13 @@
 
 .suggestionButton {
   padding: 9.6px 12px; // Increased vertical padding by 20% (8px * 1.2 = 9.6px)
-  border: 1px solid var(--cr-primary-border);
+  border: 1px solid var(--shumi-border); // Red border for Shumi branding
   border-radius: 8px; // More rounded corners
   cursor: pointer;
   font-size: 14px; // Closer to input size but still smaller than 16px
   color: #8C8C8C !important; // Use primary text color
   background-color: var(--cr-primary-bg); // Use primary background
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   text-align: left;
   width: fit-content; // Don't use full width
   max-width: 280px; // Limit width to prevent overly long suggestions
@@ -166,6 +170,7 @@
 
   &:hover {
     background-color: var(--cr-quintiary-bg);
+    border-color: var(--shumi-border-hover); // Brighter red on hover
   }
 }
 
@@ -230,7 +235,7 @@
 .userMessage {
   align-self: flex-end;
   .messageContent {
-    border: 1px solid var(--cr-primary-border);
+    border: 1px solid var(--shumi-border); // Red border for user messages
   }
 }
 
@@ -264,9 +269,14 @@
 // Styles for the input area within the floating container
 .inputArea {
   background-color: var(--cr-primary-bg);
-  border: 1px solid var(--cr-primary-border);
+  border: 1px solid var(--shumi-border); // Red border for input
   border-radius: 12px; // Rounded borders
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Add subtle shadow for floating effect
+  transition: border-color 0.2s ease;
+  
+  &:focus-within {
+    border-color: var(--shumi-border-hover); // Brighter red when focused
+  }
 }
 
 .aiInput {
