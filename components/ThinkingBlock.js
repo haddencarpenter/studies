@@ -14,9 +14,10 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
   
   if (!thinking || thinking.length === 0) return null;
   
-  // Animate progress while streaming - slower for realistic timing
+  // Animate progress while streaming - syncs with response arrival
   useEffect(() => {
     if (!isStreaming) {
+      // When streaming stops, jump to 100% and component will disappear
       setCurrentProgress(100);
       return;
     }
@@ -28,14 +29,27 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
     let stepIndex = 0;
     
     const interval = setInterval(() => {
-      // Much slower increment: 1-3% per tick (was 2-10%)
-      progress += Math.random() * 2 + 1;
-      
-      if (progress >= 100) {
-        progress = 90; // Cap at 90% until truly complete
+      // Slow increment that slows down as it approaches completion
+      // Fast at start (1-3%), then slows down near the end
+      let increment;
+      if (progress < 30) {
+        increment = Math.random() * 2 + 1; // 1-3% when < 30%
+      } else if (progress < 60) {
+        increment = Math.random() * 1.5 + 0.5; // 0.5-2% when 30-60%
+      } else if (progress < 85) {
+        increment = Math.random() * 1 + 0.3; // 0.3-1.3% when 60-85%
+      } else {
+        increment = Math.random() * 0.5 + 0.1; // 0.1-0.6% when > 85% (crawl to finish)
       }
       
-      setCurrentProgress(Math.min(progress, 90));
+      progress += increment;
+      
+      // Cap at 95% - will jump to 100% when isStreaming becomes false (response starts)
+      if (progress >= 95) {
+        progress = 95;
+      }
+      
+      setCurrentProgress(Math.min(progress, 95));
       
       // Advance steps as progress increases
       const newStepIndex = Math.floor((progress / 100) * thinking.length);
@@ -43,7 +57,7 @@ const ThinkingBlock = ({ thinking = [], isStreaming = false }) => {
         stepIndex = newStepIndex;
         setCurrentStepIndex(stepIndex);
       }
-    }, 800); // Update every 800ms (was 400ms) for slower animation
+    }, 800); // Update every 800ms
     
     return () => clearInterval(interval);
   }, [isStreaming, thinking.length]);
