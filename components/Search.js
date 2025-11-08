@@ -1,13 +1,15 @@
 import { Modal, Input, Tag } from 'antd'
-import { SearchOutlined } from "@ant-design/icons";
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { SearchOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
 import classnames from 'classnames'
 import slugify from 'slugify'
 import Fuse from 'fuse.js'
+import round from 'lodash/round'
 import searchStyles from '../styles/search.module.less'
 import Shumi from './Shumi'
+import useSocketStore from '../hooks/useSocketStore'
 
 const Search = ({ categories, collapsed }) => {
   const [coins, setCoins] = useState([])
@@ -18,8 +20,24 @@ const Search = ({ categories, collapsed }) => {
   const searchInputRef = useRef(null)
   const [fuseCoinIndex, setFuseCoinIndex] = useState(undefined)
   const [modifierKey, setModifierKey] = useState('⌘')
+  const [prices, setPrices] = useState({})
+  const [trends, setTrends] = useState(null)
+  const socket = useSocketStore(state => state.socket)
 
   const router = useRouter()
+  
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat([], { 
+    style: 'currency', 
+    currency: 'usd', 
+    currencyDisplay: 'narrowSymbol', 
+    maximumFractionDigits: 9 
+  }), [])
+  
+  const numberFormatter = useMemo(() => new Intl.NumberFormat([], { 
+    notation: 'compact', 
+    compactDisplay: 'short', 
+    maximumFractionDigits: 2 
+  }), [])
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -97,6 +115,78 @@ const Search = ({ categories, collapsed }) => {
     } // Keep default '⌘' if detection fails or for other OS
   }, [])
 
+  // Load prices from localStorage on mount
+  useEffect(() => {
+    const cachedPrices = JSON.parse(localStorage.getItem("prices"))
+    if (cachedPrices) {
+      setPrices(cachedPrices)
+    }
+  }, [])
+
+  // Fetch trends via socket
+  const fetchTrends = useCallback(() => {
+    if (socket) {
+      let cache = sessionStorage.getItem(`trends_supertrend`)
+      cache = JSON.parse(cache)
+      if (cache) {
+        setTrends(cache)
+        socket.emit('get_trends', {
+          flavor: 'supertrend',
+          intervals: ['1d']
+        }, (trends) => {
+          sessionStorage.setItem(`trends_supertrend`, JSON.stringify(trends))
+          setTrends(trends)
+        })
+      } else {
+        socket.emit('get_trends', {
+          flavor: 'supertrend',
+          intervals: ['1d']
+        }, (trends) => {
+          sessionStorage.setItem(`trends_supertrend`, JSON.stringify(trends))
+          setTrends(trends)
+        })
+      }
+    }
+  }, [socket])
+
+  useEffect(() => {
+    fetchTrends()
+  }, [fetchTrends])
+
+  // Subscribe to socket events for live prices
+  useEffect(() => {
+    if (socket) {
+      socket.on("i", (newPrices) => {
+        for (const key in newPrices) {
+          if (Object.prototype.hasOwnProperty.call(newPrices, key)) {
+            newPrices[key] = Number(newPrices[key]);
+          }
+        }
+        setPrices(newPrices)
+        localStorage.setItem("prices", JSON.stringify(newPrices))
+      });
+
+      socket.on('p', (priceUpdates) => {
+        setPrices((prevPrices) => {
+          const newPrices = { ...prevPrices }
+          Object.entries(priceUpdates).forEach(([coinSymbol, price]) => {
+            newPrices[coinSymbol] = Number(price)
+          })
+          return newPrices
+        })
+      })
+
+      socket.on('new_trends', fetchTrends)
+    }
+    return () => {
+      if (socket) {
+        socket.off('i')
+        socket.off('p')
+        socket.off('new_trends')
+      }
+    }
+  }, [socket, fetchTrends])
+
   let searchTrigger = <div onClick={openSearchModal} className={searchStyles.searchBarWrapper}>
     <Input
       className={searchStyles.searchBar}
@@ -143,6 +233,34 @@ const Search = ({ categories, collapsed }) => {
         <div className={searchStyles.optionTitle}>Coins</div>
         {
           filteredCoins.slice(0, 10).map((coin) => {
+            // Get live price for this coin
+            const price = prices[coin.symbol]
+            
+            // CRITICAL: Use coin.id not coin.symbol for trend lookup
+            // Trends are keyed by coin ID (e.g., "bitcoin"), not symbol (e.g., "btc")
+            const dailyTrend = trends?.daily?.[coin.id]?.supersuperTrend || 
+                              trends?.['1d']?.[coin.id]?.supersuperTrend
+            
+            // Calculate trend indicator
+            let trendIndicator = null
+            if (dailyTrend) {
+              const isUp = dailyTrend.trend === 'long'
+              const isDown = dailyTrend.trend === 'short'
+              const streak = dailyTrend.streak || 0
+              
+              if (isUp || isDown) {
+                trendIndicator = (
+                  <span className={classnames(searchStyles.trendIndicator, {
+                    [searchStyles.trendUp]: isUp,
+                    [searchStyles.trendDown]: isDown
+                  })}>
+                    {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                    {streak > 1 && <span className={searchStyles.streak}>{streak}</span>}
+                  </span>
+                )
+              }
+            }
+
             return (
               <div
                 className={classnames(searchStyles.option, searchStyles.coinOption)}
@@ -154,7 +272,23 @@ const Search = ({ categories, collapsed }) => {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={coin.image} alt={coin.name}/>
                 <span className={searchStyles.coinName}>{coin.name}</span>
-                <span className={searchStyles.coinSymbol}>{coin.symbol.toUpperCase()}</span>
+                <div className={searchStyles.coinMetadata}>
+                  <span className={searchStyles.coinSymbol}>{coin.symbol.toUpperCase()}</span>
+                  {coin.marketCapRank && (
+                    <Tag className={searchStyles.rankBadge}>#{coin.marketCapRank}</Tag>
+                  )}
+                  {trendIndicator}
+                  {price && (
+                    <span className={searchStyles.price}>
+                      {currencyFormatter.format(price)}
+                    </span>
+                  )}
+                  {coin.marketCap && (
+                    <span className={searchStyles.marketCap}>
+                      {numberFormatter.format(coin.marketCap)}
+                    </span>
+                  )}
+                </div>
               </div>
             )
           })

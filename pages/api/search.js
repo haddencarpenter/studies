@@ -11,7 +11,9 @@ const handler = async (req, res) => {
         symbol,
         platforms,
         "defaultPlatform",
-        (images ->> 'small') AS image
+        (images ->> 'small') AS image,
+        "marketCapRank",
+        "marketCap"
       FROM "Coin"
       ORDER BY "marketCapRank" ASC
     `

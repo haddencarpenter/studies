@@ -177,25 +177,96 @@
 }
 
 .coinOption {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 48px;
+  padding: 8px !important;
+  gap: 8px;
+
+  &:hover {
+    padding: 7px !important;
+  }
+
   img {
-    /* margin-left: 8px; // Removed, handled by padding */
-    height: 20px;
-    width: 20px;
-    flex-shrink: 0; // Prevent image shrinking
+    height: 24px;
+    width: 24px;
+    flex-shrink: 0;
   }
 
   .coinName {
-    margin-left: 10px;
-    white-space: nowrap; // Prevent wrapping
-    overflow: hidden; // Hide overflow
-    text-overflow: ellipsis; // Add ellipsis
-    flex-grow: 1; // Allow name to take space
+    margin-left: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 500;
+  }
+
+  .coinMetadata {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-left: 32px;
+    font-size: 13px;
   }
 
   .coinSymbol {
-    margin-left: 5px;
     color: @cr-gray-7;
-    flex-shrink: 0; // Prevent symbol shrinking
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .rankBadge {
+    font-size: 11px;
+    padding: 0 6px;
+    height: 20px;
+    line-height: 20px;
+    background-color: var(--cr-quintiary-bg);
+    border: 1px solid var(--cr-secondary-border);
+    color: var(--cr-secondary-text);
+    margin: 0;
+  }
+
+  .trendIndicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+
+    &.trendUp {
+      color: #52c41a;
+      background-color: rgba(82, 196, 26, 0.1);
+    }
+
+    &.trendDown {
+      color: #f5222d;
+      background-color: rgba(245, 34, 45, 0.1);
+    }
+
+    .streak {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+  }
+
+  .price {
+    color: var(--cr-primary-text);
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .marketCap {
+    color: @cr-gray-7;
+    font-size: 12px;
+    margin-left: auto;
   }
 }
 
