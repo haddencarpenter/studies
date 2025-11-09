@@ -1,5 +1,5 @@
 import { Modal, Input, Tag } from 'antd'
-import { SearchOutlined, ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
@@ -9,6 +9,9 @@ import Fuse from 'fuse.js'
 import round from 'lodash/round'
 import searchStyles from '../styles/search.module.less'
 import Shumi from './Shumi'
+import UpTag from './UpTag'
+import DownTag from './DownTag'
+import HodlTag from './HodlTag'
 
 const Search = ({ categories, collapsed }) => {
   const [coins, setCoins] = useState([])
@@ -361,24 +364,20 @@ const Search = ({ categories, collapsed }) => {
             const trendType = data?.trend
             const streak = data?.streak || 0
             
-            // Calculate trend indicator
+            // Calculate trend indicator using designed components
             let trendIndicator = null
-            if (trendType && trendType !== 'HODL') {
-              const isUp = trendType === 'UP'
-              const isDown = trendType === 'DOWN'
-              
-              if (isUp || isDown) {
-                trendIndicator = (
-                  <span className={classnames(searchStyles.trendIndicator, {
-                    [searchStyles.trendUp]: isUp,
-                    [searchStyles.trendDown]: isDown
-                  })}>
-                    {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                    {streak > 1 && <span className={searchStyles.streak}>{streak}</span>}
-                  </span>
-                )
-              }
+            if (trendType === 'UP') {
+              trendIndicator = <UpTag className={searchStyles.trendTag} />
+            } else if (trendType === 'DOWN') {
+              trendIndicator = <DownTag className={searchStyles.trendTag} />
+            } else if (trendType === 'HODL') {
+              trendIndicator = <HodlTag className={searchStyles.trendTag} />
             }
+            
+            // Add streak number if > 1
+            const streakBadge = streak > 1 ? (
+              <span className={searchStyles.streakBadge}>{streak}</span>
+            ) : null
 
             return (
               <div
@@ -397,6 +396,7 @@ const Search = ({ categories, collapsed }) => {
                     <Tag className={searchStyles.rankBadge}>#{coin.marketCapRank}</Tag>
                   )}
                   {trendIndicator}
+                  {streakBadge}
                   {price && !isNaN(price) && (
                     <span className={searchStyles.price}>
                       {currencyFormatter.format(price)}
@@ -439,25 +439,23 @@ const Search = ({ categories, collapsed }) => {
             // Get fetched data for this category
             const data = categoryData[category]
             
-            // Calculate trend indicator
+            // Calculate trend indicator using designed components
+            const trendType = data?.trend
+            const streak = data?.streak || 0
+            
             let trendIndicator = null
-            if (data?.trend && data.trend !== 'HODL') {
-              const isUp = data.trend === 'UP'
-              const isDown = data.trend === 'DOWN'
-              const streak = data.streak || 0
-              
-              if (isUp || isDown) {
-                trendIndicator = (
-                  <span className={classnames(searchStyles.trendIndicator, {
-                    [searchStyles.trendUp]: isUp,
-                    [searchStyles.trendDown]: isDown
-                  })}>
-                    {isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                    {streak > 1 && <span className={searchStyles.streak}>{streak}</span>}
-                  </span>
-                )
-              }
+            if (trendType === 'UP') {
+              trendIndicator = <UpTag className={searchStyles.trendTag} />
+            } else if (trendType === 'DOWN') {
+              trendIndicator = <DownTag className={searchStyles.trendTag} />
+            } else if (trendType === 'HODL') {
+              trendIndicator = <HodlTag className={searchStyles.trendTag} />
             }
+            
+            // Add streak number if > 1
+            const streakBadge = streak > 1 ? (
+              <span className={searchStyles.streakBadge}>{streak}</span>
+            ) : null
 
             return (
               <div
@@ -469,9 +467,10 @@ const Search = ({ categories, collapsed }) => {
                   router.push(`/category/${categorySlug}`)}
                 }>
                 <span className={searchStyles.categoryName}>{category}</span>
-                {(trendIndicator || data?.marketCap) && (
+                {(trendIndicator || streakBadge || data?.marketCap) && (
                   <div className={searchStyles.categoryMetadata}>
                     {trendIndicator}
+                    {streakBadge}
                     {data?.marketCap > 0 && (
                       <span className={searchStyles.categoryMarketCap}>
                         {numberFormatter.format(data.marketCap)}
