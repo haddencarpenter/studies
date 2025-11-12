@@ -485,12 +485,12 @@ const Search = ({ categories, collapsed }) => {
                 <span className={searchStyles.coinName}>{coin.name}</span>
                 <div className={searchStyles.coinMetadata}>
                   <span className={searchStyles.coinSymbol}>{coin.symbol.toUpperCase()}</span>
-                  {ohlc?.change7d != null && (
+                  {ohlc?.change24h != null && (
                     <span className={classnames(
-                      searchStyles.change7d,
-                      ohlc.change7d >= 0 ? searchStyles.positive : searchStyles.negative
+                      searchStyles.change24h,
+                      ohlc.change24h >= 0 ? searchStyles.positive : searchStyles.negative
                     )}>
-                      {ohlc.change7d >= 0 ? '+' : ''}{round(ohlc.change7d, 1)}%
+                      {ohlc.change24h >= 0 ? '+' : ''}{round(ohlc.change24h, 1)}%
                     </span>
                   )}
                   {ohlc?.btcDelta != null && Math.abs(ohlc.btcDelta) > 0.5 && (

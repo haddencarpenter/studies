@@ -17,25 +17,25 @@ const handler = async (req, res) => {
       return res.status(400).json({ error: 'No valid coin IDs provided' })
     }
 
-    // Calculate date 7 days ago
-    const sevenDaysAgo = new Date()
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    // Calculate date 24 hours ago
+    const oneDayAgo = new Date()
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1)
 
-    // Get BTC's OHLC data for baseline (current + 7d ago)
+    // Get BTC's OHLC data for baseline (current + 24h ago)
     const btcOhlc = await sql`
       SELECT close, "closeTime"
       FROM "Ohlc"
       WHERE "coinId" = 'bitcoin'
         AND "quoteSymbol" = 'usd'
-        AND "closeTime" >= ${sevenDaysAgo}
+        AND "closeTime" >= ${oneDayAgo}
       ORDER BY "closeTime" DESC
     `
 
-    let btcChange7d = null
+    let btcChange24h = null
     if (btcOhlc.length >= 2) {
       const btcCurrent = parseFloat(btcOhlc[0].close)
       const btcOldest = parseFloat(btcOhlc[btcOhlc.length - 1].close)
-      btcChange7d = ((btcCurrent - btcOldest) / btcOldest) * 100
+      btcChange24h = ((btcCurrent - btcOldest) / btcOldest) * 100
     }
 
     // Get OHLC data for requested coins
@@ -44,7 +44,7 @@ const handler = async (req, res) => {
       FROM "Ohlc"
       WHERE "coinId" IN ${sql(coinIds)}
         AND "quoteSymbol" = 'usd'
-        AND "closeTime" >= ${sevenDaysAgo}
+        AND "closeTime" >= ${oneDayAgo}
       ORDER BY "coinId", "closeTime" DESC
     `
 
@@ -60,7 +60,7 @@ const handler = async (req, res) => {
       })
     }
 
-    // Calculate 7d change for each coin
+    // Calculate 24h change for each coin
     const result = {}
     for (const coinId of coinIds) {
       const coinOhlc = ohlcByCoin[coinId]
@@ -74,22 +74,22 @@ const handler = async (req, res) => {
       // Current price (most recent)
       const current = coinOhlc[0].close
       
-      // Price from 7 days ago (oldest in our dataset)
+      // Price from 24h ago (oldest in our dataset)
       const oldest = coinOhlc[coinOhlc.length - 1].close
       
-      // Verify we actually have ~7 days of data
+      // Verify we actually have ~24 hours of data
       const currentDate = new Date(coinOhlc[0].closeTime)
       const oldestDate = new Date(coinOhlc[coinOhlc.length - 1].closeTime)
-      const daysDiff = (currentDate - oldestDate) / (1000 * 60 * 60 * 24)
+      const hoursDiff = (currentDate - oldestDate) / (1000 * 60 * 60)
       
-      // Only calculate if we have at least 6 days of data (allow some tolerance)
-      if (daysDiff >= 6) {
-        const change7d = ((current - oldest) / oldest) * 100
+      // Only calculate if we have at least 20 hours of data (allow some tolerance for 24h)
+      if (hoursDiff >= 20) {
+        const change24h = ((current - oldest) / oldest) * 100
         
         result[coinId] = {
-          change7d: change7d,
-          btcDelta: btcChange7d !== null ? (change7d - btcChange7d) : null,
-          daysCovered: daysDiff
+          change24h: change24h,
+          btcDelta: btcChange24h !== null ? (change24h - btcChange24h) : null,
+          hoursCovered: hoursDiff
         }
       } else {
         // Not enough historical data
