@@ -149,7 +149,7 @@
 
 .suggestionButton {
   padding: 9.6px 12px; // Increased vertical padding by 20% (8px * 1.2 = 9.6px)
-  border: 1px solid var(--shumi-border); // Blue border for Shumi branding
+  border: 1px solid var(--cr-secondary-border); // Use standard border color
   border-radius: 8px; // More rounded corners
   cursor: pointer;
   font-size: 14px; // Closer to input size but still smaller than 16px
@@ -170,7 +170,7 @@
 
   &:hover {
     background-color: var(--cr-quintiary-bg);
-    border-color: var(--shumi-border-hover); // Brighter blue on hover
+    border-color: var(--cr-primary-border); // Use standard border color on hover
   }
 }
 
@@ -273,7 +273,7 @@
   border-radius: 12px; // Rounded borders
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // Add subtle shadow for floating effect
   transition: border-color 0.2s ease;
-  
+
   &:focus-within {
     border-color: var(--shumi-border-hover); // Brighter blue when focused
   }

@@ -252,10 +252,9 @@ const Search = ({ categories, collapsed }) => {
                 <img src={coin.image} alt={coin.name}/>
                 <span className={searchStyles.coinName}>{coin.name}</span>
                 <div className={searchStyles.coinMetadata}>
-                  <span className={searchStyles.coinSymbol}>{coin.symbol.toUpperCase()}</span>
                   {coin.marketCap && (
                     <span className={searchStyles.marketCap}>
-                      {numberFormatter.format(coin.marketCap)}
+                      ${numberFormatter.format(coin.marketCap)}
                     </span>
                   )}
                   {coin.marketCapRank && (
