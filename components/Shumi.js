@@ -9,7 +9,6 @@ import classnames from 'classnames'
 
 import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
-import NotConnected from './gating/NotConnected'
 import ShumiCopyButton from './ShumiCopyButton'
 
 // Loading indicator with real progress updates
@@ -42,12 +41,13 @@ const generateSessionId = () => {
 };
 
 const Shumi = ({ isActive, initialSuggestions }) => {
-  const { loggedIn, getAccounts } = useWeb3Auth()
+  const { loggedIn, getAccounts, login } = useWeb3Auth()
   const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const [sessionId, setSessionId] = useState(() => generateSessionId());
   const [isClient, setIsClient] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState(null); // Store prompt to submit after login
 
   // Handle client-side hydration to prevent hydration mismatch
   useEffect(() => {
@@ -111,6 +111,30 @@ const Shumi = ({ isActive, initialSuggestions }) => {
       }
     }
   });
+
+  // Submit pending prompt after successful login
+  useEffect(() => {
+    if (walletAddress && pendingPrompt && sendMessage) {
+      // Wait a bit for wallet address to be fully set in transport
+      const timer = setTimeout(() => {
+        const { text, coinId, browserDateTimeWithTimezone } = pendingPrompt;
+        sendMessage({
+          text
+        }, {
+          body: {
+            walletAddress,
+            data: {
+              browserDateTimeWithTimezone,
+              sessionId,
+              ...(coinId ? { coinId } : {})
+            }
+          }
+        });
+        setPendingPrompt(null); // Clear pending prompt
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [walletAddress, pendingPrompt, sendMessage, sessionId]);
   const messagesEndRef = useRef(null)
   const aiInputRef = useRef(null)
 
@@ -270,11 +294,35 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     }
   }, [messages, progress]);
 
-  const askAi = useCallback((e) => {
+  const askAi = useCallback(async (e) => {
     if (e) e.preventDefault();
     setProgress(null); // Clear previous progress
 
     if (!input.trim() && !coinTag) return;
+
+    // Check if user is logged in
+    if (!loggedIn || !walletAddress) {
+      // Store the prompt to submit after login
+      const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
+      const browserDateTimeWithTimezone = new Date().toString();
+      setPendingPrompt({
+        text: input.trim(),
+        coinId: coinTag && coinId ? coinId : undefined,
+        browserDateTimeWithTimezone
+      });
+      // Clear input
+      setInput('');
+      // Trigger login
+      try {
+        await login();
+      } catch (error) {
+        console.error('Login failed:', error);
+        setPendingPrompt(null); // Clear pending prompt on login failure
+      }
+      return;
+    }
+
+    // User is logged in, proceed with normal submission
     const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
     // Use browser's local time string with timezone
     const browserDateTimeWithTimezone = new Date().toString();
@@ -296,7 +344,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
     // Clear input after submission in v5
     setInput('');
-  }, [sendMessage, input, coinTag, sessionId]);
+  }, [sendMessage, input, coinTag, sessionId, loggedIn, walletAddress, login]);
 
   // Handle removing the coin tag
   const handleRemoveCoinTag = useCallback(() => {
@@ -316,10 +364,9 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   // Show loading state during hydration to prevent hydration mismatch
   if (!isClient) {
     content = <div className={shumiStyles.gatingContainer}><div>Loading...</div></div>;
-  } else if (!walletAddress) {
-    content = <div className={shumiStyles.gatingContainer}><NotConnected feature='Shumi AI'/></div>;
   } else {
-    // All authenticated users now have access (no KeyPass check needed)
+    // Always show the Shumi interface, even when not logged in
+    // Sign-in will be triggered when user submits a prompt
     content = (
       <>
         <div className={shumiStyles.conversationArea} ref={messagesEndRef}>
