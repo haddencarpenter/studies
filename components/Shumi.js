@@ -23,16 +23,15 @@ const ShumiLoadingBlock = ({ progress }) => {
   };
 
   return (
-    <div className={shumiStyles.shumiLoadingCard}>
-      <div className={shumiStyles.shumiLoadingTitle}>
-        <span className={shumiStyles.shumiLoadingEmoji}>🍄</span>
-        <span>{getMessage()}</span>
-      </div>
-      <div className={shumiStyles.shumiLoadingSpinner}>
-        <div className={shumiStyles.spinnerDot}></div>
-        <div className={shumiStyles.spinnerDot}></div>
-        <div className={shumiStyles.spinnerDot}></div>
-      </div>
+    <div className={shumiStyles.shumiLoadingContainer}>
+      <img
+        className={shumiStyles.shumiLoadingMascot}
+        src="/shumi.png"
+        alt="Shumi"
+        width="18"
+        height="18"
+      />
+      <span className={shumiStyles.shumiLoadingText}>{getMessage()}</span>
     </div>
   );
 };
@@ -102,71 +101,19 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     status
   } = useChat({
     transport,
-    onData: (data) => {
-      // Handle progress updates from the data stream
-      // The data comes as a stringified JSON object from the data stream
-      try {
-        let parsed;
-        if (typeof data === 'string') {
-          // If it's a string, it might be double-stringified (data field contains stringified JSON)
-          try {
-            parsed = JSON.parse(data);
-            // If the data field is a string, parse it again
-            if (parsed?.data && typeof parsed.data === 'string') {
-              try {
-                parsed = JSON.parse(parsed.data);
-              } catch {
-                // If parsing fails, use the original parsed object
-              }
-            }
-          } catch {
-            // If parsing fails, try to parse as direct JSON
-            parsed = JSON.parse(data);
-          }
-        } else {
-          parsed = data;
-        }
-
-        if (parsed?.type === 'progress') {
-          console.log('[DEBUG] Received progress update:', parsed);
-          setProgress(parsed);
-        } else {
-          // Log non-progress data for debugging (but only first few to avoid spam)
-          if (typeof parsed === 'object' && parsed !== null) {
-            console.log('[DEBUG] Received non-progress data:', Object.keys(parsed));
-          }
-        }
-      } catch (error) {
-        // Log parsing errors for debugging
-        console.warn('[DEBUG] Error parsing data in onData:', error, 'Data:', typeof data === 'string' ? data.substring(0, 100) : data);
-      }
-    },
-
     onError: (error) => {
-      console.error('[DEBUG] useChat error:', error);
+      console.error('Shumi error:', error);
+    },
+    onData: (dataPart) => {
+      // Handle transient progress updates via onData callback (v5 best practice)
+      if (dataPart.type === 'data-progress') {
+        setProgress(dataPart.data);
+      }
     }
-  })
+  });
   const messagesEndRef = useRef(null)
   const aiInputRef = useRef(null)
 
-  // Debug: Log error and status changes
-  useEffect(() => {
-    if (error) {
-      console.error('[DEBUG] Shumi error state changed:', {
-        error,
-        errorMessage: error?.message,
-        errorStack: error?.stack,
-        status,
-        messagesCount: messages.length,
-        lastMessage: messages[messages.length - 1]
-      });
-    }
-  }, [error, status, messages]);
-
-  // Debug: Log status changes
-  useEffect(() => {
-    console.log('[DEBUG] Shumi status changed:', status);
-  }, [status]);
 
   // Helper for checking if AI is generating a response
   const isGenerating = status === 'streaming' || status === 'submitted';
@@ -182,8 +129,6 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
   // Process messages once when they're received or changed
   useEffect(() => {
-    console.log('[DEBUG] Processing messages:', messages.length, messages);
-
     const newProcessedMessages = messages.map(message => {
       // Handle v5 format: messages may have parts[] instead of content
       let content = message.content;
@@ -213,7 +158,6 @@ const Shumi = ({ isActive, initialSuggestions }) => {
       };
     });
 
-    console.log('[DEBUG] Processed messages:', newProcessedMessages.length, newProcessedMessages);
     setProcessedMessages(newProcessedMessages);
   }, [messages]);
 
@@ -312,12 +256,19 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     setSessionId(newSessionId);
   }, [setMessages])
 
-  // Clear progress when starting a new request
+  // Clear progress when the current assistant message (last message) has content
   useEffect(() => {
-    if (status === 'submitted') {
+    // Only check the last message (the one currently being generated)
+    const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+    const hasCurrentAssistantContent = lastMessage && lastMessage.role === 'assistant' && (
+      (lastMessage.content && lastMessage.content.trim()) ||
+      (lastMessage.parts && lastMessage.parts.some(part => part.type === 'text' && part.text && part.text.trim()))
+    );
+
+    if (hasCurrentAssistantContent && progress) {
       setProgress(null);
     }
-  }, [status]);
+  }, [messages, progress]);
 
   const askAi = useCallback((e) => {
     if (e) e.preventDefault();
@@ -374,7 +325,18 @@ const Shumi = ({ isActive, initialSuggestions }) => {
         <div className={shumiStyles.conversationArea} ref={messagesEndRef}>
           {messages.length > 0 ? (
              <>
-               {processedMessages.map((message, index) => (
+               {processedMessages
+                 .filter(message => {
+                   // Filter out empty assistant messages (they'll show up once content arrives)
+                   if (message.role === 'assistant') {
+                     const hasContent = (message.processedContent && message.processedContent.trim()) ||
+                                       (message.content && message.content.trim()) ||
+                                       (message.parts && message.parts.some(part => part.type === 'text' && part.text && part.text.trim()));
+                     return hasContent;
+                   }
+                   return true; // Always show user messages
+                 })
+                 .map((message, index) => (
                  <div key={index} className={classnames(shumiStyles.messageContainer, {
                    [shumiStyles.userMessage]: message.role === 'user',
                    [shumiStyles.assistantMessage]: message.role === 'assistant'
@@ -410,10 +372,17 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                    )}
                  </div>
                ))}
-               {/* Show Shumi loading block */}
-               {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
-                  <ShumiLoadingBlock progress={progress} />
-               ) : null}
+               {/* Show Shumi loading block when progress exists or when waiting for response */}
+               {(() => {
+                 // Check only the last message (the one currently being generated) for content
+                 const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+                 const hasCurrentAssistantContent = lastMessage && lastMessage.role === 'assistant' && (
+                   (lastMessage.content && lastMessage.content.trim()) ||
+                   (lastMessage.parts && lastMessage.parts.some(part => part.type === 'text' && part.text && part.text.trim()))
+                 );
+                 const shouldShow = (progress || (status === 'submitted' || status === 'streaming')) && !hasCurrentAssistantContent;
+                 return shouldShow ? <ShumiLoadingBlock progress={progress} /> : null;
+               })()}
 
                {/* Add error display */}
                {error && (

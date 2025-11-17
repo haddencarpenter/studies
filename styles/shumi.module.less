@@ -2,72 +2,36 @@
 @import './variables.module.less';
 
 // ========================================
-// Shumi Loading Block (Simple, matches styleguide)
+// Shumi Loading Block (Text only with fading mascot)
 // ========================================
-.shumiLoadingCard {
-  background-color: var(--cr-primary-bg);
-  border: 1px solid var(--cr-secondary-border);
-  border-radius: 4px;
-  padding: 16px;
-  min-width: 200px;
-  max-width: 400px;
-  margin: 12px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.shumiLoadingTitle {
+.shumiLoadingContainer {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  align-self: flex-start; // Match assistant message alignment
+}
+
+.shumiLoadingMascot {
+  width: 18px;
+  height: 18px;
+  animation: shumiFade 1.5s ease-in-out infinite;
+  vertical-align: middle;
+  margin-bottom: 2px !important; // Slight adjustment to align with text baseline
+}
+
+.shumiLoadingText {
   font-size: 14px;
-  font-weight: 500;
   color: var(--cr-secondary-text);
 }
 
-.shumiLoadingEmoji {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.shumiLoadingSpinner {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-}
-
-.spinnerDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--cr-secondary-text);
-  opacity: 0.4;
-  animation: shumiPulse 1.4s ease-in-out infinite;
-
-  &:nth-child(1) {
-    animation-delay: 0s;
+@keyframes shumiFade {
+  0%, 100% {
+    opacity: 0.3;
   }
-
-  &:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  &:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-}
-
-@keyframes shumiPulse {
-  0%, 80%, 100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  40% {
+  50% {
     opacity: 1;
-    transform: scale(1.2);
   }
 }
 
