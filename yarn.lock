@@ -1579,9 +1579,9 @@
     "@openrouter/sdk" "^0.1.8"
 
 "@openrouter/sdk@^0.1.8":
-  version "0.1.23"
-  resolved "https://registry.yarnpkg.com/@openrouter/sdk/-/sdk-0.1.23.tgz#825d1c8799b40ce17bf064d7c899ed69b4784c3e"
-  integrity sha512-W1xx3zLqBKgtH3FMmN8av7DUKKjUwFgUrdn1vZM8gDb10CtI/w7YU3bsmIismd9Ppr7mx6Y9iw3eyKuU8/UZIA==
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/@openrouter/sdk/-/sdk-0.1.25.tgz#3ccb74096d88a85a885d78fe6143939f5e809e03"
+  integrity sha512-ElOgtRVRTtLhGCgT20FKXOjrDyr5YQQcrzcp0oNbRrbU9AcXs6zfiJYIt0ETxRMg8NotirUSTl2oO+uqHx0Ohw==
   dependencies:
     zod "^3.25.0 || ^4.0.0"
 
@@ -6441,8 +6441,8 @@ code-block-writer@^10.1.1:
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
-  version "2.13.0"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#945d8dc916c89a12bbea5928874dd4042a1da9e3"
+  version "2.14.0"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#b22d519650cd3926e929aa5dbf9a4387311e66c3"
   dependencies:
     "@ai-sdk/anthropic" "^2.0.0"
     "@ai-sdk/google-vertex" "^2.2.27"
