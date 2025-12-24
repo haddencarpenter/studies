@@ -11,15 +11,116 @@ import { useWeb3Auth } from '../contexts/Web3AuthContext';
 import shumiStyles from '../styles/shumi.module.less'
 import ShumiCopyButton from './ShumiCopyButton'
 
-// Loading indicator with real progress updates
-const ShumiLoadingBlock = ({ progress }) => {
-  const getMessage = () => {
-    if (progress?.message) return progress.message;
-    if (progress?.phase === 'classifying') return 'Understanding your request...';
-    if (progress?.phase === 'executing') return 'Fetching data...';
-    if (progress?.phase === 'generating') return 'Generating response...';
-    return 'Shumi is thinking...';
-  };
+// Helper function to capitalize first letter
+const capitalizeFirst = (str) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Loading messages organized by phase
+const LOADING_MESSAGES_BY_PHASE = {
+  classifying: [
+    "Checking the vibes",
+    "Understanding your request",
+    "Reading the signals",
+    "Decoding your question",
+    "Analyzing what you need"
+  ],
+  executing: [
+    "Reading the signals",
+    "Fetching fresh market data",
+    "Sniffing for alpha",
+    "Checking what chads are buying",
+    "Scanning CT takes",
+    "Reading the hopium charts",
+    "Checking ser's bags",
+    "Stalking whale wallets",
+    "Measuring fud levels",
+    "Checking if it's priced in",
+    "Consulting the trend gods",
+    "Scanning for exit liquidity",
+    "Checking what's cooking on-chain",
+    "Reading the tea leaves",
+    "Aping into the data",
+    "Hunting for gems",
+    "Scanning the trenches",
+    "Checking order books",
+    "Summoning the charts",
+    "Asking the oracles nicely",
+    "Convincing APIs to respond",
+    "Bribing the data gods",
+    "Checking if devs are awake",
+    "Reading degen sentiment",
+    "Checking the rotations",
+    "Sniffing out narratives",
+    "Scanning for momentum",
+    "Checking what's trending",
+    "Reading whale moves",
+    "Measuring conviction",
+    "Checking funding rates",
+    "Scanning perp action",
+    "Reading the orderflow",
+    "Checking what pumped",
+    "Sniffing catalysts",
+    "Measuring memecoin season",
+    "Checking altszn indicators",
+    "Reading macro vibes",
+    "Scanning fresh wallets",
+    "Checking what's cooking",
+    "Reading the sentiment tea",
+    "Checking CT alpha",
+    "Scanning for setups",
+    "Measuring greed levels",
+    "Checking what's rotating",
+    "Reading smart money",
+    "Scanning for confluences",
+    "Checking trend strength",
+    "Measuring fomo intensity",
+    "Reading volume signals",
+    "Checking what insiders bought",
+    "Scanning for breakouts",
+    "Measuring conviction scores"
+  ],
+  generating: [
+    "Finding the alpha 🍄",
+    "Dropping some alpha",
+    "Crafting your response",
+    "Putting it all together",
+    "Writing the analysis"
+  ]
+};
+
+// Helper function to get messages for a phase
+const getMessagesForPhase = (phase) => {
+  if (phase && LOADING_MESSAGES_BY_PHASE[phase]) {
+    return LOADING_MESSAGES_BY_PHASE[phase];
+  }
+  // Fallback to executing messages if phase is unknown
+  return LOADING_MESSAGES_BY_PHASE.executing;
+};
+
+// Shumi-branded loading block with random message per phase
+const ShumiLoadingBlock = ({ progress, requestId }) => {
+  // Determine current phase from progress
+  const currentPhase = progress?.phase || 'executing';
+
+  // Pick ONE random message for this phase (changes when requestId changes)
+  const displayMessage = useMemo(() => {
+    // Use custom message from progress if it contains specific info (like level/totalLevels)
+    if (progress?.level && progress?.totalLevels && progress?.message) {
+      return capitalizeFirst(progress.message);
+    }
+
+    // Pick a random message for this phase using requestId as seed
+    const phaseMessages = getMessagesForPhase(currentPhase);
+    // Use requestId + phase to ensure different messages for different requests
+    const seed = (requestId || 0) + (currentPhase || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const randomIndex = Math.floor(Math.abs(Math.sin(seed) * 10000) % phaseMessages.length);
+    const selectedMessage = phaseMessages[randomIndex] || 'Shumi is thinking...';
+    return capitalizeFirst(selectedMessage);
+  }, [currentPhase, requestId, progress?.level, progress?.totalLevels, progress?.message]);
+
+  const stepText = displayMessage;
 
   return (
     <div className={shumiStyles.shumiLoadingContainer}>
@@ -30,7 +131,7 @@ const ShumiLoadingBlock = ({ progress }) => {
         width="18"
         height="18"
       />
-      <span className={shumiStyles.shumiLoadingText}>{getMessage()}</span>
+      <span className={shumiStyles.shumiLoadingText}>{stepText}</span>
     </div>
   );
 };
@@ -77,6 +178,8 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
   const [progress, setProgress] = useState(null);
   const [input, setInput] = useState(''); // Manage input state manually in v5
+  const requestIdRef = useRef(0); // Track request ID for randomization
+  const progressRequestIdRef = useRef(0); // Track request ID for randomization
 
   // Create transport with current walletAddress - recreate when walletAddress changes
   const transport = useMemo(() => {
@@ -107,6 +210,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     onData: (dataPart) => {
       // Handle transient progress updates via onData callback (v5 best practice)
       if (dataPart.type === 'data-progress') {
+        console.log('[Shumi] Progress update:', dataPart.data);
         setProgress(dataPart.data);
       }
     }
@@ -297,6 +401,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   const askAi = useCallback(async (e) => {
     if (e) e.preventDefault();
     setProgress(null); // Clear previous progress
+    requestIdRef.current += 1; // Increment request ID for new request
 
     if (!input.trim() && !coinTag) return;
 
@@ -428,7 +533,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                    (lastMessage.parts && lastMessage.parts.some(part => part.type === 'text' && part.text && part.text.trim()))
                  );
                  const shouldShow = (progress || (status === 'submitted' || status === 'streaming')) && !hasCurrentAssistantContent;
-                 return shouldShow ? <ShumiLoadingBlock progress={progress} /> : null;
+                 return shouldShow ? <ShumiLoadingBlock progress={progress} requestId={requestIdRef.current} /> : null;
                })()}
 
                {/* Add error display */}

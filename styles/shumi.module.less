@@ -2,7 +2,7 @@
 @import './variables.module.less';
 
 // ========================================
-// Shumi Loading Block (Text only with fading mascot)
+// Shumi Loading Block (with rotating messages)
 // ========================================
 .shumiLoadingContainer {
   display: flex;
@@ -44,10 +44,6 @@
   background-color: var(--cr-secondary-bg); // Consistent background
   height: calc(100% - 91px); // Default height for desktop
   min-height: 400px; // Minimum height to ensure proper display in modals
-
-  // Override CSS variables for Shumi blue branding
-  --shumi-border: rgba(77, 148, 255, 0.3);
-  --shumi-border-hover: rgba(77, 148, 255, 0.6);
 
   @media (max-width: @screen-lg) {
     height: calc(100vh - 52px - 91px); // Apply calc height only on smaller screens

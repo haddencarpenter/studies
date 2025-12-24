@@ -88,23 +88,16 @@ export async function POST(req) {
       execute: async ({ writer }) => {
         const onProgress = (progress) => {
           try {
-            // Map generic progress info to crypto/meme-friendly messages
-            let message = 'Shumi is thinking...';
-            if (progress.phase === 'classifying') {
-              message = 'Checking the vibes...';
-            } else if (progress.phase === 'executing') {
-              if (progress.level && progress.totalLevels) {
-                message = `Pulling market data (${progress.level}/${progress.totalLevels})...`;
-              } else {
-                message = 'Pulling market data...';
-              }
-            } else if (progress.phase === 'generating') {
-              message = 'Dropping some alpha...';
+            // Only set message if there's specific progress info (like level/totalLevels)
+            // Otherwise let the component handle rotating messages based on phase
+            let message = null;
+            if (progress.phase === 'executing' && progress.level && progress.totalLevels) {
+              message = `Pulling market data (${progress.level}/${progress.totalLevels})...`;
             }
 
             const progressData = {
               ...progress,
-              message
+              ...(message ? { message } : {})
             };
 
             // Write progress update as transient data part (v5 best practice)
