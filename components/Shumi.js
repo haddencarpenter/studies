@@ -11,23 +11,148 @@ import shumiStyles from '../styles/shumi.module.less'
 import NotConnected from './gating/NotConnected'
 import ShumiCopyButton from './ShumiCopyButton'
 
-// Animated thinking indicator component
-const ThinkingIndicator = () => {
-  const [dots, setDots] = useState('.');
+// All available loading expressions (top messages weighted higher, rest are alternates)
+// Original messages are at the top to maintain higher weight, followed by new expressions
+const LOADING_MESSAGES = [
+  // Original messages (maintained for consistency and higher weight)
+  "Reading the signals",
+  "Fetching fresh market data",
+  "Checking the vibes (sentiment)",
+  "Finding the alpha 🍄",
+  // New expressions (top favorites)
+  "sniffing for alpha",
+  "checking what chads are buying",
+  "scanning CT takes",
+  "reading the hopium charts",
+  "checking ser's bags",
+  "stalking whale wallets",
+  "measuring fud levels",
+  "checking if it's priced in",
+  "consulting the trend gods",
+  "scanning for exit liquidity",
+  "checking what's cooking on-chain",
+  "reading the tea leaves",
+  "aping into the data",
+  "hunting for gems",
+  // Additional expressions (alternates)
+  "scanning the trenches",
+  "checking order books",
+  "summoning the charts",
+  "asking the oracles nicely",
+  "convincing APIs to respond",
+  "bribing the data gods",
+  "checking if devs are awake",
+  "reading degen sentiment",
+  "checking the rotations",
+  "sniffing out narratives",
+  "scanning for momentum",
+  "checking what's trending",
+  "reading whale moves",
+  "measuring conviction",
+  "checking funding rates",
+  "scanning perp action",
+  "reading the orderflow",
+  "checking what pumped",
+  "sniffing catalysts",
+  "measuring memecoin season",
+  "checking altszn indicators",
+  "reading macro vibes",
+  "scanning fresh wallets",
+  "checking what's cooking",
+  "reading the sentiment tea",
+  "checking CT alpha",
+  "scanning for setups",
+  "measuring greed levels",
+  "checking what's rotating",
+  "reading smart money",
+  "scanning for confluences",
+  "checking trend strength",
+  "measuring fomo intensity",
+  "reading volume signals",
+  "checking what insiders bought",
+  "scanning for breakouts",
+  "measuring conviction scores"
+];
+
+// Helper function to randomly select messages with weighted preference for top messages
+// Top messages include original 4 + top 14 new expressions = 18 total higher-weighted
+const selectRandomMessages = (count) => {
+  const topMessages = LOADING_MESSAGES.slice(0, 18);
+  const alternateMessages = LOADING_MESSAGES.slice(18);
+  const selected = new Set();
+  
+  while (selected.size < count) {
+    // 70% chance to pick from top messages, 30% from alternates
+    const useTop = Math.random() < 0.7 || alternateMessages.length === 0;
+    const pool = useTop ? topMessages : alternateMessages;
+    
+    if (pool.length > 0) {
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      selected.add(pool[randomIndex]);
+    }
+  }
+  
+  return Array.from(selected);
+};
+
+// Shumi-branded loading block with progress animation
+const ShumiLoadingBlock = () => {
+  const [progress, setProgress] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [selectedSteps, setSelectedSteps] = useState(() => {
+    // Randomly decide whether to use 3 steps or 5 steps (50/50 chance)
+    const useThreeSteps = Math.random() < 0.5;
+    const stepCount = useThreeSteps ? 3 : 5;
+    const steps = selectRandomMessages(stepCount);
+    console.log(`[ShumiLoadingBlock] Selected ${stepCount}-step set:`, steps);
+    return steps;
+  });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDots(prev => {
-        if (prev === '.') return '..';
-        if (prev === '..') return '...';
-        return '.';
+    // Animate progress slowly (1-3% per tick, cap at 90%)
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        const increment = Math.random() * 2 + 1; // Random 1-3%
+        const newProgress = Math.min(90, prev + increment);
+        return newProgress;
       });
-    }, 400); // Switch every 400ms for a nice rhythm
+    }, 800); // Update every 800ms
 
-    return () => clearInterval(interval);
-  }, []);
+    // Change step every 2-3 seconds
+    const stepInterval = setInterval(() => {
+      setCurrentStepIndex(prev => (prev + 1) % selectedSteps.length);
+    }, 2500);
 
-  return `Thinking${dots}`;
+    return () => {
+      clearInterval(progressInterval);
+      clearInterval(stepInterval);
+    };
+  }, [selectedSteps.length]);
+
+  const totalSteps = selectedSteps.length;
+  const currentStepNumber = currentStepIndex + 1;
+
+  return (
+    <div className={shumiStyles.shumiLoadingCard}>
+      <div className={shumiStyles.shumiLoadingTitle}>
+        <span className={shumiStyles.shumiLoadingEmoji}>🍄</span>
+        <span>Shumi is working on it...</span>
+      </div>
+      
+      <div className={shumiStyles.shumiProgressContainer}>
+        <div 
+          className={shumiStyles.shumiProgressFill}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      
+      <div className={shumiStyles.shumiLoadingStep}>
+        {selectedSteps && selectedSteps.length > 0 && selectedSteps[currentStepIndex] 
+          ? `${currentStepNumber}/${totalSteps} ${selectedSteps[currentStepIndex]}`
+          : 'Loading...'}
+      </div>
+    </div>
+  );
 };
 
 // Helper function to generate session ID
@@ -290,12 +415,9 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                    )}
                  </div>
                ))}
-               {/* Show "Thinking..." indicator */}
+               {/* Show Shumi loading block */}
                {(status === 'submitted' || (status === 'streaming' && messages[messages.length - 1]?.role === 'user') || (status === 'streaming' && messages[messages.length - 1]?.role === 'assistant' && !messages[messages.length - 1]?.content?.trim())) ? (
-                  <div className={classnames(shumiStyles.messageContainer, shumiStyles.assistantMessage, shumiStyles.thinkingIndicator)}>
-                    <div className={shumiStyles.messageRole}><img className={shumiStyles.shumiAiIcon} src="/shumi.png" alt="Shumi" width="18" height="18" />Shumi</div>
-                    <div className={shumiStyles.messageContent}><ThinkingIndicator /></div>
-                  </div>
+                  <ShumiLoadingBlock />
                ) : null}
 
                {/* Add error display */}
