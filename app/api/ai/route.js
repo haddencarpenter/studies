@@ -126,9 +126,33 @@ export async function POST(req) {
 
         // Check if shumi returned an error Response directly
         if (response instanceof Response && !response.toUIMessageStreamResponse && !response.toDataStreamResponse) {
-          // For error responses, write error to stream
-          writer.writeError(new Error('An error occurred while processing your request.'));
-          return;
+          // Extract the original error from shumi's error Response
+          // shumi returns: new Response(JSON.stringify({ error, message, type, details }), { status: 500 })
+          try {
+            const errorData = await response.json();
+            const originalError = new Error(errorData.message || 'An error occurred while processing your request.');
+            originalError.name = errorData.type || 'Error';
+            // Preserve stack trace if available (only in development)
+            if (errorData.details?.stack) {
+              originalError.stack = errorData.details.stack;
+            }
+            // Preserve cause if available
+            if (errorData.details?.cause) {
+              originalError.cause = errorData.details.cause;
+            }
+            // Throw the original error to trigger onError handler
+            // This preserves the original error message and context
+            throw originalError;
+          } catch (parseError) {
+            // If we can't parse the error response (e.g., body already consumed),
+            // at least preserve the parse error information
+            console.error('Failed to parse error response from shumi:', parseError);
+            const fallbackError = new Error('An error occurred while processing your request.');
+            if (parseError instanceof Error) {
+              fallbackError.cause = parseError;
+            }
+            throw fallbackError;
+          }
         }
 
         // Get the UI message stream from the response and merge it into our writer
