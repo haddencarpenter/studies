@@ -1,6 +1,7 @@
 import { Input, Button, Tag, Dropdown, Menu } from 'antd'
-import { EditOutlined, ArrowUpOutlined, DatabaseFilled } from "@ant-design/icons";
+import { EditOutlined, ArrowUpOutlined, DownOutlined } from "@ant-design/icons";
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useRouter } from 'next/router'
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import ReactMarkdown from 'react-markdown'
@@ -41,6 +42,7 @@ const generateSessionId = () => {
 };
 
 const Shumi = ({ isActive, initialSuggestions }) => {
+  const router = useRouter()
   const { loggedIn, getAccounts, login } = useWeb3Auth()
   const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
@@ -276,6 +278,15 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     // Re-check when route changes (simulated by isActive for now, better would be router event)
   }, [isActive]); // Dependency on isActive simulates route change check for now
 
+  // Auto-select archetype from URL query parameter
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (router.query.archetype === 'perpdex') {
+      setArchetype('deltaneutral');
+    }
+  }, [router.isReady, router.query.archetype]);
+
   const clearChat = useCallback(() => {
     setMessages([])
     setInput('') // Clear input manually
@@ -505,18 +516,22 @@ const Shumi = ({ isActive, initialSuggestions }) => {
               allowClear
               prefix={
                 <>
-                  <Dropdown
-                    menu={archetypeMenu}
-                    placement="topLeft"
-                    trigger={['click']}
-                    popupClassName={shumiStyles.archetypeDropdown}
-                  >
-                    <Button
-                      type="text"
-                      icon={<DatabaseFilled />}
-                      className={shumiStyles.archetypeButton}
-                    />
-                  </Dropdown>
+                  {router.isReady && router.query.archetype === 'perpdex' && (
+                    <Dropdown
+                      menu={archetypeMenu}
+                      placement="topLeft"
+                      trigger={['click']}
+                      popupClassName={shumiStyles.archetypeDropdown}
+                    >
+                      <Button
+                        type="text"
+                        className={shumiStyles.archetypeButton}
+                      >
+                        <span>Archetype</span>
+                        <DownOutlined />
+                      </Button>
+                    </Dropdown>
+                  )}
                   {archetype && (
                     <Tag
                       className={shumiStyles.archetypeTag}
