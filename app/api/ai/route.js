@@ -33,7 +33,7 @@ const trackMixpanelEvent = async (event, properties) => {
 };
 
 export async function POST(req) {
-  const { messages, walletAddress, data } = await req.json();
+  const { messages, walletAddress, data, archetype } = await req.json();
 
   // AUTHENTICATION GATING: Require wallet address for Shumi AI access
   if (!walletAddress || !walletAddress.startsWith('0x')) {
@@ -88,23 +88,16 @@ export async function POST(req) {
       execute: async ({ writer }) => {
         const onProgress = (progress) => {
           try {
-            // Map generic progress info to crypto/meme-friendly messages
-            let message = 'Shumi is thinking...';
-            if (progress.phase === 'classifying') {
-              message = 'Checking the vibes...';
-            } else if (progress.phase === 'executing') {
-              if (progress.level && progress.totalLevels) {
-                message = `Pulling market data (${progress.level}/${progress.totalLevels})...`;
-              } else {
-                message = 'Pulling market data...';
-              }
-            } else if (progress.phase === 'generating') {
-              message = 'Dropping some alpha...';
+            // Only set message if there's specific progress info (like level/totalLevels)
+            // Otherwise let the component handle rotating messages based on phase
+            let message = null;
+            if (progress.phase === 'executing' && progress.level && progress.totalLevels) {
+              message = `Pulling market data (${progress.level}/${progress.totalLevels})...`;
             }
 
             const progressData = {
               ...progress,
-              message
+              ...(message ? { message } : {})
             };
 
             // Write progress update as transient data part (v5 best practice)
@@ -122,13 +115,37 @@ export async function POST(req) {
         };
 
         // Start shumi - it will call onProgress as it executes
-        const response = await shumi({ messages, walletAddress, data, onProgress, promptVersion: 'sandbox', enableSuggestions: true });
+        const response = await shumi({ messages, walletAddress, data, archetype, onProgress, promptVersion: 'sandbox', enableSuggestions: true });
 
         // Check if shumi returned an error Response directly
         if (response instanceof Response && !response.toUIMessageStreamResponse && !response.toDataStreamResponse) {
-          // For error responses, write error to stream
-          writer.writeError(new Error('An error occurred while processing your request.'));
-          return;
+          // Extract the original error from shumi's error Response
+          // shumi returns: new Response(JSON.stringify({ error, message, type, details }), { status: 500 })
+          try {
+            const errorData = await response.json();
+            const originalError = new Error(errorData.message || 'An error occurred while processing your request.');
+            originalError.name = errorData.type || 'Error';
+            // Preserve stack trace if available (only in development)
+            if (errorData.details?.stack) {
+              originalError.stack = errorData.details.stack;
+            }
+            // Preserve cause if available
+            if (errorData.details?.cause) {
+              originalError.cause = errorData.details.cause;
+            }
+            // Throw the original error to trigger onError handler
+            // This preserves the original error message and context
+            throw originalError;
+          } catch (parseError) {
+            // If we can't parse the error response (e.g., body already consumed),
+            // at least preserve the parse error information
+            console.error('Failed to parse error response from shumi:', parseError);
+            const fallbackError = new Error('An error occurred while processing your request.');
+            if (parseError instanceof Error) {
+              fallbackError.cause = parseError;
+            }
+            throw fallbackError;
+          }
         }
 
         // Parse suggestions from full text after stream completes

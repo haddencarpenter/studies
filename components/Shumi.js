@@ -1,6 +1,7 @@
-import { Input, Button, Tag } from 'antd'
-import { MessageOutlined, PlusSquareOutlined, ArrowUpOutlined } from "@ant-design/icons";
+import { Input, Button, Tag, Dropdown, Menu } from 'antd'
+import { EditOutlined, ArrowUpOutlined, DownOutlined } from "@ant-design/icons";
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useRouter } from 'next/router'
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import ReactMarkdown from 'react-markdown'
@@ -12,15 +13,116 @@ import shumiStyles from '../styles/shumi.module.less'
 import ShumiCopyButton from './ShumiCopyButton'
 import { Suggestion, Suggestions } from './ai-elements/suggestion'
 
-// Loading indicator with real progress updates
-const ShumiLoadingBlock = ({ progress }) => {
-  const getMessage = () => {
-    if (progress?.message) return progress.message;
-    if (progress?.phase === 'classifying') return 'Understanding your request...';
-    if (progress?.phase === 'executing') return 'Fetching data...';
-    if (progress?.phase === 'generating') return 'Generating response...';
-    return 'Shumi is thinking...';
-  };
+// Helper function to capitalize first letter
+const capitalizeFirst = (str) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Loading messages organized by phase
+const LOADING_MESSAGES_BY_PHASE = {
+  classifying: [
+    "Checking the vibes",
+    "Understanding your request",
+    "Reading the signals",
+    "Decoding your question",
+    "Analyzing what you need"
+  ],
+  executing: [
+    "Reading the signals",
+    "Fetching fresh market data",
+    "Sniffing for alpha",
+    "Checking what chads are buying",
+    "Scanning CT takes",
+    "Reading the hopium charts",
+    "Checking ser's bags",
+    "Stalking whale wallets",
+    "Measuring fud levels",
+    "Checking if it's priced in",
+    "Consulting the trend gods",
+    "Scanning for exit liquidity",
+    "Checking what's cooking on-chain",
+    "Reading the tea leaves",
+    "Aping into the data",
+    "Hunting for gems",
+    "Scanning the trenches",
+    "Checking order books",
+    "Summoning the charts",
+    "Asking the oracles nicely",
+    "Convincing APIs to respond",
+    "Bribing the data gods",
+    "Checking if devs are awake",
+    "Reading degen sentiment",
+    "Checking the rotations",
+    "Sniffing out narratives",
+    "Scanning for momentum",
+    "Checking what's trending",
+    "Reading whale moves",
+    "Measuring conviction",
+    "Checking funding rates",
+    "Scanning perp action",
+    "Reading the orderflow",
+    "Checking what pumped",
+    "Sniffing catalysts",
+    "Measuring memecoin season",
+    "Checking altszn indicators",
+    "Reading macro vibes",
+    "Scanning fresh wallets",
+    "Checking what's cooking",
+    "Reading the sentiment tea",
+    "Checking CT alpha",
+    "Scanning for setups",
+    "Measuring greed levels",
+    "Checking what's rotating",
+    "Reading smart money",
+    "Scanning for confluences",
+    "Checking trend strength",
+    "Measuring fomo intensity",
+    "Reading volume signals",
+    "Checking what insiders bought",
+    "Scanning for breakouts",
+    "Measuring conviction scores"
+  ],
+  generating: [
+    "Finding the alpha 🍄",
+    "Dropping some alpha",
+    "Crafting your response",
+    "Putting it all together",
+    "Writing the analysis"
+  ]
+};
+
+// Helper function to get messages for a phase
+const getMessagesForPhase = (phase) => {
+  if (phase && LOADING_MESSAGES_BY_PHASE[phase]) {
+    return LOADING_MESSAGES_BY_PHASE[phase];
+  }
+  // Fallback to executing messages if phase is unknown
+  return LOADING_MESSAGES_BY_PHASE.executing;
+};
+
+// Shumi-branded loading block with random message per phase
+const ShumiLoadingBlock = ({ progress, requestId }) => {
+  // Determine current phase from progress
+  const currentPhase = progress?.phase || 'executing';
+
+  // Pick ONE random message for this phase (changes when requestId changes)
+  const displayMessage = useMemo(() => {
+    // Use custom message from progress if it contains specific info (like level/totalLevels)
+    if (progress?.level && progress?.totalLevels && progress?.message) {
+      return capitalizeFirst(progress.message);
+    }
+
+    // Pick a random message for this phase using requestId as seed
+    const phaseMessages = getMessagesForPhase(currentPhase);
+    // Use requestId + phase to ensure different messages for different requests
+    const seed = (requestId || 0) + (currentPhase || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const randomIndex = Math.floor(Math.abs(Math.sin(seed) * 10000) % phaseMessages.length);
+    const selectedMessage = phaseMessages[randomIndex] || 'Shumi is thinking...';
+    return capitalizeFirst(selectedMessage);
+  }, [currentPhase, requestId, progress?.level, progress?.totalLevels, progress?.message]);
+
+  const stepText = displayMessage;
 
   return (
     <div className={shumiStyles.shumiLoadingContainer}>
@@ -32,7 +134,7 @@ const ShumiLoadingBlock = ({ progress }) => {
         height="18"
         style={{ width: '18px', height: '18px', maxWidth: '18px', maxHeight: '18px' }}
       />
-      <span className={shumiStyles.shumiLoadingText}>{getMessage()}</span>
+      <span className={shumiStyles.shumiLoadingText}>{stepText}</span>
     </div>
   );
 };
@@ -43,9 +145,11 @@ const generateSessionId = () => {
 };
 
 const Shumi = ({ isActive, initialSuggestions }) => {
+  const router = useRouter()
   const { loggedIn, getAccounts, login } = useWeb3Auth()
   const [walletAddress, setWalletAddress] = useState(null)
   const [coinTag, setCoinTag] = useState(null);
+  const [archetype, setArchetype] = useState(null);
   const [currentSuggestions, setCurrentSuggestions] = useState([]);
   const [aiGeneratedSuggestions, setAiGeneratedSuggestions] = useState(null); // Store AI-generated suggestions for last message
   const [sessionId, setSessionId] = useState(() => generateSessionId());
@@ -80,19 +184,22 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
   const [progress, setProgress] = useState(null);
   const [input, setInput] = useState(''); // Manage input state manually in v5
+  const requestIdRef = useRef(0); // Track request ID for randomization
+  const progressRequestIdRef = useRef(0); // Track request ID for randomization
 
-  // Create transport with current walletAddress - recreate when walletAddress changes
+  // Create transport with current walletAddress and archetype - recreate when they change
   const transport = useMemo(() => {
     return new DefaultChatTransport({
       api: '/api/ai',
       body: {
-        walletAddress
+        walletAddress,
+        ...(archetype ? { archetype } : {})
       },
       query: {
         walletAddress // Add this to pass wallet address as query param
       }
     });
-  }, [walletAddress]);
+  }, [walletAddress, archetype]);
 
   const {
     messages,
@@ -110,6 +217,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     onData: (dataPart) => {
       // Handle transient progress updates via onData callback (v5 best practice)
       if (dataPart.type === 'data-progress') {
+        console.log('[Shumi] Progress update:', dataPart.data);
         setProgress(dataPart.data);
       } else if (dataPart.type === 'data-suggestions') {
         // Store AI-generated suggestions for the last assistant message
@@ -130,6 +238,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
         }, {
           body: {
             walletAddress,
+            ...(archetype ? { archetype } : {}),
             data: {
               browserDateTimeWithTimezone,
               sessionId,
@@ -141,7 +250,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [walletAddress, pendingPrompt, sendMessage, sessionId]);
+  }, [walletAddress, pendingPrompt, sendMessage, sessionId, archetype]);
   const messagesEndRef = useRef(null)
   const aiInputRef = useRef(null)
   const hasScrolledToSuggestionsRef = useRef(false) // Track if we've scrolled to suggestions to prevent multiple scrolls
@@ -297,9 +406,19 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     // Re-check when route changes (simulated by isActive for now, better would be router event)
   }, [isActive]); // Dependency on isActive simulates route change check for now
 
+  // Auto-select archetype from URL query parameter
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (router.query.archetype === 'perpdex') {
+      setArchetype('deltaneutral');
+    }
+  }, [router.isReady, router.query.archetype]);
+
   const clearChat = useCallback(() => {
     setMessages([])
     setInput('') // Clear input manually
+    setArchetype(null) // Clear archetype
     const newSessionId = generateSessionId();
     setSessionId(newSessionId);
   }, [setMessages])
@@ -341,6 +460,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   const askAi = useCallback(async (e) => {
     if (e) e.preventDefault();
     setProgress(null); // Clear previous progress
+    requestIdRef.current += 1; // Increment request ID for new request
     setAiGeneratedSuggestions(null); // Clear previous AI suggestions when sending new message
     hasScrolledToSuggestionsRef.current = false; // Reset scroll flag when sending new message
 
@@ -374,12 +494,13 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     const browserDateTimeWithTimezone = new Date().toString();
 
     // In v5, use sendMessage to send messages
-    // Pass walletAddress in the body options to ensure it's included with each request
+    // Pass walletAddress and archetype in the body options to ensure they're included with each request
     sendMessage({
       text: input.trim()
     }, {
       body: {
         walletAddress, // Include walletAddress in the request body
+        ...(archetype ? { archetype } : {}), // Include archetype if set
         data: {
           browserDateTimeWithTimezone,
           sessionId,
@@ -390,12 +511,37 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
     // Clear input after submission in v5
     setInput('');
-  }, [sendMessage, input, coinTag, sessionId, loggedIn, walletAddress, login]);
+  }, [sendMessage, input, coinTag, archetype, sessionId, loggedIn, walletAddress, login]);
 
   // Handle removing the coin tag
   const handleRemoveCoinTag = useCallback(() => {
     setCoinTag(null);
   }, []);
+
+  // Handle removing the archetype tag
+  const handleRemoveArchetypeTag = useCallback(() => {
+    setArchetype(null);
+  }, []);
+
+  // Handle archetype selection from dropdown - toggle if already active
+  const handleArchetypeSelect = useCallback((key) => {
+    if (key === 'deltaneutral') {
+      // Toggle: if already active, deactivate; otherwise activate
+      setArchetype(archetype === 'deltaneutral' ? null : 'deltaneutral');
+    }
+  }, [archetype]);
+
+  // Create dropdown menu for archetype selection
+  const archetypeMenu = useMemo(() => ({
+    items: [
+      {
+        key: 'deltaneutral',
+        label: 'Perp Dex',
+        className: archetype === 'deltaneutral' ? 'archetypeMenuItemActive' : ''
+      }
+    ],
+    onClick: ({ key }) => handleArchetypeSelect(key)
+  }), [handleArchetypeSelect, archetype]);
 
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -586,7 +732,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                    (lastMessage.parts && lastMessage.parts.some(part => part.type === 'text' && part.text && part.text.trim()))
                  );
                  const shouldShow = (progress || (status === 'submitted' || status === 'streaming')) && !hasCurrentAssistantContent;
-                 return shouldShow ? <ShumiLoadingBlock progress={progress} /> : null;
+                 return shouldShow ? <ShumiLoadingBlock progress={progress} requestId={requestIdRef.current} /> : null;
                })()}
 
                {/* Add error display */}
@@ -629,15 +775,44 @@ const Shumi = ({ isActive, initialSuggestions }) => {
             <Input
               className={shumiStyles.aiInput}
               allowClear
-              prefix={coinTag && (
-                <Tag
-                  className={shumiStyles.coinTag}
-                  closable
-                  onClose={handleRemoveCoinTag}
-                >
-                  {coinTag}
-                </Tag>
-              )}
+              prefix={
+                <>
+                  {router.isReady && router.query.archetype === 'perpdex' && (
+                    <Dropdown
+                      menu={archetypeMenu}
+                      placement="topLeft"
+                      trigger={['click']}
+                      popupClassName={shumiStyles.archetypeDropdown}
+                    >
+                      <Button
+                        type="text"
+                        className={shumiStyles.archetypeButton}
+                      >
+                        <span>Archetype</span>
+                        <DownOutlined />
+                      </Button>
+                    </Dropdown>
+                  )}
+                  {archetype && (
+                    <Tag
+                      className={shumiStyles.archetypeTag}
+                      closable
+                      onClose={handleRemoveArchetypeTag}
+                    >
+                      Perp Dex
+                    </Tag>
+                  )}
+                  {coinTag && (
+                    <Tag
+                      className={shumiStyles.coinTag}
+                      closable
+                      onClose={handleRemoveCoinTag}
+                    >
+                      {coinTag}
+                    </Tag>
+                  )}
+                </>
+              }
               suffix={
                 <>
                   {showStopButton ? (
@@ -647,16 +822,16 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                   ) : (
                     <Button type="primary" onClick={askAi} disabled={error != null || isGenerating} icon={<ArrowUpOutlined />} className={shumiStyles.sendButton} />
                   )}
-                  <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={shumiStyles.clearChatButton} icon={<PlusSquareOutlined />} />
+                  <Button disabled={isGenerating || !messages.length || error != null} onClick={clearChat} className={shumiStyles.clearChatButton} icon={<EditOutlined />} />
                 </>
               }
-                          value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onPressEnter={disableInput ? undefined : askAi} // Disable Enter key only during submission
-            ref={aiInputRef} // Use the specific ref for AI input
-            spellCheck="false"
-            disabled={error != null || disableInput} // Disable input on error OR during submission
-            placeholder="Ask anything..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onPressEnter={disableInput ? undefined : askAi} // Disable Enter key only during submission
+              ref={aiInputRef} // Use the specific ref for AI input
+              spellCheck="false"
+              disabled={error != null || disableInput} // Disable input on error OR during submission
+              placeholder="Ask anything..."
             />
           </div>
         </div>
