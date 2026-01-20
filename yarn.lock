@@ -6547,8 +6547,8 @@ code-block-writer@^10.1.1:
   integrity sha512-67ueh2IRGst/51p0n6FvPrnRjAGHY5F8xdjkgrYE7DDzpJe6qA07RYQ9VcoUeo5ATOjSOiWpSL3SWBRRbempMw==
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
-  version "3.0.3"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#1de33bf76f2f15198b5cf6b0fd19aca92363838c"
+  version "3.0.4"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#bfcae6a39300d904353cad34da8b5ff09c104d81"
   dependencies:
     "@ai-sdk/anthropic" "^2.0.0"
     "@ai-sdk/google-vertex" "^2.2.27"
