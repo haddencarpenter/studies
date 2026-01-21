@@ -1,10 +1,10 @@
 /**
  * Test endpoint for classification validation
- * Returns just the query plan without executing tools
+ * Returns the query plan with retry metadata for evaluation
  */
 
 import { NextResponse } from 'next/server';
-import { classifyQueryOnly } from 'coinrotator-utils/shumi.js';
+import { classifyQueryWithValidation } from 'coinrotator-utils/shumi.js';
 import { Langfuse } from 'langfuse';
 
 const langfuse = new Langfuse({
@@ -13,29 +13,42 @@ const langfuse = new Langfuse({
   baseUrl: process.env.LANGFUSE_BASEURL || process.env.LANGFUSE_HOST || process.env.NEXT_PUBLIC_LANGFUSE_HOST
 });
 
-// Cache for classification prompt
-let cachedPrompt = null;
-let cachedPromptTime = 0;
+// Cache for prompts
+let cachedData = null;
+let cachedDataTime = 0;
 const CACHE_TTL = 60000; // 1 minute
 
-async function getClassificationPrompt() {
+async function getClassificationData() {
   const now = Date.now();
-  if (cachedPrompt && (now - cachedPromptTime) < CACHE_TTL) {
-    return cachedPrompt;
+  if (cachedData && (now - cachedDataTime) < CACHE_TTL) {
+    return cachedData;
   }
 
   const prompt = await langfuse.getPrompt('base/Classification Prompt', undefined, { label: 'sandbox' });
-
-  // Also fetch tool definitions
   const toolDefs = await langfuse.getPrompt('base/Tool Definitions', undefined, { label: 'sandbox' });
 
   // Replace {{Tool Definitions}} placeholder
   const fullPrompt = prompt.prompt.replace('{{Tool Definitions}}', toolDefs.prompt);
 
-  cachedPrompt = fullPrompt;
-  cachedPromptTime = now;
+  // Parse tool definitions to extract required params and full definitions
+  let toolDefinitions = {};
+  let toolRequiredParams = {};
+  try {
+    toolDefinitions = JSON.parse(toolDefs.prompt);
+    // Extract required params from each tool
+    for (const [toolName, toolDef] of Object.entries(toolDefinitions)) {
+      if (toolDef.parameters?.required) {
+        toolRequiredParams[toolName] = toolDef.parameters.required;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to parse tool definitions for validation:', e.message);
+  }
 
-  return fullPrompt;
+  cachedData = { fullPrompt, toolDefinitions, toolRequiredParams };
+  cachedDataTime = now;
+
+  return cachedData;
 }
 
 export async function POST(request) {
@@ -46,21 +59,29 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Missing query' }, { status: 400 });
     }
 
-    const classificationPrompt = await getClassificationPrompt();
+    const { fullPrompt, toolDefinitions, toolRequiredParams } = await getClassificationData();
 
-    // Get classification plan without executing
-    const result = await classifyQueryOnly(
+    // Get classification plan with validation and retry tracking
+    const result = await classifyQueryWithValidation(
       query,
-      classificationPrompt,
+      fullPrompt,
       [], // no session history
-      'openai/gpt-4.1-mini'
+      'openai/gpt-4.1-mini',
+      null, // classifierProviders
+      toolRequiredParams,
+      toolDefinitions
     );
+
+    // Extract metadata before returning
+    const metadata = result._metadata;
+    delete result._metadata;
 
     return NextResponse.json({
       queryType: result.queryType,
       description: result.description,
       plan: result.plan,
-      additionalContext: result.additionalContext
+      additionalContext: result.additionalContext,
+      _metadata: metadata
     });
 
   } catch (error) {
