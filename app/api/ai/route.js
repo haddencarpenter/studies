@@ -1,6 +1,10 @@
 import shumi, { reportErrorToServer } from 'coinrotator-utils/shumi.js';
 import { fetchWithTimeout } from 'coinrotator-utils/fetchWithTimeout.mjs';
 import { createUIMessageStream, createUIMessageStreamResponse } from 'ai';
+import { cookies } from 'next/headers';
+
+// Cookie name for tracking free query usage (per-device, cross-tab)
+const FREE_QUERY_COOKIE = 'shumi_free_used';
 
 // Function to track events in Mixpanel using fetch (Edge runtime compatible)
 const trackMixpanelEvent = async (event, properties) => {
@@ -36,11 +40,19 @@ export async function POST(req) {
   const { messages, walletAddress, data, archetype } = await req.json();
 
   // AUTHENTICATION GATING: Require wallet address for Shumi AI access
-  if (!walletAddress || !walletAddress.startsWith('0x')) {
-    console.log('Shumi AI access denied: No valid wallet address provided');
+  // One free query per device (tracked via HTTP-only cookie), subsequent queries require authentication
+  const cookieStore = await cookies();
+  const hasUsedFreeQuery = cookieStore.get(FREE_QUERY_COOKIE)?.value === 'true';
+  const isAuthenticated = walletAddress && walletAddress.startsWith('0x');
+
+  // Determine if this should be allowed as a free query
+  const allowFreeQuery = !hasUsedFreeQuery && !isAuthenticated;
+
+  if (!allowFreeQuery && !isAuthenticated) {
+    console.log('Shumi AI access denied: Free query already used and no valid wallet address provided');
     return new Response(JSON.stringify({
       error: 'Authentication required',
-      message: 'Wallet connection required to access Shumi AI'
+      message: 'Wallet connection required to continue the conversation'
     }), {
       status: 401,
       headers: {
@@ -48,6 +60,10 @@ export async function POST(req) {
         'Cache-Control': 'no-cache'
       }
     });
+  }
+
+  if (allowFreeQuery) {
+    console.log('Shumi AI: Allowing free query without authentication (first query for this device)');
   }
 
   // Get the user message (last message in the array)
@@ -234,6 +250,17 @@ export async function POST(req) {
         return "An error occurred while processing your request. Please try again later.";
       }
     });
+
+    // Set the free query cookie if this was a free query (marks device as having used free query)
+    if (allowFreeQuery) {
+      cookieStore.set(FREE_QUERY_COOKIE, 'true', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 365 // 1 year
+      });
+      console.log('Shumi AI: Set free query cookie for this device');
+    }
 
     // Convert the stream to a Response using createUIMessageStreamResponse
     return createUIMessageStreamResponse({ stream });

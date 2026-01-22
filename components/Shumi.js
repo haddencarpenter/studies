@@ -201,6 +201,9 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     });
   }, [walletAddress, archetype]);
 
+  // Track if we need to trigger login after a 401 error
+  const [authError, setAuthError] = useState(false);
+
   const {
     messages,
     sendMessage,
@@ -213,6 +216,11 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     transport,
     onError: (error) => {
       console.error('Shumi error:', error);
+      // Check if this is a 401 authentication error (free query already used)
+      if (error?.message?.includes('401') || error?.message?.includes('Authentication required')) {
+        console.log('Shumi: Authentication required - triggering login');
+        setAuthError(true);
+      }
     },
     onData: (dataPart) => {
       // Handle transient progress updates via onData callback (v5 best practice)
@@ -226,6 +234,14 @@ const Shumi = ({ isActive, initialSuggestions }) => {
       }
     }
   });
+
+  // Handle 401 auth errors by triggering login
+  useEffect(() => {
+    if (authError && !walletAddress) {
+      setAuthError(false); // Reset flag
+      login().catch(err => console.error('Login failed after auth error:', err));
+    }
+  }, [authError, walletAddress, login]);
 
   // Submit pending prompt after successful login
   useEffect(() => {
@@ -466,8 +482,9 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
     if (!input.trim() && !coinTag) return;
 
-    // Check if user is logged in
-    if (!loggedIn || !walletAddress) {
+    // Check if user is logged in - allow first query without auth (backend handles cookie-based gating)
+    const isFirstQuery = messages.length === 0;
+    if (!isFirstQuery && (!loggedIn || !walletAddress)) {
       // Store the prompt to submit after login
       const coinId = document.querySelector('meta[property="x-cr-coin-id"]')?.content;
       const browserDateTimeWithTimezone = new Date().toString();
@@ -511,7 +528,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
 
     // Clear input after submission in v5
     setInput('');
-  }, [sendMessage, input, coinTag, archetype, sessionId, loggedIn, walletAddress, login]);
+  }, [sendMessage, input, coinTag, archetype, sessionId, loggedIn, walletAddress, login, messages]);
 
   // Handle removing the coin tag
   const handleRemoveCoinTag = useCallback(() => {
