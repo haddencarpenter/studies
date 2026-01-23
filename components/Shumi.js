@@ -210,8 +210,8 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     stop,
     setMessages,
     error,
-    reload,
-    status
+    status,
+    regenerate
   } = useChat({
     transport,
     onError: (error) => {
@@ -763,7 +763,7 @@ const Shumi = ({ isActive, initialSuggestions }) => {
                          Error: {error?.message || String(error)}
                        </div>
                      )}
-                     <Button type="primary" onClick={() => reload()} className={shumiStyles.retryButton}>
+                     <Button type="primary" onClick={() => regenerate()} className={shumiStyles.retryButton}>
                        Try Again
                      </Button>
                    </div>
