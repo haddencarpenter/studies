@@ -6548,7 +6548,7 @@ code-block-writer@^10.1.1:
 
 "coinrotator-utils@git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git":
   version "3.1.2"
-  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#22d6b4dfaec55c2189c448a181d31b7f561e2f8c"
+  resolved "git+https://mayrsascha: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@github.com/mayrsascha/coinrotator-utils.git#ed79fc5102dcc6bdd1e3d7c1b10c93dc918c2935"
   dependencies:
     "@ai-sdk/anthropic" "^2.0.0"
     "@ai-sdk/google-vertex" "^2.2.27"
@@ -15107,10 +15107,15 @@ zod@^3.22.4:
   resolved "https://registry.npmjs.org/zod/-/zod-3.25.67.tgz"
   integrity sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==
 
-"zod@^3.25 || ^4.0", "zod@^3.25.0 || ^4.0.0", zod@^4.0.5:
+"zod@^3.25 || ^4.0":
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.5.tgz#aeb269a6f9fc259b1212c348c7c5432aaa474d2a"
   integrity sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==
+
+"zod@^3.25.0 || ^4.0.0", zod@^4.0.5:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.3.6.tgz#89c56e0aa7d2b05107d894412227087885ab112a"
+  integrity sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==
 
 zod@^4.1.8:
   version "4.1.12"
