@@ -1,4 +1,11 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__postgres__list_schemas",
+      "mcp__postgres__list_objects",
+      "mcp__postgres__get_object_details"
+    ]
+  },
   "mcpServers": {
     "langfuse-prompts": {
       "command": "node",
@@ -23,19 +30,28 @@
     },
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ],
       "env": {}
     },
     "bugsnag": {
       "command": "npx",
-      "args": ["-y", "bugsnag-mcp-server"],
+      "args": [
+        "-y",
+        "bugsnag-mcp-server"
+      ],
       "env": {
         "BUGSNAG_API_KEY": "54cb14b9-27de-4a76-b7f5-d59707a5b784"
       }
     },
     "notion": {
       "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "args": [
+        "-y",
+        "@notionhq/notion-mcp-server"
+      ],
       "env": {
         "NOTION_TOKEN": "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"
       }
