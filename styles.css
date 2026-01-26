@@ -69,7 +69,7 @@
 
   /* Glow Effects (for export mode control) */
   --glow-strength: 1;
-  --glow-shumi: rgba(231, 76, 60, 0.3);
+  --glow-shumi: rgba(255, 255, 255, 0.5);
   --glow-up: rgba(0, 255, 136, 0.3);
   --glow-hodl: rgba(47, 128, 255, 0.3);
 }
@@ -109,19 +109,19 @@
 /* Legacy competitor color support (for backward compatibility) */
 :root {
   --bingx-color: #FF6B35;
-  --bingx-glow: rgba(255, 107, 53, 0.3);
+  --bingx-glow: rgba(255, 255, 255, 0.5);
   --neurodex-color: #7b2cbf;
-  --neurodex-glow: rgba(123, 44, 191, 0.3);
+  --neurodex-glow: rgba(255, 255, 255, 0.5);
   --hustleai-color: #ff9800;
-  --hustleai-glow: rgba(255, 152, 0, 0.3);
+  --hustleai-glow: rgba(255, 255, 255, 0.5);
   --nansen-color: #4169e1;
-  --nansen-glow: rgba(65, 105, 225, 0.3);
+  --nansen-glow: rgba(255, 255, 255, 0.5);
   --sentient-color: #9d4edd;
-  --sentient-glow: rgba(157, 78, 221, 0.3);
+  --sentient-glow: rgba(255, 255, 255, 0.5);
   --intellectia-color: #9B59B6;
-  --intellectia-glow: rgba(155, 89, 182, 0.3);
+  --intellectia-glow: rgba(255, 255, 255, 0.5);
   --chaingpt-color: #4A90E2;
-  --chaingpt-glow: rgba(74, 144, 226, 0.3);
+  --chaingpt-glow: rgba(255, 255, 255, 0.5);
   
   /* Legacy aliases for backward compatibility */
   --shumi-red: var(--c-shumi);
@@ -588,6 +588,13 @@ a:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.score-bar-item:hover {
+  transform: translateX(4px);
+  opacity: 0.9;
 }
 
 .score-bar-header {
@@ -941,9 +948,18 @@ a:focus-visible {
   align-items: start;
 }
 
+/* Single AI layout (for individual question pages) */
+.cr-ai-comparison:has(> :only-child),
+.cr-ai-comparison.single-ai {
+  grid-template-columns: 1fr;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .ai-analysis {
   background: var(--c-bg-main);
-  padding: var(--space-lg);
+  padding: var(--space-xl);
   border-radius: 4px;
   border: 1px solid var(--c-border);
   display: flex;
@@ -1030,17 +1046,49 @@ a:focus-visible {
   color: var(--sentient-color);
 }
 
+.analysis-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+  align-items: start;
+}
+
+/* When critical errors are present, use 3 columns */
+.analysis-sections-grid.has-critical-errors {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 1024px) {
+  .analysis-sections-grid.has-critical-errors {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  /* On tablets, stack critical errors below when visible */
+  .analysis-sections-grid.has-critical-errors #critical-errors-section {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .analysis-sections-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
+
 .analysis-section {
-  margin-bottom: var(--space-lg);
+  margin-bottom: 0;
   flex: 0 0 auto;
+  min-width: 0; /* Allows grid items to shrink below content size */
 }
 
 .analysis-title {
   font-family: var(--font-ui);
   font-weight: 600;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--c-text-secondary);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1052,15 +1100,16 @@ a:focus-visible {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .analysis-list li {
   font-family: var(--font-ui);
-  font-size: var(--text-sm);
-  line-height: var(--leading-normal);
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
   color: var(--c-text-secondary);
-  padding-left: 20px;
+  padding-left: 24px;
+  padding-bottom: var(--space-sm);
   position: relative;
 }
 
@@ -1199,6 +1248,41 @@ a:focus-visible {
   transition: all 0.2s ease;
 }
 
+.insight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.insight-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: var(--text-base);
+  color: var(--c-text-primary);
+  margin: 0;
+}
+
+.insight-badge {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+  background: var(--c-bg-card);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-secondary);
+}
+
+.insight-text {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--c-text-secondary);
+  margin: 0;
+}
+
 .insight-card:hover {
   background: var(--c-bg-card);
   transform: translateY(-2px);
@@ -1209,12 +1293,55 @@ a:focus-visible {
   border-left-color: var(--c-shumi);
 }
 
+.insight-card.insight-high {
+  border-left-color: var(--c-info);
+  background: rgba(0, 212, 255, 0.03);
+}
+
 .insight-card.insight-important {
   border-left-color: #f39c12;
 }
 
+.insight-card.insight-medium {
+  border-left-color: var(--c-info);
+  background: rgba(0, 212, 255, 0.05);
+}
+
 .insight-card.insight-notable {
   border-left-color: var(--c-info);
+}
+
+/* AI Color Classes - for general use in tables and text */
+.shumi-color {
+  color: var(--c-shumi);
+}
+
+.bingx-color {
+  color: var(--bingx-color);
+}
+
+.nansen-color {
+  color: var(--nansen-color);
+}
+
+.sentient-color {
+  color: var(--sentient-color);
+}
+
+.chaingpt-color {
+  color: var(--chaingpt-color);
+}
+
+.hustleai-color {
+  color: var(--hustleai-color);
+}
+
+.neurodexai-color {
+  color: var(--neurodex-color);
+}
+
+.intellectia-color {
+  color: var(--intellectia-color);
 }
 
 .insight-header {
@@ -1890,6 +2017,38 @@ a:focus-visible {
   justify-content: flex-end;
   gap: var(--space-sm);
   height: 100%;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.score-column:hover {
+  transform: translateY(-4px);
+}
+
+.click-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--c-text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--c-bg-card);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  z-index: 10;
+}
+
+.score-column:hover .click-indicator {
+  opacity: 1;
 }
 
 .score-bar-vertical {
@@ -1918,10 +2077,20 @@ a:focus-visible {
   color: var(--c-bg-main);
 }
 
+.score-column:has(.score-bar-shumi):hover .score-bar-vertical {
+  border-color: var(--c-shumi);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--glow-shumi);
+}
+
 .score-bar-vertical.score-bar-bingx {
   background: var(--bingx-color);
   border-color: var(--bingx-color);
   color: var(--c-bg-main);
+}
+
+.score-column:has(.score-bar-bingx):hover .score-bar-vertical {
+  border-color: var(--bingx-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--bingx-glow);
 }
 
 .score-bar-vertical.score-bar-nansen {
@@ -1930,10 +2099,20 @@ a:focus-visible {
   color: var(--c-bg-main);
 }
 
+.score-column:has(.score-bar-nansen):hover .score-bar-vertical {
+  border-color: var(--nansen-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--nansen-glow);
+}
+
 .score-bar-vertical.score-bar-sentient {
   background: var(--sentient-color);
   border-color: var(--sentient-color);
   color: var(--c-bg-main);
+}
+
+.score-column:has(.score-bar-sentient):hover .score-bar-vertical {
+  border-color: var(--sentient-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--sentient-glow);
 }
 
 .score-bar-vertical.score-bar-intellectia {
@@ -1942,10 +2121,20 @@ a:focus-visible {
   color: var(--c-bg-main);
 }
 
+.score-column:has(.score-bar-intellectia):hover .score-bar-vertical {
+  border-color: var(--intellectia-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--intellectia-glow);
+}
+
 .score-bar-vertical.score-bar-chaingpt {
   background: var(--chaingpt-color);
   border-color: var(--chaingpt-color);
   color: var(--c-bg-main);
+}
+
+.score-column:has(.score-bar-chaingpt):hover .score-bar-vertical {
+  border-color: var(--chaingpt-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--chaingpt-glow);
 }
 
 .score-bar-vertical.score-bar-neurodex {
@@ -1954,10 +2143,20 @@ a:focus-visible {
   color: var(--c-bg-main);
 }
 
+.score-column:has(.score-bar-neurodex):hover .score-bar-vertical {
+  border-color: var(--neurodex-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--neurodex-glow);
+}
+
 .score-bar-vertical.score-bar-hustleai {
   background: var(--hustleai-color);
   border-color: var(--hustleai-color);
   color: var(--c-bg-main);
+}
+
+.score-column:has(.score-bar-hustleai):hover .score-bar-vertical {
+  border-color: var(--hustleai-color);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) var(--hustleai-glow);
 }
 
 .score-bar-text-vertical {

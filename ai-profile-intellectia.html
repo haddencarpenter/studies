@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Intellectia AI - Comprehensive Performance Report</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;700i&family=Orbitron:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js"></script>
+    
+    <style>
+      /* Minimal custom styles - leveraging existing design system */
+      
+      .profile-meta-strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .profile-meta-item {
+        background: var(--c-bg-card);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--c-border);
+      }
+
+      .profile-meta-label {
+        font-size: var(--text-xs);
+        color: var(--c-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+        font-family: var(--font-display);
+      }
+
+      .profile-meta-value {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #9B59B6;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .summary-card {
+        background: var(--c-bg-card);
+        border: 1px solid var(--c-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+      }
+
+      .summary-card-title {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--c-text-primary);
+        margin-bottom: 1rem;
+      }
+
+      .summary-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .summary-list li {
+        padding: 0.5rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--c-text-secondary);
+        line-height: 1.6;
+      }
+
+      .summary-list.strengths li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--c-up);
+        font-weight: bold;
+      }
+
+      .summary-list.weaknesses li::before {
+        content: "⚠";
+        position: absolute;
+        left: 0;
+        color: var(--c-down);
+      }
+
+      .summary-list.insights li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #9B59B6;
+        font-weight: bold;
+      }
+
+      .question-card {
+        background: var(--c-bg-card);
+        border: 1px solid var(--c-border);
+        border-radius: 6px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.2s ease;
+      }
+
+      .question-card:hover {
+        border-color: rgba(155, 89, 182, 0.5);
+        background: rgba(155, 89, 182, 0.02);
+      }
+
+      .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        gap: 1rem;
+      }
+
+      .question-title {
+        font-family: var(--font-display);
+        font-size: var(--text-sm);
+        color: var(--c-text-secondary);
+        flex: 1;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+      }
+
+      .question-score-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+
+      .score-large {
+        font-family: var(--font-mono);
+        font-size: var(--text-lg);
+        font-weight: 600;
+        color: #9B59B6;
+      }
+
+      .rank-badge {
+        background: transparent;
+        border: 1px solid var(--c-border);
+        color: var(--c-text-muted);
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .question-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .question-details.expanded {
+        max-height: 3000px;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--c-border);
+      }
+
+      .expand-icon {
+        transition: transform 0.3s ease;
+        color: var(--c-text-muted);
+        font-size: 1rem;
+      }
+
+      .question-card.expanded .expand-icon {
+        transform: rotate(180deg);
+        color: #9B59B6;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .detail-section {
+        background: var(--c-bg-section);
+        border: 1px solid var(--c-border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+
+      .detail-title {
+        font-family: var(--font-display);
+        font-size: var(--text-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        color: var(--c-text-primary);
+      }
+
+      .detail-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .detail-list li {
+        padding: 0.4rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--c-text-secondary);
+        line-height: 1.6;
+        font-size: var(--text-sm);
+      }
+
+      .strengths-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--c-up);
+        font-weight: bold;
+      }
+
+      .weaknesses-list li::before {
+        content: "⚠";
+        position: absolute;
+        left: 0;
+        color: var(--c-down);
+      }
+
+      .verdict-box {
+        color: var(--c-text-secondary);
+        line-height: 1.7;
+        padding: 1rem;
+        background: var(--c-bg-section);
+        border-radius: 8px;
+        border-left: 3px solid #9B59B6;
+        font-size: var(--text-sm);
+      }
+
+      .score-bar {
+        width: 100%;
+        height: 4px;
+        background: var(--c-bg-section);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+      }
+
+      .score-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #9B59B6, rgba(155, 89, 182, 0.5));
+        transition: width 0.5s ease;
+      }
+
+      .recommendation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .recommendation-card {
+        background: var(--c-bg-card);
+        border: 2px solid var(--c-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+      }
+
+      .recommendation-card.use {
+        border-color: var(--c-up);
+      }
+
+      .recommendation-card.avoid {
+        border-color: var(--c-down);
+      }
+
+      .recommendation-title {
+        font-family: var(--font-display);
+        font-size: var(--text-base);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .recommendation-title.use {
+        color: var(--c-up);
+      }
+
+      .recommendation-title.avoid {
+        color: var(--c-down);
+      }
+
+      .insight-box {
+        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), rgba(155, 89, 182, 0.05));
+        border: 2px solid #9B59B6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .insight-box-title {
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        color: #9B59B6;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cr-card">
+      <!-- Header -->
+      <header class="cr-header">
+        <div class="cr-header-left">
+          <div class="cr-avatar cr-avatar-intellectia">
+            <div class="avatar-text">📊</div>
+          </div>
+          <div class="cr-header-text">
+            <h1 class="cr-title">INTELLECTIA AI</h1>
+            <p class="cr-subtitle">COMPREHENSIVE PERFORMANCE REPORT</p>
+          </div>
+        </div>
+
+        <div class="cr-header-right">
+          <div class="cr-score-pill">
+            <span class="score-label">overall score</span>
+            <div class="score-value winner-intellectia" id="overall-score">35.8/100</div>
+            <span class="score-gap">BELOW AVERAGE</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="cr-accent-bar"></div>
+
+      <main class="cr-screen">
+        <!-- Meta strip -->
+        <section class="profile-meta-strip">
+          <div class="profile-meta-item">
+            <div class="profile-meta-label">Overall Rank</div>
+            <div class="profile-meta-value">#7 / 8</div>
+          </div>
+          <div class="profile-meta-item">
+            <div class="profile-meta-label">AI Type</div>
+            <div class="profile-meta-value" style="font-size: var(--text-base);">Premium Service</div>
+          </div>
+          <div class="profile-meta-item">
+            <div class="profile-meta-label">Best Score</div>
+            <div class="profile-meta-value">54/100</div>
+          </div>
+          <div class="profile-meta-item">
+            <div class="profile-meta-label">Critical Failures</div>
+            <div class="profile-meta-value">4</div>
+          </div>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- Critical Insights -->
+        <section class="insight-box">
+          <div class="insight-box-title">💡 Critical Insights from Evaluation</div>
+          <p style="color: var(--c-text-secondary); line-height: 1.7; margin-bottom: 1rem;">
+            Intellectia AI represents the "premium pricing paradox" - charging $14.95-$89.95/month for analysis that free tools like TradingView provide automatically. Every question received textbook technical analysis that any trader could generate in 30 seconds, raising serious questions about ROI. Notable patterns include:
+          </p>
+          <ul class="summary-list insights">
+            <li><strong>TradingView Clone:</strong> RSI, MACD, Fibonacci levels calculated correctly but available free everywhere</li>
+            <li><strong>Zero Proprietary Edge:</strong> No unique methodology, no exclusive data, no original insights</li>
+            <li><strong>Premium Pricing Crisis:</strong> $15-90/month for what free tools provide automatically</li>
+            <li><strong>Never Broke 54/100:</strong> Highest score still below average across all questions</li>
+          </ul>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- Performance Overview -->
+        <section>
+          <h2 class="section-title">Performance Overview</h2>
+          
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-card-title">✅ Key Strengths</div>
+              <ul class="summary-list strengths">
+                <li>Technical indicators calculated correctly (RSI, MACD, Bollinger, Fibonacci)</li>
+                <li>Standard TA framework consistently applied across questions</li>
+                <li>Tokenomics breakdown with FDV and supply metrics</li>
+                <li>Ecosystem context provided (use cases, partnerships)</li>
+                <li>Professional formatting and clear structure</li>
+              </ul>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-card-title">⚠️ Key Weaknesses</div>
+              <ul class="summary-list weaknesses">
+                <li>Zero proprietary insights justifying $15-90/month pricing</li>
+                <li>Every analysis replicable in 30 seconds on TradingView</li>
+                <li>Generic recommendations that don't help decide buy/sell/wait</li>
+                <li>Missing specific price triggers, timeframes, or invalidation levels</li>
+                <li>"Monitor for breakout" x9 questions without specific thresholds</li>
+              </ul>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-card-title">💡 Critical Insights</div>
+              <ul class="summary-list insights">
+                <li><strong>Premium ROI Crisis:</strong> Paying $90/month for free TradingView analysis</li>
+                <li><strong>Q9 Disaster:</strong> 24/100 - Answered "ONE metric" with "volume analysis" (most basic metric)</li>
+                <li><strong>Commodity Content:</strong> Correct but completely replaceable by free tools</li>
+                <li><strong>No Breakthrough:</strong> Never scored above 54/100 on any question</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- Performance by Question -->
+        <section>
+          <h2 class="section-title">Performance by Question</h2>
+          <p class="cr-menu-note" style="margin-bottom: 1.5rem;">
+            Click any question to expand detailed analysis with strengths, weaknesses, and verdict.
+          </p>
+
+          <div id="questions-container">
+            <!-- Populated by JavaScript -->
+          </div>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- When to Use/Avoid -->
+        <section>
+          <h2 class="section-title">When to Use or Avoid</h2>
+          <div class="recommendation-grid">
+            <div class="recommendation-card use">
+              <div class="recommendation-title use">✅ USE INTELLECTIA AI WHEN</div>
+              <ul class="summary-list strengths">
+                <li>Honestly, there's no compelling reason - everything it provides is available free on TradingView</li>
+              </ul>
+            </div>
+
+            <div class="recommendation-card avoid">
+              <div class="recommendation-title avoid">❌ AVOID INTELLECTIA AI WHEN</div>
+              <ul class="summary-list weaknesses">
+                <li>Any use case where you value your money ($15-90/month for free TradingView content)</li>
+                <li>Proprietary analysis or unique insights (zero edge)</li>
+                <li>Actionable trade decisions</li>
+                <li>You have access to any free charting tool (99% of traders)</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <div class="cr-nav-buttons">
+        <a href="ai-profile-nansen.html" class="cr-nav-btn cr-nav-btn-back">← Prev: Nansen AI (Rank #6)</a>
+        <a href="ai-profile-hustleai.html" class="cr-nav-btn">Next: HustleAI (Rank #8) →</a>
+      </div>
+    
+      <footer class="cr-footer">
+        <span class="tagline">Intellectia AI Performance Report • Rank #7 of 8 AIs</span>
+        <span class="url">coinrotator.app • AI comparison report</span>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const aiKey = 'intellectia';
+        const ai = EVALUATION_DATA.ais[aiKey];
+        
+        // Update header
+        document.getElementById('overall-score').textContent = `${ai.overallScore}/100`;
+
+        // Get all questions with Intellectia's responses
+        const questions = EVALUATION_DATA.questions.map(q => ({
+          ...q,
+          response: q.responses[aiKey]
+        })).sort((a, b) => a.id.localeCompare(b.id));
+
+        // Generate question cards
+        const container = document.getElementById('questions-container');
+        questions.forEach((question, index) => {
+          const response = question.response;
+          
+          const card = document.createElement('div');
+          card.className = 'question-card';
+          
+          // Calculate score bar width
+          const scoreWidth = response.score;
+          
+          card.innerHTML = `
+            <div class="question-header" onclick="toggleQuestion(${index})">
+              <div class="question-title">
+                ${question.id.toUpperCase()}: ${question.title}
+              </div>
+              <div class="question-score-badge">
+                <span class="score-large">${response.score}</span>
+                <span class="rank-badge">RANK #${response.rank}</span>
+                <span class="expand-icon">▼</span>
+              </div>
+            </div>
+            <div class="score-bar">
+              <div class="score-bar-fill" style="width: ${scoreWidth}%"></div>
+            </div>
+            <div class="question-details" id="details-${index}">
+              <div class="detail-grid">
+                <div class="detail-section">
+                  <div class="detail-title">✅ Strengths (${response.strengths.length})</div>
+                  <ul class="detail-list strengths-list">
+                    ${response.strengths.map(s => `<li>${s}</li>`).join('')}
+                  </ul>
+                </div>
+                
+                <div class="detail-section">
+                  <div class="detail-title">⚠️ Weaknesses (${response.weaknesses.length})</div>
+                  <ul class="detail-list weaknesses-list">
+                    ${response.weaknesses.map(w => `<li>${w}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              
+              ${response.criticalErrors && response.criticalErrors.length > 0 ? `
+              <div class="detail-section" style="margin-top: 1rem;">
+                <div class="detail-title" style="color: var(--c-down);">🚨 Critical Errors (${response.criticalErrors.length})</div>
+                <ul class="detail-list weaknesses-list">
+                  ${response.criticalErrors.map(e => `<li>${e}</li>`).join('')}
+                </ul>
+              </div>
+              ` : ''}
+              
+              <div style="margin-top: 1rem;">
+                <div class="detail-title">Verdict</div>
+                <div class="verdict-box">${response.verdict}</div>
+              </div>
+            </div>
+          `;
+          
+          container.appendChild(card);
+        });
+      });
+
+      function toggleQuestion(index) {
+        const details = document.getElementById(`details-${index}`);
+        const card = details.closest('.question-card');
+        
+        if (details.classList.contains('expanded')) {
+          details.classList.remove('expanded');
+          card.classList.remove('expanded');
+        } else {
+          details.classList.add('expanded');
+          card.classList.add('expanded');
+        }
+      }
+    </script>
+  </body>
+</html>

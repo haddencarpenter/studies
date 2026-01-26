@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AI Comparison - Q9: BingX AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;700i&family=Orbitron:wght@700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+    
+  </head>
+  <body>
+    <div class="cr-card">
+      <header class="cr-header">
+        <div class="cr-header-left">
+          <div class="cr-avatar cr-avatar-bingx">
+            <div class="avatar-text">Q9</div>
+          </div>
+          <div class="cr-header-text">
+            <h1 class="cr-title" id="header-title">QUESTION 9</h1>
+            <p class="cr-subtitle" id="header-subtitle">SHUMI AI ANALYSIS</p>
+          </div>
+        </div>
+
+        <div class="cr-header-right">
+          <div class="cr-score-pill">
+            <span class="score-label">score</span>
+            <div class="score-value winner-bingx" id="header-score">79/100</div>
+            <span class="score-gap" id="header-rank">Rank #1/8</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="cr-accent-bar"></div>
+
+      <main class="cr-screen">
+        <!-- Question -->
+        <section class="cr-question">
+          <div class="question-label">Question</div>
+          <p class="question-text" id="question-text"></p>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- Score Distribution -->
+        <section class="cr-comparison" style="margin-bottom: 2rem;">
+          <h2 class="section-title">Score Distribution</h2>
+          <p class="cr-menu-note" style="margin-bottom: 1rem;">This AI's performance vs question average</p>
+          <div class="score-bars" id="score-distribution">
+            <!-- Populated by JavaScript -->
+          </div>
+        </section>
+
+        <div class="cr-divider"></div>
+
+        <!-- AI Analysis -->
+        <section class="cr-ai-comparison single-ai">
+          <article class="ai-analysis">
+            <div class="ai-analysis-header">
+              <h3 class="ai-analysis-name bingx-color" id="ai-name">BingX AI</h3>
+              <div class="ai-analysis-score bingx-color" id="ai-score">79</div>
+            </div>
+
+            <div class="analysis-sections-grid">
+              <div class="analysis-section">
+                <h4 class="analysis-title">✅ Strengths</h4>
+                <ul class="analysis-list" id="ai-strengths"></ul>
+              </div>
+
+              <div class="analysis-section">
+                <h4 class="analysis-title">⚠️ Weaknesses</h4>
+                <ul class="analysis-list weakness-list" id="ai-weaknesses"></ul>
+              </div>
+
+              <div class="analysis-section" id="critical-errors-section" style="display: none;">
+                <h4 class="analysis-title" style="color: var(--c-down);">❌ Critical Errors</h4>
+                <ul class="analysis-list weakness-list" id="ai-critical-errors"></ul>
+              </div>
+            </div>
+
+            <div class="analysis-verdict">
+              <div class="verdict-label">Verdict</div>
+              <p class="verdict-text" id="ai-verdict"></p>
+            </div>
+
+            <div id="ai-raw-response"></div>
+          </article>
+        </section>
+      </main>
+
+      <div class="cr-nav-buttons">
+        <a href="question-q9-summary.html" class="cr-nav-btn cr-nav-btn-back" id="nav-back">← Back to Navigation</a>
+        <a href="#" class="cr-nav-btn" id="nav-next">Next AI →</a>
+      </div>
+    
+      <footer class="cr-footer">
+        <span class="tagline">AI performance benchmarking • Q9: BingX AI</span>
+        <span class="url">coinrotator.app • AI comparison report</span>
+      </footer>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const questionId = 'q9';
+        const aiKey = 'bingx';
+        
+        // Debug: Check if EVALUATION_DATA is available
+        if (typeof EVALUATION_DATA === 'undefined') {
+          console.error('EVALUATION_DATA is not defined. Make sure data.js is loaded.');
+          return;
+        }
+        
+        const question = EVALUATION_DATA.questions.find(q => q.id === questionId);
+        const aiData = question?.responses[aiKey];
+        const aiMeta = EVALUATION_DATA.ais[aiKey];
+        
+        if (!question) {
+          console.error('Question not found:', questionId);
+          console.log('Available questions:', EVALUATION_DATA.questions.map(q => q.id));
+          return;
+        }
+        if (!aiData) {
+          console.error('AI data not found:', aiKey);
+          console.log('Available AIs:', Object.keys(question.responses || {}));
+          return;
+        }
+        if (!aiMeta) {
+          console.error('AI metadata not found:', aiKey);
+          console.log('Available AIs:', Object.keys(EVALUATION_DATA.ais || {}));
+          return;
+        }
+
+        // Update header
+        document.getElementById('question-text').textContent = question.prompt;
+        document.getElementById('header-title').textContent = `QUESTION 9: ${question.title.toUpperCase()}`;
+        document.getElementById('header-subtitle').textContent = `${aiMeta.displayName} ANALYSIS`;
+        document.getElementById('header-score').textContent = `${aiData.score}/100`;
+        document.getElementById('header-rank').textContent = `Rank #${aiData.rank}/8`;
+        
+        // Update AI name and score
+        document.getElementById('ai-name').textContent = aiMeta.displayName;
+        document.getElementById('ai-score').textContent = aiData.score;
+
+        // Generate score distribution (AI vs Average)
+        const scoreDistContainer = document.getElementById('score-distribution');
+        const averageScore = question.summary.averageScore;
+        const aiScore = aiData.score;
+        const maxScore = Math.max(aiScore, averageScore, 100);
+        
+        // AI Score Bar
+        const aiScoreBar = document.createElement('div');
+        aiScoreBar.className = 'score-bar-item';
+        const aiPercentage = (aiScore / maxScore) * 100;
+        const colorName = aiMeta.color === 'neurodexai' ? 'neurodex' : aiMeta.color;
+        aiScoreBar.innerHTML = `
+          <div class="score-bar-header">
+            <span class="ai-name ${colorName}-color">${aiMeta.displayName}</span>
+            <span class="ai-score ${colorName}-color">${aiScore}/100</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill ${colorName}-fill" style="width: ${aiPercentage}%;" data-score="${aiScore}"></div>
+          </div>
+        `;
+        scoreDistContainer.appendChild(aiScoreBar);
+        
+        // Average Score Bar
+        const avgScoreBar = document.createElement('div');
+        avgScoreBar.className = 'score-bar-item';
+        const avgPercentage = (averageScore / maxScore) * 100;
+        const diff = aiScore - averageScore;
+        avgScoreBar.innerHTML = `
+          <div class="score-bar-header">
+            <span class="ai-name" style="color: var(--c-text-secondary);">Question Average</span>
+            <span class="ai-score" style="color: var(--c-text-secondary);">${averageScore.toFixed(1)}/100</span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" style="width: ${avgPercentage}%; background: var(--c-text-muted);" data-score="${averageScore}"></div>
+          </div>
+          <p class="ai-tagline" style="margin-top: 4px;">
+            ${diff > 0 ? `<span style="color: var(--c-up);">+${diff.toFixed(1)} above average</span>` : 
+              diff < 0 ? `<span style="color: var(--c-down);">${diff.toFixed(1)} below average</span>` : 
+              '<span style="color: var(--c-text-muted);">Matches average</span>'}
+          </p>
+        `;
+        scoreDistContainer.appendChild(avgScoreBar);
+
+        // Strengths
+        const strengthsEl = document.getElementById('ai-strengths');
+        aiData.strengths.forEach(strength => {
+          const li = document.createElement('li');
+          li.textContent = strength;
+          strengthsEl.appendChild(li);
+        });
+
+        // Weaknesses
+        const weaknessesEl = document.getElementById('ai-weaknesses');
+        aiData.weaknesses.forEach(weakness => {
+          const li = document.createElement('li');
+          li.textContent = weakness;
+          weaknessesEl.appendChild(li);
+        });
+
+        // Verdict
+        document.getElementById('ai-verdict').textContent = aiData.verdict;
+
+        // Critical Errors
+        const criticalErrorsSection = document.getElementById('critical-errors-section');
+        const criticalErrorsEl = document.getElementById('ai-critical-errors');
+        const analysisGrid = document.querySelector('.analysis-sections-grid');
+        if (aiData.criticalErrors && aiData.criticalErrors.length > 0) {
+          criticalErrorsSection.style.display = 'block';
+          if (analysisGrid) analysisGrid.classList.add('has-critical-errors');
+          aiData.criticalErrors.forEach(error => {
+            const li = document.createElement('li');
+            li.textContent = error;
+            criticalErrorsEl.appendChild(li);
+          });
+        } else {
+          criticalErrorsSection.style.display = 'none';
+          if (analysisGrid) analysisGrid.classList.remove('has-critical-errors');
+        }
+
+        // Raw response
+        if (aiData.rawResponse) {
+          document.getElementById('ai-raw-response').innerHTML = `
+            <div class="raw-response-section" style="margin-top: 2rem;">
+              <button class="raw-response-toggle" onclick="toggleRawResponse(this)">
+                <span class="toggle-icon">▶</span>
+                <span class="toggle-text">View Raw ${aiMeta.displayName} Response</span>
+              </button>
+              <div class="raw-response-content" style="display: none;">
+                <pre class="raw-response-text">${aiData.rawResponse}</pre>
+              </div>
+            </div>
+          `;
+        }
+
+        // Navigation
+        const nextAI = getNextAI(questionId, aiKey);
+        const navNext = document.getElementById('nav-next');
+        if (nextAI) {
+          navNext.href = `question-${questionId}-${nextAI.key}.html`;
+          navNext.textContent = `Next: ${nextAI.displayName} →`;
+        } else {
+          // Last AI, link to summary
+          navNext.href = `question-${questionId}-summary.html`;
+          navNext.textContent = 'Next: Summary →';
+        }
+      });
+
+      function toggleRawResponse(button) {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('.toggle-icon');
+        if (content.style.display === 'none') {
+          content.style.display = 'block';
+          icon.textContent = '▼';
+          button.classList.add('active');
+        } else {
+          content.style.display = 'none';
+          icon.textContent = '▶';
+          button.classList.remove('active');
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -53,33 +53,6 @@ Watch changes in futures Open Interest and funding alongside any >$1B net CEX ou
 
 ---
 
-## Q3: Biggest risks traders are NOT paying attention to (HYPE-specific)
-**Date:** Dec 24, 2025, 9:10 AM (GMT+7)
-
-**Token Metrics:**
-- Price: $23.86
-- Change: -0.33%
-- Market Cap: $5.7B
-
-**Answer:**
-
-Hyperliquid ($HYPE) has tail risks most traders shrug off — high FDV, leveraged derivative exposure on its native book, and token-concentration can turn a bullish narrative into a liquidation cascade faster than you can say "printer go brrr".
-
-**LIQUIDATION & ONCHAIN DERIVATIVE RISK**
-
-Onchain design runs a fully onchain order-book perpetuals exchange - that means high leverage and clustered liquidations are systemic, not anecdotal. Recent metrics: price $23.86, 24h vol $198.7M, market cap $5.69B, FDV $22.96B, circ. supply 238.39M of 962.27M total — big gap between circ and FDV amplifies price pressure if large holders sell or if leveraged positions unwind.
-
-**TOKENOMIC CONCENTRATION, LIQUIDITY & TRUST RISK**
-
-Large holder concentration plus aggressive buyback narratives (mentioned earlier) create reflexive flows — if a few wallets move or stop supporting buybacks, depth vanishes and slippage spikes. Whale-flow pull returned empty for the last 7d — either stealth accumulation or a data blindspot, both of which raise the chance of surprise moves traders won't see coming.
-
-Critical: FDV ≈ $22.96B vs market cap ≈ $5.69B - that's the silent weight on every rally.
-
-**BOTTOM LINE**
-
-Treat $HYPE as an event-driven, high-risk trading instrument - size tightly, monitor onchain open interest/liquidations and large wallet activity, and set stop levels assuming shallow liquidity and sudden forced selling.
-
----
 
 ## Q3 (General): Biggest risks traders are NOT paying attention to in general
 **Date:** Dec 24, 2025, 9:11 AM (GMT+7)
@@ -111,72 +84,46 @@ Shrink size, widen stops, stress-test for low-liquidity exits, watch funding/OI 
 ---
 
 ## Q4: Summarize the real narrative driving the market this week (<8 bullets)
-**Date:** Dec 24, 2025, 9:12 AM (GMT+7)
 
-**Answer:**
+Market thesis - The week is a tug-of-war: regulatory clarity hopes vs ETF redemptions, with macro liquidity whispers keeping price action range-bound.
 
-Strong thesis - this week's market is being driven more by liquidity rotation and institutional flow fatigue than by fresh retail conviction, so price moves look big but are shallow and fragile.
+REGULATORY + ETF FLOW PRESSURE
+Senate CLARITY Act markup (Jan 15) is the headline catalyst - markets price potential onshore institutional demand while banks lobby stablecoin rules, creating short-term rotation and headline-driven spikes ([Stocktwits]).
+Spot ETF flows flipped—multi-day BTC ETF outflows (~$250M day; ~$1.38B over 4 days) and ETH redemptions (~$94M) are pressuring risk appetite and keeping $BTC around $90k ([Crypto.news], [TradingView/Cointelegraph]).
+MACRO, LIQUIDITY & SENTIMENT
+Macro signals (jobs/CPI/Fed guidance) + global liquidity chatter are the background tape - traders talk of big liquidity injections but institutional flows show caution; Fear & Greed sits ~30 - fear, not euphoria.
+Altcoin rotation + selective whale moves (large exchange deposits/withdrawals) mean on-chain accumulation is fragmented — topside liquidity exists but is being deployed selectively into themes (L1s, memecoins, PerpDEX winners).
+BOTTOM LINE
 
-**ETF & INSTITUTIONAL FLOW DRAIN**
-
-Total market cap ≈ 3.08T, 24h vol ≈ 98.83B and multiple signals show $BTC/$ETH ETF net flows turned negative this month - institutional participation is cooling and that removes a steady buyer beneath risk assets. Funding in futures is mildly negative (avg ≈ -0.0239) - tells you leverage is skewed toward shorts and liquidations can cascade when liquidity thins.
-
-**HOLIDAY LIQUIDITY + MACRO CROSS-CURRENTS**
-
-Volume down ~12% week-over-week and on-chain chatter highlights low attention during the holiday window - thin order books amplify moves and slippage. Stronger macro prints (GDP/rate expectations) are keeping real rates higher, raising cross-asset correlation and making altcoins especially sensitive to bad headlines.
-
-**BOTTOM LINE**
-
-Trade light, assume exits will cost you - watch ETF flows, funding/OI and CEX inflows/outflows as the real pulse, not hype or TA alone.
+Trading plan: expect headline-driven chop into midweek (CLARITY markup + US data); momentum trades on alt themes work, but position size for directional BTC/ETH exposure should respect lingering ETF outflows and weak retail conviction.
 
 ---
 
-## Q5: What to monitor in the next 48 hours if trading actively?
-**Date:** Dec 25, 2025, 2:00 PM (GMT+7)
+## Q5
+Short thesis - Next 48h is a headline-and-flow sprint: watch ETF flows, funding/OI swings and the CLARITY Act markup for sharp, tradeable micro moves.
 
-**Answer:**
+LIQUIDITY & DERIVATIVES STRINGS TO WATCH
+Real-time ETF flows and big CEX token transfers into/out of exchanges - these move $BTC and $ETH fast; Nevrons didn't find live ETF flow API results right now, so confirm flows on your terminal (exchange/ETF dashboards) before sizing trades.
+Futures funding rates, open interest deltas and sudden liquidation clusters - rising funding + OI expansion on long side signals crowded longs; spikes in liquidations often trigger 2–5% quick moves.
+PRICE, ONCHAIN & NEWS TRIGGERS
+Key price levels for $BTC and $ETH (short-term support/resistance) and nearby options expiries—trade size around strikes/γ walls.
+Whale onchain flows, large deposits/withdrawals from Binance/Coinbase, and trending social chatter around the CLARITY Act markup or major listings - these are alpha triggers that precede momentum.
+BOTTOM LINE
 
-Market is quietly shifting - liquidity is thin and funding is slightly negative, so blows can happen fast.
+Trade small, use clear stop logic, and lean into short-term mean-reversion around ETF/news prints; if real-time ETF flows flip to heavy inflows, increase conviction on directional longs.
 
-**LIQUIDITY & VOLUME FLOWS**
+## Q6
+Short, data-backed view - $AAVE is sitting at ~$165 (market cap ~$2.51B) after a rapid ~30% drop in 10 days; positioning shows mixed technical support near the $160–167 zone but onchain whale signals and funding suggest vulnerability to follow-through.
 
-Onchain snapshot - total market cap ~ $3.11T, 24h volume ~ $70.7B (volume down ~34%), BTC dominance 56.47% - low volume + big-cap weight means moves may be led by $BTC but amplified in small caps. Watch major exchange order-book depth and CEX inflows/outflows for tokens you trade - a single large withdrawal or deposit can flip price quickly.
+WHERE THE PAIN LIVES (POSITIONING + LIQUIDITY)
+Derivatives & price context - short-term EMAs and Bollinger bands cluster around $165–167 (5/9/21-day MA ~165), so many stops and option γ walls live in that band — a shove below $160 would trigger stop clusters and fast liquidations.
+Onchain/whale context - recent whale flow snapshots show concentrated net flows in the last 7d (top movers active), implying distribution into the sell-off rather than clean accumulation — liquidity is tight, not deep.
+WHAT INVALIDATES A BOUNCE (AND WHAT CONFIRMS IT)
+Bounce invalidated if $AAVE fails to reclaim and hold above $175 (near 50% fib at $175) within 48–72h and daily close prints below $160 with rising OI/funding — that combination signals continuation and forces deleveraging.
+Bounce confirmed if price reclaims $175 with improving RSI (>55), falling funding (deleveraging), and sustained onchain outflows from exchanges (withdrawals), showing buyers are taking supply off market.
+Critical: rapid reclaim of $175 + lower funding + exchange withdrawals = credible recovery; failure to hold $160 = fast liquidation cascade and retest toward $140–157.
 
-**DERIVATIVES & SENTIMENT PULSE**
-
-Futures funding average ~ -0.0256% - slight short bias; monitor funding and open interest changes on 1h-6h cadence and liquidation clusters around round numbers (e.g., $BTC psychological levels). Social signal check - Nevrons didn't find any high-engagement Twitter shocks in the last 48h, but scan for sudden spikes in mentions for tokens you hold.
-
-Critical: funding negative + low volume = levered shorts can get squeezed fast; large whale CEX flows or concentrated liquidity removals are prime catalysts.
-
-**BOTTOM LINE** If trading actively in next 48 hours - prioritize: order-book depth, CEX token flows, funding rates / OI, and sudden social spikes. Tighten risk controls - smaller size, wider stop logic or use OCO orders - prints happen when the market feels empty.
-
----
-
-## Q6: Give a current outlook on AAVE assuming price has fallen ~30% in 10 days. Focus on positioning, liquidations, and what would invalidate a bounce.
-**Date:** Dec 25, 2025, 2:02 PM (GMT+7)
-
-**Token Metrics:**
-- Price: ~$150
-- Market Cap: ~$1.5B
-- 24h Volume: ~$241M
-
-**Answer:**
-
-AAVE looks like short-term capitulation - $AAVE dropped ~30% in 10 days into a $1.5B market-cap that still has decent liquidity, so this move smells like fast deleveraging not structural failure.
-
-**POSITIONING & ONCHAIN FLOWS**
-
-On-chain snapshot - price ~ $150, market cap ~$2.29B, 24h volume ~$241M. Whale flow scans show no concentrated large net buys in the last 7d, which means large holders aren't aggressively stepping in yet — follow big wallet activity for early signs of accumulation.
-
-**LIQUIDATIONS & DERIVATIVE RISK**
-
-Futures funding is slightly negative (avg ~ -0.0256%) - mild short bias. Historical liquidation feed unavailable right now - Nevrons didn't find any data on liquidation clusters, so assume recent 30% drop burned weak long leverage; monitor clustered stop runs near round levels (e.g., $140, $120) and spikes in OI + funding flip for fresh squeeze risk.
-
-Critical invalidators for a sustainable bounce: renewed heavy sell volume from whales, rising OI with worsening negative funding (more shorts stacking), or price breaking and closing below $120-$130 on high volume.
-
-**BOTTOM LINE** Short-term trade: treat any bounce as a reflex/scalp unless you see large-wallet accumulation + improving funding/OI. Risk control - size down, widen stops, and watch CEX flows + whale buys as the real confirmation.
-
----
+Bottom line - Treat bounces as short-term trades until $AAVE proves buyers by holding above $175; size accordingly, set tight stops under $160, and watch funding/OI + exchange flows for the real tell.
 
 ## Q7: If you had to ignore either macro data or on-chain data for the next 7 days, which would you ignore — and why?
 **Date:** Dec 24, 2025, 9:12 AM (GMT+7)
