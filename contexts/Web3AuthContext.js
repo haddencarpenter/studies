@@ -1,6 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Web3Auth } from '@web3auth/modal';
-import { CHAIN_NAMESPACES, WEB3AUTH_NETWORK, WALLET_ADAPTERS } from '@web3auth/base';
+import { CHAIN_NAMESPACES, WEB3AUTH_NETWORK, WALLET_ADAPTERS, ADAPTER_EVENTS } from '@web3auth/base';
 import { ethers } from 'ethers';
 import { useCookies } from 'react-cookie';
 
@@ -117,6 +117,7 @@ export const Web3AuthProvider = ({ children }) => {
   const [initializationError, setInitializationError] = useState(null);
   const [initializationComplete, setInitializationComplete] = useState(false);
   const [hasStoredSession, setHasStoredSession] = useState(false); // Track if there's a stored session
+  const web3authInstanceRef = useRef(null); // Ref to track instance for cleanup
 
   // Handle client-side hydration
   useEffect(() => {
@@ -172,7 +173,37 @@ export const Web3AuthProvider = ({ children }) => {
           await web3authInstance.init();
           console.log('Web3Auth modal initialized successfully');
 
+          // Set up event listeners for connection state changes
+          // This handles cases where Web3Auth auto-reconnects after initial session check
+          web3authInstance.on(ADAPTER_EVENTS.CONNECTED, async (data) => {
+            console.log('🔗 ADAPTER_EVENTS.CONNECTED fired:', data);
+            try {
+              setLoggedIn(true);
+              setWeb3authProvider(web3authInstance.provider);
+              setHasStoredSession(true);
+
+              const userInfo = await web3authInstance.getUserInfo();
+              setUser(userInfo);
+              console.log('✅ State updated via CONNECTED event for user:', userInfo?.email || userInfo?.name);
+            } catch (error) {
+              console.warn('⚠️ Error handling CONNECTED event:', error.message);
+            }
+          });
+
+          web3authInstance.on(ADAPTER_EVENTS.DISCONNECTED, () => {
+            console.log('🔌 ADAPTER_EVENTS.DISCONNECTED fired');
+            setLoggedIn(false);
+            setWeb3authProvider(null);
+            setUser(null);
+            setHasStoredSession(false);
+          });
+
+          web3authInstance.on(ADAPTER_EVENTS.ERRORED, (error) => {
+            console.error('❌ ADAPTER_EVENTS.ERRORED:', error);
+          });
+
           setWeb3auth(web3authInstance);
+          web3authInstanceRef.current = web3authInstance; // Store ref for cleanup
 
           // Log state like demo app
           console.log('state updated', {
@@ -246,6 +277,16 @@ export const Web3AuthProvider = ({ children }) => {
     if (isClient) {
       init();
     }
+
+    // Cleanup event listeners on unmount
+    return () => {
+      if (web3authInstanceRef.current) {
+        console.log('🧹 Cleaning up Web3Auth event listeners');
+        web3authInstanceRef.current.off(ADAPTER_EVENTS.CONNECTED);
+        web3authInstanceRef.current.off(ADAPTER_EVENTS.DISCONNECTED);
+        web3authInstanceRef.current.off(ADAPTER_EVENTS.ERRORED);
+      }
+    };
   }, [isClient]);
 
   const login = async (loginProvider = null) => {

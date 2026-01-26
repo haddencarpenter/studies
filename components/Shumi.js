@@ -187,19 +187,44 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   const requestIdRef = useRef(0); // Track request ID for randomization
   const progressRequestIdRef = useRef(0); // Track request ID for randomization
 
-  // Create transport with current walletAddress and archetype - recreate when they change
+  // Use refs for values that need to be accessed dynamically at request time
+  // This fixes the issue where the transport body is static in AI SDK v5
+  const walletAddressRef = useRef(walletAddress);
+  const archetypeRef = useRef(archetype);
+  const requestDataRef = useRef(null); // Stores browserDateTimeWithTimezone, sessionId, coinId
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    walletAddressRef.current = walletAddress;
+  }, [walletAddress]);
+
+  useEffect(() => {
+    archetypeRef.current = archetype;
+  }, [archetype]);
+
+  // Create transport with prepareSendMessagesRequest to ensure fresh values at request time
   const transport = useMemo(() => {
     return new DefaultChatTransport({
       api: '/api/ai',
-      body: {
-        walletAddress,
-        ...(archetype ? { archetype } : {})
-      },
-      query: {
-        walletAddress // Add this to pass wallet address as query param
+      // Use prepareSendMessagesRequest to dynamically include wallet address at request time
+      // This fixes the AI SDK v5 issue where body is static and captured at first render
+      prepareSendMessagesRequest: ({ id, messages }) => {
+        const currentWalletAddress = walletAddressRef.current;
+        const currentArchetype = archetypeRef.current;
+        const currentData = requestDataRef.current;
+        console.log('[Shumi Transport] Preparing request with walletAddress:', currentWalletAddress);
+        return {
+          body: {
+            id,
+            messages,
+            walletAddress: currentWalletAddress,
+            ...(currentArchetype ? { archetype: currentArchetype } : {}),
+            ...(currentData ? { data: currentData } : {})
+          }
+        };
       }
     });
-  }, [walletAddress, archetype]);
+  }, []); // No dependencies - prepareSendMessagesRequest uses refs for fresh values
 
   // Track if we need to trigger login after a 401 error
   const [authError, setAuthError] = useState(false);
@@ -246,27 +271,23 @@ const Shumi = ({ isActive, initialSuggestions }) => {
   // Submit pending prompt after successful login
   useEffect(() => {
     if (walletAddress && pendingPrompt && sendMessage) {
-      // Wait a bit for wallet address to be fully set in transport
+      // Wait a bit for wallet address to be fully set in ref
       const timer = setTimeout(() => {
         const { text, coinId, browserDateTimeWithTimezone } = pendingPrompt;
+        // Set request data ref before calling sendMessage
+        requestDataRef.current = {
+          browserDateTimeWithTimezone,
+          sessionId,
+          ...(coinId ? { coinId } : {})
+        };
         sendMessage({
           text
-        }, {
-          body: {
-            walletAddress,
-            ...(archetype ? { archetype } : {}),
-            data: {
-              browserDateTimeWithTimezone,
-              sessionId,
-              ...(coinId ? { coinId } : {})
-            }
-          }
         });
         setPendingPrompt(null); // Clear pending prompt
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [walletAddress, pendingPrompt, sendMessage, sessionId, archetype]);
+  }, [walletAddress, pendingPrompt, sendMessage, sessionId]);
   const messagesEndRef = useRef(null)
   const aiInputRef = useRef(null)
   const hasScrolledToSuggestionsRef = useRef(false) // Track if we've scrolled to suggestions to prevent multiple scrolls
@@ -510,25 +531,24 @@ const Shumi = ({ isActive, initialSuggestions }) => {
     // Use browser's local time string with timezone
     const browserDateTimeWithTimezone = new Date().toString();
 
+    // Set request data ref BEFORE calling sendMessage
+    // This ensures prepareSendMessagesRequest has access to fresh values
+    requestDataRef.current = {
+      browserDateTimeWithTimezone,
+      sessionId,
+      ...(coinTag && coinId ? { coinId } : {})
+    };
+
     // In v5, use sendMessage to send messages
-    // Pass walletAddress and archetype in the body options to ensure they're included with each request
+    // Body is now handled by prepareSendMessagesRequest in the transport
+    // which reads from refs to ensure fresh values at request time
     sendMessage({
       text: input.trim()
-    }, {
-      body: {
-        walletAddress, // Include walletAddress in the request body
-        ...(archetype ? { archetype } : {}), // Include archetype if set
-        data: {
-          browserDateTimeWithTimezone,
-          sessionId,
-          ...(coinTag && coinId ? { coinId } : {}) // Only include coinId if coinTag is set
-        }
-      }
     });
 
     // Clear input after submission in v5
     setInput('');
-  }, [sendMessage, input, coinTag, archetype, sessionId, loggedIn, walletAddress, login, messages]);
+  }, [sendMessage, input, coinTag, sessionId, loggedIn, walletAddress, login, messages]);
 
   // Handle removing the coin tag
   const handleRemoveCoinTag = useCallback(() => {
