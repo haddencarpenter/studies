@@ -1,0 +1,3 @@
+### PAIR TRADING ADDITION TO THE PERPEX ARCHETYPE
+
+Ongoing tasks go here
