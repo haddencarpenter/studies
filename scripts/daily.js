@@ -47,6 +47,10 @@ const fetchCoinDataCoingecko = async (coinId) => {
   let coinData
   try {
     coinData = (await getCoin(coinId)).data
+    if (!coinData?.market_data) {
+      console.log(`[SKIP] ${coinId} has no market_data, treating as delisted. Response:`, JSON.stringify(coinData)?.substring(0, 500))
+      throw(noRankError)
+    }
     if (isNil(coinData.market_data.market_cap_rank) && !unrankedCoins.includes(coinId)) {
       throw(noRankError)
     }
