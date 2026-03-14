@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 004 — From Blog Post to Content Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px 24px; position: relative;
+  }
+  .term {
+    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    width: 100%; max-width: 960px; overflow: hidden;
+    position: absolute; opacity: 0; transition: opacity 0.6s ease; pointer-events: none;
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+  .term-bar { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-bottom: 1px solid #1E1E22; }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 16px; line-height: 2.2; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+  .t-prompt { color: #22D3EE; } .t-path { color: #60A5FA; } .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; } .t-dim { color: #27272A; } .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; } .t-red { color: #C45B4F; } .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; } .t-comment { color: #3F3F46; font-style: italic; }
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 44px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .narration-area {
+    height: 160px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px 48px 48px; text-align: center; border-top: 1px solid #1E1E22;
+  }
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 004</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 004</div>
+      <div class="title-big line-reveal">From Blog Post<span class="sub">to Content Pipeline</span></div>
+    </div>
+
+    <div class="title-card" id="tc_blog">
+      <div class="title-quote line-reveal">"this is a fine addition"</div>
+    </div>
+
+    <div class="title-card" id="tc_format">
+      <div class="title-quote line-reveal" style="color:#C45B4F">"i wanted it to be a video storyboard<br>not a blog post"</div>
+    </div>
+
+    <div class="title-card" id="tc_scroll">
+      <div class="title-quote line-reveal">"it should scroll on its own though"</div>
+    </div>
+
+    <div class="title-card" id="tc_v1">
+      <div class="title-big line-reveal">two-skins-one-engine.html</div>
+      <div style="font-size:24px;color:#52525B;margin-top:16px" class="line-reveal">The format that already existed.</div>
+    </div>
+
+    <div class="title-card" id="tc_sounds">
+      <div class="title-quote line-reveal">"what about the cmux tones?"</div>
+    </div>
+
+    <div class="title-card" id="tc_tiktok">
+      <div class="title-quote line-reveal">"do u think these would make good tiktok videos?"</div>
+    </div>
+
+    <div class="title-card" id="tc_skill">
+      <div class="title-big line-reveal">/study</div>
+      <div style="font-size:24px;color:#52525B;margin-top:16px" class="line-reveal">A skill that generates films from sessions.</div>
+    </div>
+
+    <div class="title-card" id="tc_meta">
+      <div class="title-big line-reveal">The session built<br>its own content pipeline.</div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <div class="title-mono line-reveal">END OF STUDY</div>
+      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+    </div>
+
+    <!-- Terminal: first attempt — scrolling blog -->
+    <div class="term" id="term_blog">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">studies-data.ts</span></div>
+      <div class="term-body" id="tb_blog"></div>
+    </div>
+
+    <!-- Terminal: card slide deck -->
+    <div class="term" id="term_cards">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">clip1-the-leak.html</span></div>
+      <div class="term-body" id="tb_cards"></div>
+    </div>
+
+    <!-- Terminal: found the v1 film format -->
+    <div class="term" id="term_v1">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">two-skins-one-engine.html</span></div>
+      <div class="term-body" id="tb_v1"></div>
+    </div>
+
+    <!-- Terminal: SND library -->
+    <div class="term" id="term_snd">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">snd-lib — kit01 sine</span></div>
+      <div class="term-body" id="tb_snd"></div>
+    </div>
+
+    <!-- Terminal: the recording profile -->
+    <div class="term" id="term_rec">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">.recording-profile.zsh</span></div>
+      <div class="term-body" id="tb_rec"></div>
+    </div>
+
+    <!-- Terminal: skill created -->
+    <div class="term" id="term_skill">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">~/.claude/skills/study-film/</span></div>
+      <div class="term-body" id="tb_skill"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // TITLE
+  { title:'tc0', dur:3500,
+    label:'', narr:'The same session. Second half.' },
+
+  // ACT 1: THE BLOG
+  { term:'term_blog', tb:'tb_blog', dur:5000, lines:[
+    '<span class="t-dim">  // lib/studies-data.ts — first output</span>',
+    '<span class="t-out">  slug: "live-session-context-engineering",</span>',
+    '<span class="t-out">  sections: [</span>',
+    '<span class="t-out">    { title: "What happened", paragraphs: [...] },</span>',
+    '<span class="t-out">    { title: "The privacy finding", bullets: [...] },</span>',
+    '<span class="t-out">  ]</span>',
+  ], label:'ATTEMPT 1', narr:'A data entry in studies-data.ts. <span class="hi">A blog post.</span>' },
+
+  { title:'tc_blog', dur:2500,
+    label:'', narr:'The user accepts it. Then asks for more.' },
+
+  // ACT 2: FORMAT MISSES
+  { title:'tc_format', dur:3500, sound:'caution',
+    label:'CORRECTION 5', narr:'' },
+
+  { term:'term_cards', tb:'tb_cards', dur:4500, lines:[
+    '<span class="t-dim">  // rebuilt as card slide deck</span>',
+    '<span class="t-out">  &lt;button onclick="go(1)"&gt;Next →&lt;/button&gt;</span>',
+    '<span class="t-out">  &lt;button onclick="go(0)"&gt;← Back&lt;/button&gt;</span>',
+    '',
+    '<span class="t-comment">  # user: it should scroll on its own though</span>',
+  ], label:'ATTEMPT 2', narr:'Slide deck with prev/next buttons. <span class="red">Wrong again.</span>' },
+
+  { title:'tc_scroll', dur:2500, sound:'notification',
+    label:'CORRECTION 6', narr:'' },
+
+  // ACT 3: FOUND THE FORMAT
+  { title:'tc_v1', dur:3500, sound:'notification',
+    label:'DISCOVERY', narr:'' },
+
+  { term:'term_v1', tb:'tb_v1', dur:5500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/studies</span> <span class="t-caret">❯</span> <span class="t-cmd">cat two-skins-one-engine.html</span>',
+    '',
+    '<span class="t-out">  const scenes = [</span>',
+    '<span class="t-out">    { id:"s0", dur:4500 },</span>',
+    '<span class="t-out">    { id:"s1", dur:5000 },</span>',
+    '<span class="t-out">    { id:"s5", dur:7000, term:"t_brief", lines:[...] },</span>',
+    '<span class="t-out">  ]</span>  <span class="t-comment">// 37 scenes, auto-advancing</span>',
+  ], label:'STUDY 001', narr:'The format already existed. <span class="hi">Auto-advancing film viewer.</span>' },
+
+  // ACT 4: SOUND HUNT
+  { title:'tc_sounds', dur:3000,
+    label:'', narr:'Looking for the right tones.' },
+
+  { term:'term_snd', tb:'tb_snd', dur:5500, lines:[
+    '<span class="t-dim">  // snd-lib — CC0 UI sounds by sound designers</span>',
+    '<span class="t-out">  kit01: "sine"</span>     <span class="t-comment">← warm, organic</span>',
+    '<span class="t-out">  kit02: "piano"</span>',
+    '<span class="t-out">  kit03: "industrial"</span>',
+    '',
+    '<span class="t-warn">  TRANSITION_UP: 0.35</span>  <span class="t-dim">TAP: 0.2</span>  <span class="t-dim">TYPE: 0.25</span>',
+    '<span class="t-cmd">  CAUTION: 1.0</span>  <span class="t-ok">CELEBRATION: 1.0</span>',
+  ], label:'SND LIBRARY', narr:'Free. Commercial use. <span class="hi">Kit01 sine — the warm one.</span>' },
+
+  // ACT 5: RECORDING THEME
+  { term:'term_rec', tb:'tb_rec', dur:5000, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~</span> <span class="t-caret">❯</span> <span class="t-cmd">source ~/.recording-profile.zsh</span>',
+    '',
+    '<span class="t-out">  ┌─────────────────────────────────────┐</span>',
+    '<span class="t-red">  │  🔴 RECORDING MODE ACTIVE           │</span>',
+    '<span class="t-out">  │  ✓ Identity scrubbed                │</span>',
+    '<span class="t-out">  │  ✓ Env vars sanitized               │</span>',
+    '<span class="t-out">  │  ✓ .env reads blocked               │</span>',
+    '<span class="t-out">  └─────────────────────────────────────┘</span>',
+  ], label:'TERMINAL THEME', narr:'The prompt that was already built. <span class="hi">shumi ~/path ❯</span>' },
+
+  // ACT 6: TIKTOK
+  { title:'tc_tiktok', dur:3000,
+    label:'', narr:'Can this be short-form content?' },
+
+  // ACT 7: THE SKILL
+  { term:'term_skill', tb:'tb_skill', dur:5500, lines:[
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">~/.claude/skills/study-film/SKILL.md</span>',
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">~/.claude/skills/study-film/references/template.html</span>',
+    '',
+    '<span class="t-dim">  triggers: /study, /tiktok, "make a study"</span>',
+    '<span class="t-dim">  process:  extract arc → build scenes → output HTML</span>',
+    '',
+    '<span class="t-ok">  ✓ skill registered</span>  <span class="t-out">study-film</span>',
+  ], label:'/STUDY', narr:'The session built <span class="hi">a skill that generates films from sessions.</span>', sound:'celebration' },
+
+  { title:'tc_skill', dur:3500,
+    label:'', narr:'' },
+
+  // CLOSE
+  { title:'tc_meta', dur:4000,
+    label:'', narr:'Seven format attempts. One pipeline.' },
+
+  { title:'tc_end', dur:4000,
+    label:'', narr:'' },
+];
+
+var current = -1, running = false;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; nextScene();
+}
+
+function nextScene() {
+  if (!running) return;
+  clearAll();
+  current++;
+  if (current >= total) { running = false; showNarr('',''); return; }
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  setTimeout(nextScene, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+});
+</script>
+</body>
+</html>
