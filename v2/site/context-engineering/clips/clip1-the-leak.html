@@ -160,17 +160,20 @@
 
   <!-- ACT 5: THE SCAN -->
   <div class="scene" id="s11">
-    <div class="time-label line-reveal">/resume</div>
-    <div class="big-text line-reveal">17 repos scanned</div>
+    <div class="scene-text line-reveal"><em>/resume</em></div>
+    <div class="term line-reveal" style="margin-top:24px">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div></div>
+      <div class="term-body"><div class="term-line show"><span class="t-prompt">$</span> <span class="t-cmd">bash ~/.claude/skills/resume/scripts/scan_projects.sh 8</span></div></div>
+    </div>
   </div>
 
   <div class="scene" id="s12">
     <div class="scan-demo">
-      <div class="scan-row" id="sr0"><span class="sr-name">coinrotator</span><span class="sr-score" style="color:#5CB87A">42</span></div>
-      <div class="scan-row" id="sr1"><span class="sr-name">shumi-bot</span><span class="sr-score" style="color:#5CB87A">38</span></div>
-      <div class="scan-row" id="sr2"><span class="sr-name">coinrotator-utils</span><span class="sr-score" style="color:#D4A843">36</span></div>
-      <div class="scan-row" id="sr3"><span class="sr-name">coinrotator-backend</span><span class="sr-score" style="color:#D4A843">36</span></div>
-      <div class="scan-row" id="sr4"><span class="sr-name">shumi-landing</span><span class="sr-score" style="color:#3F3F46">17</span></div>
+      <div class="scan-row" id="sr0"><span class="sr-name" style="color:#5CB87A">42</span><span style="color:#A1A1AA;font-weight:600">coinrotator</span><span style="color:#3F3F46;font-size:14px;margin-left:auto">sandbox · 20 dirty · 7 stashes</span></div>
+      <div class="scan-row" id="sr1"><span class="sr-name" style="color:#5CB87A">38</span><span style="color:#A1A1AA;font-weight:600">shumi-bot</span><span style="color:#3F3F46;font-size:14px;margin-left:auto">main · 1 dirty · feat: one-tap alerts</span></div>
+      <div class="scan-row" id="sr2"><span class="sr-name" style="color:#D4A843">36</span><span style="color:#A1A1AA;font-weight:600">coinrotator-utils</span><span style="color:#3F3F46;font-size:14px;margin-left:auto">feat/holder-cohort-tool · 3 dirty</span></div>
+      <div class="scan-row" id="sr3"><span class="sr-name" style="color:#D4A843">36</span><span style="color:#A1A1AA;font-weight:600">coinrotator-backend</span><span style="color:#3F3F46;font-size:14px;margin-left:auto">feat/holder-cohorts-tool · 10 dirty</span></div>
+      <div class="scan-row" id="sr4"><span class="sr-name" style="color:#3F3F46">17</span><span style="color:#52525B">shumi-landing</span><span style="color:#27272A;font-size:14px;margin-left:auto">renderer-test · 0 dirty · 2 stashes</span></div>
     </div>
   </div>
 
@@ -218,21 +221,28 @@ var scenes = [
 
   // ACT 2: LEAK
   { id:'s2', dur:3000, sub:'A routine question.' },
-  { id:'s3', dur:4500, term:'t_env', lines:[
-    '<span class="t-prompt">$</span> <span class="t-cmd">cat .env.example</span>',
-    '<span class="t-out">NEXT_PUBLIC_SHUMI_API_ENDPOINT=</span><span class="t-red">████████████</span>',
-    '<span class="t-out">NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT=</span><span class="t-red">████████████</span>',
-  ], sub:'Prints both values. <span class="red">Full URLs.</span>' },
+  { id:'s3', dur:6000, term:'t_env', lines:[
+    '<span class="t-dim">⏵ mcp__render__get_service</span> <span class="t-out">srv-d1n812umcj7s73bpuq70</span>',
+    '<span class="t-dim">  → {"type":"static_site","name":"shumi-landing"}</span>',
+    '<span class="t-warn">  no env vars in response. falling back...</span>',
+    '<span class="t-dim">⏵ Read</span> <span class="t-cmd">/projects/shumi-landing/.env.example</span>',
+    '<span class="t-out">  NEXT_PUBLIC_SHUMI_API_ENDPOINT=</span><span class="t-red">████████████████████</span>',
+    '<span class="t-out">  NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT=</span><span class="t-red">████████████████████</span>',
+  ], sub:'Render MCP returns nothing. Falls back to the file. <span class="red">Prints both.</span>' },
   { id:'s4', dur:2500, sound:'caution', sub:'<span class="red">On camera.</span>' },
 
   // ACT 3: CORRECTIONS
   { id:'s5', dur:2500, sound:'caution', sub:'<span class="hi">Correction one.</span>' },
   { id:'s6', dur:3000, sub:'Over-scoped. Every session.' },
   { id:'s7', dur:2500, sound:'notification', sub:'<span class="hi">Correction two.</span>' },
-  { id:'s8', dur:4000, term:'t_memory', lines:[
-    '<span class="t-out">scope:</span> <span class="t-red" style="text-decoration:line-through">all sessions</span> <span class="t-dim">→</span> <span class="t-ok">recording only</span>',
-    '<span class="t-dim">// behavioral fix, not code</span>',
-  ], sub:'Narrows the scope. Memory, not code.' },
+  { id:'s8', dur:5000, term:'t_memory', lines:[
+    '<span class="t-dim">⏵ Write</span> <span class="t-cmd">~/.claude/memory/feedback_screen_recording_privacy.md</span>',
+    '<span class="t-out">  ---</span>',
+    '<span class="t-out">  name: Screen recording privacy</span>',
+    '<span class="t-out">  type: feedback</span>',
+    '<span class="t-out">  scope:</span> <span class="t-red" style="text-decoration:line-through">all sessions</span> <span class="t-dim">→</span> <span class="t-ok">recording mode only</span>',
+    '<span class="t-out">  ---</span>',
+  ], sub:'Re-reads its own memory file. <span class="hi">Edits the scope.</span>' },
 
   // ACT 4: WRONG TREE
   { id:'s9', dur:2500, sound:'notification', sub:'<span class="hi">Correction three.</span>' },
@@ -247,12 +257,15 @@ var scenes = [
   { id:'s14', dur:3000, sub:'Generic output. No proof of work.' },
 
   // ACT 7: SHIP
-  { id:'s15', dur:4500, term:'t_ship', lines:[
+  { id:'s15', dur:5500, term:'t_ship', lines:[
+    '<span class="t-dim">⏵ Edit</span> <span class="t-cmd">lib/studies-data.ts</span> <span class="t-out">+72 lines</span>',
+    '<span class="t-prompt">$</span> <span class="t-cmd">git commit -m "feat: add context engineering session study"</span>',
+    '<span class="t-ok">[feat/studies 1066d0e]</span> <span class="t-out">1 file changed, 72 insertions(+)</span>',
     '<span class="t-prompt">$</span> <span class="t-cmd">git push origin feat/studies</span>',
-    '<span class="t-ok">✓</span> <span class="t-out">studies-data.ts → origin</span>',
+    '<span class="t-out">  b156f3ef..1066d0e</span>  <span class="t-ok">feat/studies → feat/studies</span>',
     '<span class="t-prompt">$</span> <span class="t-cmd">git push origin main</span>',
-    '<span class="t-ok">✓</span> <span class="t-out">index.html → origin</span>',
-  ], sub:'Rewritten with real numbers. <span class="hi">Pushed.</span>' },
+    '<span class="t-out">  052c079..0126578</span>  <span class="t-ok">main → main</span>',
+  ], sub:'Real commit hashes. <span class="hi">Both pushed.</span>' },
   { id:'s16', dur:3500, sound:'celebration', sub:'Four corrections. <span class="hi">It shipped.</span>' },
 
   // END
