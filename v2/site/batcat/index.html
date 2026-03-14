@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 009 — Batcat</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px 24px; position: relative;
+  }
+
+  .term {
+    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    width: 100%; max-width: 960px; overflow: hidden;
+    position: absolute; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
+    border-bottom: 1px solid #1E1E22;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.2; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #27272A; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #3F3F46; font-style: italic; }
+
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 44px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .narration-area {
+    height: 160px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px 48px 48px; text-align: center;
+    border-top: 1px solid #1E1E22;
+  }
+
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 009</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title cards -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 009</div>
+      <div class="title-big line-reveal">Batcat<span class="sub">46 hours. 21 commits. Every layer was wrong.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_data">
+      <div class="title-big line-reveal" style="color:#52525B">Performance fixed.<span class="sub" style="color:#3F3F46">Then we looked at the data.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_batcat">
+      <div class="title-big line-reveal" style="color:#C45B4F">BTC resolves to batcat.</div>
+    </div>
+
+    <div class="title-card" id="tc_human">
+      <div class="title-big line-reveal" style="color:#C45B4F">Bloomberg is a person.</div>
+    </div>
+
+    <div class="title-card" id="tc_every">
+      <div class="title-big line-reveal" style="color:#E8E4DE">Every layer was wrong.</div>
+    </div>
+
+    <div class="title-card" id="tc_ship">
+      <div class="title-big line-reveal">21 commits. 46 hours.<span class="sub">The metadata layer, rebuilt.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <div class="title-mono line-reveal">END OF STUDY</div>
+      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+    </div>
+
+    <!-- Terminal: Render logs -->
+    <div class="term" id="term_render">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">render — pair-trading-suggestions</span></div>
+      <div class="term-body" id="tb_render"></div>
+    </div>
+
+    <!-- Terminal: Thundering herd -->
+    <div class="term" id="term_herd">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">diagnosis</span></div>
+      <div class="term-body" id="tb_herd"></div>
+    </div>
+
+    <!-- Terminal: First fix wave -->
+    <div class="term" id="term_fix1">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">optimization — 5 PRs in 48h</span></div>
+      <div class="term-body" id="tb_fix1"></div>
+    </div>
+
+    <!-- Terminal: AJV -->
+    <div class="term" id="term_ajv">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">historical-metadata API</span></div>
+      <div class="term-body" id="tb_ajv"></div>
+    </div>
+
+    <!-- Terminal: Batcat code -->
+    <div class="term" id="term_btc">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentRoutes.js — getCoinBySymbol</span></div>
+      <div class="term-body" id="tb_btc"></div>
+    </div>
+
+    <!-- Terminal: Hybrid fix -->
+    <div class="term" id="term_hybrid">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentRoutes.js — hybrid resolution</span></div>
+      <div class="term-body" id="tb_hybrid"></div>
+    </div>
+
+    <!-- Terminal: YouTube invisible -->
+    <div class="term" id="term_yt">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentAnalysis.js</span></div>
+      <div class="term-body" id="tb_yt"></div>
+    </div>
+
+    <!-- Terminal: News orgs -->
+    <div class="term" id="term_news">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentAnalysis.js — newsOrgs</span></div>
+      <div class="term-body" id="tb_news"></div>
+    </div>
+
+    <!-- Terminal: Ship -->
+    <div class="term" id="term_ship">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">git log — Feb 16-18</span></div>
+      <div class="term-body" id="tb_ship"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4500,
+    label:'', narr:'A performance fix that became an excavation.' },
+
+  // ACT 2: RENDER LOGS
+  { term:'term_render', tb:'tb_render', dur:6000, lines:[
+    '<span class="t-dim">  Render request logs — /api/pair-trading-suggestions</span>',
+    '',
+    '<span class="t-out">  14:01:12  GET  200</span>  <span class="t-red">33.2s</span>',
+    '<span class="t-out">  14:01:14  GET  200</span>  <span class="t-red">54.7s</span>',
+    '<span class="t-out">  14:01:15  GET  200</span>  <span class="t-red">87.3s</span>',
+    '<span class="t-out">  14:01:16  GET  502</span>  <span class="t-red">105.0s  TIMEOUT</span>',
+    '',
+    '<span class="t-comment">  # 5 concurrent requests. All computing independently.</span>',
+  ], label:'FEB 16, 2026', narr:'Users hitting the endpoint. <span class="red">105 seconds. 502 timeout.</span>', rec:true },
+
+  // ACT 3: THUNDERING HERD
+  { term:'term_herd', tb:'tb_herd', dur:5500, lines:[
+    '<span class="t-warn">  THUNDERING HERD</span>',
+    '',
+    '<span class="t-out">  Each request runs the full pipeline independently:</span>',
+    '<span class="t-out">    55 individual OHLC queries</span>  <span class="t-dim">(one per coin)</span>',
+    '<span class="t-out">    ARRAY_AGG sort across 8,250 daily groups</span>',
+    '<span class="t-out">    Full table scan on 3,886 rows per resolution</span>',
+    '<span class="t-red">    No request deduplication. No caching. No pool limits.</span>',
+  ], label:'DIAGNOSIS', narr:'Five users ask the same question. <span class="red">Five independent 54-second pipelines.</span>' },
+
+  // ACT 4: FIRST FIX WAVE
+  { term:'term_fix1', tb:'tb_fix1', dur:6500, lines:[
+    '<span class="t-ok">  1.</span> <span class="t-out">Request coalescing — concurrent requests share one Promise</span>',
+    '<span class="t-ok">  2.</span> <span class="t-out">ARRAY_AGG \u2192 CTE + MIN/MAX JOIN</span>  <span class="t-dim">no per-group sort</span>',
+    '<span class="t-ok">  3.</span> <span class="t-out">2 bulk OHLC queries instead of 55 individual</span>',
+    '<span class="t-ok">  4.</span> <span class="t-out">In-memory Maps replace full table scans</span>  <span class="t-dim">0ms vs DB</span>',
+    '<span class="t-ok">  5.</span> <span class="t-out">Persistent OHLC cache + daily CRON warming</span>',
+    '<span class="t-ok">  6.</span> <span class="t-out">DB pool: max 10, idle timeout 30s, max lifetime 30min</span>',
+    '',
+    '<span class="t-warn">  54s \u2192 6.6s \u2192 ~1s warm</span>',
+  ], label:'5 FIXES, 48 HOURS', narr:'Six optimizations. <span class="hi">54 seconds to under one.</span>', sound:'notification' },
+
+  // ACT 5: TRANSITION
+  { title:'tc_data', dur:3500,
+    label:'', narr:'' },
+
+  // ACT 6: AJV
+  { term:'term_ajv', tb:'tb_ajv', dur:5500, lines:[
+    '<span class="t-tool">  \u23F5 curl</span> <span class="t-cmd">/api/coin/historical-metadata?timestampAmount=30</span>',
+    '<span class="t-red">  400  "timestampAmount must be number"</span>',
+    '',
+    '<span class="t-comment">  // URL query params are always strings</span>',
+    '<span class="t-comment">  // Fastify AJV rejects "30" because schema says: number</span>',
+    '',
+    '<span class="t-ok">  Fix: ajv: { coerceTypes: true }</span>  <span class="t-dim">+2 lines</span>',
+  ], label:'LAYER 1', narr:'Every AI agent historical metadata call. <span class="red">All returning 400.</span>' },
+
+  // ACT 7: BTC CODE
+  { term:'term_btc', tb:'tb_btc', dur:6000, lines:[
+    '<span class="t-dim">  // Before: naive CoinGecko lookup</span>',
+    '<span class="t-out">  const coinBasicInfo = await getCoinBySymbolFromCG(symbol);</span>',
+    '',
+    '<span class="t-dim">  // CoinGecko /coins/list matches by string similarity</span>',
+    '<span class="t-dim">  // not by market cap</span>',
+    '',
+    '<span class="t-out">  getCoinBySymbolFromCG(<span class="t-warn">"BTC"</span>)</span>  <span class="t-dim">\u2192</span>  <span class="t-red">batcat</span>',
+    '<span class="t-out">  getCoinBySymbolFromCG(<span class="t-warn">"ETH"</span>)</span>  <span class="t-dim">\u2192</span>  <span class="t-red">bifrost</span>',
+  ], label:'LAYER 2', narr:'CoinGecko resolves BTC to <span class="red">batcat</span>. ETH to <span class="red">bifrost</span>.', sound:'caution' },
+
+  // ACT 8: BATCAT
+  { title:'tc_batcat', dur:3500,
+    label:'', narr:'String similarity beats market cap. <span class="red">The biggest coin in the world resolves to a meme.</span>' },
+
+  // ACT 9: HYBRID FIX
+  { term:'term_hybrid', tb:'tb_hybrid', dur:5500, lines:[
+    '<span class="t-dim">  // After: hybrid resolution</span>',
+    '',
+    '<span class="t-out">  if (allMatches.length === <span class="t-ok">1</span>)</span>  <span class="t-dim">\u2192 unique symbol, use cache</span>',
+    '<span class="t-out">  else if (allMatches.length > 1)</span>  <span class="t-dim">\u2192 ambiguous</span>',
+    '<span class="t-out">    <span class="t-ok">/search endpoint ranked by market_cap</span></span>',
+    '',
+    '<span class="t-ok">  getCoinBySymbol("BTC") \u2192 bitcoin  (rank #1)</span>',
+    '<span class="t-ok">  getCoinBySymbol("ETH") \u2192 ethereum (rank #2)</span>',
+  ], label:'FIX', narr:'Unique symbols use cached list. Ambiguous ones <span class="hi">rank by market cap.</span>' },
+
+  // ACT 10: YOUTUBE INVISIBLE
+  { term:'term_yt', tb:'tb_yt', dur:6000, lines:[
+    '<span class="t-dim">  // YouTube missing from FOUR separate arrays:</span>',
+    '',
+    '<span class="t-red">  socialMediaSources</span>  <span class="t-dim">\u2192 invisible to availability checks</span>',
+    '<span class="t-red">  socialMediaSourceTypes</span>  <span class="t-dim">\u2192 invisible to source distribution</span>',
+    '<span class="t-red">  socialMediaOnly SQL</span>  <span class="t-dim">\u2192 invisible to narrative detection</span>',
+    '<span class="t-red">  source stats filter</span>  <span class="t-dim">\u2192 invisible to AI prompt</span>',
+    '',
+    '<span class="t-comment">  // YouTube data existed in DB. Nobody could see it.</span>',
+  ], label:'LAYER 3', narr:'YouTube was in the database. <span class="red">Four separate arrays forgot to list it.</span>', sound:'caution' },
+
+  // ACT 11: NEWS ORGS
+  { term:'term_news', tb:'tb_news', dur:6000, lines:[
+    '<span class="t-dim">  // The newsOrgs array determines what the AI sees as "news"</span>',
+    '<span class="t-dim">  // Everything else is classified as HUMAN opinion</span>',
+    '',
+    '<span class="t-out">  newsOrgs had:  <span class="t-warn">9 entries</span></span>',
+    '<span class="t-out">  DB contained:  <span class="t-warn">33+ distinct sources</span></span>',
+    '',
+    '<span class="t-red">  Bloomberg \u2192 HUMAN</span>',
+    '<span class="t-red">  Reuters \u2192 HUMAN</span>',
+    '<span class="t-red">  WSJ \u2192 HUMAN</span>',
+  ], label:'LAYER 4', narr:'The AI was treating <span class="red">Bloomberg as a random person\u2019s opinion.</span>' },
+
+  // ACT 12: BLOOMBERG IS A PERSON
+  { title:'tc_human', dur:3000, sound:'caution',
+    label:'', narr:'9 orgs in the list. 33 in the database. <span class="red">24 classified as human.</span>' },
+
+  // ACT 13: EVERY LAYER
+  { title:'tc_every', dur:3000,
+    label:'', narr:'Performance. Type coercion. Symbol resolution. Source taxonomy.' },
+
+  // ACT 14: SHIP
+  { term:'term_ship', tb:'tb_ship', dur:6500, lines:[
+    '<span class="t-dim">  Feb 16 13:49 \u2192 Feb 18 11:51</span>',
+    '',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">Request coalescing + OHLC query rewrite</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">In-memory coin resolution (0ms)</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">DB connection pool limits + idle timeout</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">AJV type coercion for all schema routes</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">Hybrid symbol resolution (cache + market cap rank)</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">YouTube added to 4 source arrays</span>',
+    '<span class="t-ok">  \u2713</span> <span class="t-out">25 news orgs added to taxonomy</span>',
+  ], label:'SHIPPED', narr:'<span class="hi">21 commits. 5 PRs. The metadata layer, rebuilt.</span>', sound:'celebration' },
+
+  // ACT 15: SHIP CARD
+  { title:'tc_ship', dur:4000,
+    label:'', narr:'Started fixing speed. Ended fixing <span class="hi">what the AI sees.</span>' },
+
+  // ACT 16: END
+  { title:'tc_end', dur:4000,
+    label:'', narr:'' },
+];
+
+var current = -1, running = false;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; nextScene();
+}
+
+function nextScene() {
+  if (!running) return;
+  clearAll();
+  current++;
+  if (current >= total) { running = false; showNarr('',''); return; }
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+
+  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  setTimeout(nextScene, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+});
+</script>
+</body>
+</html>
