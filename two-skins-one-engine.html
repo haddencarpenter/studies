@@ -516,8 +516,14 @@
   </div>
   <span id="audioLabel">AMBIENT</span>
 </button>
-<!-- YouTube player (hidden) -->
-<div id="ytPlayer" style="position:fixed;bottom:-200px;left:0;width:1px;height:1px;overflow:hidden;pointer-events:none;"></div>
+<!-- YouTube player (off-screen iframe) -->
+<iframe
+  id="ytFrame"
+  style="position:fixed;bottom:0;left:0;width:300px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;"
+  src=""
+  allow="autoplay; encrypted-media"
+  frameborder="0"
+></iframe>
 
 <script>
 const scenes = [
@@ -578,8 +584,8 @@ function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
   running = true;
   // Auto-start music
-  if (ytReady && !audioOn) {
-    player.playVideo();
+  if (!audioOn) {
+    document.getElementById('ytFrame').src = ytSrc;
     audioOn = true;
     document.getElementById('audioBtn').classList.add('on');
   }
@@ -633,40 +639,18 @@ function nextScene() {
   setTimeout(nextScene, s.dur);
 }
 
-// YouTube IFrame API
-let ytReady = false;
-let player = null;
+// Audio via YouTube embed iframe
 let audioOn = false;
-
-const tag = document.createElement('script');
-tag.src = 'https://www.youtube.com/iframe_api';
-document.head.appendChild(tag);
-
-window.onYouTubeIframeAPIReady = function() {
-  player = new YT.Player('ytPlayer', {
-    height: '1',
-    width: '1',
-    videoId: 'uxTdTaNIUxo',
-    playerVars: {
-      autoplay: 0,
-      loop: 1,
-      playlist: 'uxTdTaNIUxo',
-      controls: 0,
-    },
-    events: {
-      onReady: function() { ytReady = true; },
-    },
-  });
-};
+const ytSrc = 'https://www.youtube.com/embed/uxTdTaNIUxo?autoplay=1&loop=1&playlist=uxTdTaNIUxo&controls=0&showinfo=0&rel=0&modestbranding=1&enablejsapi=0';
 
 function toggleAudio() {
+  const frame = document.getElementById('ytFrame');
   const btn = document.getElementById('audioBtn');
-  if (!ytReady) return;
   if (audioOn) {
-    player.pauseVideo();
+    frame.src = '';
     btn.classList.remove('on');
   } else {
-    player.playVideo();
+    frame.src = ytSrc;
     btn.classList.add('on');
   }
   audioOn = !audioOn;
