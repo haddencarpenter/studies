@@ -12,8 +12,7 @@
     background: #09090B; color: #A1A1AA;
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-    overflow: hidden;
-    width: 1080px; height: 1920px;
+    overflow: hidden; width: 1080px; height: 1920px;
   }
   .film { position: relative; width: 100%; height: 100%; }
   .scene {
@@ -59,6 +58,22 @@
   .sr-branch { color: #3F3F46; font-size: 14px; flex: 1; }
   .sr-dirty { color: #52525B; font-size: 14px; width: 80px; text-align: right; }
   .sr-score { font-weight: 700; width: 40px; text-align: right; }
+
+  .sub-bar {
+    position: fixed; bottom: 120px; left: 0; right: 0;
+    display: flex; justify-content: center; z-index: 80;
+  }
+  .sub-text {
+    font-family: 'Inter', sans-serif; font-size: 36px; font-weight: 600;
+    color: #E8E4DE; text-align: center; max-width: 900px;
+    line-height: 1.4; padding: 16px 32px;
+    background: rgba(9, 9, 11, 0.85); border-radius: 8px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .sub-text.show { opacity: 1; transform: translateY(0); }
+  .sub-text .hi { color: #D4A843; }
+
   .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
   .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
 </style>
@@ -92,20 +107,28 @@
   </div>
 </div>
 
+<div class="sub-bar"><div class="sub-text" id="sub"></div></div>
 <div class="progress-bar" id="progressBar"></div>
 <div class="counter" id="counter"></div>
 
 <script>
-const snd = new Snd(); snd.load(Snd.KITS.SND01);
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
 
-const scenes = [
-  { id:'s0', dur:3500 },
-  { id:'s1', dur:6000, scanRows:['sr0','sr1','sr2','sr3','sr4'] },
-  { id:'s2', dur:4000 },
+var scenes = [
+  { id:'s0', dur:3500, sub:'Forensic scan. <span class="hi">Seventeen repos.</span>' },
+  { id:'s1', dur:6000, scanRows:['sr0','sr1','sr2','sr3','sr4'], sub:'Scored by dirty files, stashes, recent commits.' },
+  { id:'s2', dur:4000, sub:'Five active. Twelve stashes. <span class="hi">Normal Tuesday.</span>' },
 ];
 
-let current = -1, running = false;
-const total = scenes.length;
+var current = -1, running = false;
+var total = scenes.length;
+
+function showSub(html) {
+  var el = document.getElementById('sub');
+  el.classList.remove('show');
+  if (!html) return;
+  setTimeout(function() { el.innerHTML = html; el.classList.add('show'); try { snd.play(Snd.SOUNDS.NOTIFICATION); } catch(e) {} }, 200);
+}
 
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
@@ -116,23 +139,25 @@ function nextScene() {
   if (!running) return;
   if (current >= 0) document.getElementById(scenes[current].id).classList.remove('active');
   current++;
-  if (current >= total) { running = false; return; }
-  const s = scenes[current];
-  const el = document.getElementById(s.id);
+  if (current >= total) { running = false; showSub(''); return; }
+  var s = scenes[current];
+  var el = document.getElementById(s.id);
   el.classList.add('active');
   document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
   document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
 
   try { snd.play(Snd.SOUNDS.TRANSITION_UP); } catch(e) {}
 
-  el.querySelectorAll('.line-reveal').forEach((r,i) => setTimeout(() => { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP); } catch(e) {} }, 300+i*600));
+  showSub(s.sub || '');
+
+  el.querySelectorAll('.line-reveal').forEach(function(r,i) { setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP); } catch(e) {} }, 300+i*600); });
   if (s.scanRows) {
-    s.scanRows.forEach((id,i) => setTimeout(() => { document.getElementById(id).classList.add('show'); try { snd.play(Snd.SOUNDS.SELECT); } catch(e) {} }, 600+i*500));
+    s.scanRows.forEach(function(id,i) { setTimeout(function() { document.getElementById(id).classList.add('show'); try { snd.play(Snd.SOUNDS.SELECT); } catch(e) {} }, 600+i*500); });
   }
   setTimeout(nextScene, s.dur);
 }
 
-document.addEventListener('keydown', e => { if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); } });
+document.addEventListener('keydown', function(e) { if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); } });
 </script>
 </body>
 </html>
