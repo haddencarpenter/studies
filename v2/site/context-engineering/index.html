@@ -666,7 +666,7 @@
           <span class="card-timestamp">00:00</span>
         </div>
         <h3>"show env keys for the shumi landing page"</h3>
-        <p>The operator opens Claude Code from the home directory. A routine infrastructure question. The assistant calls <code>mcp__render__get_service</code> for the static site, gets JSON with no env vars, falls back to reading <code>.env.example</code>.</p>
+        <p>Render MCP returns no env vars. The assistant reads <code>.env.example</code> instead and prints both keys with their full URLs in a markdown table.</p>
       </div>
 
       <div class="story-card" data-beat="2">
@@ -674,11 +674,8 @@
           <span class="card-badge badge-correction">Leak</span>
           <span class="card-timestamp">00:32</span>
         </div>
-        <h3>Environment values printed to terminal</h3>
-        <p>The assistant prints both key names and their full endpoint URLs in a markdown table. The operator is screen recording. Two <code>NEXT_PUBLIC_</code> prefixed values now visible on camera.</p>
-        <div class="card-detail detail-finding">
-          The assistant had no concept of "recording mode." It treated <code>.env.example</code> the same as any file read, with no gate for sensitive output context.
-        </div>
+        <h3>Endpoint URLs on camera</h3>
+        <p>Two <code>NEXT_PUBLIC_</code> values now visible on the recording. Yes, these are public by design. That's not the point. The assistant has no concept of output context.</p>
       </div>
 
       <div class="story-card" data-beat="3">
@@ -686,8 +683,8 @@
           <span class="card-badge badge-correction">Correction #1</span>
           <span class="card-timestamp">01:15</span>
         </div>
-        <h3>"but you revealed private data"</h3>
-        <p>The assistant acknowledges the mistake. Writes a memory rule to suppress env values. But over-scopes it: the rule applies to <em>all sessions</em>, not just recording sessions.</p>
+        <h3>"you revealed private data"</h3>
+        <p>Assistant writes a memory rule to suppress values. Scopes it to all sessions. Overcorrection.</p>
       </div>
 
       <div class="story-card" data-beat="4">
@@ -695,8 +692,8 @@
           <span class="card-badge badge-correction">Correction #2</span>
           <span class="card-timestamp">01:48</span>
         </div>
-        <h3>"this rule is just for recording mode, not for all states"</h3>
-        <p>The assistant re-reads its own memory file at <code>feedback_screen_recording_privacy.md</code>, edits the scope from "always" to "recording mode only." A behavioral fix, not a code fix.</p>
+        <h3>"just for recording mode, not all states"</h3>
+        <p>Re-reads <code>feedback_screen_recording_privacy.md</code>, narrows the scope. Behavioral fix, not code.</p>
       </div>
 
       <div class="story-card" data-beat="5">
@@ -704,8 +701,8 @@
           <span class="card-badge badge-correction">Correction #3</span>
           <span class="card-timestamp">02:30</span>
         </div>
-        <h3>"was there an HTML generated from this session?"</h3>
-        <p>The assistant searches for generated files. Wrong tree entirely. The operator clarifies: <em>"a previous session was published as an inspirational study."</em> Then: <em>"its on hadden carpenter studies pages."</em> Three hops to reach the actual task.</p>
+        <h3>"was there an HTML generated?"</h3>
+        <p>Wrong tree. Searches for generated files. Operator: <em>"a previous session was published as a study."</em> Then: <em>"its on hadden carpenter."</em> Three hops.</p>
       </div>
 
       <div class="story-card" data-beat="6">
@@ -713,11 +710,8 @@
           <span class="card-badge badge-discovery">Recovery</span>
           <span class="card-timestamp">03:45</span>
         </div>
-        <h3>/resume scans 17 repositories</h3>
-        <p>The <code>/resume</code> skill runs <code>scan_projects.sh</code>, scoring repos by uncommitted changes, stash depth, recent commits, and handoff file presence. Finds PR #8 from <code>haddencarpenter</code> with 1,118 additions.</p>
-        <div class="card-detail detail-insight">
-          The forensic scan found 5 repos with active work in the same 8-hour window and 12 total stashes across the workspace. Normal operating state for this project.
-        </div>
+        <h3>17 repos scanned, PR #8 found</h3>
+        <p><code>/resume</code> scores every repo under <code>~/projects/</code>. Five with active work, twelve stashes total. Finds the open studies PR with 1,118 additions.</p>
       </div>
 
       <div class="story-card" data-beat="7">
@@ -725,8 +719,8 @@
           <span class="card-badge badge-discovery">Discovery</span>
           <span class="card-timestamp">05:20</span>
         </div>
-        <h3>Existing studies format found</h3>
-        <p>The assistant checks out <code>feat/studies</code>, reads <code>lib/studies-data.ts</code>: typed <code>PublishedStudy</code> objects with slug, category, heroNote, metrics, sections, and sources. Two studies already published. Dynamic <code>[slug]</code> routing means adding data is enough.</p>
+        <h3>Studies data shape reverse-engineered</h3>
+        <p>Checks out <code>feat/studies</code>. Two published entries in <code>studies-data.ts</code>. Typed objects, dynamic <code>[slug]</code> routing. Adding data is enough.</p>
       </div>
 
       <div class="story-card" data-beat="8">
@@ -734,10 +728,10 @@
           <span class="card-badge badge-correction">Correction #4</span>
           <span class="card-timestamp">07:00</span>
         </div>
-        <h3>"i dont want to make it so generic that actual coders think its ai slop"</h3>
-        <p>First draft of the study entry was too clean. Generic summaries, no specific data. The operator wants actual session traces: scan scores, branch names, the correction sequence, the MCP tool calls. Proof of work, not a press release.</p>
+        <h3>"coders will think its ai slop"</h3>
+        <p>First draft was generic. No scan scores, no branch names, no tool calls. Rewritten with the actual numbers.</p>
         <div class="card-detail detail-result">
-          Rewritten with real numbers: coinrotator scored 42, shumi-bot 38, shumi-landing 17. Specific branch names, PR numbers, and the meta-moment of this feedback itself included in the final copy.
+          coinrotator: 42. shumi-bot: 38. shumi-landing: 17. The feedback itself made it into the copy.
         </div>
       </div>
 
@@ -746,8 +740,8 @@
           <span class="card-badge badge-shipped">Shipped</span>
           <span class="card-timestamp">09:30</span>
         </div>
-        <h3>Two commits, two repos, both pushed</h3>
-        <p>Study data added to <code>lib/studies-data.ts</code> on <code>feat/studies</code> branch. This HTML storyboard page added to <code>v2/site/context-engineering/</code> in the studies repo. Both pushed to origin.</p>
+        <h3>Two commits, two repos, pushed</h3>
+        <p><code>studies-data.ts</code> on <code>feat/studies</code>. This page in the studies repo. Both to origin.</p>
       </div>
 
     </div>
@@ -805,16 +799,13 @@
     </table>
 
     <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-      Scored by: uncommitted changes (strongest), recent commits (&lt;8h), stash count, HANDOFF.md / CURRENT_STATE.md presence. 17 repos scanned.
+      17 repos scored. Dirty files weigh most.
     </p>
 
     <!-- ── CLOSING ───────────────────────────── -->
-    <div class="section-label">Why This Is Published</div>
-
     <div class="closing">
-      <p><strong>Three corrections in five minutes is a normal Claude Code interaction, not a failure.</strong> The first correction caught the leak. The second scoped the fix. The third redirected the session. The fourth improved the output quality.</p>
-      <p>Each correction required the assistant to re-read its own memory, update it, and re-orient. The operator never explained the full context upfront. This is how real context engineering works: <strong>incremental steering, not upfront specification.</strong></p>
-      <p>Most AI product demos show curated, successful interactions. This study publishes the rough edges. The session transcript is the proof.</p>
+      <p>Four corrections, one leaked env file, three wrong guesses about what the task was. The assistant wrote a memory rule that was too broad, then fixed it, then forgot what it was doing, then produced a draft that got called slop.</p>
+      <p>It shipped by the end. <strong>That's the whole story.</strong></p>
     </div>
   </div>
 
