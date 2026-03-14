@@ -103,49 +103,23 @@
     </div>
 
     <div class="title-card" id="tc_hours">
-      <div class="title-mid line-reveal" style="color:#52525B">Hundreds of engineering hours.</div>
-      <div class="title-mid line-reveal" style="margin-top:16px">Thousands of Claude sessions.</div>
-      <div class="title-mid line-reveal" style="margin-top:16px;color:#D4A843">Not to build a chatbot.</div>
+      <div class="title-big line-reveal" style="color:#D4A843">Not a chatbot.</div>
     </div>
 
     <div class="title-card" id="tc_components">
-      <div class="title-big line-reveal">Data components.<span class="sub">Tested. Iterable. Mix and match.</span></div>
-    </div>
-
-    <div class="title-card" id="tc_not">
-      <div class="title-mid line-reveal" style="color:#52525B">Not a dashboard.</div>
-      <div class="title-mid line-reveal" style="margin-top:8px;color:#52525B">Not a screener.</div>
-      <div class="title-mid line-reveal" style="margin-top:8px;color:#52525B">Not another wrapper.</div>
-    </div>
-
-    <div class="title-card" id="tc_bridge">
-      <div class="title-big line-reveal">We bridge the gaps<span class="sub">between raw data and what you actually need to know.</span></div>
-    </div>
-
-    <div class="title-card" id="tc_confluence">
-      <div class="title-mid line-reveal" style="color:#52525B">Standalone win rate: 35-40%</div>
-      <div class="title-mid line-reveal" style="margin-top:16px;color:#5CB87A">Combined confluence: 57-73%</div>
-      <div class="title-mid line-reveal" style="margin-top:24px;color:#3F3F46">That discovery took six months of backtesting.</div>
+      <div class="title-big line-reveal">Data components.</div>
     </div>
 
     <div class="title-card" id="tc_walkforward">
-      <div class="title-mid line-reveal" style="color:#5CB87A">90% out-of-sample win rate.</div>
-      <div class="title-mid line-reveal" style="margin-top:8px;color:#52525B">Real funding costs included.</div>
-      <div class="title-mid line-reveal" style="margin-top:8px;color:#52525B">Published with the failures.</div>
+      <div class="title-big line-reveal" style="color:#5CB87A">90% OOS.</div>
     </div>
 
     <div class="title-card" id="tc_personalize">
-      <div class="title-big line-reveal">Your data needs.<span class="sub">Not ours.</span></div>
-    </div>
-
-    <div class="title-card" id="tc_studies">
-      <div class="title-mid line-reveal">Every study is a receipt.</div>
-      <div class="title-mid line-reveal" style="margin-top:16px;color:#52525B">Every failure is a finding.</div>
+      <div class="title-big line-reveal">Your needs.</div>
     </div>
 
     <div class="title-card" id="tc_close">
       <div class="title-big line-reveal" style="color:#D4A843">shumi.ai</div>
-      <div style="font-size:24px;color:#3F3F46;margin-top:24px" class="line-reveal">The work is the product.</div>
     </div>
 
     <!-- Terminal: the component inventory -->
@@ -187,88 +161,50 @@
 var snd = new Snd(); snd.load(Snd.KITS.SND01);
 
 var scenes = [
-  // TITLE
-  { title:'tc0', dur:3500,
+  { title:'tc0', dur:3000,
     label:'', narr:'' },
 
-  // THE INVESTMENT
-  { title:'tc_hours', dur:5000,
-    label:'THE INVESTMENT', narr:'This is what the hours went into.' },
-
-  // WHAT IT IS
-  { title:'tc_components', dur:4000,
-    label:'', narr:'Building blocks for <span class="hi">your</span> data needs.' },
-
-  // THE INVENTORY
-  { term:'term_inv', tb:'tb_inv', dur:6500, lines:[
-    '<span class="t-ok">signals</span>      <span class="t-out">RSI Bands HTF · KAMA Bands · SuperTrend regime</span>',
-    '<span class="t-ok">sentiment</span>    <span class="t-out">narrative scoring · cross-source validation</span>',
-    '<span class="t-ok">futures</span>      <span class="t-out">funding rate · OI confluence · carry detection</span>',
-    '<span class="t-ok">widgets</span>      <span class="t-out">embeddable chat · universal renderer · signal console</span>',
-    '<span class="t-ok">modes</span>        <span class="t-out">signal seeker · deep research · delta neutral · pair trading</span>',
-    '<span class="t-warn">algos</span>       <span class="t-out">walk-forward tested · funding costs included · failures published</span>',
-  ], label:'COMPONENTS', narr:'Each one tested independently. <span class="hi">Composed for your use case.</span>' },
-
-  // WHAT IT ISN'T
-  { title:'tc_not', dur:3500,
-    label:'', narr:'Those already exist. We built something else.' },
-
-  // SURFACES
-  { term:'term_surfaces', tb:'tb_surfaces', dur:5500, lines:[
-    '<span class="t-warn">web</span>         <span class="t-out">shumi.ai/app — conversational interface</span>',
-    '<span class="t-warn">console</span>     <span class="t-out">coinrotator.app — signal-first briefing</span>',
-    '<span class="t-warn">telegram</span>    <span class="t-out">@shumi_bot — alerts, digests, /ask</span>',
-    '<span class="t-warn">widget</span>      <span class="t-out">shumi-chat npm — embed in your own site</span>',
-    '<span class="t-warn">api</span>         <span class="t-out">REST endpoints — plug into your own stack</span>',
-    '',
-    '<span class="t-dim">  same data. same engine. different rooms.</span>',
-  ], label:'SURFACES', narr:'Five ways in. <span class="hi">Same intelligence layer underneath.</span>' },
-
-  // THE BRIDGE
-  { title:'tc_bridge', dur:4500,
+  { title:'tc_hours', dur:3000,
     label:'', narr:'' },
 
-  // THE DISCOVERY
-  { term:'term_discovery', tb:'tb_discovery', dur:6000, lines:[
-    '<span class="t-dim">  // RSI Bands HTF + KAMA Bands confluence</span>',
+  { title:'tc_components', dur:3000,
+    label:'', narr:'<span class="hi">Mix and match.</span>' },
+
+  { term:'term_inv', tb:'tb_inv', dur:5000, lines:[
+    '<span class="t-ok">signals</span>    <span class="t-out">regime · confluence · bands</span>',
+    '<span class="t-ok">futures</span>    <span class="t-out">funding · OI · carry</span>',
+    '<span class="t-ok">widgets</span>    <span class="t-out">chat · renderer · console</span>',
+    '<span class="t-warn">algos</span>     <span class="t-out">walk-forward tested · failures published</span>',
+  ], label:'', narr:'' },
+
+  { term:'term_surfaces', tb:'tb_surfaces', dur:4500, lines:[
+    '<span class="t-warn">web</span>        <span class="t-out">shumi.ai</span>',
+    '<span class="t-warn">console</span>    <span class="t-out">coinrotator.app</span>',
+    '<span class="t-warn">telegram</span>   <span class="t-out">@shumi_bot</span>',
+    '<span class="t-warn">widget</span>     <span class="t-out">npm install shumi-chat</span>',
+  ], label:'SURFACES', narr:'Same engine. <span class="hi">Different rooms.</span>' },
+
+  { term:'term_discovery', tb:'tb_discovery', dur:5000, lines:[
+    '<span class="t-out">  standalone:</span>  <span class="t-red">37%</span>',
+    '<span class="t-out">  combined:</span>    <span class="t-ok">73%</span>',
     '',
-    '<span class="t-out">  standalone RSI Bands:</span>    <span class="t-red">~37% win rate</span>',
-    '<span class="t-out">  standalone KAMA Bands:</span>   <span class="t-red">~39% win rate</span>',
-    '',
-    '<span class="t-out">  combined confluence:</span>     <span class="t-ok">57-73% win rate</span>',
-    '<span class="t-out">  ETH:</span> <span class="t-red">-88%</span> <span class="t-dim">→</span> <span class="t-ok">+73%</span>  <span class="t-comment">← same asset, add one filter</span>',
-  ], label:'DISCOVERY', narr:'One filter changed everything. <span class="hi">Six months of backtesting to find it.</span>' },
+    '<span class="t-out">  ETH:</span> <span class="t-red">-88%</span> <span class="t-dim">→</span> <span class="t-ok">+73%</span>',
+  ], label:'DISCOVERY', narr:'<span class="hi">One filter.</span> Six months to find it.' },
 
-  // WALK-FORWARD
-  { title:'tc_confluence', dur:4500,
-    label:'VERIFIED', narr:'' },
+  { title:'tc_walkforward', dur:3000,
+    label:'VERIFIED', narr:'Costs included. Failures published.' },
 
-  { title:'tc_walkforward', dur:4500,
-    label:'WALK-FORWARD', narr:'Published with the <span class="hi">methodology and the misses.</span>' },
-
-  // WIDGET
-  { term:'term_widget', tb:'tb_widget', dur:5000, lines:[
+  { term:'term_widget', tb:'tb_widget', dur:4000, lines:[
     '<span class="t-prompt">shumi</span> <span class="t-path">~/your-site</span> <span class="t-caret">❯</span> <span class="t-cmd">npm install shumi-chat</span>',
     '',
-    '<span class="t-out">  &lt;ShumiChat</span>',
-    '<span class="t-out">    mode="signal-seeker"</span>',
-    '<span class="t-out">    theme="warm"</span>',
-    '<span class="t-out">  /&gt;</span>',
-    '',
-    '<span class="t-dim">  // your site. your users. our intelligence layer.</span>',
-  ], label:'EMBEDDABLE', narr:'Drop it into your own product. <span class="hi">Pick the mode. Pick the skin.</span>' },
+    '<span class="t-out">  &lt;ShumiChat mode="signal-seeker" /&gt;</span>',
+  ], label:'', narr:'Your site. <span class="hi">Our layer.</span>' },
 
-  // PERSONALIZE
-  { title:'tc_personalize', dur:3500,
-    label:'', narr:'Mix the components. Match your workflow.' },
-
-  // RECEIPTS
-  { title:'tc_studies', dur:4000,
-    label:'PROOF OF WORK', narr:'The studies page is the audit trail.' },
-
-  // CLOSE
-  { title:'tc_close', dur:5000, sound:'celebration',
+  { title:'tc_personalize', dur:3000,
     label:'', narr:'' },
+
+  { title:'tc_close', dur:4000, sound:'celebration',
+    label:'', narr:'The work is the product.' },
 ];
 
 var current = -1, running = false;
