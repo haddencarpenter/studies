@@ -54,8 +54,12 @@
   .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 18px; line-height: 2.4; }
   .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
   .term-line.show { opacity: 1; transform: translateY(0); }
-  .t-prompt { color: #3F3F46; } .t-cmd { color: #A1A1AA; } .t-dim { color: #27272A; }
+  .t-prompt { color: #22D3EE; } /* cyan — "shumi" */
+  .t-path { color: #60A5FA; } /* blue — path */
+  .t-caret { color: #FACC15; } /* yellow — ❯ */
+  .t-cmd { color: #A1A1AA; } .t-dim { color: #27272A; }
   .t-out { color: #52525B; } .t-ok { color: #5CB87A; } .t-red { color: #C45B4F; } .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; } /* purple — tool calls */
 
   .scan-demo {
     width: 100%; max-width: 900px; margin-top: 32px;
@@ -163,7 +167,7 @@
     <div class="scene-text line-reveal"><em>/resume</em></div>
     <div class="term line-reveal" style="margin-top:24px">
       <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div></div>
-      <div class="term-body"><div class="term-line show"><span class="t-prompt">$</span> <span class="t-cmd">bash ~/.claude/skills/resume/scripts/scan_projects.sh 8</span></div></div>
+      <div class="term-body"><div class="term-line show"><span class="t-prompt">shumi</span> <span class="t-path">~</span> <span class="t-caret">❯</span> <span class="t-cmd">bash ~/.claude/skills/resume/scripts/scan_projects.sh 8</span></div></div>
     </div>
   </div>
 
@@ -221,13 +225,13 @@ var scenes = [
 
   // ACT 2: LEAK
   { id:'s2', dur:3000, sub:'A routine question.' },
-  { id:'s3', dur:6000, term:'t_env', lines:[
-    '<span class="t-dim">⏵ mcp__render__get_service</span> <span class="t-out">srv-d1n812umcj7s73bpuq70</span>',
-    '<span class="t-dim">  → {"type":"static_site","name":"shumi-landing"}</span>',
-    '<span class="t-warn">  no env vars in response. falling back...</span>',
-    '<span class="t-dim">⏵ Read</span> <span class="t-cmd">/projects/shumi-landing/.env.example</span>',
-    '<span class="t-out">  NEXT_PUBLIC_SHUMI_API_ENDPOINT=</span><span class="t-red">████████████████████</span>',
-    '<span class="t-out">  NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT=</span><span class="t-red">████████████████████</span>',
+  { id:'s3', dur:7000, term:'t_env', lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/shumi-landing</span> <span class="t-caret">❯</span> <span class="t-cmd">claude</span>',
+    '<span class="t-tool">  ⏵ mcp__render__get_service</span> <span class="t-dim">srv-d1n812u...</span>',
+    '<span class="t-dim">    → static_site "shumi-landing" — no env vars</span>',
+    '<span class="t-tool">  ⏵ Read</span> <span class="t-cmd">.env.example</span>',
+    '<span class="t-out">    NEXT_PUBLIC_SHUMI_API_ENDPOINT=</span><span class="t-red">██████████████████</span>',
+    '<span class="t-out">    NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT=</span><span class="t-red">██████████████████</span>',
   ], sub:'Render MCP returns nothing. Falls back to the file. <span class="red">Prints both.</span>' },
   { id:'s4', dur:2500, sound:'caution', sub:'<span class="red">On camera.</span>' },
 
@@ -236,12 +240,12 @@ var scenes = [
   { id:'s6', dur:3000, sub:'Over-scoped. Every session.' },
   { id:'s7', dur:2500, sound:'notification', sub:'<span class="hi">Correction two.</span>' },
   { id:'s8', dur:5000, term:'t_memory', lines:[
-    '<span class="t-dim">⏵ Write</span> <span class="t-cmd">~/.claude/memory/feedback_screen_recording_privacy.md</span>',
-    '<span class="t-out">  ---</span>',
-    '<span class="t-out">  name: Screen recording privacy</span>',
-    '<span class="t-out">  type: feedback</span>',
-    '<span class="t-out">  scope:</span> <span class="t-red" style="text-decoration:line-through">all sessions</span> <span class="t-dim">→</span> <span class="t-ok">recording mode only</span>',
-    '<span class="t-out">  ---</span>',
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">~/.claude/memory/feedback_screen_recording_privacy.md</span>',
+    '<span class="t-dim">    ---</span>',
+    '<span class="t-out">    name: Screen recording privacy</span>',
+    '<span class="t-out">    type: feedback</span>',
+    '<span class="t-out">    scope:</span> <span class="t-red" style="text-decoration:line-through">all sessions</span> <span class="t-dim">→</span> <span class="t-ok">recording mode only</span>',
+    '<span class="t-dim">    ---</span>',
   ], sub:'Re-reads its own memory file. <span class="hi">Edits the scope.</span>' },
 
   // ACT 4: WRONG TREE
@@ -258,12 +262,12 @@ var scenes = [
 
   // ACT 7: SHIP
   { id:'s15', dur:5500, term:'t_ship', lines:[
-    '<span class="t-dim">⏵ Edit</span> <span class="t-cmd">lib/studies-data.ts</span> <span class="t-out">+72 lines</span>',
-    '<span class="t-prompt">$</span> <span class="t-cmd">git commit -m "feat: add context engineering session study"</span>',
+    '<span class="t-tool">  ⏵ Edit</span> <span class="t-cmd">lib/studies-data.ts</span> <span class="t-out">+72 lines</span>',
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/shumi-landing</span> <span class="t-caret">❯</span> <span class="t-cmd">git commit -m "feat: add context engineering session study"</span>',
     '<span class="t-ok">[feat/studies 1066d0e]</span> <span class="t-out">1 file changed, 72 insertions(+)</span>',
-    '<span class="t-prompt">$</span> <span class="t-cmd">git push origin feat/studies</span>',
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/shumi-landing</span> <span class="t-caret">❯</span> <span class="t-cmd">git push origin feat/studies</span>',
     '<span class="t-out">  b156f3ef..1066d0e</span>  <span class="t-ok">feat/studies → feat/studies</span>',
-    '<span class="t-prompt">$</span> <span class="t-cmd">git push origin main</span>',
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/studies</span> <span class="t-caret">❯</span> <span class="t-cmd">git push origin main</span>',
     '<span class="t-out">  052c079..0126578</span>  <span class="t-ok">main → main</span>',
   ], sub:'Real commit hashes. <span class="hi">Both pushed.</span>' },
   { id:'s16', dur:3500, sound:'celebration', sub:'Four corrections. <span class="hi">It shipped.</span>' },
