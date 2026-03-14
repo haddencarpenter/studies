@@ -107,14 +107,12 @@
     .site-nav-links a:hover { color: var(--text); }
 
     .site-nav-cta {
-      font-family: var(--font-display);
       font-size: 14px;
       font-weight: 500;
       color: var(--bg) !important;
       background: var(--accent);
       padding: 10px 24px;
       border-radius: 6px;
-      text-decoration: none;
       transition: opacity 0.2s ease;
     }
 
@@ -206,82 +204,180 @@
       border-radius: 50%;
     }
 
-    /* ── VIDEO ───────────────────────────────── */
-    .video-section {
-      margin-top: 48px;
-      margin-bottom: 56px;
+    /* ── PLAYER BAR ─────────────────────────── */
+    .player-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(17, 17, 17, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      padding: 12px 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%;
+    .player-bar.visible {
+      transform: translateY(0);
+    }
+
+    .player-bar .play-pause {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    .player-bar .play-pause:hover { transform: scale(1.08); }
+
+    .player-bar .play-pause svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--bg);
+    }
+
+    .player-bar .play-pause .icon-pause { display: none; }
+    .player-bar.playing .play-pause .icon-play { display: none; }
+    .player-bar.playing .play-pause .icon-pause { display: block; }
+
+    .player-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .player-title {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-status {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .player-bar.playing .player-status { color: var(--green); }
+
+    .player-progress {
+      width: 200px;
+      height: 3px;
+      background: var(--surface-raised);
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .player-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s linear;
+    }
+
+    .player-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* Hidden YouTube iframe */
+    #yt-player {
+      position: fixed;
+      bottom: -9999px;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* ── PLAY CTA ───────────────────────────── */
+    .play-cta {
+      margin-top: 48px;
+      margin-bottom: 56px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 28px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .video-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    .video-placeholder {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: border-color 0.2s ease, background 0.2s ease;
     }
 
-    .video-placeholder:hover {
+    .play-cta:hover {
+      border-color: var(--accent);
       background: var(--surface-hover);
     }
 
-    .play-btn {
-      width: 72px;
-      height: 72px;
+    .play-cta .cta-btn {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .video-placeholder:hover .play-btn {
-      transform: scale(1.08);
-      box-shadow: 0 0 32px rgba(212, 168, 67, 0.25);
+    .play-cta:hover .cta-btn {
+      transform: scale(1.06);
+      box-shadow: 0 0 24px rgba(212, 168, 67, 0.2);
     }
 
-    .play-btn svg {
-      width: 28px;
-      height: 28px;
-      margin-left: 4px;
+    .play-cta .cta-btn svg {
+      width: 20px;
+      height: 20px;
+      margin-left: 3px;
       fill: var(--bg);
     }
 
-    .video-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
+    .cta-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cta-text strong {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .cta-text span {
+      font-size: 12px;
       color: var(--text-muted);
     }
 
-    /* ── SECTIONS ────────────────────────────── */
+    .play-cta.active { display: none; }
+
+    /* ── SECTION LABEL ───────────────────────── */
     .section-label {
       font-size: 10px;
       font-weight: 600;
@@ -292,73 +388,100 @@
       margin-top: 56px;
     }
 
-    .section-label:first-of-type {
-      margin-top: 0;
+    /* ── STORYBOARD ──────────────────────────── */
+    .storyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
 
-    /* ── TIMELINE ────────────────────────────── */
-    .timeline {
-      position: relative;
-      padding-left: 28px;
+    .story-card {
+      padding: 24px 28px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      transition: border-color 0.3s ease, background 0.3s ease;
     }
 
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 5px;
-      top: 6px;
-      bottom: 6px;
-      width: 1px;
-      background: var(--border);
+    .story-card.active {
+      border-color: var(--accent);
+      background: var(--surface-hover);
     }
 
-    .t-beat {
-      position: relative;
-      padding-bottom: 32px;
+    .story-card .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .t-beat:last-child { padding-bottom: 0; }
-
-    .t-dot {
-      position: absolute;
-      left: -24px;
-      top: 6px;
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: var(--bg);
-    }
-
-    .t-beat.correction .t-dot { border-color: var(--red); background: var(--red-dim); }
-    .t-beat.discovery .t-dot { border-color: var(--accent); background: var(--accent-dim); }
-    .t-beat.action .t-dot { border-color: var(--green); background: var(--green-dim); }
-
-    .t-label {
-      font-size: 10px;
-      font-weight: 600;
+    .card-badge {
+      font-size: 9px;
+      font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      padding: 3px 8px;
+      border-radius: 3px;
     }
 
-    .t-beat.correction .t-label { color: var(--red); }
-    .t-beat.discovery .t-label { color: var(--accent); }
-    .t-beat.action .t-label { color: var(--green); }
+    .badge-prompt { background: var(--green-dim); color: var(--green); }
+    .badge-correction { background: var(--red-dim); color: var(--red); }
+    .badge-discovery { background: var(--accent-dim); color: var(--accent); }
+    .badge-shipped { background: var(--green-dim); color: var(--green); }
 
-    .t-content {
-      font-size: 14px;
+    .card-timestamp {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .story-card h3 {
+      font-family: var(--font-display);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .story-card p {
+      font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
     }
 
-    .t-content code {
+    .story-card code {
       font-family: var(--font-mono);
       font-size: 12px;
       background: var(--surface-raised);
       padding: 2px 6px;
       border-radius: 3px;
       color: var(--text);
+    }
+
+    .story-card .card-detail {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .detail-finding {
+      background: var(--red-dim);
+      border-left: 2px solid var(--red);
+      color: var(--text-secondary);
+    }
+
+    .detail-insight {
+      background: var(--accent-dim);
+      border-left: 2px solid var(--accent);
+      color: var(--text-secondary);
+    }
+
+    .detail-result {
+      background: var(--green-dim);
+      border-left: 2px solid var(--green);
+      color: var(--text-secondary);
     }
 
     /* ── SCAN TABLE ──────────────────────────── */
@@ -406,63 +529,6 @@
     .score-mid { color: var(--accent) !important; }
     .score-low { color: var(--text-muted) !important; }
 
-    /* ── FINDING BOX ────────────────────────── */
-    .finding-box {
-      padding: 20px 24px;
-      background: var(--red-dim);
-      border-left: 3px solid var(--red);
-      border-radius: 4px;
-      margin-top: 24px;
-    }
-
-    .finding-box .finding-label {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 8px;
-    }
-
-    .finding-box p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .finding-box code {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      background: rgba(196, 91, 79, 0.12);
-      padding: 2px 6px;
-      border-radius: 3px;
-      color: var(--text);
-    }
-
-    /* ── INSIGHT BOX ────────────────────────── */
-    .insight-box {
-      padding: 20px 24px;
-      background: var(--accent-dim);
-      border-left: 3px solid var(--accent);
-      border-radius: 4px;
-      margin-top: 24px;
-    }
-
-    .insight-box .insight-label {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    .insight-box p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
     /* ── CLOSING ─────────────────────────────── */
     .closing {
       padding: 28px 32px;
@@ -491,11 +557,13 @@
       line-height: 1.7;
     }
 
+    .closing p + p { margin-top: 12px; }
     .closing strong { color: var(--text); }
 
     /* ── FOOTER ──────────────────────────────── */
     .site-footer {
       border-top: 1px solid var(--border-subtle);
+      padding-bottom: 72px; /* space for player bar */
     }
 
     .footer-inner {
@@ -546,8 +614,8 @@
       header h1 { font-size: 32px; }
       header h1 span { font-size: 22px; }
       .meta-strip { flex-wrap: wrap; gap: 16px; }
-      .scan-table { font-size: 12px; }
-      .scan-table th, .scan-table td { padding: 8px; }
+      .player-bar { padding: 10px 24px; }
+      .player-progress { width: 80px; }
       .footer-inner { padding: 32px 24px; }
     }
   </style>
@@ -576,79 +644,116 @@
       </div>
     </header>
 
-    <!-- ── VIDEO ──────────────────────────────── -->
-    <div class="video-section">
-      <div class="video-wrapper" id="video-container">
-        <div class="video-placeholder" id="video-trigger">
-          <div class="play-btn">
-            <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
-          </div>
-          <span class="video-label">Watch the full session</span>
-        </div>
+    <!-- Play CTA -->
+    <div class="play-cta" id="play-cta">
+      <div class="cta-btn">
+        <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+      </div>
+      <div class="cta-text">
+        <strong>Play session recording</strong>
+        <span>Audio plays while you read the storyboard below</span>
       </div>
     </div>
 
-    <!-- ── SESSION TIMELINE ──────────────────── -->
-    <div class="section-label">Session Timeline</div>
+    <!-- ── STORYBOARD ────────────────────────── -->
+    <div class="section-label">Session Storyboard</div>
 
-    <div class="timeline">
-      <div class="t-beat action">
-        <div class="t-dot"></div>
-        <div class="t-label">Prompt</div>
-        <div class="t-content">
-          Operator: <code>show env keys for the shumi landing page</code><br>
-          The assistant called <code>mcp__render__get_service</code> for the static site, got JSON with no env vars, fell back to reading <code>.env.example</code>.
+    <div class="storyboard">
+
+      <div class="story-card" data-beat="1">
+        <div class="card-header">
+          <span class="card-badge badge-prompt">Prompt</span>
+          <span class="card-timestamp">00:00</span>
+        </div>
+        <h3>"show env keys for the shumi landing page"</h3>
+        <p>The operator opens Claude Code from the home directory. A routine infrastructure question. The assistant calls <code>mcp__render__get_service</code> for the static site, gets JSON with no env vars, falls back to reading <code>.env.example</code>.</p>
+      </div>
+
+      <div class="story-card" data-beat="2">
+        <div class="card-header">
+          <span class="card-badge badge-correction">Leak</span>
+          <span class="card-timestamp">00:32</span>
+        </div>
+        <h3>Environment values printed to terminal</h3>
+        <p>The assistant prints both key names and their full endpoint URLs in a markdown table. The operator is screen recording. Two <code>NEXT_PUBLIC_</code> prefixed values now visible on camera.</p>
+        <div class="card-detail detail-finding">
+          The assistant had no concept of "recording mode." It treated <code>.env.example</code> the same as any file read, with no gate for sensitive output context.
         </div>
       </div>
 
-      <div class="t-beat correction">
-        <div class="t-dot"></div>
-        <div class="t-label">Correction #1 &mdash; Leak caught</div>
-        <div class="t-content">
-          The assistant printed both key names and their endpoint URLs in a markdown table. Operator was screen recording.<br>
-          <em>"but you revealed private data"</em><br>
-          The assistant wrote a memory rule to suppress values &mdash; but scoped it to all sessions.
+      <div class="story-card" data-beat="3">
+        <div class="card-header">
+          <span class="card-badge badge-correction">Correction #1</span>
+          <span class="card-timestamp">01:15</span>
+        </div>
+        <h3>"but you revealed private data"</h3>
+        <p>The assistant acknowledges the mistake. Writes a memory rule to suppress env values. But over-scopes it: the rule applies to <em>all sessions</em>, not just recording sessions.</p>
+      </div>
+
+      <div class="story-card" data-beat="4">
+        <div class="card-header">
+          <span class="card-badge badge-correction">Correction #2</span>
+          <span class="card-timestamp">01:48</span>
+        </div>
+        <h3>"this rule is just for recording mode, not for all states"</h3>
+        <p>The assistant re-reads its own memory file at <code>feedback_screen_recording_privacy.md</code>, edits the scope from "always" to "recording mode only." A behavioral fix, not a code fix.</p>
+      </div>
+
+      <div class="story-card" data-beat="5">
+        <div class="card-header">
+          <span class="card-badge badge-correction">Correction #3</span>
+          <span class="card-timestamp">02:30</span>
+        </div>
+        <h3>"was there an HTML generated from this session?"</h3>
+        <p>The assistant searches for generated files. Wrong tree entirely. The operator clarifies: <em>"a previous session was published as an inspirational study."</em> Then: <em>"its on hadden carpenter studies pages."</em> Three hops to reach the actual task.</p>
+      </div>
+
+      <div class="story-card" data-beat="6">
+        <div class="card-header">
+          <span class="card-badge badge-discovery">Recovery</span>
+          <span class="card-timestamp">03:45</span>
+        </div>
+        <h3>/resume scans 17 repositories</h3>
+        <p>The <code>/resume</code> skill runs <code>scan_projects.sh</code>, scoring repos by uncommitted changes, stash depth, recent commits, and handoff file presence. Finds PR #8 from <code>haddencarpenter</code> with 1,118 additions.</p>
+        <div class="card-detail detail-insight">
+          The forensic scan found 5 repos with active work in the same 8-hour window and 12 total stashes across the workspace. Normal operating state for this project.
         </div>
       </div>
 
-      <div class="t-beat correction">
-        <div class="t-dot"></div>
-        <div class="t-label">Correction #2 &mdash; Scope fix</div>
-        <div class="t-content">
-          <em>"this rule is just for recording mode, not for all states"</em><br>
-          The assistant re-read its own memory file, updated it, scoped the rule to recording mode only.
+      <div class="story-card" data-beat="7">
+        <div class="card-header">
+          <span class="card-badge badge-discovery">Discovery</span>
+          <span class="card-timestamp">05:20</span>
+        </div>
+        <h3>Existing studies format found</h3>
+        <p>The assistant checks out <code>feat/studies</code>, reads <code>lib/studies-data.ts</code>: typed <code>PublishedStudy</code> objects with slug, category, heroNote, metrics, sections, and sources. Two studies already published. Dynamic <code>[slug]</code> routing means adding data is enough.</p>
+      </div>
+
+      <div class="story-card" data-beat="8">
+        <div class="card-header">
+          <span class="card-badge badge-correction">Correction #4</span>
+          <span class="card-timestamp">07:00</span>
+        </div>
+        <h3>"i dont want to make it so generic that actual coders think its ai slop"</h3>
+        <p>First draft of the study entry was too clean. Generic summaries, no specific data. The operator wants actual session traces: scan scores, branch names, the correction sequence, the MCP tool calls. Proof of work, not a press release.</p>
+        <div class="card-detail detail-result">
+          Rewritten with real numbers: coinrotator scored 42, shumi-bot 38, shumi-landing 17. Specific branch names, PR numbers, and the meta-moment of this feedback itself included in the final copy.
         </div>
       </div>
 
-      <div class="t-beat correction">
-        <div class="t-dot"></div>
-        <div class="t-label">Correction #3 &mdash; Task redirect</div>
-        <div class="t-content">
-          <em>"was there an HTML generated from this session?"</em><br>
-          The assistant searched for generated files. Wrong tree. Operator: <em>"a previous session was published as an inspirational study."</em> Then: <em>"its on hadden carpenter studies pages."</em><br>
-          Three hops to reach the actual task: generate a study page matching the ones on <code>feat/studies</code>.
+      <div class="story-card" data-beat="9">
+        <div class="card-header">
+          <span class="card-badge badge-shipped">Shipped</span>
+          <span class="card-timestamp">09:30</span>
         </div>
+        <h3>Two commits, two repos, both pushed</h3>
+        <p>Study data added to <code>lib/studies-data.ts</code> on <code>feat/studies</code> branch. This HTML storyboard page added to <code>v2/site/context-engineering/</code> in the studies repo. Both pushed to origin.</p>
       </div>
 
-      <div class="t-beat discovery">
-        <div class="t-dot"></div>
-        <div class="t-label">Recovery &mdash; /resume scan</div>
-        <div class="t-content">
-          The <code>/resume</code> skill ran <code>scan_projects.sh</code> across 17 git repos, scoring by uncommitted changes, stash depth, recent commits, and handoff file presence. Found PR #8 from <code>haddencarpenter</code> with 1,118 additions including <code>/studies</code> index and <code>[slug]</code> detail pages.
-        </div>
-      </div>
-
-      <div class="t-beat action">
-        <div class="t-dot"></div>
-        <div class="t-label">Shipped</div>
-        <div class="t-content">
-          Checked out <code>feat/studies</code>, read the <code>PublishedStudy</code> type and two existing entries, added a new study matching the data shape. First draft flagged as "AI slop." Rewrote with actual session traces. Then built this HTML page in the studies repo.
-        </div>
-      </div>
     </div>
 
-    <!-- ── FORENSIC SCAN ─────────────────────── -->
-    <div class="section-label">Forensic Scan Results</div>
+    <!-- ── SCAN RESULTS ──────────────────────── -->
+    <div class="section-label">Forensic Scan Snapshot</div>
 
     <table class="scan-table">
       <thead>
@@ -700,39 +805,16 @@
     </table>
 
     <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-      Scored by: uncommitted changes (strongest), recent commits (&lt;8h), stash count, HANDOFF.md/CURRENT_STATE.md presence. 17 repos scanned total.
+      Scored by: uncommitted changes (strongest), recent commits (&lt;8h), stash count, HANDOFF.md / CURRENT_STATE.md presence. 17 repos scanned.
     </p>
-
-    <!-- ── THE FINDING ───────────────────────── -->
-    <div class="section-label">The Privacy Finding</div>
-
-    <div class="finding-box">
-      <div class="finding-label">Environment leak</div>
-      <p>
-        A <code>show env keys</code> prompt returned both <code>NEXT_PUBLIC_SHUMI_API_ENDPOINT</code> and <code>NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT</code> with their full URL values from <code>.env.example</code>. These are <code>NEXT_PUBLIC_</code> prefixed, so they ship in the browser bundle anyway &mdash; but the operator's point stands: the assistant had no gate for "am I being recorded right now?"
-      </p>
-    </div>
-
-    <div class="insight-box">
-      <div class="insight-label">Behavioral fix</div>
-      <p>
-        The fix is a scoped memory entry, not code. The assistant now distinguishes recording mode from normal mode and suppresses config values when the operator signals they are recording. Normal sessions show everything. The memory was over-scoped on the first try (all sessions), then corrected (recording only).
-      </p>
-    </div>
 
     <!-- ── CLOSING ───────────────────────────── -->
     <div class="section-label">Why This Is Published</div>
 
     <div class="closing">
-      <p>
-        <strong>Three corrections in five minutes is a normal Claude Code interaction, not a failure.</strong> The first correction caught the leak. The second scoped the fix. The third redirected the session toward the actual task.
-      </p>
-      <p style="margin-top: 12px;">
-        Each correction required the assistant to re-read its own memory, update it, and re-orient. The operator never explained the full context upfront. This is how real context engineering works: <strong>incremental steering, not upfront specification.</strong>
-      </p>
-      <p style="margin-top: 12px;">
-        Most AI product demos show curated, successful interactions. This study publishes the rough edges: an assistant that leaks values, a context recovery that takes multiple hops, and a user correcting the AI three times before it understands the request. The session transcript is the proof.
-      </p>
+      <p><strong>Three corrections in five minutes is a normal Claude Code interaction, not a failure.</strong> The first correction caught the leak. The second scoped the fix. The third redirected the session. The fourth improved the output quality.</p>
+      <p>Each correction required the assistant to re-read its own memory, update it, and re-orient. The operator never explained the full context upfront. This is how real context engineering works: <strong>incremental steering, not upfront specification.</strong></p>
+      <p>Most AI product demos show curated, successful interactions. This study publishes the rough edges. The session transcript is the proof.</p>
     </div>
   </div>
 
@@ -749,15 +831,108 @@
     </div>
   </footer>
 
-  <script>
-    // YouTube embed on play click
-    // Replace YOUR_VIDEO_ID with the actual YouTube video ID after upload
-    const VIDEO_ID = 'YqYMbwmwJDs';
+  <!-- Hidden YouTube player -->
+  <div id="yt-player"></div>
 
-    document.getElementById('video-trigger').addEventListener('click', function() {
-      const container = document.getElementById('video-container');
-      container.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + VIDEO_ID + '?autoplay=1&rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  <!-- Player bar -->
+  <div class="player-bar" id="player-bar">
+    <button class="play-pause" id="pp-btn">
+      <svg class="icon-play" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+    </button>
+    <div class="player-info">
+      <div class="player-title">Session #003 — Context Engineering Under Recording</div>
+      <div class="player-status" id="player-status">Paused</div>
+    </div>
+    <div class="player-progress">
+      <div class="player-progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="player-time" id="player-time">0:00</div>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script>
+    var player;
+    var playerReady = false;
+    var pollTimer = null;
+
+    // Load YT API
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('yt-player', {
+        height: '1',
+        width: '1',
+        videoId: 'YqYMbwmwJDs',
+        playerVars: { autoplay: 0, controls: 0, modestbranding: 1, rel: 0 },
+        events: {
+          onReady: function() { playerReady = true; },
+          onStateChange: function(e) {
+            var bar = document.getElementById('player-bar');
+            var status = document.getElementById('player-status');
+            if (e.data === YT.PlayerState.PLAYING) {
+              bar.classList.add('playing');
+              status.textContent = 'Playing';
+              startProgress();
+            } else if (e.data === YT.PlayerState.PAUSED) {
+              bar.classList.remove('playing');
+              status.textContent = 'Paused';
+              stopProgress();
+            } else if (e.data === YT.PlayerState.ENDED) {
+              bar.classList.remove('playing');
+              status.textContent = 'Ended';
+              stopProgress();
+              document.getElementById('progress-fill').style.width = '100%';
+            }
+          }
+        }
+      });
+    }
+
+    function fmt(s) {
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function startProgress() {
+      stopProgress();
+      pollTimer = setInterval(function() {
+        if (!player || !player.getDuration) return;
+        var d = player.getDuration();
+        var c = player.getCurrentTime();
+        if (d > 0) {
+          document.getElementById('progress-fill').style.width = (c / d * 100) + '%';
+          document.getElementById('player-time').textContent = fmt(c);
+        }
+      }, 300);
+    }
+
+    function stopProgress() {
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    function togglePlay() {
+      if (!playerReady) return;
+      var state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    // Play CTA starts the video and shows the bar
+    document.getElementById('play-cta').addEventListener('click', function() {
+      this.classList.add('active');
+      document.getElementById('player-bar').classList.add('visible');
+      if (playerReady) player.playVideo();
     });
+
+    // Player bar toggle
+    document.getElementById('pp-btn').addEventListener('click', togglePlay);
   </script>
 </body>
 </html>
