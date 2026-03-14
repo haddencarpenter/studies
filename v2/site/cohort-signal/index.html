@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 006 — The Cohort Signal</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  /* ── TOP: TERMINAL DEMO ──────────────────── */
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px 24px; position: relative;
+  }
+
+  .term {
+    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    width: 100%; max-width: 960px; overflow: hidden;
+    position: absolute; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
+    border-bottom: 1px solid #1E1E22;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.2; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #27272A; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #3F3F46; font-style: italic; }
+
+  .t-leaked {
+    color: #C45B4F;
+    background: rgba(196, 91, 79, 0.12);
+    padding: 1px 4px; border-radius: 2px;
+  }
+
+  /* Title card */
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 44px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* Recording badge */
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── BOTTOM: NARRATION ───────────────────── */
+  .narration-area {
+    height: 160px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px 48px 48px; text-align: center;
+    border-top: 1px solid #1E1E22;
+  }
+
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  /* ── PLAYER BAR ──────────────────────────── */
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  /* ── START SCREEN ────────────────────────── */
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 004</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title cards -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 004</div>
+      <div class="title-big line-reveal">The Cohort Signal<span class="sub">From News Reports to Shumi Tool</span></div>
+    </div>
+
+    <div class="title-card" id="tc_ath">
+      <div class="title-big line-reveal" style="color:#5CB87A">One day before the ATH.</div>
+    </div>
+
+    <div class="title-card" id="tc_pivot">
+      <div class="title-quote line-reveal">"how would this be<br>discovered on shumi?"</div>
+    </div>
+
+    <div class="title-card" id="tc_constraint">
+      <div class="title-quote line-reveal">"dedicated tool but i dont<br>want to add state bloat"</div>
+    </div>
+
+    <div class="title-card" id="tc_jsondb">
+      <div class="title-big line-reveal" style="color:#D4A843">The JSON file<span class="sub">IS the database.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_ship">
+      <div class="title-big line-reveal">It shipped.</div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <div class="title-mono line-reveal">END OF STUDY</div>
+      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+    </div>
+
+    <!-- Terminal: building the analysis -->
+    <div class="term" id="term_build">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — simulation-engine</span></div>
+      <div class="term-body" id="tb_build"></div>
+    </div>
+
+    <!-- Terminal: the signal output -->
+    <div class="term" id="term_signal">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">pepe_cohort_analysis.js</span></div>
+      <div class="term-body" id="tb_signal"></div>
+    </div>
+
+    <!-- Terminal: forward returns -->
+    <div class="term" id="term_returns">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">SIGNAL FORWARD RETURNS</span></div>
+      <div class="term-body" id="tb_returns"></div>
+    </div>
+
+    <!-- Terminal: H3 bug fix -->
+    <div class="term" id="term_bugfix">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">HYPOTHESIS VALIDATION</span></div>
+      <div class="term-body" id="tb_bugfix"></div>
+    </div>
+
+    <!-- Terminal: four surfaces -->
+    <div class="term" id="term_surfaces">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">discovery surfaces</span></div>
+      <div class="term-body" id="tb_surfaces"></div>
+    </div>
+
+    <!-- Terminal: the 3-repo build -->
+    <div class="term" id="term_repos">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">3 repos, 0 tables</span></div>
+      <div class="term-body" id="tb_repos"></div>
+    </div>
+
+    <!-- Terminal: test output -->
+    <div class="term" id="term_test">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">node — holderCohorts.js</span></div>
+      <div class="term-body" id="tb_test"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4000,
+    label:'', narr:'19 news reports. One hypothesis. An unedited session.' },
+
+  // ACT 2: THE BUILD
+  { term:'term_build', tb:'tb_build', dur:5500, lines:[
+    '<span class="t-comment">  # user: let\'s build this in the simulation engine</span>',
+    '',
+    '<span class="t-tool">  \u23F5 Write</span> <span class="t-cmd">data/onchain/pepe_cohorts.json</span>',
+    '<span class="t-tool">  \u23F5 Write</span> <span class="t-cmd">src/indicators/holder_cohorts.js</span>',
+    '<span class="t-tool">  \u23F5 Write</span> <span class="t-cmd">scripts/pepe_cohort_analysis.js</span>',
+    '<span class="t-dim">  // 3 files. Interpolation engine + phase classifier + narrative builder</span>',
+  ], label:'BUILD', narr:'Sparse event data from Lookonchain and ITB. <span class="hi">Linear interpolation fills the gaps.</span>', rec:true },
+
+  // ACT 3: THE SIGNAL
+  { term:'term_signal', tb:'tb_signal', dur:5500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/simulation-engine</span> <span class="t-caret">\u276F</span> <span class="t-cmd">node scripts/pepe_cohort_analysis.js</span>',
+    '',
+    '<span class="t-out">  TRADING SIGNALS (5 total)</span>',
+    '',
+    '<span class="t-ok">  2023-12-10  BULLISH_SETUP    conf: 80%</span>',
+    '<span class="t-red">  2024-12-09  EXIT_WARNING     conf: 90%</span>  <span class="t-dim">price: 2.64e-5</span>',
+  ], label:'FIRST RUN', narr:'Five signals generated. One stands out.' },
+
+  // ACT 4: FORWARD RETURNS
+  { term:'term_returns', tb:'tb_returns', dur:6000, lines:[
+    '<span class="t-out">  Date         Signal              +7d     +30d     +90d</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-ok">  2023-12-10   BULLISH_SETUP     -7.2%   -22.2%</span>  <span class="t-ok" style="font-weight:600">+495.4%</span>',
+    '<span class="t-red">  2024-12-09   EXIT_WARNING      -8.4%   -29.4%</span>  <span class="t-red" style="font-weight:600">-74.8%</span>',
+    '<span class="t-out">  2025-01-15   BULLISH_SETUP     -8.8%   -44.5%   -58.0%</span>',
+  ], label:'FORWARD RETURNS', narr:'Dec 9 EXIT_WARNING. <span class="red">PEPE\'s all-time high was Dec 10.</span>', sound:'notification' },
+
+  // ACT 5: ATH REVEAL
+  { title:'tc_ath', dur:3500,
+    label:'', narr:'The signal fired from <span class="hi">conviction holder exit</span>. Hodlers peaked at 91,200.' },
+
+  // ACT 6: BUG FIX
+  { term:'term_bugfix', tb:'tb_bugfix', dur:5500, lines:[
+    '<span class="t-out">  H3: Bear phases consolidate into fewer, stronger hands</span>',
+    '',
+    '<span class="t-red">  Total addresses: 130K \u2192 434K (+233.8%)</span>  <span class="t-comment">\u2190 wrong</span>',
+    '<span class="t-dim">  // comparing across cycles, not within a single bear phase</span>',
+    '',
+    '<span class="t-ok">  2025-01-15 \u2192 2025-04-15 (91d): Total -20.2% | Hodler share +4.1pp</span>',
+    '<span class="t-ok">  Evidence score: 6  Verdict: SUPPORTED</span>',
+  ], label:'BUG FIX', narr:'H3 was comparing across cycles. <span class="hi">Extended whale lookback 45\u219290 days.</span>' },
+
+  // ACT 7: THE PIVOT
+  { title:'tc_pivot', dur:3500, sound:'notification',
+    label:'PIVOT', narr:'' },
+
+  // ACT 8: FOUR SURFACES
+  { term:'term_surfaces', tb:'tb_surfaces', dur:5500, lines:[
+    '<span class="t-warn">  1.</span> <span class="t-out">Contextual enrichment on getCoinBySymbol</span>  <span class="t-dim">highest value</span>',
+    '<span class="t-warn">  2.</span> <span class="t-out">Dedicated getHolderCohorts tool</span>  <span class="t-dim">explicit queries</span>',
+    '<span class="t-warn">  3.</span> <span class="t-out">Filter dimension on getFilteredCoins</span>  <span class="t-dim">"what\'s accumulating?"</span>',
+    '<span class="t-warn">  4.</span> <span class="t-out">Proactive phase transition alerts</span>  <span class="t-dim">push-based</span>',
+    '',
+    '<span class="t-comment">  # the most valuable signal is push-based, not pull-based</span>',
+  ], label:'DISCOVERY', narr:'Four ways to surface it. The user chose <span class="hi">dedicated tool</span>.' },
+
+  // ACT 9: THE CONSTRAINT
+  { title:'tc_constraint', dur:3500, sound:'caution',
+    label:'CONSTRAINT', narr:'' },
+
+  // ACT 10: THE BUILD ACROSS REPOS
+  { term:'term_repos', tb:'tb_repos', dur:6000, lines:[
+    '<span class="t-tool">  coinrotator-backend</span>',
+    '<span class="t-out">    data/onchain/pepe_cohorts.json</span>  <span class="t-dim">19 events, 4KB</span>',
+    '<span class="t-out">    lib/holderCohorts.js</span>  <span class="t-dim">150 lines, pure function</span>',
+    '<span class="t-out">    index.js</span>  <span class="t-dim">+1 endpoint: /api/coin/holder-cohorts</span>',
+    '<span class="t-tool">  coinrotator-utils</span>',
+    '<span class="t-out">    src/shumi.js</span>  <span class="t-dim">+9 lines</span>',
+  ], label:'3 REPOS, 0 TABLES', narr:'No Postgres. No Redis. No cron. <span class="hi">Static JSON is the database.</span>' },
+
+  // ACT 11: THE TEST
+  { term:'term_test', tb:'tb_test', dur:5000, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/coinrotator-backend</span> <span class="t-caret">\u276F</span> <span class="t-cmd">node -e "import {analyzeHolderCohorts} ..."</span>',
+    '',
+    '<span class="t-ok">  Available assets: [ \'PEPE\' ]</span>',
+    '<span class="t-out">  phase: "NEUTRAL"</span>',
+    '<span class="t-out">  cohorts: { traders: 23.8%, cruisers: 47.6%, hodlers: 28.6% }</span>',
+    '<span class="t-warn">  dataFreshness: { daysStale: 194, warning: "interpret with caution" }</span>',
+  ], label:'TEST', narr:'Stateless. Computes on demand. <span class="hi">Warns when data is stale.</span>', sound:'notification' },
+
+  // ACT 12: JSON = DB
+  { title:'tc_jsondb', dur:3500,
+    label:'', narr:'New data point? Edit the JSON. Push. Render redeploys.' },
+
+  // ACT 13: SHIP
+  { title:'tc_ship', dur:3500, sound:'celebration',
+    label:'', narr:'19 events. 3 repos. Zero state. One tool.' },
+
+  { title:'tc_end', dur:4000,
+    label:'', narr:'' },
+];
+
+var current = -1, running = false;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; nextScene();
+}
+
+function nextScene() {
+  if (!running) return;
+  clearAll();
+  current++;
+  if (current >= total) { running = false; showNarr('',''); return; }
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+
+  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  setTimeout(nextScene, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+});
+</script>
+</body>
+</html>

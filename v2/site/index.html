@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studies — Shumi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090B;
+      --surface: #0C0C0E;
+      --border: #1E1E22;
+      --border-hover: #2A2A30;
+      --text: #E8E4DE;
+      --text-dim: #52525B;
+      --text-muted: #27272A;
+      --accent: #D4A843;
+      --green: #5CB87A;
+      --red: #C45B4F;
+      --purple: #A78BFA;
+      --cyan: #22D3EE;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 32px 120px;
+    }
+
+    /* ── HEADER ─────────────────────── */
+    .eyebrow {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    /* ── SECTION LABEL ──────────────── */
+    .section-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      padding-left: 2px;
+    }
+
+    /* ── STUDY CARDS ────────────────── */
+    .studies {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 56px;
+    }
+
+    .study-card {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .study-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .study-card:hover {
+      border-color: var(--border-hover);
+      background: #0E0E11;
+      transform: translateX(2px);
+    }
+
+    .study-card:hover::before {
+      opacity: 1;
+    }
+
+    .study-num {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .study-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .study-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .study-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    .study-meta {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .study-tag {
+      display: inline-block;
+      font-family: 'Geist Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 2px;
+      margin-top: 4px;
+    }
+
+    /* Card accent colors by type */
+    .study-card[data-type="signal"]::before { background: var(--green); }
+    .study-card[data-type="signal"] .study-num { color: var(--green); }
+
+    .study-card[data-type="infra"]::before { background: var(--red); }
+    .study-card[data-type="infra"] .study-num { color: var(--red); }
+
+    .study-card[data-type="prompt"]::before { background: var(--accent); }
+    .study-card[data-type="prompt"] .study-num { color: var(--accent); }
+
+    .study-card[data-type="privacy"]::before { background: var(--purple); }
+    .study-card[data-type="privacy"] .study-num { color: var(--purple); }
+
+    .study-card[data-type="ux"]::before { background: var(--cyan); }
+    .study-card[data-type="ux"] .study-num { color: var(--cyan); }
+
+    .study-card[data-type="meta"]::before { background: var(--text-dim); }
+    .study-card[data-type="meta"] .study-num { color: var(--text-dim); }
+
+    .tag-signal { background: rgba(92,184,122,0.1); color: var(--green); }
+    .tag-infra { background: rgba(196,91,79,0.1); color: var(--red); }
+    .tag-prompt { background: rgba(212,168,67,0.1); color: var(--accent); }
+    .tag-privacy { background: rgba(167,139,250,0.1); color: var(--purple); }
+    .tag-ux { background: rgba(34,211,238,0.1); color: var(--cyan); }
+    .tag-meta { background: rgba(82,82,91,0.15); color: var(--text-dim); }
+
+    /* ── BENCHMARK CARD ─────────────── */
+    .benchmark-card {
+      display: block;
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 56px;
+    }
+
+    .benchmark-card:hover {
+      border-color: var(--border-hover);
+      background: #0E0E11;
+    }
+
+    .benchmark-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .benchmark-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .benchmark-stats {
+      display: flex;
+      gap: 24px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .benchmark-stats span { display: flex; align-items: center; gap: 6px; }
+    .benchmark-stats span::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* ── FOOTER ─────────────────────── */
+    .footer {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer a {
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ─────────────────── */
+    @media (max-width: 640px) {
+      .page { padding: 48px 20px 80px; }
+      h1 { font-size: 32px; }
+      .study-card { grid-template-columns: 32px 1fr; gap: 14px; }
+      .study-meta { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="eyebrow">Studies</div>
+    <h1>Session Films</h1>
+    <p class="subtitle">Unedited Claude Code sessions turned into short films. Real repos, real corrections, real data. Nothing staged.</p>
+
+    <div class="section-label">Films</div>
+    <div class="studies">
+
+      <a href="phantom-table/" class="study-card" data-type="infra">
+        <div class="study-num">005</div>
+        <div class="study-info">
+          <div class="study-title">The Phantom Table</div>
+          <div class="study-desc">API endpoints that query a table that was never created. 5 months of stale data. Backtest validates.</div>
+          <span class="study-tag tag-infra">infrastructure</span>
+        </div>
+        <div class="study-meta">19 scenes<br>~2m</div>
+      </a>
+
+      <a href="six-glyphs/" class="study-card" data-type="prompt">
+        <div class="study-num">006</div>
+        <div class="study-info">
+          <div class="study-title">Six Glyphs</div>
+          <div class="study-desc">Killing the wall of text. 11 contradictions in a 180-line prompt. Sandbox was hitting production the whole time.</div>
+          <span class="study-tag tag-prompt">prompt engineering</span>
+        </div>
+        <div class="study-meta">22 scenes<br>~2m</div>
+      </a>
+
+      <a href="cohort-signal/" class="study-card" data-type="signal">
+        <div class="study-num">004</div>
+        <div class="study-info">
+          <div class="study-title">The Cohort Signal</div>
+          <div class="study-desc">19 news reports become a trading signal. EXIT_WARNING fires one day before PEPE's all-time high. JSON file is the database.</div>
+          <span class="study-tag tag-signal">signal discovery</span>
+        </div>
+        <div class="study-meta">14 scenes<br>~1m 49s</div>
+      </a>
+
+      <a href="the-mask/" class="study-card" data-type="privacy">
+        <div class="study-num">007</div>
+        <div class="study-info">
+          <div class="study-title">The Mask</div>
+          <div class="study-desc">Building in public without building in public. Terminal exposes username, hostname, credential paths. 6-layer recording profile.</div>
+          <span class="study-tag tag-privacy">privacy</span>
+        </div>
+        <div class="study-meta">18 scenes<br>~1m 53s</div>
+      </a>
+
+      <a href="copy-skill-to-one-tap/" class="study-card" data-type="ux">
+        <div class="study-num">008</div>
+        <div class="study-info">
+          <div class="study-title">Copy Skill to One Tap</div>
+          <div class="study-desc">Three copy buttons nobody clicks. Reframe: what would be most sticky? /watch collision forces rename to /alert. Ships to Telegram.</div>
+          <span class="study-tag tag-ux">ux</span>
+        </div>
+        <div class="study-meta">15 scenes<br>~1m 40s</div>
+      </a>
+
+      <a href="context-engineering/" class="study-card" data-type="privacy">
+        <div class="study-num">003</div>
+        <div class="study-info">
+          <div class="study-title">Context Engineering</div>
+          <div class="study-desc">Under recording. Two endpoint URLs leaked on camera. Four corrections. One session.</div>
+          <span class="study-tag tag-privacy">privacy</span>
+        </div>
+        <div class="study-meta">23 scenes<br>~2m 6s</div>
+      </a>
+
+      <a href="content-pipeline/" class="study-card" data-type="meta">
+        <div class="study-num">004b</div>
+        <div class="study-info">
+          <div class="study-title">Content Pipeline</div>
+          <div class="study-desc">From blog post to film format. Discovers SND library, .recording-profile.zsh, builds /study skill. The pipeline builds itself.</div>
+          <span class="study-tag tag-meta">meta</span>
+        </div>
+        <div class="study-meta">17 scenes<br>~1m 45s</div>
+      </a>
+
+    </div>
+
+    <div class="section-label">Benchmarks</div>
+    <a href="benchmark/" class="benchmark-card">
+      <div class="benchmark-title">AI Crypto Analyst Benchmark v2</div>
+      <div class="benchmark-desc">6 platforms given identical trading questions. Scored across 5 weighted dimensions. Includes methodology self-critique.</div>
+      <div class="benchmark-stats">
+        <span>6 platforms</span>
+        <span>9 questions</span>
+        <span>270 scores</span>
+        <span>March 2026</span>
+      </div>
+    </a>
+
+    <div class="footer">
+      <a href="https://shumi.ai">shumi.ai</a>
+    </div>
+
+  </div>
+</body>
+</html>

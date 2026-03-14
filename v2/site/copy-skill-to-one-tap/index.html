@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 007 — Copy Skill to One Tap</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  /* ── TOP: TERMINAL DEMO ──────────────────── */
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px 24px; position: relative;
+  }
+
+  .term {
+    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    width: 100%; max-width: 960px; overflow: hidden;
+    position: absolute; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
+    border-bottom: 1px solid #1E1E22;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.2; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #27272A; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #3F3F46; font-style: italic; }
+  .t-leaked {
+    color: #C45B4F;
+    background: rgba(196, 91, 79, 0.12);
+    padding: 1px 4px; border-radius: 2px;
+  }
+
+  /* Title card */
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 44px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* Recording badge */
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── BOTTOM: NARRATION ───────────────────── */
+  .narration-area {
+    height: 160px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px 48px 48px; text-align: center;
+    border-top: 1px solid #1E1E22;
+  }
+
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  /* ── PLAYER BAR ──────────────────────────── */
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  /* ── START SCREEN ────────────────────────── */
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 007</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title: opening -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 007</div>
+      <div class="title-big line-reveal">Copy Skill to One Tap<span class="sub">From UX critique to shipped feature in one session</span></div>
+    </div>
+
+    <!-- Title: the reframe -->
+    <div class="title-card" id="tc_sticky">
+      <div class="title-quote line-reveal">"what would be the<br>most sticky"</div>
+    </div>
+
+    <!-- Title: the insight -->
+    <div class="title-card" id="tc_insight">
+      <div class="title-big line-reveal" style="font-size:40px">A "Watch" button answers the question<br><span style="color:#D4A843">the user is already thinking.</span></div>
+    </div>
+
+    <!-- Title: laziness -->
+    <div class="title-card" id="tc_lazy">
+      <div class="title-quote line-reveal">"how to make shumi alerts<br>as lazy as possible"</div>
+    </div>
+
+    <!-- Title: correction 1 -->
+    <div class="title-card" id="tc_c1">
+      <div class="title-quote line-reveal" style="color:#C45B4F">Unknown command: /alert</div>
+    </div>
+
+    <!-- Title: correction 2 -->
+    <div class="title-card" id="tc_c2">
+      <div class="title-quote line-reveal">"it requires a push to<br>trigger the deploy"</div>
+    </div>
+
+    <!-- Title: vibe coder insight -->
+    <div class="title-card" id="tc_vibe">
+      <div class="title-big line-reveal" style="font-size:36px">Every step between "AI wrote it"<br>and "I can use it" is friction<br><span style="color:#C45B4F">that breaks flow.</span></div>
+    </div>
+
+    <!-- Title: ship -->
+    <div class="title-card" id="tc_ship">
+      <div class="title-big line-reveal">It shipped.</div>
+    </div>
+
+    <!-- Title: end -->
+    <div class="title-card" id="tc_end">
+      <div class="title-mono line-reveal">END OF STUDY</div>
+      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+    </div>
+
+    <!-- Terminal: the critique -->
+    <div class="term" id="term_critique">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — shumi briefing review</span></div>
+      <div class="term-body" id="tb_critique"></div>
+    </div>
+
+    <!-- Terminal: codebase scan -->
+    <div class="term" id="term_scan">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — shumi-bot</span></div>
+      <div class="term-body" id="tb_scan"></div>
+    </div>
+
+    <!-- Terminal: collision -->
+    <div class="term" id="term_collision">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — shumi-bot</span></div>
+      <div class="term-body" id="tb_collision"></div>
+    </div>
+
+    <!-- Terminal: commit -->
+    <div class="term" id="term_commit">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — shumi-bot</span></div>
+      <div class="term-body" id="tb_commit"></div>
+    </div>
+
+    <!-- Terminal: inline keyboard -->
+    <div class="term" id="term_keyboard">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">buildDigestKeyboard() output</span></div>
+      <div class="term-body" id="tb_keyboard"></div>
+    </div>
+
+    <!-- Terminal: push + memory -->
+    <div class="term" id="term_push">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">claude — shumi-bot</span></div>
+      <div class="term-body" id="tb_push"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4000,
+    label:'', narr:'A screenshot. A question. A shipped feature.' },
+
+  // ACT 2: THE CRITIQUE
+  { term:'term_critique', tb:'tb_critique', dur:5500, lines:[
+    '<span class="t-comment">  # user: is this a logical use case of skills?</span>',
+    '<span class="t-comment">  # [screenshot: briefing with "copy skill" buttons]</span>',
+    '',
+    '<span class="t-out">  The sections feel like components of a single</span>',
+    '<span class="t-out">  briefing skill, not standalone skills.</span>',
+    '<span class="t-red">  "Copy skill" suggests the wrong mental model.</span>',
+  ], label:'PROMPT', narr:'User shows the Shumi briefing. Three <span class="red">[copy skill]</span> buttons that nobody will click.', rec:true },
+
+  // ACT 3: THE REFRAME
+  { title:'tc_sticky', dur:3000, sound:'notification',
+    label:'REFRAME', narr:'' },
+
+  // ACT 4: THE INSIGHT
+  { title:'tc_insight', dur:4500,
+    label:'INSIGHT', narr:'When someone reads "near upper band," their next thought is <span class="hi">"tell me when it hits it."</span>' },
+
+  // ACT 5: CODEBASE SCAN
+  { term:'term_scan', tb:'tb_scan', dur:5500, lines:[
+    '<span class="t-tool">  ⏵ Agent</span> <span class="t-cmd">Explore shumi-bot architecture</span>',
+    '<span class="t-tool">  ⏵ Agent</span> <span class="t-cmd">Explore briefing generation code</span>',
+    '',
+    '<span class="t-ok">  Found:</span> <span class="t-cmd">funding-alerts.js</span> <span class="t-dim">— exact pattern to follow</span>',
+    '<span class="t-out">  One-shot condition alerts, 30m checker, auto-resolve</span>',
+    '<span class="t-out">  DB tables: alert_history, alert_cooldowns</span>',
+  ], label:'BUILD', narr:'Two agents scan 17 repos in parallel. The pattern already exists.' },
+
+  // ACT 6: COLLISION
+  { term:'term_collision', tb:'tb_collision', dur:5000, lines:[
+    '<span class="t-tool">  ⏵ Grep</span> <span class="t-cmd">bot.command(\'watch\')</span>',
+    '',
+    '<span class="t-red">  /watch already registered by signals.js</span>',
+    '<span class="t-out">  Usage: /watch $BTC — adds ticker to watchlist</span>',
+    '',
+    '<span class="t-ok">  Pivot:</span> <span class="t-red" style="text-decoration:line-through">/watch</span> <span class="t-dim">\u2192</span> <span class="t-ok">/alert</span>',
+  ], label:'COLLISION', narr:'Command namespace taken. <span class="hi">Rename and keep moving.</span>' },
+
+  // ACT 7: COMMIT
+  { term:'term_commit', tb:'tb_commit', dur:5000, lines:[
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">src/modules/watches.js</span> <span class="t-dim">330 lines</span>',
+    '<span class="t-tool">  ⏵ Edit</span> <span class="t-cmd">src/schema/init.js</span> <span class="t-dim">watches table</span>',
+    '<span class="t-tool">  ⏵ Edit</span> <span class="t-cmd">src/index.js</span> <span class="t-dim">register module</span>',
+    '',
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/shumi-bot</span> <span class="t-caret">\u276F</span> <span class="t-cmd">git commit</span>',
+    '<span class="t-ok">[main 109cfea]</span> <span class="t-out">feat: add condition-based market alerts</span>',
+  ], label:'SHIP 1', narr:'Three watch types: <span class="hi">trend flip, band touch, streak milestone.</span>', sound:'notification' },
+
+  // ACT 8: LAZINESS
+  { title:'tc_lazy', dur:3000, sound:'notification',
+    label:'REFRAME 2', narr:'' },
+
+  // ACT 9: INLINE KEYBOARD
+  { term:'term_keyboard', tb:'tb_keyboard', dur:5500, lines:[
+    '<span class="t-dim">  // One-tap buttons on the morning digest</span>',
+    '',
+    '<span class="t-out">  inline_keyboard: [</span>',
+    '<span class="t-out">    [</span>',
+    '<span class="t-warn">      { text: "\uD83D\uDD14 BTC flip", callback: "w:BTC:trend" }</span>',
+    '<span class="t-warn">      { text: "\uD83D\uDD14 ETH flip", callback: "w:ETH:trend" }</span>',
+    '<span class="t-out">    ]</span>',
+    '<span class="t-out">  ]</span>',
+  ], label:'ONE TAP', narr:'Inline buttons on the briefing. <span class="hi">Tap to watch. No typing.</span>' },
+
+  // ACT 10: CORRECTION 1
+  { title:'tc_c1', dur:3000, sound:'caution',
+    label:'CORRECTION 1', narr:'User tests in Telegram. The bot is still running old code.' },
+
+  // ACT 11: CORRECTION 2
+  { title:'tc_c2', dur:3500, sound:'caution',
+    label:'CORRECTION 2', narr:'' },
+
+  // ACT 12: PUSH + MEMORY
+  { term:'term_push', tb:'tb_push', dur:5500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/projects/shumi-bot</span> <span class="t-caret">\u276F</span> <span class="t-cmd">git push origin main</span>',
+    '<span class="t-out">  6b783fd..d8cc0dc</span>  <span class="t-ok">main \u2192 main</span>',
+    '',
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">memory/feedback_deploy_workflow.md</span>',
+    '<span class="t-out">  Never suggest local testing for shumi-bot.</span>',
+    '<span class="t-ok">  User workflow: push \u2192 Render deploys \u2192 test in Telegram.</span>',
+  ], label:'SHIPPED', narr:'Pushed. Deployed. <span class="hi">Memory saved so the mistake never repeats.</span>', sound:'celebration' },
+
+  // ACT 13: VIBE CODER INSIGHT
+  { title:'tc_vibe', dur:5000,
+    label:'THE FINDING', narr:'The #1 killer of vibe coding momentum.' },
+
+  // ACT 14: SHIP
+  { title:'tc_ship', dur:3500,
+    label:'', narr:'Two corrections. Two commits. One tap.' },
+
+  // ACT 15: END
+  { title:'tc_end', dur:4000,
+    label:'', narr:'' },
+];
+
+var current = -1, running = false;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; nextScene();
+}
+
+function nextScene() {
+  if (!running) return;
+  clearAll();
+  current++;
+  if (current >= total) { running = false; showNarr('',''); return; }
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+
+  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  setTimeout(nextScene, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+});
+</script>
+</body>
+</html>
