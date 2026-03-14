@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Session: Context Engineering Under Recording</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-sans/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1/dist/fonts/geist-mono/style.css">
+  <style>
+    :root {
+      --bg: #0A0A0A;
+      --surface: #111111;
+      --surface-raised: #141414;
+      --surface-hover: #1A1A1A;
+      --border: #2A2520;
+      --border-subtle: #1A1714;
+      --text: #F0ECE4;
+      --text-secondary: #8A8A8A;
+      --text-muted: #555049;
+      --accent: #D4A843;
+      --accent-dim: rgba(212, 168, 67, 0.10);
+      --green: #5CB87A;
+      --green-dim: rgba(92, 184, 122, 0.10);
+      --red: #C45B4F;
+      --red-dim: rgba(196, 91, 79, 0.10);
+      --font-display: 'Geist', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-mono);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(10, 10, 10, 0.4) 100%);
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .site-nav-logo {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .site-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .site-nav-links a {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav-links a:hover { color: var(--text); }
+
+    .site-nav-cta {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--bg) !important;
+      background: var(--accent);
+      padding: 10px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .site-nav-cta:hover { opacity: 0.9; color: var(--bg) !important; }
+
+    /* ── HEADER ──────────────────────────────── */
+    header {
+      padding: 80px 0 56px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 200px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    header h1 {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    header h1 span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 32px;
+      font-weight: 500;
+      opacity: 0.7;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    .meta-strip {
+      display: flex;
+      gap: 32px;
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .meta-strip span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .meta-strip span::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 50%;
+    }
+
+    /* ── VIDEO ───────────────────────────────── */
+    .video-section {
+      margin-top: 48px;
+      margin-bottom: 56px;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-placeholder {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .video-placeholder:hover {
+      background: var(--surface-hover);
+    }
+
+    .play-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .video-placeholder:hover .play-btn {
+      transform: scale(1.08);
+      box-shadow: 0 0 32px rgba(212, 168, 67, 0.25);
+    }
+
+    .play-btn svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 4px;
+      fill: var(--bg);
+    }
+
+    .video-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ── SECTIONS ────────────────────────────── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      margin-top: 56px;
+    }
+
+    .section-label:first-of-type {
+      margin-top: 0;
+    }
+
+    /* ── TIMELINE ────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 6px;
+      bottom: 6px;
+      width: 1px;
+      background: var(--border);
+    }
+
+    .t-beat {
+      position: relative;
+      padding-bottom: 32px;
+    }
+
+    .t-beat:last-child { padding-bottom: 0; }
+
+    .t-dot {
+      position: absolute;
+      left: -24px;
+      top: 6px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg);
+    }
+
+    .t-beat.correction .t-dot { border-color: var(--red); background: var(--red-dim); }
+    .t-beat.discovery .t-dot { border-color: var(--accent); background: var(--accent-dim); }
+    .t-beat.action .t-dot { border-color: var(--green); background: var(--green-dim); }
+
+    .t-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .t-beat.correction .t-label { color: var(--red); }
+    .t-beat.discovery .t-label { color: var(--accent); }
+    .t-beat.action .t-label { color: var(--green); }
+
+    .t-content {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .t-content code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--surface-raised);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--text);
+    }
+
+    /* ── SCAN TABLE ──────────────────────────── */
+    .scan-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 4px;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .scan-table th {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 8px 12px;
+    }
+
+    .scan-table th:last-child { text-align: right; }
+
+    .scan-table td {
+      padding: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .scan-table td:first-child {
+      border-radius: 4px 0 0 4px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .scan-table td:last-child {
+      border-radius: 0 4px 4px 0;
+      text-align: right;
+      font-weight: 700;
+    }
+
+    .score-high { color: var(--green) !important; }
+    .score-mid { color: var(--accent) !important; }
+    .score-low { color: var(--text-muted) !important; }
+
+    /* ── FINDING BOX ────────────────────────── */
+    .finding-box {
+      padding: 20px 24px;
+      background: var(--red-dim);
+      border-left: 3px solid var(--red);
+      border-radius: 4px;
+      margin-top: 24px;
+    }
+
+    .finding-box .finding-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 8px;
+    }
+
+    .finding-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .finding-box code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(196, 91, 79, 0.12);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--text);
+    }
+
+    /* ── INSIGHT BOX ────────────────────────── */
+    .insight-box {
+      padding: 20px 24px;
+      background: var(--accent-dim);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      margin-top: 24px;
+    }
+
+    .insight-box .insight-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .insight-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ── CLOSING ─────────────────────────────── */
+    .closing {
+      padding: 28px 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-top: 48px;
+      margin-bottom: 80px;
+      position: relative;
+    }
+
+    .closing::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 120px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .closing p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .closing strong { color: var(--text); }
+
+    /* ── FOOTER ──────────────────────────────── */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .footer-links a {
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .footer-copy {
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 768px) {
+      .site-nav { padding: 16px 24px; }
+      .site-nav-links { gap: 16px; }
+      .site-nav-links a:not(.site-nav-cta) { display: none; }
+      .container { padding: 0 24px; }
+      header { padding: 48px 0 40px; }
+      header h1 { font-size: 32px; }
+      header h1 span { font-size: 22px; }
+      .meta-strip { flex-wrap: wrap; gap: 16px; }
+      .scan-table { font-size: 12px; }
+      .scan-table th, .scan-table td { padding: 8px; }
+      .footer-inner { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav">
+    <a href="/" class="site-nav-logo">SHUMI</a>
+    <div class="site-nav-links">
+      <a href="https://docs.shumi.ai" target="_blank">Docs</a>
+      <a href="https://t.me/+8DRbgvB2NxE2YmFk" target="_blank">Telegram</a>
+      <a href="https://github.com/haddencarpenter/studies" target="_blank">GitHub</a>
+      <a href="/shumi" class="site-nav-cta">Try Shumi</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <div class="eyebrow">Process Note &middot; Session #003</div>
+      <h1>Context Engineering<span>Under Recording</span></h1>
+      <p class="subtitle">An unedited Claude Code session. The operator tested screen recording safety, the AI leaked .env values on the first prompt, took three corrections to understand the task, and still shipped a study page by the end.</p>
+      <div class="meta-strip">
+        <span>March 14, 2026</span>
+        <span>Claude Opus 4.6</span>
+        <span>17 repos scanned</span>
+        <span>3 corrections &middot; 1 privacy gap</span>
+      </div>
+    </header>
+
+    <!-- ── VIDEO ──────────────────────────────── -->
+    <div class="video-section">
+      <div class="video-wrapper" id="video-container">
+        <div class="video-placeholder" id="video-trigger">
+          <div class="play-btn">
+            <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+          </div>
+          <span class="video-label">Watch the full session</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SESSION TIMELINE ──────────────────── -->
+    <div class="section-label">Session Timeline</div>
+
+    <div class="timeline">
+      <div class="t-beat action">
+        <div class="t-dot"></div>
+        <div class="t-label">Prompt</div>
+        <div class="t-content">
+          Operator: <code>show env keys for the shumi landing page</code><br>
+          The assistant called <code>mcp__render__get_service</code> for the static site, got JSON with no env vars, fell back to reading <code>.env.example</code>.
+        </div>
+      </div>
+
+      <div class="t-beat correction">
+        <div class="t-dot"></div>
+        <div class="t-label">Correction #1 &mdash; Leak caught</div>
+        <div class="t-content">
+          The assistant printed both key names and their endpoint URLs in a markdown table. Operator was screen recording.<br>
+          <em>"but you revealed private data"</em><br>
+          The assistant wrote a memory rule to suppress values &mdash; but scoped it to all sessions.
+        </div>
+      </div>
+
+      <div class="t-beat correction">
+        <div class="t-dot"></div>
+        <div class="t-label">Correction #2 &mdash; Scope fix</div>
+        <div class="t-content">
+          <em>"this rule is just for recording mode, not for all states"</em><br>
+          The assistant re-read its own memory file, updated it, scoped the rule to recording mode only.
+        </div>
+      </div>
+
+      <div class="t-beat correction">
+        <div class="t-dot"></div>
+        <div class="t-label">Correction #3 &mdash; Task redirect</div>
+        <div class="t-content">
+          <em>"was there an HTML generated from this session?"</em><br>
+          The assistant searched for generated files. Wrong tree. Operator: <em>"a previous session was published as an inspirational study."</em> Then: <em>"its on hadden carpenter studies pages."</em><br>
+          Three hops to reach the actual task: generate a study page matching the ones on <code>feat/studies</code>.
+        </div>
+      </div>
+
+      <div class="t-beat discovery">
+        <div class="t-dot"></div>
+        <div class="t-label">Recovery &mdash; /resume scan</div>
+        <div class="t-content">
+          The <code>/resume</code> skill ran <code>scan_projects.sh</code> across 17 git repos, scoring by uncommitted changes, stash depth, recent commits, and handoff file presence. Found PR #8 from <code>haddencarpenter</code> with 1,118 additions including <code>/studies</code> index and <code>[slug]</code> detail pages.
+        </div>
+      </div>
+
+      <div class="t-beat action">
+        <div class="t-dot"></div>
+        <div class="t-label">Shipped</div>
+        <div class="t-content">
+          Checked out <code>feat/studies</code>, read the <code>PublishedStudy</code> type and two existing entries, added a new study matching the data shape. First draft flagged as "AI slop." Rewrote with actual session traces. Then built this HTML page in the studies repo.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FORENSIC SCAN ─────────────────────── -->
+    <div class="section-label">Forensic Scan Results</div>
+
+    <table class="scan-table">
+      <thead>
+        <tr>
+          <th>Repo</th>
+          <th>Branch</th>
+          <th>Dirty files</th>
+          <th>Stashes</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>coinrotator</td>
+          <td>sandbox</td>
+          <td>20</td>
+          <td>7</td>
+          <td class="score-high">42</td>
+        </tr>
+        <tr>
+          <td>shumi-bot</td>
+          <td>main</td>
+          <td>1</td>
+          <td>0</td>
+          <td class="score-high">38</td>
+        </tr>
+        <tr>
+          <td>coinrotator-utils</td>
+          <td>feat/holder-cohort-tool</td>
+          <td>3</td>
+          <td>4</td>
+          <td class="score-mid">36</td>
+        </tr>
+        <tr>
+          <td>coinrotator-backend</td>
+          <td>feat/holder-cohorts-tool</td>
+          <td>10</td>
+          <td>4</td>
+          <td class="score-mid">36</td>
+        </tr>
+        <tr>
+          <td>shumi-landing</td>
+          <td>renderer-test</td>
+          <td>0</td>
+          <td>2</td>
+          <td class="score-low">17</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
+      Scored by: uncommitted changes (strongest), recent commits (&lt;8h), stash count, HANDOFF.md/CURRENT_STATE.md presence. 17 repos scanned total.
+    </p>
+
+    <!-- ── THE FINDING ───────────────────────── -->
+    <div class="section-label">The Privacy Finding</div>
+
+    <div class="finding-box">
+      <div class="finding-label">Environment leak</div>
+      <p>
+        A <code>show env keys</code> prompt returned both <code>NEXT_PUBLIC_SHUMI_API_ENDPOINT</code> and <code>NEXT_PUBLIC_SHUMI_SUGGESTIONS_ENDPOINT</code> with their full URL values from <code>.env.example</code>. These are <code>NEXT_PUBLIC_</code> prefixed, so they ship in the browser bundle anyway &mdash; but the operator's point stands: the assistant had no gate for "am I being recorded right now?"
+      </p>
+    </div>
+
+    <div class="insight-box">
+      <div class="insight-label">Behavioral fix</div>
+      <p>
+        The fix is a scoped memory entry, not code. The assistant now distinguishes recording mode from normal mode and suppresses config values when the operator signals they are recording. Normal sessions show everything. The memory was over-scoped on the first try (all sessions), then corrected (recording only).
+      </p>
+    </div>
+
+    <!-- ── CLOSING ───────────────────────────── -->
+    <div class="section-label">Why This Is Published</div>
+
+    <div class="closing">
+      <p>
+        <strong>Three corrections in five minutes is a normal Claude Code interaction, not a failure.</strong> The first correction caught the leak. The second scoped the fix. The third redirected the session toward the actual task.
+      </p>
+      <p style="margin-top: 12px;">
+        Each correction required the assistant to re-read its own memory, update it, and re-orient. The operator never explained the full context upfront. This is how real context engineering works: <strong>incremental steering, not upfront specification.</strong>
+      </p>
+      <p style="margin-top: 12px;">
+        Most AI product demos show curated, successful interactions. This study publishes the rough edges: an assistant that leaks values, a context recovery that takes multiple hops, and a user correcting the AI three times before it understands the request. The session transcript is the proof.
+      </p>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://docs.shumi.ai" target="_blank">Docs</a>
+        <a href="https://t.me/+8DRbgvB2NxE2YmFk" target="_blank">Telegram</a>
+        <a href="https://x.com/coinrotatorapp" target="_blank">Twitter</a>
+        <a href="https://github.com/haddencarpenter/studies" target="_blank">GitHub</a>
+      </div>
+      <div class="footer-status">Process Note &middot; Session #003 &middot; March 2026</div>
+      <div class="footer-copy">&copy; 2026 Shumi</div>
+    </div>
+  </footer>
+
+  <script>
+    // YouTube embed on play click
+    // Replace YOUR_VIDEO_ID with the actual YouTube video ID after upload
+    const VIDEO_ID = 'YqYMbwmwJDs';
+
+    document.getElementById('video-trigger').addEventListener('click', function() {
+      const container = document.getElementById('video-container');
+      container.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + VIDEO_ID + '?autoplay=1&rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    });
+  </script>
+</body>
+</html>
