@@ -390,7 +390,7 @@ function nextScene() {
   if (current >= 1) document.getElementById('recBadge').classList.add('show');
 
   // Sound
-  try { snd.play(Snd.SOUNDS.TRANSITION_UP); } catch(e) {}
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
   if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
   if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
   if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
@@ -403,7 +403,7 @@ function nextScene() {
     var tc = document.getElementById(s.title);
     tc.classList.add('active');
     tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
-      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP); } catch(e) {} }, 300+i*500);
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
     });
   }
 
@@ -419,7 +419,7 @@ function nextScene() {
       b.appendChild(d);
       setTimeout(function() {
         d.classList.add('show');
-        if (l) try { snd.play(Snd.SOUNDS.TYPE); } catch(e) {}
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
       }, 600+i*600);
     });
   }
