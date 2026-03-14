@@ -311,10 +311,23 @@
   <div class="eq-bars"><div class="eq-bar" style="height:3px"></div><div class="eq-bar" style="height:5px"></div><div class="eq-bar" style="height:4px"></div></div>
   <span>SESSION AUDIO</span>
 </button>
-<iframe id="ytFrame" style="position:fixed;bottom:0;left:0;width:300px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;" src="" allow="autoplay; encrypted-media" frameborder="0"></iframe>
+<div id="ytPlayer" style="position:fixed;bottom:0;left:0;width:300px;height:170px;opacity:0.01;pointer-events:none;z-index:-1;"></div>
 
 <script>
-const ytSrc = 'https://www.youtube.com/embed/YqYMbwmwJDs?autoplay=1&controls=0&showinfo=0&rel=0&modestbranding=1';
+// YouTube IFrame API
+var ytPlayer, ytReady = false;
+var tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+function onYouTubeIframeAPIReady() {
+  ytPlayer = new YT.Player('ytPlayer', {
+    height: '170', width: '300',
+    videoId: 'YqYMbwmwJDs',
+    playerVars: { autoplay: 0, controls: 0, modestbranding: 1, rel: 0, playsinline: 1 },
+    events: { onReady: function() { ytReady = true; } }
+  });
+}
 
 const scenes = [
   { id:'s0', dur:4500 },
@@ -372,7 +385,7 @@ const total = scenes.length;
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
   running = true;
-  if (!audioOn) { document.getElementById('ytFrame').src = ytSrc; audioOn = true; document.getElementById('audioBtn').classList.add('on'); }
+  if (!audioOn && ytReady) { ytPlayer.playVideo(); audioOn = true; document.getElementById('audioBtn').classList.add('on'); }
   nextScene();
 }
 
@@ -399,8 +412,9 @@ function nextScene() {
 
 let audioOn = false;
 function toggleAudio() {
-  const f = document.getElementById('ytFrame'), btn = document.getElementById('audioBtn');
-  if (audioOn) { f.src=''; btn.classList.remove('on'); } else { f.src=ytSrc; btn.classList.add('on'); }
+  if (!ytReady) return;
+  const btn = document.getElementById('audioBtn');
+  if (audioOn) { ytPlayer.pauseVideo(); btn.classList.remove('on'); } else { ytPlayer.playVideo(); btn.classList.add('on'); }
   audioOn = !audioOn;
 }
 
