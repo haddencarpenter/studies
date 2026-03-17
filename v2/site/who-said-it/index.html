@@ -58,6 +58,7 @@
     opacity: 0; transition: opacity 0.8s ease;
   }
   .title-card.active { opacity: 1; }
+  #tc_end { inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
   .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
   .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
   .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
@@ -163,8 +164,11 @@
     </div>
 
     <div class="title-card" id="tc_end">
-      <div class="title-mono line-reveal">END OF STUDY</div>
-      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+      <iframe id="physarum" src="about:blank" style="position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;transition:opacity 2s ease;z-index:0;pointer-events:none" allow="autoplay" loading="lazy"></iframe>
+      <div style="position:relative;z-index:1">
+        <div class="title-mono line-reveal">END OF STUDY</div>
+        <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+      </div>
     </div>
 
     <!-- Terminal: the dataset -->
@@ -340,7 +344,7 @@ var scenes = [
   { title:'tc_ship', dur:4000,
     label:'', narr:'' },
 
-  { title:'tc_end', dur:4000,
+  { title:'tc_end', dur:6000,
     label:'', narr:'' },
 ];
 
@@ -388,6 +392,18 @@ function showScene(idx) {
   if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
 
   showNarr(s.label, s.narr);
+
+  // preload physarum one scene before the end card
+  var phys = document.getElementById('physarum');
+  if (s.title === 'tc_ship' && phys.src === 'about:blank') {
+    phys.src = 'https://shumi-landing.onrender.com/physarum/stencil.html?lp&seed=60&es=0.57&ew=0.28';
+  }
+  // fade in physarum on end card
+  if (s.title === 'tc_end') {
+    phys.style.opacity = '0.25';
+  } else {
+    phys.style.opacity = '0';
+  }
 
   if (s.title) {
     var tc = document.getElementById(s.title);
