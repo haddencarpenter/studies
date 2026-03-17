@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Study 009 — Batcat</title>
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: #09090B; color: #A1A1AA;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow: hidden; width: 100vw; height: 100vh;
   }
@@ -18,24 +18,32 @@
 
   .demo-area {
     flex: 1; display: flex; align-items: center; justify-content: center;
-    padding: 60px 48px 24px; position: relative;
+    padding: 48px 48px 100px; position: relative;
   }
 
   .term {
-    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
-    width: 100%; max-width: 960px; overflow: hidden;
-    position: absolute; opacity: 0; transition: opacity 0.6s ease;
+    background: #1C1C1E; border: 1px solid #3A3A3C; border-radius: 10px;
+    max-width: 960px; overflow: hidden;
+    position: absolute; left: 32px; right: 32px; margin: 0 auto; opacity: 0; transition: opacity 0.6s ease;
     pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.3);
   }
   .term.active { opacity: 1; pointer-events: auto; }
 
   .term-bar {
-    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
-    border-bottom: 1px solid #1E1E22;
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    border-bottom: 1px solid #2A2A2C;
+    background: #28282A; position: relative;
   }
-  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
-  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.2; }
+  .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .term-dot:nth-child(1) { background: #FF5F57 !important; }
+  .term-dot:nth-child(2) { background: #FEBC2E !important; }
+  .term-dot:nth-child(3) { background: #28C840 !important; }
+  .term-title {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #5A5A5E;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .term-body { padding: 20px 24px; font-family: 'Geist Mono', monospace; font-size: 14px; line-height: 2.0; }
   .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
   .term-line.show { opacity: 1; transform: translateY(0); }
 
@@ -43,13 +51,13 @@
   .t-path { color: #60A5FA; }
   .t-caret { color: #FACC15; }
   .t-cmd { color: #A1A1AA; }
-  .t-dim { color: #27272A; }
+  .t-dim { color: #4A4A50; }
   .t-out { color: #52525B; }
   .t-ok { color: #5CB87A; }
   .t-red { color: #C45B4F; }
   .t-warn { color: #D4A843; }
   .t-tool { color: #A78BFA; }
-  .t-comment { color: #3F3F46; font-style: italic; }
+  .t-comment { color: #5A5A62; font-style: italic; }
 
   .title-card {
     position: absolute; text-align: center;
@@ -75,10 +83,10 @@
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .narration-area {
-    height: 160px; flex-shrink: 0;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    padding: 16px 48px 48px; text-align: center;
-    border-top: 1px solid #1E1E22;
+    position: absolute; bottom: 60px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 48px; text-align: center; z-index: 10;
+    pointer-events: none;
   }
 
   .narration-label {
@@ -125,6 +133,7 @@
   <div class="start-label">PRESS TO PLAY</div>
 </div>
 
+<a href="../" style="position:fixed;top:24px;left:32px;font-family:'Geist Mono',monospace;font-size:12px;color:#27272A;text-decoration:none;z-index:50;letter-spacing:0.08em;transition:color 0.3s" onmouseover="this.style.color='#52525B'" onmouseout="this.style.color='#27272A'">← studies</a>
 <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
 
 <div class="film">
@@ -163,55 +172,55 @@
 
     <!-- Terminal: Render logs -->
     <div class="term" id="term_render">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">render — pair-trading-suggestions</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — pair-trading</span></div>
       <div class="term-body" id="tb_render"></div>
     </div>
 
     <!-- Terminal: Thundering herd -->
     <div class="term" id="term_herd">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">diagnosis</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — diagnosis</span></div>
       <div class="term-body" id="tb_herd"></div>
     </div>
 
     <!-- Terminal: First fix wave -->
     <div class="term" id="term_fix1">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">optimization — 5 PRs in 48h</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — optimization</span></div>
       <div class="term-body" id="tb_fix1"></div>
     </div>
 
     <!-- Terminal: AJV -->
     <div class="term" id="term_ajv">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">historical-metadata API</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — historical-metadata</span></div>
       <div class="term-body" id="tb_ajv"></div>
     </div>
 
     <!-- Terminal: Batcat code -->
     <div class="term" id="term_btc">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentRoutes.js — getCoinBySymbol</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — getCoinBySymbol</span></div>
       <div class="term-body" id="tb_btc"></div>
     </div>
 
     <!-- Terminal: Hybrid fix -->
     <div class="term" id="term_hybrid">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentRoutes.js — hybrid resolution</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — hybrid resolution</span></div>
       <div class="term-body" id="tb_hybrid"></div>
     </div>
 
     <!-- Terminal: YouTube invisible -->
     <div class="term" id="term_yt">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentAnalysis.js</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — YouTube arrays</span></div>
       <div class="term-body" id="tb_yt"></div>
     </div>
 
     <!-- Terminal: News orgs -->
     <div class="term" id="term_news">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentimentAnalysis.js — newsOrgs</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — newsOrgs</span></div>
       <div class="term-body" id="tb_news"></div>
     </div>
 
     <!-- Terminal: Ship -->
     <div class="term" id="term_ship">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">git log — Feb 16-18</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">coinrotatordev — git log</span></div>
       <div class="term-body" id="tb_ship"></div>
     </div>
 
@@ -367,12 +376,13 @@ var scenes = [
     label:'', narr:'' },
 ];
 
-var current = -1, running = false;
+var current = -1, running = false, timer = null;
 var total = scenes.length;
 
 function clearAll() {
   document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
   document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.line-reveal').forEach(function(r) { r.classList.remove('show'); });
 }
 
 function showNarr(label, html) {
@@ -389,14 +399,14 @@ function showNarr(label, html) {
 
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
-  running = true; nextScene();
+  running = true; showScene(0);
 }
 
-function nextScene() {
-  if (!running) return;
+function showScene(idx) {
+  if (timer) clearTimeout(timer);
+  if (idx < 0 || idx >= total) { running = false; showNarr('',''); return; }
   clearAll();
-  current++;
-  if (current >= total) { running = false; showNarr('',''); return; }
+  current = idx;
   var s = scenes[current];
   document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
   document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
@@ -434,11 +444,20 @@ function nextScene() {
     });
   }
 
-  setTimeout(nextScene, s.dur);
+  timer = setTimeout(function() { showScene(current + 1); }, s.dur);
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+  if (e.code === 'Space') { e.preventDefault(); if (current < 0) startFilm(); }
+  if (e.code === 'ArrowRight' && running) { e.preventDefault(); showScene(current + 1); }
+  if (e.code === 'ArrowLeft' && running) { e.preventDefault(); showScene(current - 1); }
+});
+
+document.querySelector('.film').addEventListener('click', function(e) {
+  if (!running) return;
+  var x = e.clientX / window.innerWidth;
+  if (x < 0.33) showScene(current - 1);
+  else showScene(current + 1);
 });
 </script>
 </body>
