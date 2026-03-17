@@ -159,14 +159,14 @@
     /* ── FEATURED CARD ─────────────── */
     .featured {
       display: block;
-      padding: 28px;
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
+      padding: 24px;
+      background: #0D0D0C;
+      border: 1px solid rgba(212,168,67,0.3);
+      border-radius: 16px;
       text-decoration: none;
       color: var(--text);
       margin-bottom: 8px;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.2s, border-color 0.2s;
       position: relative;
       overflow: hidden;
     }
@@ -178,8 +178,8 @@
       background: var(--accent);
     }
     .featured:hover {
-      background: var(--surface-hover);
-      transform: translateX(2px);
+      background: rgba(255,255,255,0.02);
+      border-color: rgba(212,168,67,0.5);
     }
     .featured-eyebrow {
       font-family: 'Space Mono', monospace;
@@ -212,11 +212,12 @@
       padding-left: 2px;
     }
 
-    /* ── STUDY CARDS ────────────────── */
+    /* ── STUDY LIST ─────────────────── */
     .studies {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      border: 1px solid rgba(42,37,32,0.6);
+      border-radius: 16px;
+      background: #0D0D0C;
+      overflow: hidden;
       margin-bottom: 64px;
     }
 
@@ -225,16 +226,15 @@
       grid-template-columns: 44px 1fr auto;
       align-items: center;
       gap: 20px;
-      padding: 20px 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      padding: 16px 24px;
       text-decoration: none;
       color: var(--text);
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      transition: background 0.2s;
       position: relative;
-      overflow: hidden;
+      border-bottom: 1px solid rgba(42,37,32,0.5);
     }
+
+    .study-card:last-child { border-bottom: none; }
 
     .study-card::before {
       content: '';
@@ -246,9 +246,7 @@
     }
 
     .study-card:hover {
-      border-color: var(--border-hover);
-      background: var(--surface-hover);
-      transform: translateX(2px);
+      background: rgba(255,255,255,0.02);
     }
 
     .study-card:hover::before { opacity: 1; }
