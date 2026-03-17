@@ -344,12 +344,14 @@ var scenes = [
     label:'', narr:'' },
 ];
 
-var current = -1, running = false;
+var current = -1, running = false, timer = null;
 var total = scenes.length;
 
 function clearAll() {
   document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
   document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+  // reset line-reveal states so re-visiting a scene replays animations
+  document.querySelectorAll('.line-reveal').forEach(function(r) { r.classList.remove('show'); });
 }
 
 function showNarr(label, html) {
@@ -366,14 +368,14 @@ function showNarr(label, html) {
 
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
-  running = true; nextScene();
+  running = true; showScene(0);
 }
 
-function nextScene() {
-  if (!running) return;
+function showScene(idx) {
+  if (timer) clearTimeout(timer);
+  if (idx < 0 || idx >= total) { running = false; showNarr('',''); return; }
   clearAll();
-  current++;
-  if (current >= total) { running = false; showNarr('',''); return; }
+  current = idx;
   var s = scenes[current];
   document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
   document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
@@ -411,11 +413,21 @@ function nextScene() {
     });
   }
 
-  setTimeout(nextScene, s.dur);
+  timer = setTimeout(function() { showScene(current + 1); }, s.dur);
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+  if (e.code === 'Space') { e.preventDefault(); if (current < 0) startFilm(); }
+  if (e.code === 'ArrowRight' && running) { e.preventDefault(); showScene(current + 1); }
+  if (e.code === 'ArrowLeft' && running) { e.preventDefault(); showScene(current - 1); }
+});
+
+// tap/click navigation: left third = back, right two-thirds = forward
+document.querySelector('.film').addEventListener('click', function(e) {
+  if (!running) return;
+  var x = e.clientX / window.innerWidth;
+  if (x < 0.33) showScene(current - 1);
+  else showScene(current + 1);
 });
 </script>
 </body>
