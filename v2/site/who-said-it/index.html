@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 005 — Who Said It</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  /* ── TOP: TERMINAL DEMO ──────────────────── */
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 48px 24px; position: relative;
+  }
+
+  .term {
+    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    width: 100%; max-width: 960px; overflow: hidden;
+    position: absolute; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
+    border-bottom: 1px solid #1E1E22;
+  }
+  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.1; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #27272A; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #3F3F46; font-style: italic; }
+
+  /* Title card */
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 40px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* Recording badge */
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── BOTTOM: NARRATION ───────────────────── */
+  .narration-area {
+    height: 160px; flex-shrink: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 16px 48px 48px; text-align: center;
+    border-top: 1px solid #1E1E22;
+  }
+
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  /* ── PLAYER BAR ──────────────────────────── */
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  /* ── START SCREEN ────────────────────────── */
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 005</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title cards -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 005</div>
+      <div class="title-big line-reveal">Who Said It<span class="sub">Four tests. One signal. One endpoint.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_handoff">
+      <div class="title-quote line-reveal">"fix the crossref script params<br>and run it"</div>
+    </div>
+
+    <div class="title-card" id="tc_pivot">
+      <div class="title-quote line-reveal">"surely there are more promising<br>avenues with our datasets?"</div>
+    </div>
+
+    <div class="title-card" id="tc_fail1">
+      <div class="title-big line-reveal" style="color:#C45B4F;font-size:44px">Market-level sentiment<br>does not predict returns.</div>
+    </div>
+
+    <div class="title-card" id="tc_finding">
+      <div class="title-big line-reveal" style="font-size:44px">It's not <span style="color:#C45B4F">what</span> was said.<br>It's <span style="color:#D4A843">who</span> said it.</div>
+    </div>
+
+    <div class="title-card" id="tc_principle">
+      <div class="title-quote line-reveal" style="color:#C45B4F">"everything should target discovering<br>profitable or hyper useful endpoints.<br>everything else is secondary."</div>
+    </div>
+
+    <div class="title-card" id="tc_ship">
+      <div class="title-big line-reveal">Four tests.<br>Three discards.<br>One endpoint.</div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <div class="title-mono line-reveal">END OF STUDY</div>
+      <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
+    </div>
+
+    <!-- Terminal: param bugs -->
+    <div class="term" id="term_bugs">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">scripts/count_signals_overlap.js</span></div>
+      <div class="term-body" id="tb_bugs"></div>
+    </div>
+
+    <!-- Terminal: crossref result -->
+    <div class="term" id="term_crossref">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentiment_crossref.js — permutation test</span></div>
+      <div class="term-body" id="tb_crossref"></div>
+    </div>
+
+    <!-- Terminal: market extremes FAIL -->
+    <div class="term" id="term_mkt">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">market_sentiment_extremes.js</span></div>
+      <div class="term-body" id="tb_mkt"></div>
+    </div>
+
+    <!-- Terminal: tier divergence PASS -->
+    <div class="term" id="term_tier">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentiment_tier_divergence.js — permutation test</span></div>
+      <div class="term-body" id="tb_tier"></div>
+    </div>
+
+    <!-- Terminal: the buckets -->
+    <div class="term" id="term_buckets">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">10d forward returns by divergence tercile</span></div>
+      <div class="term-body" id="tb_buckets"></div>
+    </div>
+
+    <!-- Terminal: velocity FAIL -->
+    <div class="term" id="term_vel">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentiment_velocity.js</span></div>
+      <div class="term-body" id="tb_vel"></div>
+    </div>
+
+    <!-- Terminal: scorecard -->
+    <div class="term" id="term_score">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">research scorecard</span></div>
+      <div class="term-body" id="tb_score"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4000,
+    label:'', narr:'An unedited Claude Code session.' },
+
+  // ACT 2: THE HANDOFF
+  { title:'tc_handoff', dur:3500, sound:'notification',
+    label:'HANDOFF', narr:'Previous session left a note. <span class="hi">Five minutes, if you read the gotchas.</span>' },
+
+  // ACT 3: THREE PARAM BUGS
+  { term:'term_bugs', tb:'tb_bugs', dur:6000, lines:[
+    '<span class="t-tool">  ⏵ Read</span> <span class="t-cmd">scripts/count_signals_overlap.js</span>',
+    '<span class="t-tool">  ⏵ Read</span> <span class="t-cmd">scripts/sentiment_crossref.js</span>',
+    '',
+    '<span class="t-red" style="text-decoration:line-through">  htfAggregation: \'week\'</span> <span class="t-dim">→</span> <span class="t-ok">htfAggregation: 5</span>  <span class="t-comment">← silent zero</span>',
+    '<span class="t-red" style="text-decoration:line-through">  startDate: \'2025-09-01\'</span> <span class="t-dim">→</span> <span class="t-ok">startDate: \'2021-01-01\'</span>  <span class="t-comment">← no warmup</span>',
+    '<span class="t-red" style="text-decoration:line-through">  endDate: \'2026-02-11\'</span> <span class="t-dim">→</span> <span class="t-ok">endDate: \'2026-03-17\'</span>  <span class="t-comment">← 5 weeks short</span>',
+  ], label:'THREE BUGS', narr:'Three params wrong. The string <span class="red">\'week\'</span> silently produced zero signals.', rec:true },
+
+  // ACT 4: CROSSREF — MARGINAL
+  { term:'term_crossref', tb:'tb_crossref', dur:5500, lines:[
+    '<span class="t-out">  PERMUTATION TEST (1000 iterations, de-clustered)</span>',
+    '',
+    '<span class="t-out">   5d: lift=-1.7pp  p=0.808  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '<span class="t-out">  10d: lift=-19.9pp p=0.064  </span><span class="t-warn">MARGINAL</span>',
+    '<span class="t-out">  14d: lift=-20.3pp p=0.033  </span><span class="t-ok">SIGNIFICANT</span> <span class="t-dim">← but n=11</span>',
+    '',
+    '<span class="t-warn">  MARGINAL: suggestive but not conclusive</span>',
+  ], label:'CROSSREF', narr:'Contrarian direction is right. But <span class="red">n=11</span> is too thin to trust.' },
+
+  // ACT 5: THE PIVOT
+  { title:'tc_pivot', dur:3500, sound:'notification',
+    label:'PROMPT', narr:'<span class="hi">165,000 sentiment items.</span> There has to be more signal in here.' },
+
+  // ACT 6: MARKET EXTREMES — FAIL
+  { term:'term_mkt', tb:'tb_mkt', dur:5500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/market_sentiment_extremes.js</span>',
+    '',
+    '<span class="t-out">  184 days, 169 items/day, quintile analysis</span>',
+    '',
+    '<span class="t-out">   5d: Q1-Q5 spread=-1.2pp  p=0.416  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '<span class="t-out">  10d: Q1-Q5 spread=+1.0pp  p=0.621  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '<span class="t-out">  14d: Q1-Q5 spread=+2.2pp  p=0.343  </span><span class="t-red">NOT SIGNIFICANT</span>',
+  ], label:'TEST 1 OF 3', narr:'Market-level sentiment: <span class="red">no signal at any horizon.</span>' },
+
+  { title:'tc_fail1', dur:3000, sound:'caution',
+    label:'DISCARD', narr:'Ranked #1 most promising. <span class="red">Failed.</span>' },
+
+  // ACT 7: THE FINDING — TITLE CARD
+  { title:'tc_finding', dur:4000, sound:'notification',
+    label:'HYPOTHESIS', narr:'Split sources into institutional and social. <span class="hi">Measure the disagreement.</span>' },
+
+  // ACT 8: TIER DIVERGENCE — PASS
+  { term:'term_tier', tb:'tb_tier', dur:5500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/sentiment_tier_divergence.js</span>',
+    '',
+    '<span class="t-out">  184 days, 44 inst items/day, 125 social items/day</span>',
+    '',
+    '<span class="t-out">   5d: T3-T1 spread=+1.5pp  p=0.147  </span><span class="t-out">NOT SIGNIFICANT</span>',
+    '<span class="t-ok">  10d: T3-T1 spread=+3.2pp  p=0.033  SIGNIFICANT (p&lt;0.05)</span>',
+    '<span class="t-out">  14d: T3-T1 spread=+1.8pp  p=0.322  </span><span class="t-out">NOT SIGNIFICANT</span>',
+  ], label:'TEST 2 OF 3', narr:'Institutional leadership predicts <span class="hi">10-day BTC returns. p=0.033.</span>' },
+
+  // ACT 9: THE DATA
+  { term:'term_buckets', tb:'tb_buckets', dur:6000, lines:[
+    '<span class="t-out">  Tercile            n   BTC mean   WR>0</span>',
+    '<span class="t-dim">  ────────────────────────────────────────</span>',
+    '<span class="t-red">  Social > Inst      38    -4.9%     26%</span>  <span class="t-comment">← worst</span>',
+    '<span class="t-out">  Aligned            51    -2.9%     35%</span>',
+    '<span class="t-ok">  Inst > Social      51    -2.1%     41%</span>  <span class="t-comment">← best</span>',
+    '',
+    '<span class="t-warn">  When social panics but institutions don\'t: buy.</span>',
+  ], label:'SMART MONEY', narr:'Social euphoria without institutional backing is <span class="red">fragile.</span>' },
+
+  // ACT 10: VELOCITY — FAIL
+  { term:'term_vel', tb:'tb_vel', dur:4500, lines:[
+    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/sentiment_velocity.js</span>',
+    '',
+    '<span class="t-out">  3d velocity: best p=0.196  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '<span class="t-out">  7d velocity: best p=0.255  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '',
+    '<span class="t-red">  NO SIGNAL. No endpoint.</span>',
+  ], label:'TEST 3 OF 3', narr:'How fast sentiment changes: <span class="red">doesn\'t matter.</span>' },
+
+  // ACT 11: THE PRINCIPLE
+  { title:'tc_principle', dur:4500, sound:'caution',
+    label:'CORRECTION', narr:'' },
+
+  // ACT 12: SCORECARD
+  { term:'term_score', tb:'tb_score', dur:6500, lines:[
+    '<span class="t-out">  Test                    p-value   Endpoint?</span>',
+    '<span class="t-dim">  ──────────────────────────────────────────────</span>',
+    '<span class="t-warn">  Per-coin crossref       0.033     revisit Sep 2026</span>',
+    '<span class="t-red">  Market-level extremes   0.343     DISCARD</span>',
+    '<span class="t-ok">  Source tier divergence  0.033     /api/sentiment/tier-divergence</span>',
+    '<span class="t-red">  Sentiment velocity      0.196     DISCARD</span>',
+    '',
+    '<span class="t-ok">  Gate 1 passed → scope endpoint → forward-test 90 days</span>',
+  ], label:'SCORECARD', narr:'One endpoint candidate. <span class="hi">Research exists to ship.</span>', sound:'celebration' },
+
+  // ACT 13: SHIP
+  { title:'tc_ship', dur:4000,
+    label:'', narr:'It\'s not what was said. It\'s who said it.' },
+
+  { title:'tc_end', dur:4000,
+    label:'', narr:'' },
+];
+
+var current = -1, running = false;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; nextScene();
+}
+
+function nextScene() {
+  if (!running) return;
+  clearAll();
+  current++;
+  if (current >= total) { running = false; showNarr('',''); return; }
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+
+  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  setTimeout(nextScene, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code==='Space') { e.preventDefault(); if (current<0) startFilm(); }
+});
+</script>
+</body>
+</html>
