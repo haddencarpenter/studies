@@ -35,10 +35,55 @@
       scroll-behavior: smooth;
     }
 
+    /* ── SITE HEADER ────────────────── */
+    .site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(17,15,13,0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28);
+    }
+    .site-header-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--text);
+      font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+      transition: color 0.2s;
+    }
+    .site-header-logo:hover { color: var(--accent); }
+    .site-header-logo img { width: 36px; height: 36px; object-fit: contain; }
+    .site-header-nav {
+      display: flex; align-items: center; gap: 32px;
+    }
+    .site-header-nav a {
+      font-size: 14px; color: var(--text-secondary); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .site-header-nav a:hover { color: var(--text); }
+    .site-header-nav a.active { color: var(--text); }
+    .site-header-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 14px; font-weight: 500; color: var(--accent);
+      text-decoration: none;
+      padding: 6px 14px;
+      border: 1px solid rgba(212,168,67,0.5);
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    .site-header-cta:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+    @media (max-width: 640px) {
+      .site-header-nav { display: none; }
+    }
+
     .page {
       max-width: 760px;
       margin: 0 auto;
-      padding: 80px 32px 120px;
+      padding: 100px 32px 120px;
     }
 
     /* ── HEADER ─────────────────────── */
@@ -313,18 +358,28 @@
   </style>
 </head>
 <body>
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <a href="https://shumi.ai" class="site-header-logo">
+      <img src="https://shumi-landing.onrender.com/images/shumi.webp" alt="Shumi">
+      <span>Shumi</span>
+    </a>
+    <nav class="site-header-nav">
+      <a href="https://shumi.ai/#query">Query</a>
+      <a href="https://shumi.ai/#modes">Modes</a>
+      <a href="#" class="active">Studies</a>
+      <a href="https://shumi.ai/#builders">Developers</a>
+    </nav>
+    <a href="https://shumi.ai/app" class="site-header-cta">Open App →</a>
+  </header>
+
   <div class="page">
 
     <!-- HEADER -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:48px">
-      <div>
-        <div class="eyebrow">Studies</div>
-        <h1>Proof of Work.</h1>
-        <p class="subtitle">Research sessions, benchmarks, and signal discoveries. Methodology included. Failures published.</p>
-        <div class="byline">by <a href="https://x.com/coinrotatordev" target="_blank">coinrotatordev</a></div>
-      </div>
-      <a href="https://shumi.ai" style="font-size:20px;font-weight:500;color:var(--text-muted);text-decoration:none;transition:color 0.2s;white-space:nowrap;margin-left:32px" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">shumi.ai</a>
-    </div>
+    <div class="eyebrow">Studies</div>
+    <h1>Proof of Work.</h1>
+    <p class="subtitle">Research sessions, benchmarks, and signal discoveries. Methodology included. Failures published.</p>
+    <div class="byline">by <a href="https://x.com/coinrotatordev" target="_blank">coinrotatordev</a></div>
 
     <!-- JUMPLINKS -->
     <div class="jumplinks">
