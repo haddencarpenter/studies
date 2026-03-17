@@ -69,7 +69,12 @@
   #tc_end { inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
   /* ── PHYSARUM BLAST + PULSE ────────────────── */
-  #physarum { opacity: 0; transform: scale(1.3) translateY(22%); filter: brightness(1); transition: none; mix-blend-mode: screen; }
+  #physarum {
+    opacity: 0; transform: scale(1.3) translateY(22%); filter: brightness(1); transition: none;
+    mix-blend-mode: screen;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 65%);
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 65%);
+  }
   #physarum.blast {
     animation: physBlast 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
                physPulse 4s ease-in-out 2.5s infinite;
@@ -189,8 +194,7 @@
 
     <div class="title-card" id="tc_end">
       <iframe id="physarum" src="about:blank" style="position:absolute;inset:0;width:100%;height:100%;border:0;z-index:0;pointer-events:none" allow="autoplay" loading="lazy"></iframe>
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 30%, #09090B 75%);z-index:1;pointer-events:none"></div>
-      <div style="position:absolute;bottom:15%;left:0;right:0;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px">
+      <div style="position:absolute;bottom:15%;left:0;right:0;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px">
         <div class="line-reveal" style="font-size:36px;font-weight:500;color:#E8E4DE;letter-spacing:-0.01em">shumi.ai</div>
       </div>
     </div>
