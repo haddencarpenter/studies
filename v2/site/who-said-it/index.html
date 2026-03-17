@@ -23,20 +23,28 @@
   }
 
   .term {
-    background: #0C0C0E; border: 1px solid #1E1E22; border-radius: 8px;
+    background: #1C1C1E; border: 1px solid #3A3A3C; border-radius: 10px;
     width: 100%; max-width: 960px; overflow: hidden;
     position: absolute; opacity: 0; transition: opacity 0.6s ease;
     pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.3);
   }
   .term.active { opacity: 1; pointer-events: auto; }
 
   .term-bar {
-    display: flex; align-items: center; gap: 8px; padding: 14px 18px;
-    border-bottom: 1px solid #1E1E22;
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    border-bottom: 1px solid #2A2A2C;
+    background: #28282A; position: relative;
   }
-  .term-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #27272A; margin-left: 12px; }
-  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.1; }
+  .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .term-dot:nth-child(1) { background: #FF5F57 !important; }
+  .term-dot:nth-child(2) { background: #FEBC2E !important; }
+  .term-dot:nth-child(3) { background: #28C840 !important; }
+  .term-title {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #5A5A5E;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .term-body { padding: 20px 24px; font-family: 'Geist Mono', monospace; font-size: 14px; line-height: 2.0; }
   .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
   .term-line.show { opacity: 1; transform: translateY(0); }
 
@@ -260,7 +268,7 @@ var scenes = [
     label:'', narr:'Every trader\'s first AI idea. <span class="hi">Nobody ships it.</span>' },
 
   // ACT 3: THE DATASET
-  { term:'term_data', tb:'tb_data', dur:5500, lines:[
+  { term:'term_data', tb:'tb_data', dur:6500, lines:[
     '<span class="t-out">  sentiment pipeline — 6 months</span>',
     '',
     '<span class="t-out">  items:    <span class="t-warn">165,438</span></span>',
@@ -293,12 +301,11 @@ var scenes = [
 
   // ACT 6: MARKET EXTREMES — FAIL
   { term:'term_mkt', tb:'tb_mkt', dur:5500, lines:[
-    '<span class="t-out">  TEST: sort all 184 days by aggregate sentiment</span>',
-    '<span class="t-out">  quintile buckets — most bullish vs most bearish</span>',
+    '<span class="t-out">  TEST: rank all 184 days by sentiment — do the extremes predict anything?</span>',
     '',
-    '<span class="t-out">   5d: Q1−Q5 spread=−1.2pp  p=0.416  </span><span class="t-red">NOTHING</span>',
-    '<span class="t-out">  10d: Q1−Q5 spread=+1.0pp  p=0.621  </span><span class="t-red">NOTHING</span>',
-    '<span class="t-out">  14d: Q1−Q5 spread=+2.2pp  p=0.343  </span><span class="t-red">NOTHING</span>',
+    '<span class="t-out">  after 5 days:   <span class="t-red">no difference</span></span>     <span class="t-dim">(p=0.416)</span>',
+    '<span class="t-out">  after 10 days:  <span class="t-red">no difference</span></span>     <span class="t-dim">(p=0.621)</span>',
+    '<span class="t-out">  after 14 days:  <span class="t-red">no difference</span></span>     <span class="t-dim">(p=0.343)</span>',
   ], label:'TEST 2 OF 4', narr:'The most optimistic day produces the same returns as the most pessimistic. <span class="red">Mood is not signal.</span>' },
 
   // FAIL TITLE
@@ -314,13 +321,15 @@ var scenes = [
     label:'', narr:'' },
 
   // ACT 9: TIER DIVERGENCE — PASS
-  { term:'term_tier', tb:'tb_tier', dur:6000, lines:[
+  { term:'term_tier', tb:'tb_tier', dur:6500, lines:[
     '<span class="t-out">  institutional:  44 items/day</span>  <span class="t-dim">(Reuters, Bloomberg, The Block)</span>',
     '<span class="t-out">  social:        125 items/day</span>  <span class="t-dim">(Twitter, Reddit, YouTube)</span>',
     '',
-    '<span class="t-out">   5d: T3−T1 spread=+1.5pp  p=0.147  </span><span class="t-out">NO</span>',
-    '<span class="t-ok">  10d: T3−T1 spread=+3.2pp  p=0.033  SIGNIFICANT</span>',
-    '<span class="t-out">  14d: T3−T1 spread=+1.8pp  p=0.322  </span><span class="t-out">NO</span>',
+    '<span class="t-out">  TEST: when they disagree, who\'s right?</span>',
+    '',
+    '<span class="t-out">  after 5 days:   <span class="t-out">no</span></span>              <span class="t-dim">(p=0.147)</span>',
+    '<span class="t-ok">  after 10 days:  SIGNIFICANT</span>       <span class="t-dim">(p=0.033)</span>',
+    '<span class="t-out">  after 14 days:  <span class="t-out">no</span></span>              <span class="t-dim">(p=0.322)</span>',
   ], label:'TEST 3 OF 4', narr:'The crowd is <span class="red">3x louder</span>. The signal is <span class="hi">quiet.</span>' },
 
   // ACT 10: THE TABLE
@@ -332,7 +341,7 @@ var scenes = [
     '<span class="t-ok">  Institutions lead   n=51    mean −2.1%    WR 41%</span>  <span class="t-comment">← smart money moves first</span>',
     '',
     '<span class="t-warn">  When Twitter panics and Bloomberg doesn\'t — buy.</span>',
-  ], label:'THE SPLIT', narr:'Twitter celebrates alone: <span class="red">drops 74% of the time.</span> The party nobody credible attended.' },
+  ], label:'THE SPLIT', narr:'The party nobody credible attended. <span class="red">Drops 74% of the time.</span>' },
 
   // ACT 11: VELOCITY — FAIL
   { term:'term_vel', tb:'tb_vel', dur:4500, lines:[
