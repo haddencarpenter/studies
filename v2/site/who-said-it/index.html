@@ -73,8 +73,8 @@
   #physarum {
     opacity: 0; transform: scale(1.3) translateY(22%); filter: brightness(1); transition: none;
     mix-blend-mode: screen;
-    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 65%);
-    mask-image: radial-gradient(ellipse at center, black 20%, transparent 65%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
   }
   #physarum.blast {
     animation: physBlast 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
@@ -413,8 +413,9 @@ function showScene(idx) {
   document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
   document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
 
-  if (current >= 1 && current <= 3) document.getElementById('recBadge').classList.add('show');
-  else document.getElementById('recBadge').classList.remove('show');
+  var rb = document.getElementById('recBadge');
+  if (current >= 1 && current <= 3) { rb.classList.add('show'); rb.style.display = ''; }
+  else { rb.classList.remove('show'); rb.style.display = 'none'; }
 
   try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
   if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
@@ -431,6 +432,15 @@ function showScene(idx) {
   // blast physarum on end card
   if (s.title === 'tc_end') {
     phys.classList.add('blast');
+    // trigger physarum network expansion via postMessage
+    if (phys.contentWindow) {
+      phys.contentWindow.postMessage({ type: 'blast', active: true }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'speed', value: 13 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'trailBright', value: 3.0 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'deposit', value: 22 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'MS', key: 'speed', value: 6 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'MS', key: 'trailBright', value: 1.8 }, '*');
+    }
   } else {
     phys.classList.remove('blast');
   }
