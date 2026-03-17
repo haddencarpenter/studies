@@ -139,27 +139,23 @@
     <!-- Title cards -->
     <div class="title-card" id="tc0">
       <div class="title-mono line-reveal">STUDY 005</div>
-      <div class="title-big line-reveal">Who Said It<span class="sub">Four tests. One signal. One endpoint.</span></div>
+      <div class="title-big line-reveal">Who Said It<span class="sub">165,000 headlines. One question.</span></div>
     </div>
 
-    <div class="title-card" id="tc_handoff">
-      <div class="title-quote line-reveal">"fix the crossref script params<br>and run it"</div>
-    </div>
-
-    <div class="title-card" id="tc_pivot">
-      <div class="title-quote line-reveal">"surely there are more promising<br>avenues with our datasets?"</div>
+    <div class="title-card" id="tc_question">
+      <div class="title-quote line-reveal">"Does news sentiment<br>predict crypto prices?"</div>
     </div>
 
     <div class="title-card" id="tc_fail1">
-      <div class="title-big line-reveal" style="color:#C45B4F;font-size:44px">Market-level sentiment<br>does not predict returns.</div>
+      <div class="title-big line-reveal" style="color:#C45B4F;font-size:44px">165,000 headlines.<br>Zero edge.</div>
+    </div>
+
+    <div class="title-card" id="tc_pivot">
+      <div class="title-quote line-reveal">"We're averaging Bloomberg<br>with @CryptoMoonShot69"</div>
     </div>
 
     <div class="title-card" id="tc_finding">
       <div class="title-big line-reveal" style="font-size:44px">It's not <span style="color:#C45B4F">what</span> was said.<br>It's <span style="color:#D4A843">who</span> said it.</div>
-    </div>
-
-    <div class="title-card" id="tc_principle">
-      <div class="title-quote line-reveal" style="color:#C45B4F">"everything should target discovering<br>profitable or hyper useful endpoints.<br>everything else is secondary."</div>
     </div>
 
     <div class="title-card" id="tc_ship">
@@ -171,9 +167,15 @@
       <div style="color:#27272A;margin-top:16px;font-size:20px" class="line-reveal">shumi.ai</div>
     </div>
 
+    <!-- Terminal: the dataset -->
+    <div class="term" id="term_data">
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">sentiment pipeline — overview</span></div>
+      <div class="term-body" id="tb_data"></div>
+    </div>
+
     <!-- Terminal: param bugs -->
     <div class="term" id="term_bugs">
-      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">scripts/count_signals_overlap.js</span></div>
+      <div class="term-bar"><div class="term-dot" style="background:#C45B4F"></div><div class="term-dot" style="background:#D4A843"></div><div class="term-dot" style="background:#5CB87A"></div><span class="term-title">scripts/sentiment_crossref.js</span></div>
       <div class="term-body" id="tb_bugs"></div>
     </div>
 
@@ -230,106 +232,113 @@ var snd = new Snd(); snd.load(Snd.KITS.SND01);
 var scenes = [
   // ACT 1: TITLE
   { title:'tc0', dur:4000,
-    label:'', narr:'An unedited Claude Code session.' },
+    label:'', narr:'' },
 
-  // ACT 2: THE HANDOFF
-  { title:'tc_handoff', dur:3500, sound:'notification',
-    label:'HANDOFF', narr:'Previous session left a note. <span class="hi">Five minutes, if you read the gotchas.</span>' },
+  // ACT 2: THE QUESTION
+  { title:'tc_question', dur:3500, sound:'notification',
+    label:'', narr:'Every trader\'s first AI idea. <span class="hi">Nobody ships it.</span>' },
 
-  // ACT 3: THREE PARAM BUGS
-  { term:'term_bugs', tb:'tb_bugs', dur:6000, lines:[
-    '<span class="t-tool">  ⏵ Read</span> <span class="t-cmd">scripts/count_signals_overlap.js</span>',
+  // ACT 3: THE DATASET
+  { term:'term_data', tb:'tb_data', dur:5500, lines:[
+    '<span class="t-out">  sentiment pipeline — 6 months</span>',
+    '',
+    '<span class="t-out">  items:    <span class="t-warn">165,438</span></span>',
+    '<span class="t-out">  days:     184</span>',
+    '<span class="t-out">  sources:  CoinDesk, Bloomberg, Reuters, The Block,</span>',
+    '<span class="t-out">            @trader_xyz, @CryptoWhale, Reddit, YouTube...</span>',
+    '',
+    '<span class="t-dim">  all scored −1 to +1. all in one bucket.</span>',
+  ], label:'THE DATA', narr:'Bloomberg and anonymous Twitter accounts. <span class="hi">Same weight.</span>', rec:true },
+
+  // ACT 4: HOUSEKEEPING
+  { term:'term_bugs', tb:'tb_bugs', dur:4500, lines:[
     '<span class="t-tool">  ⏵ Read</span> <span class="t-cmd">scripts/sentiment_crossref.js</span>',
     '',
-    '<span class="t-red" style="text-decoration:line-through">  htfAggregation: \'week\'</span> <span class="t-dim">→</span> <span class="t-ok">htfAggregation: 5</span>  <span class="t-comment">← silent zero</span>',
-    '<span class="t-red" style="text-decoration:line-through">  startDate: \'2025-09-01\'</span> <span class="t-dim">→</span> <span class="t-ok">startDate: \'2021-01-01\'</span>  <span class="t-comment">← no warmup</span>',
-    '<span class="t-red" style="text-decoration:line-through">  endDate: \'2026-02-11\'</span> <span class="t-dim">→</span> <span class="t-ok">endDate: \'2026-03-17\'</span>  <span class="t-comment">← 5 weeks short</span>',
-  ], label:'THREE BUGS', narr:'Three params wrong. The string <span class="red">\'week\'</span> silently produced zero signals.', rec:true },
+    '<span class="t-red" style="text-decoration:line-through">  htfAggregation: \'week\'</span> <span class="t-dim">→</span> <span class="t-ok">5</span>  <span class="t-comment">← string, not number. silent zero.</span>',
+    '<span class="t-red" style="text-decoration:line-through">  startDate: \'2025-09-01\'</span> <span class="t-dim">→</span> <span class="t-ok">\'2021-01-01\'</span>  <span class="t-comment">← 4 years of warmup missing</span>',
+    '<span class="t-red" style="text-decoration:line-through">  endDate: \'2026-02-11\'</span> <span class="t-dim">→</span> <span class="t-ok">\'2026-03-17\'</span>  <span class="t-comment">← 5 weeks short</span>',
+  ], label:'HOUSEKEEPING', narr:'Three bugs from the last session. The word <span class="red">\'week\'</span> produced zero signals.' },
 
-  // ACT 4: CROSSREF — MARGINAL
+  // ACT 5: CROSSREF — THIN
   { term:'term_crossref', tb:'tb_crossref', dur:5500, lines:[
-    '<span class="t-out">  PERMUTATION TEST (1000 iterations, de-clustered)</span>',
+    '<span class="t-out">  TEST: when bearish headlines spike, do prices drop?</span>',
+    '<span class="t-out">  permutation test — 1000 iterations, de-clustered</span>',
     '',
-    '<span class="t-out">   5d: lift=-1.7pp  p=0.808  </span><span class="t-red">NOT SIGNIFICANT</span>',
-    '<span class="t-out">  10d: lift=-19.9pp p=0.064  </span><span class="t-warn">MARGINAL</span>',
-    '<span class="t-out">  14d: lift=-20.3pp p=0.033  </span><span class="t-ok">SIGNIFICANT</span> <span class="t-dim">← but n=11</span>',
+    '<span class="t-out">   5d: lift=−1.7pp  p=0.808  </span><span class="t-red">NO</span>',
+    '<span class="t-out">  10d: lift=−19.9pp p=0.064  </span><span class="t-warn">MAYBE</span>',
+    '<span class="t-out">  14d: lift=−20.3pp p=0.033  </span><span class="t-ok">YES</span> <span class="t-dim">← but only 11 events</span>',
     '',
-    '<span class="t-warn">  MARGINAL: suggestive but not conclusive</span>',
-  ], label:'CROSSREF', narr:'Contrarian direction is right. But <span class="red">n=11</span> is too thin to trust.' },
-
-  // ACT 5: THE PIVOT
-  { title:'tc_pivot', dur:3500, sound:'notification',
-    label:'PROMPT', narr:'<span class="hi">165,000 sentiment items.</span> There has to be more signal in here.' },
+    '<span class="t-warn">  Direction is right. Sample is too thin to ship.</span>',
+  ], label:'TEST 1 OF 4', narr:'Right direction, wrong sample size. <span class="red">11 data points is a coin flip with extra steps.</span>' },
 
   // ACT 6: MARKET EXTREMES — FAIL
   { term:'term_mkt', tb:'tb_mkt', dur:5500, lines:[
-    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/market_sentiment_extremes.js</span>',
+    '<span class="t-out">  TEST: sort all 184 days by aggregate sentiment</span>',
+    '<span class="t-out">  quintile buckets — most bullish vs most bearish</span>',
     '',
-    '<span class="t-out">  184 days, 169 items/day, quintile analysis</span>',
-    '',
-    '<span class="t-out">   5d: Q1-Q5 spread=-1.2pp  p=0.416  </span><span class="t-red">NOT SIGNIFICANT</span>',
-    '<span class="t-out">  10d: Q1-Q5 spread=+1.0pp  p=0.621  </span><span class="t-red">NOT SIGNIFICANT</span>',
-    '<span class="t-out">  14d: Q1-Q5 spread=+2.2pp  p=0.343  </span><span class="t-red">NOT SIGNIFICANT</span>',
-  ], label:'TEST 1 OF 3', narr:'Market-level sentiment: <span class="red">no signal at any horizon.</span>' },
+    '<span class="t-out">   5d: Q1−Q5 spread=−1.2pp  p=0.416  </span><span class="t-red">NOTHING</span>',
+    '<span class="t-out">  10d: Q1−Q5 spread=+1.0pp  p=0.621  </span><span class="t-red">NOTHING</span>',
+    '<span class="t-out">  14d: Q1−Q5 spread=+2.2pp  p=0.343  </span><span class="t-red">NOTHING</span>',
+  ], label:'TEST 2 OF 4', narr:'The most optimistic day produces the same returns as the most pessimistic. <span class="red">Mood is not signal.</span>' },
 
+  // FAIL TITLE
   { title:'tc_fail1', dur:3000, sound:'caution',
-    label:'DISCARD', narr:'Ranked #1 most promising. <span class="red">Failed.</span>' },
+    label:'', narr:'Sentiment is a <span class="red">mirror</span>. Not a window.' },
 
-  // ACT 7: THE FINDING — TITLE CARD
+  // ACT 7: THE PIVOT
+  { title:'tc_pivot', dur:4000, sound:'notification',
+    label:'', narr:'The data isn\'t wrong. <span class="hi">The aggregation is.</span>' },
+
+  // ACT 8: THE IDEA
   { title:'tc_finding', dur:4000, sound:'notification',
-    label:'HYPOTHESIS', narr:'Split sources into institutional and social. <span class="hi">Measure the disagreement.</span>' },
+    label:'', narr:'' },
 
-  // ACT 8: TIER DIVERGENCE — PASS
-  { term:'term_tier', tb:'tb_tier', dur:5500, lines:[
-    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/sentiment_tier_divergence.js</span>',
+  // ACT 9: TIER DIVERGENCE — PASS
+  { term:'term_tier', tb:'tb_tier', dur:6000, lines:[
+    '<span class="t-out">  institutional:  44 items/day</span>  <span class="t-dim">(Reuters, Bloomberg, The Block)</span>',
+    '<span class="t-out">  social:        125 items/day</span>  <span class="t-dim">(Twitter, Reddit, YouTube)</span>',
     '',
-    '<span class="t-out">  184 days, 44 inst items/day, 125 social items/day</span>',
-    '',
-    '<span class="t-out">   5d: T3-T1 spread=+1.5pp  p=0.147  </span><span class="t-out">NOT SIGNIFICANT</span>',
-    '<span class="t-ok">  10d: T3-T1 spread=+3.2pp  p=0.033  SIGNIFICANT (p&lt;0.05)</span>',
-    '<span class="t-out">  14d: T3-T1 spread=+1.8pp  p=0.322  </span><span class="t-out">NOT SIGNIFICANT</span>',
-  ], label:'TEST 2 OF 3', narr:'Institutional leadership predicts <span class="hi">10-day BTC returns. p=0.033.</span>' },
+    '<span class="t-out">   5d: T3−T1 spread=+1.5pp  p=0.147  </span><span class="t-out">NO</span>',
+    '<span class="t-ok">  10d: T3−T1 spread=+3.2pp  p=0.033  SIGNIFICANT</span>',
+    '<span class="t-out">  14d: T3−T1 spread=+1.8pp  p=0.322  </span><span class="t-out">NO</span>',
+  ], label:'TEST 3 OF 4', narr:'The crowd is <span class="red">3x louder</span>. The signal is <span class="hi">quiet.</span>' },
 
-  // ACT 9: THE DATA
-  { term:'term_buckets', tb:'tb_buckets', dur:6000, lines:[
-    '<span class="t-out">  Tercile            n   BTC mean   WR>0</span>',
-    '<span class="t-dim">  ────────────────────────────────────────</span>',
-    '<span class="t-red">  Social > Inst      38    -4.9%     26%</span>  <span class="t-comment">← worst</span>',
-    '<span class="t-out">  Aligned            51    -2.9%     35%</span>',
-    '<span class="t-ok">  Inst > Social      51    -2.1%     41%</span>  <span class="t-comment">← best</span>',
+  // ACT 10: THE TABLE
+  { term:'term_buckets', tb:'tb_buckets', dur:6500, lines:[
+    '<span class="t-out">  10d forward BTC returns by who leads the narrative</span>',
+    '<span class="t-dim">  ────────────────────────────────────────────────────</span>',
+    '<span class="t-red">  Social leads        n=38    mean −4.9%    WR 26%</span>  <span class="t-comment">← crowd confident, smart money quiet</span>',
+    '<span class="t-out">  Aligned             n=51    mean −2.9%    WR 35%</span>',
+    '<span class="t-ok">  Institutions lead   n=51    mean −2.1%    WR 41%</span>  <span class="t-comment">← smart money moves first</span>',
     '',
-    '<span class="t-warn">  When social panics but institutions don\'t: buy.</span>',
-  ], label:'SMART MONEY', narr:'Social euphoria without institutional backing is <span class="red">fragile.</span>' },
+    '<span class="t-warn">  When Twitter panics and Bloomberg doesn\'t — buy.</span>',
+  ], label:'THE SPLIT', narr:'Twitter celebrates alone: <span class="red">drops 74% of the time.</span> The party nobody credible attended.' },
 
-  // ACT 10: VELOCITY — FAIL
+  // ACT 11: VELOCITY — FAIL
   { term:'term_vel', tb:'tb_vel', dur:4500, lines:[
-    '<span class="t-prompt">shumi</span> <span class="t-path">~/simulation-engine</span> <span class="t-caret">❯</span> <span class="t-cmd">node scripts/sentiment_velocity.js</span>',
+    '<span class="t-out">  TEST: does the speed of sentiment change matter?</span>',
     '',
-    '<span class="t-out">  3d velocity: best p=0.196  </span><span class="t-red">NOT SIGNIFICANT</span>',
-    '<span class="t-out">  7d velocity: best p=0.255  </span><span class="t-red">NOT SIGNIFICANT</span>',
+    '<span class="t-out">  3d velocity: best p=0.196  </span><span class="t-red">NO</span>',
+    '<span class="t-out">  7d velocity: best p=0.255  </span><span class="t-red">NO</span>',
     '',
-    '<span class="t-red">  NO SIGNAL. No endpoint.</span>',
-  ], label:'TEST 3 OF 3', narr:'How fast sentiment changes: <span class="red">doesn\'t matter.</span>' },
-
-  // ACT 11: THE PRINCIPLE
-  { title:'tc_principle', dur:4500, sound:'caution',
-    label:'CORRECTION', narr:'' },
+    '<span class="t-red">  Discarded. No endpoint.</span>',
+  ], label:'TEST 4 OF 4', narr:'The speed of the crowd\'s mood swings. <span class="red">Also noise.</span>' },
 
   // ACT 12: SCORECARD
   { term:'term_score', tb:'tb_score', dur:6500, lines:[
-    '<span class="t-out">  Test                    p-value   Endpoint?</span>',
+    '<span class="t-out">  Test                     p-value   Ship?</span>',
     '<span class="t-dim">  ──────────────────────────────────────────────</span>',
-    '<span class="t-warn">  Per-coin crossref       0.033     revisit Sep 2026</span>',
-    '<span class="t-red">  Market-level extremes   0.343     DISCARD</span>',
-    '<span class="t-ok">  Source tier divergence  0.033     /api/sentiment/tier-divergence</span>',
-    '<span class="t-red">  Sentiment velocity      0.196     DISCARD</span>',
+    '<span class="t-warn">  Per-coin crossref        0.033     revisit (n too low)</span>',
+    '<span class="t-red">  Market-level extremes    0.343     DISCARD</span>',
+    '<span class="t-ok">  Source tier divergence   0.033     /api/sentiment/tier-divergence</span>',
+    '<span class="t-red">  Sentiment velocity       0.196     DISCARD</span>',
     '',
-    '<span class="t-ok">  Gate 1 passed → scope endpoint → forward-test 90 days</span>',
-  ], label:'SCORECARD', narr:'One endpoint candidate. <span class="hi">Research exists to ship.</span>', sound:'celebration' },
+    '<span class="t-ok">  → forward-test 90 days before production</span>',
+  ], label:'SCORECARD', narr:'Three hypotheses killed. One endpoint born. <span class="hi">That\'s a good session.</span>', sound:'celebration' },
 
-  // ACT 13: SHIP
+  // END TITLES
   { title:'tc_ship', dur:4000,
-    label:'', narr:'It\'s not what was said. It\'s who said it.' },
+    label:'', narr:'' },
 
   { title:'tc_end', dur:4000,
     label:'', narr:'' },
