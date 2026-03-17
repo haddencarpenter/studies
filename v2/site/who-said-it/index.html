@@ -152,6 +152,42 @@
   .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
   .play-btn svg { margin-left: 6px; }
   .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+
+  /* ── MOBILE ──────────────────────────────── */
+  @media (max-width: 480px) {
+    .demo-area { padding: 32px 0 80px; }
+
+    /* terminals become full-width text cards */
+    .term {
+      left: 12px; right: 12px;
+      border-radius: 8px;
+      box-shadow: none;
+      border-color: #2A2A2C;
+    }
+    .term-bar { display: none; }
+    .term-body { padding: 16px 18px; font-size: 12px; line-height: 1.9; }
+
+    /* title cards scale down */
+    .title-big { font-size: 32px; }
+    .title-big .sub { font-size: 18px; }
+    .title-quote { font-size: 24px; padding: 0 20px; }
+
+    /* narration readable on phone */
+    .narration-area { bottom: 40px; padding: 0 20px; }
+    .narration-text { font-size: 18px; }
+    .narration-label { font-size: 10px; }
+
+    /* start screen */
+    .play-btn { width: 80px; height: 80px; }
+    .start-label { font-size: 12px; }
+
+    /* counter + progress */
+    .counter { bottom: 16px; right: 16px; font-size: 12px; }
+    .rec-badge { top: 16px; right: 16px; font-size: 10px; }
+
+    /* end card */
+    #tc_end a { font-size: 28px !important; }
+  }
 </style>
 </head>
 <body>
