@@ -8,20 +8,11 @@
   <style>
     :root {
       --bg: #110F0D;
-      --surface: #171412;
-      --surface-hover: #1C1916;
       --border: #2A2520;
-      --border-hover: #3A3530;
       --text: #F9FAFB;
       --text-secondary: #9CA3AF;
       --text-muted: #5C554D;
       --accent: #D4A843;
-      --accent-dim: rgba(212,168,67,0.12);
-      --green: #5CB87A;
-      --red: #C45B4F;
-      --purple: #A78BFA;
-      --cyan: #22D3EE;
-      --radius: 10px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,7 +23,6 @@
       font-family: 'DM Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
-      scroll-behavior: smooth;
     }
 
     /* ── SITE HEADER ────────────────── */
@@ -74,19 +64,19 @@
     }
     .site-header-cta:hover {
       border-color: var(--accent);
-      background: var(--accent-dim);
+      background: rgba(212,168,67,0.12);
     }
     @media (max-width: 640px) {
       .site-header-nav { display: none; }
     }
 
+    /* ── PAGE ───────────────────────── */
     .page {
       max-width: 760px;
       margin: 0 auto;
       padding: 100px 32px 120px;
     }
 
-    /* ── HEADER ─────────────────────── */
     .eyebrow {
       font-family: 'Space Mono', monospace;
       font-size: 10px;
@@ -118,7 +108,7 @@
       font-size: 11px;
       color: var(--text-muted);
       letter-spacing: 0.04em;
-      margin-bottom: 0;
+      margin-bottom: 56px;
     }
     .byline a {
       color: var(--text-secondary);
@@ -127,36 +117,68 @@
     }
     .byline a:hover { color: var(--accent); }
 
-    /* ── JUMPLINKS ─────────────────── */
-    .jumplinks {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 48px;
-    }
-    .jumplink {
+    /* ── SECTION LABEL ──────────────── */
+    .section-label {
       font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      text-decoration: none;
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .jumplink:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: var(--accent-dim);
-    }
-    .jumplink span {
-      color: var(--text-muted);
-      margin-left: 6px;
       font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-left: 2px;
     }
 
-    /* ── FEATURED CARD ─────────────── */
+    /* ── STUDY LIST ─────────────────── */
+    .studies {
+      border: 1px solid rgba(42,37,32,0.6);
+      border-radius: 16px;
+      background: #0D0D0C;
+      overflow: hidden;
+      margin-bottom: 64px;
+    }
+
+    .study-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s;
+      border-bottom: 1px solid rgba(42,37,32,0.5);
+    }
+
+    .study-card:last-child { border-bottom: none; }
+
+    .study-card:hover { background: rgba(255,255,255,0.02); }
+
+    .study-info { flex: 1; min-width: 0; }
+
+    .study-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .study-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .study-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: right;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── FEATURED ───────────────────── */
     .featured {
       display: block;
       padding: 24px;
@@ -165,17 +187,8 @@
       border-radius: 16px;
       text-decoration: none;
       color: var(--text);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       transition: background 0.2s, border-color 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .featured::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--accent);
     }
     .featured:hover {
       background: rgba(255,255,255,0.02);
@@ -200,133 +213,6 @@
       gap: 20px;
     }
 
-    /* ── SECTION LABEL ──────────────── */
-    .section-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-      padding-left: 2px;
-    }
-
-    /* ── STUDY LIST ─────────────────── */
-    .studies {
-      border: 1px solid rgba(42,37,32,0.6);
-      border-radius: 16px;
-      background: #0D0D0C;
-      overflow: hidden;
-      margin-bottom: 64px;
-    }
-
-    .study-card {
-      display: grid;
-      grid-template-columns: 44px 1fr auto;
-      align-items: center;
-      gap: 20px;
-      padding: 16px 24px;
-      text-decoration: none;
-      color: var(--text);
-      transition: background 0.2s;
-      position: relative;
-      border-bottom: 1px solid rgba(42,37,32,0.5);
-    }
-
-    .study-card:last-child { border-bottom: none; }
-
-    .study-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .study-card:hover {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .study-card:hover::before { opacity: 1; }
-
-    .study-num {
-      font-family: 'Space Mono', monospace;
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .study-info {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .study-title {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .study-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .study-meta {
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      color: var(--text-muted);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    .study-tag {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 4px;
-      margin-top: 4px;
-    }
-
-    /* Card accent colors */
-    .study-card[data-type="signal"]::before { background: var(--green); }
-    .study-card[data-type="signal"] .study-num { color: var(--green); }
-    .study-card[data-type="infra"]::before { background: var(--red); }
-    .study-card[data-type="infra"] .study-num { color: var(--red); }
-    .study-card[data-type="prompt"]::before { background: var(--accent); }
-    .study-card[data-type="prompt"] .study-num { color: var(--accent); }
-    .study-card[data-type="privacy"]::before { background: var(--purple); }
-    .study-card[data-type="privacy"] .study-num { color: var(--purple); }
-    .study-card[data-type="ux"]::before { background: var(--cyan); }
-    .study-card[data-type="ux"] .study-num { color: var(--cyan); }
-    .study-card[data-type="meta"]::before { background: var(--text-muted); }
-    .study-card[data-type="meta"] .study-num { color: var(--text-muted); }
-    .study-card[data-type="benchmark"]::before { background: var(--accent); }
-    .study-card[data-type="benchmark"] .study-num { color: var(--accent); }
-    .study-card[data-type="validation"]::before { background: var(--green); }
-    .study-card[data-type="validation"] .study-num { color: var(--green); }
-    .study-card[data-type="process"]::before { background: var(--purple); }
-    .study-card[data-type="process"] .study-num { color: var(--purple); }
-
-    .tag-signal { background: rgba(92,184,122,0.1); color: var(--green); }
-    .tag-infra { background: rgba(196,91,79,0.1); color: var(--red); }
-    .tag-prompt { background: rgba(212,168,67,0.1); color: var(--accent); }
-    .tag-privacy { background: rgba(167,139,250,0.1); color: var(--purple); }
-    .tag-ux { background: rgba(34,211,238,0.1); color: var(--cyan); }
-    .tag-meta { background: rgba(92,85,77,0.15); color: var(--text-muted); }
-    .tag-benchmark { background: var(--accent-dim); color: var(--accent); }
-    .tag-validation { background: rgba(92,184,122,0.1); color: var(--green); }
-    .tag-process { background: rgba(167,139,250,0.1); color: var(--purple); }
-
     /* ── FOOTER ─────────────────────── */
     .footer {
       display: flex;
@@ -347,16 +233,14 @@
 
     /* ── RESPONSIVE ─────────────────── */
     @media (max-width: 640px) {
-      .page { padding: 48px 20px 80px; }
+      .page { padding: 80px 20px 80px; }
       h1 { font-size: 30px; }
-      .study-card { grid-template-columns: 36px 1fr; gap: 14px; }
-      .study-meta { display: none; }
+      .study-desc { display: none; }
       .footer { flex-direction: column; gap: 8px; text-align: center; }
     }
   </style>
 </head>
 <body>
-  <!-- SITE HEADER -->
   <header class="site-header">
     <a href="https://shumi.ai" class="site-header-logo">
       <img src="https://shumi-landing.onrender.com/images/shumi.webp" alt="Shumi">
@@ -373,169 +257,130 @@
 
   <div class="page">
 
-    <!-- HEADER -->
     <div class="eyebrow">Studies</div>
     <h1>Proof of Work.</h1>
     <p class="subtitle">Research sessions, benchmarks, and signal discoveries. Methodology included. Failures published.</p>
     <div class="byline">by <a href="https://x.com/coinrotatordev" target="_blank">coinrotatordev</a></div>
 
-    <!-- JUMPLINKS -->
-    <div class="jumplinks">
-      <a href="#films" class="jumplink">Films<span>9</span></a>
-      <a href="#research" class="jumplink">Research<span>3</span></a>
-      <a href="#brand" class="jumplink">Brand<span>1</span></a>
-    </div>
+    <div class="section-label">Session Films</div>
 
-    <!-- FEATURED -->
-    <div class="section-label" id="films">Latest</div>
     <a href="who-said-it/" class="featured">
-      <div class="featured-eyebrow">New · Signal Discovery</div>
+      <div class="featured-eyebrow">New</div>
       <div class="study-title">Who Said It</div>
       <div class="study-desc">165,000 headlines. Four tests. Sentiment doesn't predict prices — but the disagreement between Bloomberg and Twitter does.</div>
       <div class="study-meta">
         <span>15 scenes</span>
         <span>~1m 15s</span>
-        <span>Interactive</span>
       </div>
     </a>
 
-    <div class="section-label" style="margin-top:48px">Session Films</div>
     <div class="studies">
 
-      <a href="batcat/" class="study-card" data-type="infra">
-        <div class="study-num">009</div>
+      <a href="batcat/" class="study-card">
         <div class="study-info">
           <div class="study-title">Batcat</div>
           <div class="study-desc">Pair suggestions timing out at 105s. Fix performance, then discover BTC resolves to batcat, YouTube is invisible, Bloomberg is a person.</div>
-          <span class="study-tag tag-infra">infrastructure</span>
         </div>
         <div class="study-meta">16 scenes<br>~2m</div>
       </a>
 
-      <a href="phantom-table/" class="study-card" data-type="infra">
-        <div class="study-num">010</div>
+      <a href="phantom-table/" class="study-card">
         <div class="study-info">
           <div class="study-title">The Phantom Table</div>
           <div class="study-desc">API endpoints that query a table that was never created. 5 months of stale data. Backtest validates.</div>
-          <span class="study-tag tag-infra">infrastructure</span>
         </div>
         <div class="study-meta">19 scenes<br>~2m</div>
       </a>
 
-      <a href="six-glyphs/" class="study-card" data-type="prompt">
-        <div class="study-num">006</div>
+      <a href="six-glyphs/" class="study-card">
         <div class="study-info">
           <div class="study-title">Six Glyphs</div>
           <div class="study-desc">Killing the wall of text. 11 contradictions in a 180-line prompt. Sandbox was hitting production the whole time.</div>
-          <span class="study-tag tag-prompt">prompt engineering</span>
         </div>
         <div class="study-meta">22 scenes<br>~2m</div>
       </a>
 
-      <a href="cohort-signal/" class="study-card" data-type="signal">
-        <div class="study-num">004</div>
+      <a href="cohort-signal/" class="study-card">
         <div class="study-info">
           <div class="study-title">The Cohort Signal</div>
           <div class="study-desc">19 news reports become a trading signal. EXIT_WARNING fires one day before PEPE's all-time high. JSON file is the database.</div>
-          <span class="study-tag tag-signal">signal discovery</span>
         </div>
         <div class="study-meta">14 scenes<br>~1m 49s</div>
       </a>
 
-      <a href="the-mask/" class="study-card" data-type="privacy">
-        <div class="study-num">007</div>
+      <a href="the-mask/" class="study-card">
         <div class="study-info">
           <div class="study-title">The Mask</div>
           <div class="study-desc">Building in public without building in public. Terminal exposes username, hostname, credential paths. 6-layer recording profile.</div>
-          <span class="study-tag tag-privacy">privacy</span>
         </div>
         <div class="study-meta">18 scenes<br>~1m 53s</div>
       </a>
 
-      <a href="copy-skill-to-one-tap/" class="study-card" data-type="ux">
-        <div class="study-num">008</div>
+      <a href="copy-skill-to-one-tap/" class="study-card">
         <div class="study-info">
           <div class="study-title">Copy Skill to One Tap</div>
           <div class="study-desc">Three copy buttons nobody clicks. Reframe: what would be most sticky? /watch collision forces rename to /alert. Ships to Telegram.</div>
-          <span class="study-tag tag-ux">ux</span>
         </div>
         <div class="study-meta">15 scenes<br>~1m 40s</div>
       </a>
 
-      <a href="context-engineering/" class="study-card" data-type="privacy">
-        <div class="study-num">003</div>
+      <a href="context-engineering/" class="study-card">
         <div class="study-info">
           <div class="study-title">Context Engineering</div>
           <div class="study-desc">Under recording. Two endpoint URLs leaked on camera. Four corrections. One session.</div>
-          <span class="study-tag tag-privacy">privacy</span>
         </div>
         <div class="study-meta">23 scenes<br>~2m 6s</div>
       </a>
 
-      <a href="content-pipeline/" class="study-card" data-type="meta">
-        <div class="study-num">004b</div>
+      <a href="content-pipeline/" class="study-card">
         <div class="study-info">
           <div class="study-title">Content Pipeline</div>
           <div class="study-desc">From blog post to film format. Discovers SND library, .recording-profile.zsh, builds /study skill. The pipeline builds itself.</div>
-          <span class="study-tag tag-meta">meta</span>
         </div>
         <div class="study-meta">17 scenes<br>~1m 45s</div>
       </a>
 
-    </div>
-
-    <div class="section-label" id="research">Research Notes</div>
-    <div class="studies">
-
-      <a href="/studies/walk-forward-performance-2024-2025" class="study-card" data-type="validation">
-        <div class="study-num">—</div>
-        <div class="study-info">
-          <div class="study-title">Walk-Forward Performance Study</div>
-          <div class="study-desc">Two-year walk-forward test with real Binance funding costs. 90% OOS win rate, Sharpe 0.75. Weak spots included.</div>
-          <span class="study-tag tag-validation">validation</span>
-        </div>
-        <div class="study-meta">7 min read</div>
-      </a>
-
-      <a href="/studies/crypto-ai-benchmark-v2" class="study-card" data-type="benchmark">
-        <div class="study-num">—</div>
-        <div class="study-info">
-          <div class="study-title">Crypto AI Benchmark v2</div>
-          <div class="study-desc">6 platforms given identical trading questions. 270 weighted scores. Raw responses published for independent rescoring.</div>
-          <span class="study-tag tag-benchmark">benchmark</span>
-        </div>
-        <div class="study-meta">8 min read</div>
-      </a>
-
-      <a href="/studies/live-session-context-engineering" class="study-card" data-type="process">
-        <div class="study-num">—</div>
-        <div class="study-info">
-          <div class="study-title">Context Engineering Under Recording</div>
-          <div class="study-desc">An unedited session where the AI leaked .env values on the first prompt, took three corrections, and still shipped by the end.</div>
-          <span class="study-tag tag-process">process note</span>
-        </div>
-        <div class="study-meta">6 min read</div>
-      </a>
-
-    </div>
-
-    <div class="section-label" id="brand">Brand</div>
-    <div class="studies">
-
-      <a href="what-you-get/" class="study-card" data-type="prompt">
-        <div class="study-num">—</div>
+      <a href="what-you-get/" class="study-card">
         <div class="study-info">
           <div class="study-title">What You Actually Get</div>
           <div class="study-desc">Not a chatbot. Data components — signals, widgets, modes, algos. Mix and match. The work is the product.</div>
-          <span class="study-tag tag-prompt">brand</span>
         </div>
         <div class="study-meta">10 scenes<br>~35s</div>
       </a>
 
     </div>
 
+    <div class="section-label">Research Notes</div>
+    <div class="studies">
+
+      <a href="/studies/walk-forward-performance-2024-2025" class="study-card">
+        <div class="study-info">
+          <div class="study-title">Walk-Forward Performance Study</div>
+          <div class="study-desc">Two-year walk-forward test with real Binance funding costs. 90% OOS win rate, Sharpe 0.75. Weak spots included.</div>
+        </div>
+        <div class="study-meta">7 min read</div>
+      </a>
+
+      <a href="/studies/crypto-ai-benchmark-v2" class="study-card">
+        <div class="study-info">
+          <div class="study-title">Crypto AI Benchmark v2</div>
+          <div class="study-desc">6 platforms given identical trading questions. 270 weighted scores. Raw responses published for independent rescoring.</div>
+        </div>
+        <div class="study-meta">8 min read</div>
+      </a>
+
+      <a href="/studies/live-session-context-engineering" class="study-card">
+        <div class="study-info">
+          <div class="study-title">Context Engineering Under Recording</div>
+          <div class="study-desc">An unedited session where the AI leaked .env values on the first prompt, took three corrections, and still shipped by the end.</div>
+        </div>
+        <div class="study-meta">6 min read</div>
+      </a>
+
+    </div>
+
     <div class="footer">
-      <span>© 2026 coinrotatordev</span>
+      <span>coinrotatordev</span>
       <a href="https://shumi.ai/app">Try Shumi →</a>
     </div>
 

@@ -156,7 +156,6 @@
   <div class="start-label">PRESS TO PLAY</div>
 </div>
 
-<a href="../" style="position:fixed;top:24px;left:32px;font-family:'Geist Mono',monospace;font-size:12px;color:#27272A;text-decoration:none;z-index:50;letter-spacing:0.08em;transition:color 0.3s" onmouseover="this.style.color='#52525B'" onmouseout="this.style.color='#27272A'">← studies</a>
 <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
 
 <div class="film">
@@ -436,7 +435,8 @@ function showScene(idx) {
   document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
   document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
 
-  if (current >= 1) document.getElementById('recBadge').classList.add('show');
+  if (current >= 1 && current <= 3) document.getElementById('recBadge').classList.add('show');
+  else document.getElementById('recBadge').classList.remove('show');
 
   try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
   if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
