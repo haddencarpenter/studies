@@ -468,10 +468,12 @@ function showScene(i) {
   var nLabel = document.getElementById('nLabel');
   var nText = document.getElementById('nText');
   nLabel.classList.remove('show'); nText.classList.remove('show');
-  nLabel.textContent = s.label || '';
-  nText.innerHTML = s.narr || '';
-  setTimeout(function() { nLabel.classList.add('show'); }, 300);
-  setTimeout(function() { nText.classList.add('show'); }, 500);
+  setTimeout(function() {
+    nLabel.textContent = s.label || '';
+    nText.innerHTML = s.narr || '';
+    nLabel.classList.add('show');
+  }, 350);
+  setTimeout(function() { nText.classList.add('show'); }, 550);
 
   // Progress + counter
   var pct = ((i + 1) / scenes.length * 100).toFixed(1);
