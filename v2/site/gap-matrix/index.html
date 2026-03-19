@@ -148,25 +148,25 @@
     </div>
 
     <!-- Scene 3: CORRECTION 1 — Anti-council -->
-    <div class="term" id="t3">
+    <div class="term" id="tc-corr1">
       <div class="term-bar">
         <div class="term-dot" style="background:#E84749"></div>
         <div class="term-dot" style="background:#D4A843"></div>
         <div class="term-dot" style="background:#5CB87A"></div>
         <div class="term-title">CORRECTION 1</div>
       </div>
-      <div class="term-body" id="tb3"></div>
+      <div class="term-body" id="tb-corr1"></div>
     </div>
 
     <!-- Scene 3b: Anti-council — structural diff -->
-    <div class="term" id="t3b">
+    <div class="term" id="tc-diff">
       <div class="term-bar">
         <div class="term-dot" style="background:#E84749"></div>
         <div class="term-dot" style="background:#D4A843"></div>
         <div class="term-dot" style="background:#5CB87A"></div>
         <div class="term-title">architecture diff</div>
       </div>
-      <div class="term-body" id="tb3b"></div>
+      <div class="term-body" id="tb-diff"></div>
     </div>
 
     <!-- Scene 4: Harness running -->
@@ -220,14 +220,14 @@
     </div>
 
     <!-- Scene 8: CORRECTION 2 — Think bigger -->
-    <div class="term" id="t8">
+    <div class="term" id="tc-corr2">
       <div class="term-bar">
         <div class="term-dot" style="background:#E84749"></div>
         <div class="term-dot" style="background:#D4A843"></div>
         <div class="term-dot" style="background:#5CB87A"></div>
         <div class="term-title">CORRECTION 2</div>
       </div>
-      <div class="term-body" id="tb8"></div>
+      <div class="term-body" id="tb-corr2"></div>
     </div>
 
     <!-- Scene 9: CORRECTION 3 — Parrot problem -->
@@ -302,7 +302,7 @@ var scenes = [
     narr: 'Real backtest numbers as the rubric. <span class="hi">The engine scores what the model can\'t fake.</span>' },
 
   // 3: CORRECTION 1 — anti-council
-  { term: 't3', tb: 'tb3', dur: 5500, sound: 'caution',
+  { term: 'tc-corr1', tb: 'tb-corr1', dur: 5500, sound: 'caution',
     lines: [
       '<span class="t-comment">  # "im not entirely sure using the council is the best option"</span>',
       '<span class="t-comment">  # "i simply want to create a gap analysis for each model"</span>',
@@ -314,7 +314,7 @@ var scenes = [
     narr: 'Consensus <span class="red">hides</span> individual gaps. Wrong tool.' },
 
   // 3b: Anti-council structural diff
-  { term: 't3b', tb: 'tb3b', dur: 5500,
+  { term: 'tc-diff', tb: 'tb-diff', dur: 5500,
     lines: [
       '<span class="t-dim">// council approach — wrong for this task</span>',
       '<span class="t-red">  4 models  →  consensus  →  1 answer</span>',
@@ -384,7 +384,7 @@ var scenes = [
     narr: 'Sonnet over-asserts. Grok miscalculates. <span class="hi">Two real gaps.</span>' },
 
   // 8: CORRECTION 2 — think bigger
-  { term: 't8', tb: 'tb8', dur: 5500, sound: 'caution',
+  { term: 'tc-corr2', tb: 'tb-corr2', dur: 5500, sound: 'caution',
     lines: [
       '<span class="t-comment">  # "are these the best ways to introduce these gaps?"</span>',
       '<span class="t-comment">  # "lets think bigger"</span>',
