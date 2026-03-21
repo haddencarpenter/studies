@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 010 — Biorhythm</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  /* ── TOP: TERMINAL DEMO ──────────────────── */
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 48px 48px 100px; position: relative;
+  }
+
+  .term {
+    background: #1C1C1E; border: 1px solid #3A3A3C; border-radius: 10px;
+    max-width: 960px; overflow: hidden;
+    position: absolute; left: 32px; right: 32px; margin: 0 auto; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    border-bottom: 1px solid #2A2A2C;
+    background: #28282A; position: relative;
+  }
+  .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .term-dot:nth-child(1) { background: #FF5F57 !important; }
+  .term-dot:nth-child(2) { background: #FEBC2E !important; }
+  .term-dot:nth-child(3) { background: #28C840 !important; }
+  .term-title {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #5A5A5E;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .term-body { padding: 20px 24px; font-family: 'Geist Mono', monospace; font-size: 14px; line-height: 2.0; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-caret { color: #FACC15; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #4A4A50; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #5A5A62; font-style: italic; }
+
+  /* Title card */
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  #tc_end { inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  #tc_end a:hover { color: #D4A843 !important; }
+
+  /* ── PHYSARUM BLAST + PULSE ────────────────── */
+  #physarum {
+    opacity: 0; transform: scale(1.3) translateY(22%); filter: brightness(1); transition: none;
+    mix-blend-mode: screen;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  #physarum.blast {
+    animation: physBlast 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+               physPulse 4s ease-in-out 2.5s infinite;
+  }
+  @keyframes physBlast {
+    0%   { opacity: 0;   transform: scale(1.3) translateY(22%); filter: brightness(3); }
+    20%  { opacity: 0.7; transform: scale(1.05) translateY(22%); filter: brightness(1.8); }
+    100% { opacity: 0.5; transform: scale(1) translateY(22%);   filter: brightness(1); }
+  }
+  @keyframes physPulse {
+    0%, 100% { opacity: 0.5;  transform: scale(1) translateY(22%);    filter: brightness(1); }
+    50%      { opacity: 0.58; transform: scale(1.015) translateY(22%); filter: brightness(1.15); }
+  }
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 40px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* Recording badge */
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── NARRATION (subtitle overlay) ─────────── */
+  .narration-area {
+    position: absolute; bottom: 60px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 48px; text-align: center; z-index: 10;
+    pointer-events: none;
+  }
+
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  /* ── PLAYER BAR ──────────────────────────── */
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  /* back link */
+  .back-link {
+    position: fixed; top: 24px; left: 32px; z-index: 50;
+    font-family: 'Geist Mono', monospace; font-size: 12px;
+    color: #27272A; text-decoration: none; letter-spacing: 0.06em;
+    transition: color 0.3s;
+  }
+  .back-link:hover { color: #52525B; }
+
+  /* ── START SCREEN ────────────────────────── */
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+
+  /* ── MOBILE ──────────────────────────────── */
+  @media (max-width: 480px) {
+    .demo-area { padding: 32px 0 80px; }
+    .term {
+      left: 12px; right: 12px;
+      border-radius: 8px;
+      box-shadow: none;
+      border-color: #2A2A2C;
+    }
+    .term-bar { display: none; }
+    .term-body { padding: 16px 18px; font-size: 12px; line-height: 1.9; }
+    .title-big { font-size: 32px; }
+    .title-big .sub { font-size: 18px; }
+    .title-quote { font-size: 24px; padding: 0 20px; }
+    .narration-area { bottom: 40px; padding: 0 20px; }
+    .narration-text { font-size: 18px; }
+    .narration-label { font-size: 10px; }
+    .play-btn { width: 80px; height: 80px; }
+    .start-label { font-size: 12px; }
+    .counter { bottom: 16px; right: 16px; font-size: 12px; }
+    .rec-badge { top: 16px; right: 16px; font-size: 10px; }
+    #tc_end a { font-size: 28px !important; }
+  }
+</style>
+</head>
+<body>
+
+<a href="../" class="back-link">&larr; studies</a>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 010</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title cards -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 010</div>
+      <div class="title-big line-reveal">Biorhythm<span class="sub">9,464 commits. 28 repos. One week.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_question">
+      <div class="title-quote line-reveal">"Does your body know<br>what day it is?"</div>
+    </div>
+
+    <div class="title-card" id="tc_tuesday">
+      <div class="title-big line-reveal" style="font-size:44px">Tuesday is the only day<br>you <span style="color:#C45B4F">delete more than you create.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_wednesday">
+      <div class="title-big line-reveal" style="font-size:44px">Wednesday is <span style="color:#D4A843">peak output.</span><br>Every week. For fifteen months.</div>
+    </div>
+
+    <div class="title-card" id="tc_noclock">
+      <div class="title-quote line-reveal">"No alarm clock.<br>No standup. No sprint."</div>
+    </div>
+
+    <div class="title-card" id="tc_play">
+      <div class="title-big line-reveal" style="font-size:44px">Saturday is for <span style="color:#D4A843">play.</span><br>The body <span style="color:#52525B">insists.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_streak">
+      <div class="title-big line-reveal" style="font-size:44px">15-day building streak.<br><span style="color:#52525B">One research streak. Three days.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_rhythm">
+      <div class="title-big line-reveal" style="font-size:40px">Create. Explore. Peak.<br>Clean. Polish. Fix. Rest.</div>
+    </div>
+
+    <div class="title-card" id="tc_close">
+      <div class="title-quote line-reveal">"The rhythm was always there.<br>The data just made it <span style="color:#D4A843">visible.</span>"</div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <iframe id="physarum" src="about:blank" style="position:absolute;inset:0;width:100%;height:100%;border:0;z-index:0;pointer-events:none" allow="autoplay" loading="lazy"></iframe>
+      <div style="position:absolute;bottom:15%;left:0;right:0;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px">
+        <a href="https://shumi.ai/app" target="_blank" class="line-reveal" style="font-size:36px;font-weight:500;color:#E8E4DE;letter-spacing:-0.01em;text-decoration:none;pointer-events:auto;transition:color 0.3s">shumi.ai</a>
+      </div>
+    </div>
+
+    <!-- Terminal: the dataset -->
+    <div class="term" id="term_data">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — git log --all</span></div>
+      <div class="term-body" id="tb_data"></div>
+    </div>
+
+    <!-- Terminal: the shape of the week -->
+    <div class="term" id="term_week">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — weekly distribution</span></div>
+      <div class="term-body" id="tb_week"></div>
+    </div>
+
+    <!-- Terminal: tuesday pruning -->
+    <div class="term" id="term_tuesday">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — tuesday pattern</span></div>
+      <div class="term-body" id="tb_tuesday"></div>
+    </div>
+
+    <!-- Terminal: wednesday peak -->
+    <div class="term" id="term_weds">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — wednesday analysis</span></div>
+      <div class="term-body" id="tb_weds"></div>
+    </div>
+
+    <!-- Terminal: time of day -->
+    <div class="term" id="term_time">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — circadian profile</span></div>
+      <div class="term-body" id="tb_time"></div>
+    </div>
+
+    <!-- Terminal: saturday play -->
+    <div class="term" id="term_saturday">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — saturday repos</span></div>
+      <div class="term-body" id="tb_saturday"></div>
+    </div>
+
+    <!-- Terminal: building streaks -->
+    <div class="term" id="term_streaks">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — focus streaks</span></div>
+      <div class="term-body" id="tb_streaks"></div>
+    </div>
+
+    <!-- Terminal: the full cycle -->
+    <div class="term" id="term_cycle">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — biorhythm</span></div>
+      <div class="term-body" id="tb_cycle"></div>
+    </div>
+
+    <!-- Terminal: acceleration -->
+    <div class="term" id="term_accel">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">coinrotatordev — velocity</span></div>
+      <div class="term-body" id="tb_accel"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4500,
+    label:'', narr:'' },
+
+  // ACT 2: THE QUESTION
+  { title:'tc_question', dur:4000, sound:'notification',
+    label:'', narr:'Fifteen months of solo building. <span class="hi">No schedule. No manager.</span>' },
+
+  // ACT 3: THE DATASET
+  { term:'term_data', tb:'tb_data', dur:6500, lines:[
+    '<span class="t-out">  git log --all --format="%ad|%s" --since="2025-01-01"</span>',
+    '',
+    '<span class="t-out">  commits:     <span class="t-warn">9,464</span></span>',
+    '<span class="t-out">  repos:       28</span>',
+    '<span class="t-out">  span:        Jan 2025 \u2014 Mar 2026</span>  <span class="t-dim">(15 months)</span>',
+    '',
+    '<span class="t-dim">  categorized by commit message + file patterns</span>',
+    '<span class="t-dim">  build \u00b7 explore \u00b7 clean \u00b7 fix \u00b7 design \u00b7 integrate \u00b7 document</span>',
+  ], label:'THE DATA', narr:'Every commit tagged by type. Building, exploring, cleaning, fixing, designing.', rec:true },
+
+  // ACT 4: THE SHAPE OF THE WEEK
+  { term:'term_week', tb:'tb_week', dur:7000, lines:[
+    '<span class="t-out">  Day          Commits    Share     Character</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-out">  Monday       1,339      14.1%</span>     <span class="t-ok">Builder</span>',
+    '<span class="t-out">  Tuesday      1,552      16.4%</span>     <span class="t-warn">Explorer</span>',
+    '<span class="t-out">  Wednesday    1,660      17.5%</span>     <span class="t-ok">Peak</span>      <span class="t-comment">\u2190 highest</span>',
+    '<span class="t-out">  Thursday     1,605      17.0%</span>     <span class="t-warn">Deep Clean</span>',
+    '<span class="t-out">  Friday       1,537      16.2%</span>     <span class="t-tool">Polish</span>',
+    '<span class="t-out">  Saturday     1,041      11.0%</span>     <span class="t-red">Fix + Play</span>',
+    '<span class="t-out">  Sunday         730       7.7%</span>     <span class="t-dim">Rest</span>      <span class="t-comment">\u2190 lowest</span>',
+  ], label:'THE SHAPE', narr:'Not random. <span class="hi">A shape.</span> The same shape, every week.' },
+
+  // ACT 5: TUESDAY PRUNING
+  { term:'term_tuesday', tb:'tb_tuesday', dur:6000, lines:[
+    '<span class="t-out">  Tuesday deletion ratio: <span class="t-red">1.097</span></span>  <span class="t-comment">\u2190 deletes &gt; inserts</span>',
+    '',
+    '<span class="t-out">  Every other day:        <span class="t-ok">net positive</span></span>',
+    '<span class="t-out">  Tuesday only:           <span class="t-red">net negative</span></span>',
+    '',
+    '<span class="t-out">  peak research:          <span class="t-warn">11.3%</span> of work</span>  <span class="t-comment">\u2190 highest of any day</span>',
+    '<span class="t-out">  peak ops/config:        <span class="t-warn">13.0%</span> of work</span>  <span class="t-comment">\u2190 highest of any day</span>',
+    '',
+    '<span class="t-dim">  Monday builds. Tuesday evaluates what survived.</span>',
+  ], label:'DISCOVERY 1', narr:'One day a week the body says: <span class="red">stop building. Start cutting.</span>' },
+
+  // TUESDAY TITLE
+  { title:'tc_tuesday', dur:3500, sound:'caution',
+    label:'', narr:'Diverge Monday. Converge Tuesday. <span class="hi">Without planning it.</span>' },
+
+  // ACT 6: WEDNESDAY PEAK
+  { term:'term_weds', tb:'tb_weds', dur:5500, lines:[
+    '<span class="t-out">  Wednesday: <span class="t-warn">1,660</span> commits</span>  <span class="t-comment">\u2190 17.5% of all work</span>',
+    '',
+    '<span class="t-out">  deep commits (100+ lines):  <span class="t-ok">27.7%</span></span>  <span class="t-comment">\u2190 highest share</span>',
+    '<span class="t-out">  config/ops overhead:        <span class="t-ok">8.4%</span></span>   <span class="t-comment">\u2190 lowest share</span>',
+    '',
+    '<span class="t-out">  top repos: coinrotator, coinrotator-ai, coinrotator-backend</span>',
+    '<span class="t-dim">  48.3% of Wednesday work happens 14:00\u201318:00</span>',
+  ], label:'DISCOVERY 2', narr:'Biggest changes. Least overhead. <span class="hi">The body clears the runway.</span>' },
+
+  // WEDNESDAY TITLE
+  { title:'tc_wednesday', dur:3500, sound:'notification',
+    label:'', narr:'' },
+
+  // ACT 7: TIME OF DAY
+  { term:'term_time', tb:'tb_time', dur:6500, lines:[
+    '<span class="t-out">  circadian commit profile</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-dim">  06:00\u201311:00    6.8%</span>     <span class="t-dim">\u2591</span>',
+    '<span class="t-out">  12:00\u201313:00   <span class="t-out">8.2%</span></span>     <span class="t-out">\u2592\u2592</span>',
+    '<span class="t-warn">  14:00\u201318:00  <span class="t-warn">38.4%</span></span>    <span class="t-warn">\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593</span>  <span class="t-comment">\u2190 peak</span>',
+    '<span class="t-out">  19:00         <span class="t-out">dip</span></span>      <span class="t-dim">\u2591</span>        <span class="t-comment">\u2190 dinner</span>',
+    '<span class="t-ok">  20:00\u201301:00  <span class="t-ok">29.7%</span></span>    <span class="t-ok">\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593</span>',
+    '<span class="t-red">  01:00\u201305:00  <span class="t-red">16.9%</span></span>    <span class="t-red">\u2593\u2593\u2593\u2593\u2593</span>    <span class="t-comment">\u2190 Thu + Sat nights</span>',
+  ], label:'CIRCADIAN', narr:'Dead before noon. Two peaks: afternoon and late night. <span class="hi">A dip at dinnertime.</span>' },
+
+  // NO CLOCK TITLE
+  { title:'tc_noclock', dur:4000, sound:'notification',
+    label:'', narr:'This is <span class="hi">biological scheduling.</span> Not calendar scheduling.' },
+
+  // ACT 8: SATURDAY PLAY
+  { term:'term_saturday', tb:'tb_saturday', dur:6000, lines:[
+    '<span class="t-out">  Saturday work type</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-red">  Bug fixing:          21.0%</span>    <span class="t-comment">\u2190 highest of any day</span>',
+    '<span class="t-tool">  Creative (physarum):  42.4% of all physarum commits</span>',
+    '',
+    '<span class="t-out">  late-night commits:   <span class="t-red">32.9%</span> between midnight and 6am</span>',
+    '',
+    '<span class="t-dim">  the creative coding repo lives here. not chosen \u2014 observed.</span>',
+  ], label:'DISCOVERY 3', narr:'Generative art at 2am. The week\u2019s bugs patched between sessions.' },
+
+  // PLAY TITLE
+  { title:'tc_play', dur:4000, sound:'notification',
+    label:'', narr:'42% of all creative coding commits. <span class="hi">Saturday. Every time.</span>' },
+
+  // ACT 9: BUILDING STREAKS
+  { term:'term_streaks', tb:'tb_streaks', dur:6500, lines:[
+    '<span class="t-out">  focus streaks (3+ consecutive days, same work type)</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-ok">  building streaks:     25 detected</span>',
+    '<span class="t-ok">  longest:              <span class="t-warn">15 days</span></span>  <span class="t-comment">\u2190 Dec 12\u201327, 2025</span>',
+    '<span class="t-ok">  second:               11 days</span>  <span class="t-comment">\u2190 Nov 29\u2013Dec 10</span>',
+    '',
+    '<span class="t-red">  research streaks:     1 detected</span>',
+    '<span class="t-red">  longest:              3 days</span>   <span class="t-comment">\u2190 May 2025</span>',
+  ], label:'DISCOVERY 4', narr:'A builder who researches <span class="hi">tactically</span>. Not a researcher who builds.' },
+
+  // STREAK TITLE
+  { title:'tc_streak', dur:3500, sound:'caution',
+    label:'', narr:'Research is <span class="red">fuel</span>. Building is the <span class="hi">engine.</span>' },
+
+  // ACT 10: THE FULL CYCLE
+  { term:'term_cycle', tb:'tb_cycle', dur:7000, lines:[
+    '<span class="t-out">  Mon \u2192 Tue \u2192 Wed \u2192 Thu \u2192 Fri \u2192 Sat \u2192 Sun</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-ok">  CREATE</span>  <span class="t-warn">EXPLORE</span>  <span class="t-ok">PEAK</span>   <span class="t-warn">CLEAN</span>  <span class="t-tool">POLISH</span>  <span class="t-red">FIX</span>   <span class="t-dim">REST</span>',
+    '',
+    '<span class="t-ok">  \u2501\u2501\u2501\u2501\u2501 build crescendo \u2501\u2501\u2501\u2501\u2501</span>  <span class="t-warn">\u2501 consolidate \u2501</span>  <span class="t-dim">\u2501 maintain \u2501</span>',
+    '',
+    '<span class="t-out">  weekday:  81.3%   \u2502  building + research + cleaning</span>',
+    '<span class="t-out">  weekend:  18.7%   \u2502  fixing + connecting + documenting</span>',
+    '',
+    '<span class="t-dim">  a builder\u2019s rhythm. create\u2013consolidate\u2013rest. every week.</span>',
+  ], label:'THE RHYTHM', narr:'Three phases. <span class="hi">Build. Consolidate. Maintain.</span> Then start again.' },
+
+  // ACT 11: ACCELERATION
+  { term:'term_accel', tb:'tb_accel', dur:6000, lines:[
+    '<span class="t-out">  monthly commit velocity</span>',
+    '<span class="t-dim">  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500</span>',
+    '<span class="t-out">  Q1 2025:   ~216/mo</span>   <span class="t-dim">\u2591\u2591</span>',
+    '<span class="t-out">  Q2 2025:   ~540/mo</span>   <span class="t-out">\u2592\u2592\u2592\u2592\u2592</span>',
+    '<span class="t-out">  Q3 2025:   ~427/mo</span>   <span class="t-out">\u2592\u2592\u2592\u2592</span>',
+    '<span class="t-warn">  Q4 2025:   ~691/mo</span>   <span class="t-warn">\u2593\u2593\u2593\u2593\u2593\u2593\u2593</span>',
+    '<span class="t-ok">  Q1 2026:  ~1,280/mo</span>  <span class="t-ok">\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593\u2593</span>  <span class="t-comment">\u2190 6x baseline</span>',
+    '',
+    '<span class="t-dim">  the rhythm held through a 6x acceleration.</span>',
+  ], label:'VELOCITY', narr:'Six times faster. <span class="hi">Same weekly shape.</span> The rhythm scales.', sound:'celebration' },
+
+  // RHYTHM TITLE
+  { title:'tc_rhythm', dur:4500,
+    label:'', narr:'Not productivity advice. <span class="hi">Self-knowledge.</span>' },
+
+  // CLOSE
+  { title:'tc_close', dur:5000,
+    label:'', narr:'' },
+
+  // END
+  { title:'tc_end', dur:6000,
+    label:'', narr:'The work continues.' },
+];
+
+var current = -1, running = false, timer = null;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.line-reveal').forEach(function(r) { r.classList.remove('show'); });
+}
+
+function showNarr(label, html) {
+  var nl = document.getElementById('nLabel');
+  var nt = document.getElementById('nText');
+  nl.classList.remove('show'); nt.classList.remove('show');
+  setTimeout(function() {
+    nl.textContent = label || '';
+    nt.innerHTML = html || '';
+    if (label) nl.classList.add('show');
+    if (html) nt.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  running = true; showScene(0);
+}
+
+function showScene(idx) {
+  if (timer) clearTimeout(timer);
+  if (idx < 0 || idx >= total) { running = false; showNarr('',''); return; }
+  clearAll();
+  current = idx;
+  var s = scenes[current];
+  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
+
+  var rb = document.getElementById('recBadge');
+  if (s.rec) { rb.classList.add('show'); rb.style.display = ''; }
+  else { rb.classList.remove('show'); rb.style.display = 'none'; }
+
+  try { snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.35}); } catch(e) {}
+  if (s.sound === 'caution') try { setTimeout(function() { snd.play(Snd.SOUNDS.CAUTION); }, 300); } catch(e) {}
+  if (s.sound === 'notification') try { setTimeout(function() { snd.play(Snd.SOUNDS.NOTIFICATION); }, 300); } catch(e) {}
+  if (s.sound === 'celebration') try { setTimeout(function() { snd.play(Snd.SOUNDS.CELEBRATION); }, 300); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  // preload physarum one scene before the end card
+  var phys = document.getElementById('physarum');
+  if (s.title === 'tc_close' && phys.src === 'about:blank') {
+    phys.src = 'https://shumi-landing.onrender.com/physarum/stencil.html?lp&seed=60&es=0.57&ew=0.28';
+  }
+  // blast physarum on end card
+  if (s.title === 'tc_end') {
+    phys.classList.add('blast');
+    if (phys.contentWindow) {
+      phys.contentWindow.postMessage({ type: 'blast', active: true }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'speed', value: 13 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'trailBright', value: 3.0 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'BG', key: 'deposit', value: 22 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'MS', key: 'speed', value: 6 }, '*');
+      phys.contentWindow.postMessage({ type: 'updateSimParam', target: 'MS', key: 'trailBright', value: 1.8 }, '*');
+    }
+  } else {
+    phys.classList.remove('blast');
+  }
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    tc.querySelectorAll('.line-reveal').forEach(function(r,i) {
+      setTimeout(function() { r.classList.add('show'); try { snd.play(Snd.SOUNDS.TAP,{volume:0.2}); } catch(e) {} }, 300+i*500);
+    });
+  }
+
+  if (s.term) {
+    var term = document.getElementById(s.term);
+    term.classList.add('active');
+    var b = document.getElementById(s.tb); b.innerHTML = '';
+    s.lines.forEach(function(l,i) {
+      var d = document.createElement('div');
+      d.className = 'term-line';
+      d.innerHTML = l || '&nbsp;';
+      b.appendChild(d);
+      setTimeout(function() {
+        d.classList.add('show');
+        if (l) try { snd.play(Snd.SOUNDS.TYPE,{volume:0.25}); } catch(e) {}
+      }, 600+i*600);
+    });
+  }
+
+  timer = setTimeout(function() { showScene(current + 1); }, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space') { e.preventDefault(); if (current < 0) startFilm(); }
+  if (e.code === 'ArrowRight' && running) { e.preventDefault(); showScene(current + 1); }
+  if (e.code === 'ArrowLeft' && running) { e.preventDefault(); showScene(current - 1); }
+});
+
+// tap/click navigation: left third = back, right two-thirds = forward
+document.querySelector('.film').addEventListener('click', function(e) {
+  if (!running) return;
+  var x = e.clientX / window.innerWidth;
+  if (x < 0.33) showScene(current - 1);
+  else showScene(current + 1);
+});
+</script>
+</body>
+</html>
