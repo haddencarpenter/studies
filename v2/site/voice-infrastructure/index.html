@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study 016 — Voice Infrastructure</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #09090B; color: #A1A1AA;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  .demo-area {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 48px 48px 100px; position: relative;
+  }
+
+  .term {
+    background: #1C1C1E; border: 1px solid #3A3A3C; border-radius: 10px;
+    max-width: 960px; overflow: hidden;
+    position: absolute; left: 32px; right: 32px; margin: 0 auto; opacity: 0; transition: opacity 0.6s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .term.active { opacity: 1; pointer-events: auto; }
+
+  .term-bar {
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    border-bottom: 1px solid #2A2A2C;
+    background: #28282A; position: relative;
+  }
+  .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .term-dot:nth-child(1) { background: #FF5F57 !important; }
+  .term-dot:nth-child(2) { background: #FEBC2E !important; }
+  .term-dot:nth-child(3) { background: #28C840 !important; }
+  .term-title {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #5A5A5E;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .term-body { padding: 20px 24px; font-family: 'Geist Mono', monospace; font-size: 14px; line-height: 2.0; }
+  .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-prompt { color: #22D3EE; }
+  .t-path { color: #60A5FA; }
+  .t-cmd { color: #A1A1AA; }
+  .t-dim { color: #4A4A50; }
+  .t-out { color: #52525B; }
+  .t-ok { color: #5CB87A; }
+  .t-red { color: #C45B4F; }
+  .t-warn { color: #D4A843; }
+  .t-tool { color: #A78BFA; }
+  .t-comment { color: #5A5A62; font-style: italic; }
+
+  .title-card {
+    position: absolute; text-align: center;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  .title-card.active { opacity: 1; }
+  #tc_end { inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+  .title-mono { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; margin-bottom: 24px; }
+  .title-big { font-size: 56px; font-weight: 600; color: #E8E4DE; line-height: 1.2; letter-spacing: -0.03em; }
+  .title-big .sub { font-size: 28px; font-weight: 400; color: #52525B; margin-top: 16px; display: block; }
+  .title-quote { font-size: 40px; font-weight: 500; color: #E8E4DE; line-height: 1.3; letter-spacing: -0.02em; font-style: italic; max-width: 800px; }
+
+  .line-reveal { opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .line-reveal.show { opacity: 1; transform: translateY(0); }
+
+  .rec-badge {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #C45B4F;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #C45B4F; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .narration-area {
+    position: absolute; bottom: 60px; left: 0; right: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 48px; text-align: center; z-index: 10;
+    pointer-events: none;
+  }
+  .narration-label {
+    font-family: 'Geist Mono', monospace; font-size: 12px; color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 16px;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .narration-label.show { opacity: 1; }
+  .narration-text {
+    font-size: 24px; font-weight: 600; color: #E8E4DE;
+    line-height: 1.4; max-width: 900px;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .narration-text.show { opacity: 1; transform: translateY(0); }
+  .narration-text .hi { color: #D4A843; }
+  .narration-text .red { color: #C45B4F; }
+
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 24px; right: 32px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #1E1E22; letter-spacing: 0.06em; z-index: 100; }
+
+  .start-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #09090B; cursor: pointer; transition: opacity 0.8s ease;
+  }
+  .start-screen.hidden { opacity: 0; pointer-events: none; }
+  .play-btn {
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #27272A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 40px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start-screen:hover .play-btn { border-color: #D4A843; transform: scale(1.05); }
+  .play-btn svg { margin-left: 6px; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 14px; color: #27272A; letter-spacing: 0.12em; }
+
+  @media (max-width: 480px) {
+    .demo-area { padding: 32px 0 80px; }
+    .term { left: 12px; right: 12px; border-radius: 8px; box-shadow: none; border-color: #2A2A2C; }
+    .term-bar { display: none; }
+    .term-body { padding: 16px 18px; font-size: 12px; line-height: 1.9; }
+    .title-big { font-size: 32px; }
+    .title-big .sub { font-size: 18px; }
+    .title-quote { font-size: 24px; padding: 0 20px; }
+    .narration-area { bottom: 40px; padding: 0 20px; }
+    .narration-text { font-size: 18px; }
+    .narration-label { font-size: 10px; }
+    .play-btn { width: 80px; height: 80px; }
+    .start-label { font-size: 12px; }
+    .counter { bottom: 16px; right: 16px; font-size: 12px; }
+    .rec-badge { top: 16px; right: 16px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="start-screen" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:32px">STUDY 016</div>
+  <div class="play-btn"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#52525B"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="demo-area">
+
+    <!-- Title cards -->
+    <div class="title-card" id="tc0">
+      <div class="title-mono line-reveal">STUDY 016</div>
+      <div class="title-big line-reveal">Memory That Speaks<span class="sub">How we taught sessions to remember — and talk.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_memory_problem">
+      <div class="title-quote line-reveal">"Sessions end.<br>Context <span style="color:#C45B4F">dies.</span>"</div>
+    </div>
+
+    <div class="title-card" id="tc_memory_solution">
+      <div class="title-quote line-reveal">"What if every session<br><span style="color:#D4A843">briefed</span> the next one?"</div>
+    </div>
+
+    <div class="title-card" id="tc_harness">
+      <div class="title-big line-reveal" style="font-size:44px">One harness.<br><span style="color:#D4A843">Every surface.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_voice_pivot">
+      <div class="title-quote line-reveal">"Markdown is for machines.<br>Founders <span style="color:#C45B4F">skim.</span>"</div>
+    </div>
+
+    <div class="title-card" id="tc_voice_found">
+      <div class="title-big line-reveal" style="font-size:44px">Jordan.<br><span style="color:#D4A843">Warm Narrator.</span></div>
+    </div>
+
+    <div class="title-card" id="tc_pipeline">
+      <div class="title-big line-reveal" style="font-size:44px">HANDOFF.md<br>→ <span style="color:#52525B">LLM</span><br>→ <span style="color:#D4A843">Jordan</span><br>→ <span style="color:#5CB87A">Telegram</span></div>
+    </div>
+
+    <div class="title-card" id="tc_end">
+      <div style="position:absolute;bottom:15%;left:0;right:0;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px">
+        <a href="https://shumi.ai/app" target="_blank" class="line-reveal" style="font-size:36px;font-weight:500;color:#E8E4DE;letter-spacing:-0.01em;text-decoration:none;pointer-events:auto;transition:color 0.3s">shumi.ai</a>
+      </div>
+    </div>
+
+    <!-- Terminal: memory architecture -->
+    <div class="term" id="term_memory">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — memory system</span></div>
+      <div class="term-body" id="tb_memory"></div>
+    </div>
+
+    <!-- Terminal: the harness -->
+    <div class="term" id="term_harness">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — session harness</span></div>
+      <div class="term-body" id="tb_harness"></div>
+    </div>
+
+    <!-- Terminal: telegram delivery -->
+    <div class="term" id="term_telegram">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — telegram voice delivery</span></div>
+      <div class="term-body" id="tb_telegram"></div>
+    </div>
+
+    <!-- Terminal: git identity setup -->
+    <div class="term" id="term_git">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — ~/.gitconfig</span></div>
+      <div class="term-body" id="tb_git"></div>
+    </div>
+
+    <!-- Terminal: the audit -->
+    <div class="term" id="term_audit">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — kanban cross-reference</span></div>
+      <div class="term-body" id="tb_audit"></div>
+    </div>
+
+    <!-- Terminal: PR batch -->
+    <div class="term" id="term_prs">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — gh pr create</span></div>
+      <div class="term-body" id="tb_prs"></div>
+    </div>
+
+    <!-- Terminal: voice search -->
+    <div class="term" id="term_voices">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — voice audition</span></div>
+      <div class="term-body" id="tb_voices"></div>
+    </div>
+
+    <!-- Terminal: voice settings -->
+    <div class="term" id="term_settings">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — speak_insight.sh</span></div>
+      <div class="term-body" id="tb_settings"></div>
+    </div>
+
+    <!-- Terminal: handoff pipeline -->
+    <div class="term" id="term_handoff">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — voice-handoff.sh</span></div>
+      <div class="term-body" id="tb_handoff"></div>
+    </div>
+
+    <!-- Terminal: study batch -->
+    <div class="term" id="term_studies">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — study narration pipeline</span></div>
+      <div class="term-body" id="tb_studies"></div>
+    </div>
+
+    <!-- Terminal: scorecard -->
+    <div class="term" id="term_score">
+      <div class="term-bar"><div class="term-dot"></div><div class="term-dot"></div><div class="term-dot"></div><span class="term-title">pxeodev — session scorecard</span></div>
+      <div class="term-body" id="tb_score"></div>
+    </div>
+
+  </div>
+
+  <div class="narration-area">
+    <div class="narration-label" id="nLabel"></div>
+    <div class="narration-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var scenes = [
+  // ACT 1: TITLE
+  { title:'tc0', dur:4000,
+    label:'', narr:'' },
+
+  // ACT 2: THE MEMORY PROBLEM
+  { title:'tc_memory_problem', dur:4000, sound:'notification',
+    label:'', narr:'Every Claude Code session starts from <span class="red">zero.</span>' },
+
+  // ACT 3: MEMORY ARCHITECTURE
+  { term:'term_memory', tb:'tb_memory', dur:7000, lines:[
+    '<span class="t-tool">  ⏵ Write</span> <span class="t-cmd">~/.claude/memory/</span>',
+    '',
+    '<span class="t-out">  Types:</span>',
+    '<span class="t-out">    <span class="t-ok">user</span>      — who you are, how you think</span>',
+    '<span class="t-out">    <span class="t-warn">feedback</span>  — what worked, what didn\'t, why</span>',
+    '<span class="t-out">    <span class="t-tool">project</span>   — what\'s in flight, who\'s blocked</span>',
+    '<span class="t-out">    <span class="t-dim">reference</span> — where to look outside the repo</span>',
+    '',
+    '<span class="t-out">  MEMORY.md indexes everything. <span class="t-warn">65 files</span> and growing.</span>',
+    '<span class="t-dim">  Sessions read it on start. Write to it on learn.</span>',
+  ], label:'THE MEMORY LAYER', narr:'Four types of memory. Indexed, searchable, <span class="hi">persistent across sessions.</span>' },
+
+  // ACT 4: THE SOLUTION
+  { title:'tc_memory_solution', dur:4000, sound:'notification',
+    label:'', narr:'Not a database. A <span class="hi">briefing system.</span>' },
+
+  // ACT 5: THE HARNESS
+  { title:'tc_harness', dur:3500,
+    label:'', narr:'Memory updates hit <span class="hi">every surface at once.</span>' },
+
+  { term:'term_harness', tb:'tb_harness', dur:7000, lines:[
+    '<span class="t-out">  Session hooks:</span>',
+    '<span class="t-out">    <span class="t-ok">SessionStart</span>  → load memory, read HANDOFF.md, resume context</span>',
+    '<span class="t-out">    <span class="t-warn">Stop</span>          → speak [SPOKEN] summary via Jordan TTS</span>',
+    '<span class="t-out">    <span class="t-tool">SessionEnd</span>   → write handoff, voice note to Telegram</span>',
+    '',
+    '<span class="t-out">  Surfaces:</span>',
+    '<span class="t-out">    CLI terminal     <span class="t-dim">→</span> spoken audio after each response</span>',
+    '<span class="t-out">    Telegram         <span class="t-dim">→</span> voice handoff on session end</span>',
+    '<span class="t-out">    QMD search       <span class="t-dim">→</span> semantic search over all memory</span>',
+    '<span class="t-out">    Next session     <span class="t-dim">→</span> MEMORY.md + HANDOFF.md auto-loaded</span>',
+  ], label:'THE HARNESS', narr:'One write. Four surfaces. The CLI hears you. Telegram briefs Sascha. QMD indexes it. <span class="hi">The next session remembers.</span>' },
+
+  // ACT 6: TELEGRAM DELIVERY
+  { term:'term_telegram', tb:'tb_telegram', dur:6500, lines:[
+    '<span class="t-dim">  voice-handoff.sh pipeline:</span>',
+    '',
+    '<span class="t-out">  1. Read HANDOFF.md</span>           <span class="t-comment">raw markdown, git snapshot</span>',
+    '<span class="t-out">  2. <span class="t-warn">Gemini Flash</span> rewrite</span>     <span class="t-comment">"say it like a person"</span>',
+    '<span class="t-out">  3. <span class="t-ok">Jordan TTS</span> generate</span>      <span class="t-comment">ElevenLabs 44.1kHz</span>',
+    '<span class="t-out">  4. sox treble rolloff</span>        <span class="t-comment">-2dB @ 6kHz, stereo</span>',
+    '<span class="t-out">  5. ffmpeg → OGG opus</span>        <span class="t-comment">Telegram voice note format</span>',
+    '<span class="t-out">  6. <span class="t-tool">sendVoice</span> to Sascha</span>    <span class="t-comment">🍄 caption, 2x-able</span>',
+  ], label:'TELEGRAM VOICE', narr:'Markdown in. Voice note out. Sascha gets a briefing he can <span class="hi">listen to while walking.</span>', sound:'notification' },
+
+  // ACT 7: THE VOICE SEARCH
+  { title:'tc_voice_pivot', dur:3500,
+    label:'', narr:'But first we needed a voice that didn\'t sound like <span class="red">a robot.</span>' },
+
+  { term:'term_voices', tb:'tb_voices', dur:6500, lines:[
+    '<span class="t-red">  ✗ Edge TTS</span>         <span class="t-comment">"insanely sharp and trebly"</span>',
+    '<span class="t-red">  ✗ macOS say</span>         <span class="t-comment">"extremely robotic and stiff"</span>',
+    '<span class="t-red">  ✗ ElevenLabs free</span>   <span class="t-comment">"still pretty harsh"</span>',
+    '<span class="t-warn">  ⟳ Upgrade to paid</span>  <span class="t-comment">unlocked 500+ library voices</span>',
+    '',
+    '<span class="t-out">  Auditioned: <span class="t-warn">20+ voices</span></span>',
+    '<span class="t-out">  Rejected:   Andrew, Brian, Oxley, Dan, Michael...</span>',
+    '<span class="t-ok">  Selected:   Jordan — Warm Narrator</span>  <span class="t-comment">"this is the one"</span>',
+  ], label:'THE AUDITION', narr:'Twenty voices. Three engines. Most sounded like <span class="red">a newsreader in a tile bathroom.</span>' },
+
+  { title:'tc_voice_found', dur:3000, sound:'celebration',
+    label:'', narr:'Soft. Earthy. <span class="hi">North American.</span>' },
+
+  { term:'term_settings', tb:'tb_settings', dur:5000, lines:[
+    '<span class="t-out">  voice:     Jordan — Warm Narrator</span>',
+    '<span class="t-out">  stability: <span class="t-warn">0.25</span></span>   <span class="t-comment">← emotional variation</span>',
+    '<span class="t-out">  similarity: 0.6</span>    <span class="t-comment">← enough to stay grounded</span>',
+    '<span class="t-out">  speed:     0.95</span>',
+    '<span class="t-out">  pacing:    &lt;break 400-600ms&gt;</span>  <span class="t-comment">← between topic shifts</span>',
+    '<span class="t-out">  sox:       treble -2 @ 6kHz</span>  <span class="t-comment">← gentle warmth</span>',
+  ], label:'THE SETTINGS', narr:'Low stability for feeling. Break tags for <span class="hi">breathing room.</span>' },
+
+  // ACT 8: ALSO SHIPPED
+  { term:'term_prs', tb:'tb_prs', dur:6000, lines:[
+    '<span class="t-ok">  ✓</span> <span class="t-out">coinrotator-ai  #68</span>  <span class="t-comment">narrative slope pipeline — 17 categories</span>',
+    '<span class="t-ok">  ✓</span> <span class="t-out">shumi-doctor    #2</span>   <span class="t-comment">alert suppression + /context command</span>',
+    '<span class="t-ok">  ✓</span> <span class="t-out">shumi-landing   #8</span>   <span class="t-comment">studies section + Who Said It</span>',
+    '<span class="t-ok">  ✓</span> <span class="t-out">shumi-bot       #17</span>  <span class="t-comment">glass box + memory + idea radar</span>',
+    '',
+    '<span class="t-dim">  All sent to Telegram in one batch. 🍄</span>',
+  ], label:'ALSO SHIPPED', narr:'Four PRs across four repos. <span class="hi">While building the voice system.</span>' },
+
+  // ACT 9: STUDY BATCH
+  { term:'term_studies', tb:'tb_studies', dur:5500, lines:[
+    '<span class="t-out">  Ran all 15 study films through the voice pipeline</span>',
+    '',
+    '<span class="t-ok">  ✓</span> batcat, biorhythm, buying-losers, cohort-signal,',
+    '<span class="t-ok">  ✓</span> content-pipeline, copy-skill, gap-matrix,',
+    '<span class="t-ok">  ✓</span> generative-ui, output-pipeline, phantom-table,',
+    '<span class="t-ok">  ✓</span> sascha-audit, six-glyphs, the-mask, what-you-get,',
+    '<span class="t-ok">  ✓</span> who-said-it',
+    '',
+    '<span class="t-ok">  15/15 sent to Telegram</span>   <span class="t-dim">~8 min total</span>',
+  ], label:'15 STUDY FILMS', narr:'Every study narrated by Jordan. The whole product story in <span class="hi">eight minutes.</span>', sound:'notification' },
+
+  // SCORECARD
+  { term:'term_score', tb:'tb_score', dur:7000, lines:[
+    '<span class="t-out">  Built                         Status</span>',
+    '<span class="t-dim">  ──────────────────────────────────────────</span>',
+    '<span class="t-ok">  Persistent memory (65 files)   running</span>',
+    '<span class="t-ok">  Session harness (4 surfaces)   running</span>',
+    '<span class="t-ok">  Voice handoff pipeline         running</span>',
+    '<span class="t-ok">  Brand voice (Jordan)           selected</span>',
+    '<span class="t-ok">  CLI spoken summaries           running</span>',
+    '<span class="t-ok">  4 PRs across 4 repos           shipped</span>',
+    '<span class="t-ok">  15 study voice narrations      delivered</span>',
+    '',
+    '<span class="t-warn">  One session. The machine remembers now.</span>',
+  ], label:'SCORECARD', narr:'Memory that persists. A voice that speaks. Surfaces that <span class="hi">stay in sync.</span> That\'s the harness.', sound:'celebration' },
+
+  // END
+  { title:'tc_end', dur:6000,
+    label:'', narr:'The work continues.' },
+];
+
+var current = -1, running = false, timer = null;
+var total = scenes.length;
+
+function clearAll() {
+  document.querySelectorAll('.term').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.title-card').forEach(function(t) { t.classList.remove('active'); });
+}
+
+function showNarr(label, text) {
+  var nL = document.getElementById('nLabel');
+  var nT = document.getElementById('nText');
+  nL.classList.remove('show'); nT.classList.remove('show');
+  setTimeout(function() {
+    nL.innerHTML = label; nT.innerHTML = text;
+    if (label) nL.classList.add('show');
+    if (text) nT.classList.add('show');
+  }, 200);
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('recBadge').classList.add('show');
+  running = true; showScene(0);
+}
+
+function showScene(idx) {
+  if (idx < 0 || idx >= total) return;
+  clearTimeout(timer);
+  current = idx;
+
+  clearAll();
+  document.querySelectorAll('.line-reveal').forEach(function(el) { el.classList.remove('show'); });
+
+  var s = scenes[current];
+  document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+
+  if (s.sound) try { snd.play(Snd.SOUNDS[s.sound.toUpperCase()]); } catch(e) {}
+
+  showNarr(s.label, s.narr);
+
+  if (s.title) {
+    var tc = document.getElementById(s.title);
+    tc.classList.add('active');
+    setTimeout(function() {
+      tc.querySelectorAll('.line-reveal').forEach(function(el, i) {
+        setTimeout(function() { el.classList.add('show'); }, i * 200);
+      });
+    }, 100);
+  }
+
+  if (s.term) {
+    document.getElementById(s.term).classList.add('active');
+    var body = document.getElementById(s.tb);
+    body.innerHTML = '';
+    s.lines.forEach(function(line, i) {
+      var div = document.createElement('div');
+      div.className = 'term-line';
+      div.innerHTML = line;
+      body.appendChild(div);
+      setTimeout(function() { div.classList.add('show'); }, 200 + i * 180);
+    });
+  }
+
+  timer = setTimeout(function() { showScene(current + 1); }, s.dur);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'ArrowRight' && running) { e.preventDefault(); showScene(current + 1); }
+  if (e.code === 'ArrowLeft' && running) { e.preventDefault(); showScene(current - 1); }
+});
+
+document.querySelector('.film').addEventListener('click', function(e) {
+  if (!running) return;
+  var x = (e.clientX / window.innerWidth) - 0.5;
+  if (x < -0.15) showScene(current - 1);
+  else showScene(current + 1);
+});
+</script>
+</body>
+</html>
