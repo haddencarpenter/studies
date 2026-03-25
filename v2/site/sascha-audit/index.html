@@ -153,6 +153,17 @@
   .c-white { color: #F9FAFB; }
   .c-dim { color: #555; }
 
+  /* ── AUDIO TOGGLE ── */
+  .audio-toggle {
+    position: fixed; top: 20px; left: 28px;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 0.1em; z-index: 50;
+    cursor: pointer; user-select: none;
+    color: #3F3F46; transition: color 0.3s;
+  }
+  .audio-toggle:hover { color: #A1A1AA; }
+  .audio-toggle.on { color: #D4A843; }
+
   /* ── REC BADGE ── */
   .rec-badge {
     position: fixed; top: 20px; right: 28px;
@@ -266,6 +277,7 @@
   <div class="start-label">PRESS TO PLAY</div>
 </div>
 
+<div class="audio-toggle" id="audioToggle" onclick="toggleAudio()">VOICE OFF</div>
 <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
 
 <div class="film">
@@ -463,6 +475,29 @@
 <script>
 var snd = new Snd(); snd.load(Snd.KITS.SND01);
 
+// ── Audio engine (single continuous track) ───────────────────
+var audioEnabled = false;
+var narrationTrack = new Audio('audio/narration.mp3');
+narrationTrack.preload = 'auto';
+
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  var btn = document.getElementById('audioToggle');
+  btn.textContent = audioEnabled ? 'VOICE ON' : 'VOICE OFF';
+  btn.classList.toggle('on', audioEnabled);
+  if (audioEnabled && running) {
+    narrationTrack.play().catch(function() {});
+  } else {
+    narrationTrack.pause();
+  }
+}
+
+function startNarration() {
+  if (!audioEnabled) return;
+  narrationTrack.currentTime = 0;
+  narrationTrack.play().catch(function() {});
+}
+
 var scenes = [
   // S0: Title
   { el: 's0', dur: 5500,
@@ -588,7 +623,7 @@ function showNarr(label, html) {
 
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
-  running = true; nextScene();
+  running = true; startNarration(); nextScene();
 }
 
 function playScene() {
@@ -642,7 +677,7 @@ function playScene() {
 function nextScene() {
   clearAll();
   cur++;
-  if (cur >= total) { running = false; showNarr('',''); return; }
+  if (cur >= total) { running = false; showNarr('',''); narrationTrack.pause(); return; }
   playScene();
 }
 
@@ -659,8 +694,8 @@ document.addEventListener('keydown', function(e) {
   if (e.code === 'Space') {
     e.preventDefault();
     if (cur < 0) { startFilm(); return; }
-    if (running) { running = false; killTimers(); }
-    else { running = true; nextScene(); }
+    if (running) { running = false; killTimers(); if (audioEnabled) narrationTrack.pause(); }
+    else { running = true; if (audioEnabled) narrationTrack.play().catch(function(){}); nextScene(); }
   }
   if (e.code === 'ArrowRight' || e.code === 'PageDown') {
     e.preventDefault();
