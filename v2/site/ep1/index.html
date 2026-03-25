@@ -38,7 +38,7 @@
   }
   .hero-sub {
     font-family: 'Space Mono', monospace;
-    font-size: clamp(12px, 1.4vw, 18px);
+    font-size: clamp(14px, 1.6vw, 22px);
     color: #555; letter-spacing: 0.12em;
     text-transform: uppercase; margin-top: 20px; text-align: center;
   }
@@ -72,9 +72,9 @@
   }
   .vs-label {
     font-family: 'Space Mono', monospace;
-    font-size: clamp(10px, 1.2vw, 14px);
+    font-size: clamp(14px, 1.4vw, 18px);
     color: #555; letter-spacing: 0.1em;
-    text-transform: uppercase; margin-top: 8px;
+    text-transform: uppercase; margin-top: 10px;
   }
   .vs-slash {
     font-family: 'DM Sans', sans-serif;
@@ -85,7 +85,7 @@
   /* ── MINI TERMINAL ── */
   .mini-term {
     background: #0A0A0C; border: 1px solid #1E1E22;
-    border-radius: 8px; width: 100%; max-width: 680px; overflow: hidden;
+    border-radius: 8px; width: 85vw; max-width: 1400px; overflow: hidden;
   }
   .mini-term-bar {
     display: flex; align-items: center; gap: 7px;
@@ -94,12 +94,12 @@
   .mini-term-dot { width: 8px; height: 8px; border-radius: 50%; }
   .mini-term-title {
     font-family: 'Space Mono', monospace;
-    font-size: clamp(9px, 1vw, 11px); color: #333; margin-left: 10px;
+    font-size: clamp(12px, 1.1vw, 15px); color: #333; margin-left: 10px;
   }
   .mini-term-body {
     padding: clamp(14px, 2vh, 24px) clamp(16px, 2vw, 24px);
     font-family: 'Space Mono', monospace;
-    font-size: clamp(11px, 1.2vw, 15px); line-height: 2.2;
+    font-size: clamp(16px, 1.6vw, 24px); line-height: 2.4;
   }
   .mini-term-line {
     opacity: 0; transform: translateY(6px);
@@ -119,8 +119,8 @@
   /* ── BADGE ── */
   .badge {
     font-family: 'Space Mono', monospace;
-    font-size: clamp(11px, 1.2vw, 14px); font-weight: 700;
-    padding: 6px 16px; border-radius: 4px;
+    font-size: clamp(14px, 1.4vw, 18px); font-weight: 700;
+    padding: 8px 20px; border-radius: 4px;
     letter-spacing: 0.08em; display: inline-block; margin-top: 16px;
   }
   .badge-red { background: rgba(232,71,73,0.15); color: #E84749; }
@@ -195,13 +195,13 @@
 
   /* ── NARRATION STRIP ── */
   .narr-strip {
-    height: clamp(56px, 9vh, 90px); flex-shrink: 0;
+    height: clamp(72px, 10vh, 110px); flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    padding: 0 clamp(16px, 4vw, 48px); text-align: center;
+    padding: 0 clamp(24px, 6vw, 80px); text-align: center;
     border-top: 1px solid #222; background: #141414;
   }
   .narr-text {
-    font-size: clamp(13px, 1.6vw, 20px); font-weight: 500;
+    font-size: clamp(18px, 2vw, 28px); font-weight: 500;
     color: #777; line-height: 1.35; max-width: 800px;
     opacity: 0; transform: translateY(4px);
     transition: opacity 0.4s, transform 0.4s;
@@ -210,7 +210,7 @@
 
   /* ── PROGRESS ── */
   .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
-  .counter { position: fixed; bottom: 12px; right: 28px; font-family: 'Space Mono', monospace; font-size: 11px; color: #2A2A2A; z-index: 100; }
+  .counter { position: fixed; bottom: 16px; right: 28px; font-family: 'Space Mono', monospace; font-size: 14px; color: #2A2A2A; z-index: 100; }
 
   /* ── START ── */
   .start {
@@ -219,6 +219,11 @@
     background: #141414; cursor: pointer; transition: opacity 0.8s;
   }
   .start.hidden { opacity: 0; pointer-events: none; }
+  html.autoplay .start { display: none !important; }
+  html.autoplay .audio-toggle { display: none !important; }
+  html.autoplay .kill-counter { display: none !important; }
+  html.autoplay .rec-badge { display: none !important; }
+  html.autoplay .counter { display: none !important; }
   .play-ring {
     width: 90px; height: 90px; border-radius: 50%; border: 1px solid #333;
     display: flex; align-items: center; justify-content: center;
@@ -321,6 +326,7 @@
 </style>
 </head>
 <body>
+<script>if(location.search.includes('autoplay'))document.documentElement.classList.add('autoplay')</script>
 
 <div class="start" id="startScreen" onclick="startFilm()">
   <div class="start-label" style="margin-bottom:20px">EPISODE 1</div>
@@ -770,6 +776,12 @@ function startFilm() {
   btn.textContent = 'VOICE ON';
   btn.classList.add('on');
   running = true; startNarration(); nextScene();
+}
+
+// Auto-start for recording (skip start screen)
+if (window.location.search.includes('autoplay')) {
+  document.getElementById('startScreen').style.display = 'none';
+  setTimeout(function() { running = true; nextScene(); }, 500);
 }
 
 function playScene() {
