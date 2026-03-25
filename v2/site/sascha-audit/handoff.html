@@ -198,7 +198,13 @@
   <tr><td>Heartbeat writes for scanners</td><td>Not started</td><td>Sascha</td></tr>
   <tr><td>Cross-surface memory API</td><td><span class="surface-status live">✓ 5 endpoints shipped</span></td><td>shumi-bot</td></tr>
   <tr><td>Glass Box intel endpoint</td><td><span class="surface-status live">✓ Shipped</span></td><td>shumi-bot</td></tr>
+  <tr><td>Backtest confidence map API</td><td><span class="surface-status deferred">PR open — <code>feat/confidence-map</code></span></td><td>pxeo → Sascha merge</td></tr>
+  <tr><td>Confidence tiers in <code>getSignalData</code></td><td><span class="surface-status deferred">PR open — <code>feat/confidence-map</code></span></td><td>pxeo → Sascha merge</td></tr>
 </table>
+
+<div class="note-box">
+  <strong>Confidence map (2026-03-25):</strong> Simulation engine breadth sweep validated 63 coins across consensus thresholds and direction filters. 6 coins pass OOS validation (KAS, PEPE, FLOKI, GALA, BONK, AAVE), 14 more pass full-period gate. Two PRs pending on <code>coinrotator-ai</code> and <code>coinrotator-utils</code> (<code>feat/confidence-map</code> branches). Backend serves static JSON at <code>/api/regime/confidence</code>; shumi.js auto-enriches signal tool responses with tier data. No schema changes.
+</div>
 
 <div class="note-box">
   <strong>PAT token note:</strong> Sascha flagged the inline GitHub PAT in <code>coinrotator-ai/package.json</code> as a false positive. Fix branch (<code>hotfix/ai-config-fallback</code>) has been removed — status unclear. Both repos are private. Sascha's call on priority.
