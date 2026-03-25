@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>400 Experiments. 3 Survived.</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #141414; color: #F9FAFB;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden; width: 100vw; height: 100vh;
+  }
+  .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
+
+  .stage {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 24px; position: relative; overflow: hidden;
+  }
+
+  .scene {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.7s ease;
+    padding: 24px;
+  }
+  .scene.active { opacity: 1; }
+
+  /* ── HERO NUMBERS ── */
+  .hero-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(100px, 18vw, 260px);
+    font-weight: 700; line-height: 0.85;
+    letter-spacing: -0.04em; text-align: center;
+  }
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(12px, 1.4vw, 18px);
+    color: #555; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-top: 20px; text-align: center;
+  }
+
+  /* ── SINGLE STAT (one number, one color) ── */
+  .stat-single {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(72px, 14vw, 180px);
+    font-weight: 700; line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .stat-ghost {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(20px, 3vw, 36px);
+    color: #2A2A2E; margin-top: 12px;
+  }
+
+  /* ── VERSUS (two numbers, split) ── */
+  .vs {
+    display: flex; align-items: center; justify-content: center;
+    gap: clamp(32px, 6vw, 80px);
+  }
+  .vs-col { text-align: center; }
+  .vs-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(56px, 10vw, 140px);
+    font-weight: 700; line-height: 1; letter-spacing: -0.03em;
+  }
+  .vs-label {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(10px, 1.2vw, 14px);
+    color: #555; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-top: 8px;
+  }
+  .vs-slash {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    color: #2A2A2E; font-weight: 300;
+  }
+
+  /* ── MINI TERMINAL ── */
+  .mini-term {
+    background: #0A0A0C; border: 1px solid #1E1E22;
+    border-radius: 8px; width: 100%; max-width: 680px; overflow: hidden;
+  }
+  .mini-term-bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: clamp(6px, 1vh, 12px) 16px; border-bottom: 1px solid #1E1E22;
+  }
+  .mini-term-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .mini-term-title {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(9px, 1vw, 11px); color: #333; margin-left: 10px;
+  }
+  .mini-term-body {
+    padding: clamp(14px, 2vh, 24px) clamp(16px, 2vw, 24px);
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(11px, 1.2vw, 15px); line-height: 2.2;
+  }
+  .mini-term-line {
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.35s, transform 0.35s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mini-term-line.show { opacity: 1; transform: translateY(0); }
+
+  .t-red { color: #E84749; }
+  .t-green { color: #5CB87A; }
+  .t-gold { color: #D4A843; }
+  .t-dim { color: #2A2A2E; }
+  .t-gray { color: #555; }
+  .t-cyan { color: #22D3EE; }
+  .t-leaked { color: #E84749; background: rgba(232,71,73,0.12); padding: 1px 4px; border-radius: 2px; }
+
+  /* ── BADGE ── */
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(11px, 1.2vw, 14px); font-weight: 700;
+    padding: 6px 16px; border-radius: 4px;
+    letter-spacing: 0.08em; display: inline-block; margin-top: 16px;
+  }
+  .badge-red { background: rgba(232,71,73,0.15); color: #E84749; }
+  .badge-green { background: rgba(92,184,122,0.15); color: #5CB87A; }
+  .badge-amber { background: rgba(212,168,67,0.15); color: #D4A843; }
+
+  /* ── REVEAL ANIMATION ── */
+  .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .reveal.show { opacity: 1; transform: translateY(0); }
+
+  /* ── ANIMATED EQUITY CURVE ── */
+  .eq-line {
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+    transition: stroke-dashoffset 3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .eq-line.draw { stroke-dashoffset: 0; }
+
+  /* ── KILL COUNTER ── */
+  .kill-counter {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    letter-spacing: 0.1em; z-index: 50;
+    color: #2A2A2E; transition: color 0.5s, opacity 0.5s;
+    opacity: 0;
+  }
+  .kill-counter.show { opacity: 1; }
+  .kill-counter .kc-num { color: #E84749; transition: color 0.3s; }
+  .kill-counter.survived .kc-num { color: #5CB87A; }
+
+  /* ── KILL STAMP ── */
+  .kill-stamp {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(2.5);
+    font-family: 'DM Sans', sans-serif; font-size: clamp(48px, 8vw, 80px);
+    font-weight: 700; color: rgba(232, 71, 73, 0);
+    letter-spacing: 0.06em; pointer-events: none; z-index: 5;
+    text-transform: uppercase;
+    transition: color 0.15s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .kill-stamp.slam {
+    color: rgba(232, 71, 73, 0.12);
+    transform: translate(-50%, -50%) rotate(-12deg) scale(1);
+  }
+
+  /* ── COLORS ── */
+  .c-red { color: #E84749; }
+  .c-green { color: #5CB87A; }
+  .c-gold { color: #D4A843; }
+  .c-dim { color: #555; }
+
+  /* ── REC + AUDIO ── */
+  .audio-toggle {
+    position: fixed; top: 20px; left: 28px;
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 0.1em; z-index: 50;
+    cursor: pointer; user-select: none;
+    color: #3F3F46; transition: color 0.3s;
+  }
+  .audio-toggle:hover { color: #A1A1AA; }
+  .audio-toggle.on { color: #D4A843; }
+
+  .rec-badge {
+    position: fixed; top: 20px; right: 28px;
+    font-family: 'Space Mono', monospace; font-size: 11px; color: #E84749;
+    letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: #E84749; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── NARRATION STRIP ── */
+  .narr-strip {
+    height: clamp(56px, 9vh, 90px); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 clamp(16px, 4vw, 48px); text-align: center;
+    border-top: 1px solid #222; background: #141414;
+  }
+  .narr-text {
+    font-size: clamp(13px, 1.6vw, 20px); font-weight: 500;
+    color: #777; line-height: 1.35; max-width: 800px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .narr-text.show { opacity: 1; transform: translateY(0); }
+
+  /* ── PROGRESS ── */
+  .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 12px; right: 28px; font-family: 'Space Mono', monospace; font-size: 11px; color: #2A2A2A; z-index: 100; }
+
+  /* ── START ── */
+  .start {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #141414; cursor: pointer; transition: opacity 0.8s;
+  }
+  .start.hidden { opacity: 0; pointer-events: none; }
+  .play-ring {
+    width: 90px; height: 90px; border-radius: 50%; border: 1px solid #333;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px; transition: border-color 0.3s, transform 0.3s;
+  }
+  .start:hover .play-ring { border-color: #D4A843; transform: scale(1.06); }
+  .play-ring svg { margin-left: 5px; }
+  .start-title {
+    font-size: clamp(18px, 3vw, 28px); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 32px; text-align: center;
+  }
+  .start-label { font-family: 'Space Mono', monospace; font-size: 12px; color: #333; letter-spacing: 0.14em; }
+
+  /* ── PHYSARUM END CARD ── */
+  #physarum {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+    z-index: 0; pointer-events: none; opacity: 0;
+    transform: scale(1.3) translateY(10%);
+    mix-blend-mode: screen;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+  #physarum.blast {
+    animation: physBlast 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+               physPulse 4s ease-in-out 2.5s infinite;
+  }
+  @keyframes physBlast {
+    0%   { opacity: 0;   transform: scale(1.3) translateY(10%); filter: brightness(3); }
+    20%  { opacity: 0.7; transform: scale(1.05) translateY(10%); filter: brightness(1.8); }
+    100% { opacity: 0.5; transform: scale(1) translateY(10%);   filter: brightness(1); }
+  }
+  @keyframes physPulse {
+    0%, 100% { opacity: 0.5;  transform: scale(1) translateY(10%);    filter: brightness(1); }
+    50%      { opacity: 0.58; transform: scale(1.015) translateY(10%); filter: brightness(1.15); }
+  }
+  .end-cta {
+    position: absolute; bottom: 3%; left: 0; right: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .end-cta a {
+    font-size: clamp(28px, 4vw, 36px); font-weight: 500;
+    color: #E8E4DE; letter-spacing: -0.01em; text-decoration: none;
+    pointer-events: auto; transition: color 0.3s;
+  }
+  .end-cta a:hover { color: #D4A843; }
+  .end-motto {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(10px, 1.1vw, 13px); color: #3F3F46;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  /* ── PIE (single-element) ── */
+  .pie-wrap { text-align: center; }
+  .pie {
+    width: clamp(160px, 24vw, 280px); height: clamp(160px, 24vw, 280px);
+    border-radius: 50%; margin: 0 auto;
+    background: conic-gradient(#E84749 0% 57%, #1E1E22 57% 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pie-inner {
+    width: 60%; height: 60%; border-radius: 50%; background: #141414;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif; font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700; color: #E84749;
+  }
+
+  /* ── BAR CHART ── */
+  .bar-chart {
+    display: flex; align-items: flex-end; justify-content: center;
+    gap: clamp(16px, 3vw, 32px); height: clamp(200px, 30vh, 320px);
+  }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .bar {
+    width: clamp(48px, 8vw, 80px); border-radius: 4px 4px 0 0;
+    transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bar-val {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(18px, 2.5vw, 28px); font-weight: 700;
+  }
+  .bar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(9px, 1vw, 12px); color: #555;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  /* ── DOT GRID (128 configs) ── */
+  .dot-grid {
+    display: grid;
+    grid-template-columns: repeat(16, clamp(12px, 1.8vw, 20px));
+    gap: clamp(4px, 0.6vw, 7px);
+  }
+  .dot {
+    width: clamp(12px, 1.8vw, 20px); height: clamp(12px, 1.8vw, 20px);
+    border-radius: 3px; background: #5CB87A;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .dot.fail { background: #E84749; }
+  .dot.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="start" id="startScreen" onclick="startFilm()">
+  <div class="start-label" style="margin-bottom:20px">EPISODE 1</div>
+  <div class="start-title">400 Experiments. 3 Survived.</div>
+  <div class="play-ring"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#555"/></svg></div>
+  <div class="start-label">PRESS TO PLAY</div>
+</div>
+
+<div class="audio-toggle" id="audioToggle" onclick="toggleAudio()">VOICE OFF</div>
+<div class="kill-counter" id="killCounter">KILLED: <span class="kc-num" id="kcNum">0</span> / 400</div>
+<div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+
+<div class="film">
+  <div class="stage">
+
+    <!-- S0: COLD OPEN — just 74%, narration carries the paradox -->
+    <div class="scene" id="s0">
+      <div class="stat-single reveal">
+        <div class="hero-num c-green">74%</div>
+      </div>
+    </div>
+
+    <!-- S1: Auto-research loop terminal -->
+    <div class="scene" id="s1">
+      <div class="mini-term">
+        <div class="mini-term-bar">
+          <div class="mini-term-dot" style="background:#E84749"></div>
+          <div class="mini-term-dot" style="background:#D4A843"></div>
+          <div class="mini-term-dot" style="background:#5CB87A"></div>
+          <div class="mini-term-title">autoresearch</div>
+        </div>
+        <div class="mini-term-body" id="tb1"></div>
+      </div>
+    </div>
+
+    <!-- S2: Batcat terminal -->
+    <div class="scene" id="s2">
+      <div class="mini-term">
+        <div class="mini-term-bar">
+          <div class="mini-term-dot" style="background:#E84749"></div>
+          <div class="mini-term-dot" style="background:#D4A843"></div>
+          <div class="mini-term-dot" style="background:#5CB87A"></div>
+          <div class="mini-term-title">shumi query</div>
+        </div>
+        <div class="mini-term-body" id="tb0"></div>
+      </div>
+    </div>
+
+    <!-- S3: Four bugs terminal -->
+    <div class="scene" id="s3">
+      <div class="mini-term">
+        <div class="mini-term-bar">
+          <div class="mini-term-dot" style="background:#E84749"></div>
+          <div class="mini-term-dot" style="background:#D4A843"></div>
+          <div class="mini-term-dot" style="background:#5CB87A"></div>
+          <div class="mini-term-title">audit layers</div>
+        </div>
+        <div class="mini-term-body" id="tb3"></div>
+      </div>
+    </div>
+
+    <!-- S4: 46 hours -->
+    <div class="scene" id="s4">
+      <div class="stat-single reveal">
+        <div class="hero-num c-red">46</div>
+        <div class="hero-sub">HOURS TO REBUILD</div>
+      </div>
+    </div>
+
+    <!-- S5: Phantom table terminal -->
+    <div class="scene" id="s5">
+      <div class="mini-term">
+        <div class="mini-term-bar">
+          <div class="mini-term-dot" style="background:#E84749"></div>
+          <div class="mini-term-dot" style="background:#D4A843"></div>
+          <div class="mini-term-dot" style="background:#5CB87A"></div>
+          <div class="mini-term-title">pg query</div>
+        </div>
+        <div class="mini-term-body" id="tb5"></div>
+      </div>
+    </div>
+
+    <!-- S6: ACT 2 — WHAT WE KILLED title -->
+    <div class="scene" id="s6">
+      <div class="stat-single reveal">
+        <div class="stat-num c-red" style="font-size:clamp(36px,5vw,64px)">WHAT WE KILLED</div>
+      </div>
+    </div>
+
+    <!-- S7: Funding paradox — 74% vs -8% -->
+    <div class="scene" id="s7">
+      <div class="kill-stamp" id="ks7">KILLED</div>
+      <div class="stat-single">
+        <div class="hero-sub reveal" style="margin-bottom:16px">FUNDING RATE SIGNAL</div>
+        <div class="vs reveal">
+          <div class="vs-col">
+            <div class="vs-num c-green">74%</div>
+            <div class="vs-label">WIN RATE</div>
+          </div>
+          <div class="vs-slash">/</div>
+          <div class="vs-col">
+            <div class="vs-num c-red">-8%</div>
+            <div class="vs-label">AVG RETURN</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8: Squeeze — 22 assets, 2 carried it -->
+    <div class="scene" id="s8">
+      <div class="kill-stamp" id="ks8">KILLED</div>
+      <div class="stat-single">
+        <div class="hero-sub reveal" style="margin-bottom:16px">SQUEEZE PERSISTENCE</div>
+        <div class="vs reveal">
+          <div class="vs-col">
+            <div class="vs-num c-dim">22</div>
+            <div class="vs-label">ASSETS TESTED</div>
+          </div>
+          <div class="vs-slash">→</div>
+          <div class="vs-col">
+            <div class="vs-num c-red">2</div>
+            <div class="vs-label">CARRIED THE SIGNAL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S9: (removed — pair trading conflicts with product archetype) -->
+    <div class="scene" id="s9" style="display:none"></div>
+
+    <!-- S10: 165K headlines -->
+    <div class="scene" id="s10">
+      <div class="stat-single reveal">
+        <div class="hero-num c-gold">165K</div>
+        <div class="hero-sub">HEADLINES</div>
+      </div>
+    </div>
+
+    <!-- S11: Who said it — n=38 -->
+    <div class="scene" id="s11">
+      <div class="stat-single reveal">
+        <div class="hero-sub" style="margin-bottom:12px">SOURCE TIER DIVERGENCE</div>
+        <div class="stat-num c-gold">n=38</div>
+        <div class="badge badge-amber">WATCHING · NOT TRADING</div>
+      </div>
+    </div>
+
+    <!-- S12: ACT 3 — 400 → 3 -->
+    <div class="scene" id="s12">
+      <div class="stat-single">
+        <div class="hero-sub reveal" style="margin-bottom:16px">WHAT SURVIVED</div>
+        <div class="vs reveal">
+          <div class="vs-col">
+            <div class="vs-num c-dim">400</div>
+            <div class="vs-label">TESTED</div>
+          </div>
+          <div class="vs-slash">→</div>
+          <div class="vs-col">
+            <div class="vs-num c-green">3</div>
+            <div class="vs-label">SURVIVED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S13: Redacted terminal (won't tell exact rules) -->
+    <div class="scene" id="s13">
+      <div class="mini-term">
+        <div class="mini-term-bar">
+          <div class="mini-term-dot" style="background:#E84749"></div>
+          <div class="mini-term-dot" style="background:#D4A843"></div>
+          <div class="mini-term-dot" style="background:#5CB87A"></div>
+          <div class="mini-term-title">strategy.config</div>
+        </div>
+        <div class="mini-term-body" id="tb13"></div>
+      </div>
+    </div>
+
+    <!-- S14: Signal 1 — survived but not proven -->
+    <div class="scene" id="s14">
+      <div class="stat-single reveal">
+        <div class="hero-sub" style="margin-bottom:12px">WALK-FORWARD VALIDATION</div>
+        <div class="stat-num c-green" style="font-size:clamp(48px,8vw,100px)">5/5</div>
+        <div class="hero-sub" style="margin-top:8px">FOLDS PASSED</div>
+        <div class="badge badge-amber">2022 IN TRAINING DATA</div>
+      </div>
+    </div>
+
+    <!-- S15: OOS — +16.8% -->
+    <div class="scene" id="s15">
+      <div class="stat-single reveal">
+        <div class="stat-num c-green">+16.8%</div>
+        <div class="hero-sub">OUT-OF-SAMPLE</div>
+      </div>
+    </div>
+
+    <!-- S16: Signal 2 — concentration: real equity curve + bar chart -->
+    <div class="scene" id="s16">
+      <div class="stat-single">
+        <div class="bar-chart reveal" id="concBars">
+          <div class="bar-col">
+            <div class="bar-val c-green">+87%</div>
+            <div class="bar" style="height:260px;background:#5CB87A"></div>
+            <div class="bar-label">BASELINE</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val c-gold">+37%</div>
+            <div class="bar" style="height:111px;background:#D4A843"></div>
+            <div class="bar-label">−1 TRADE</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-val c-red">−10%</div>
+            <div class="bar" style="height:30px;background:#E84749"></div>
+            <div class="bar-label">−3 TRADES</div>
+          </div>
+        </div>
+        <div class="badge badge-red reveal" style="margin-top:16px">CONCENTRATION RISK</div>
+      </div>
+    </div>
+
+    <!-- S17: Signal 3 — n=5 holder exit -->
+    <div class="scene" id="s17">
+      <div class="stat-single reveal">
+        <div class="hero-sub" style="margin-bottom:12px">HOLDER EXIT SIGNAL</div>
+        <div class="stat-num c-gold" style="font-size:clamp(80px,14vw,160px)">n=5</div>
+        <div class="hero-sub" style="margin-top:8px">1 ASSET · 5 FIRES · 1 HIT ATH</div>
+        <div class="badge badge-amber">HYPOTHESIS</div>
+      </div>
+    </div>
+
+    <!-- S18: CLOSING — recap -->
+    <div class="scene" id="s18">
+      <div class="stat-single reveal">
+        <div class="stat-num" style="font-size:clamp(28px,4vw,48px); color:#F9FAFB; line-height:1.6">
+          400 experiments<br>
+          <span class="c-green">3</span> survivors<br>
+          <span class="c-red">0</span> perfect
+        </div>
+      </div>
+    </div>
+
+    <!-- S19: Tagline -->
+    <div class="scene" id="s19">
+      <div class="stat-single reveal">
+        <div style="font-size:clamp(28px,4.5vw,56px); font-weight:700; letter-spacing:-0.02em; line-height:1.3">
+          Trust the code.<br><span class="c-dim">Not the changelog.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- S20: End card — physarum + shumi.ai -->
+    <div class="scene" id="s20">
+      <iframe id="physarum" src="about:blank" allow="autoplay" loading="lazy"></iframe>
+      <div class="end-cta">
+        <a href="https://shumi.ai/app" target="_blank" class="reveal">shumi.ai</a>
+        <div class="end-motto reveal">the work continues</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="narr-strip">
+    <div class="narr-text" id="nText"></div>
+  </div>
+</div>
+
+<div class="progress" id="progressBar"></div>
+<div class="counter" id="counter"></div>
+
+<script>
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+// Ambient pad (low drone under narration)
+var ambientPad = new Audio('https://cdn.pixabay.com/audio/2024/11/04/audio_afff2a0498.mp3');
+ambientPad.loop = true; ambientPad.volume = 0.08; ambientPad.preload = 'auto';
+
+// Audio engine
+var audioEnabled = false;
+var narrationTrack = new Audio('audio/narration.mp3');
+narrationTrack.preload = 'auto';
+
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  var btn = document.getElementById('audioToggle');
+  btn.textContent = audioEnabled ? 'VOICE ON' : 'VOICE OFF';
+  btn.classList.toggle('on', audioEnabled);
+  if (audioEnabled && running) { narrationTrack.play().catch(function(){}); ambientPad.play().catch(function(){}); }
+  else { narrationTrack.pause(); ambientPad.pause(); }
+}
+function startNarration() {
+  if (!audioEnabled) return;
+  narrationTrack.currentTime = 0;
+  narrationTrack.play().catch(function(){});
+  ambientPad.currentTime = 0;
+  ambientPad.play().catch(function(){});
+}
+
+// Kill counter state
+var killCount = 0;
+var killTargets = { 's7': 197, 's8': 397 }; // cumulative kills at each scene
+
+var scenes = [
+  // S0: Paradox cold open
+  { el:'s0', dur:16000,
+    narr:'74% win rate... loses money.' },
+
+  // S1: Auto-research loop
+  { el:'s1', dur:14000,
+    term: { id:'tb1', lines:[
+      '<span class="t-cyan">$</span> <span class="t-gray">run autoresearch</span>',
+      '<span class="t-dim">  hypothesis → test → kill → repeat</span>',
+      '<span class="t-red">  397 killed</span>  <span class="t-green">3 survived</span>',
+    ]},
+    narr:'Auto-research. Machines don\'t get attached.' },
+
+  // S2: Batcat terminal
+  { el:'s2', dur:16000,
+    term: { id:'tb0', lines:[
+      '<span class="t-cyan">$</span> <span class="t-gray">shumi analyze BTC</span>',
+      '<span class="t-dim">  resolving ticker...</span>',
+      '<span class="t-leaked">  BTC → batcat (CoinGecko ID: batcat)</span>',
+    ]},
+    narr:'Batcat. That was the easy one.' },
+
+  // S3: Four bugs
+  { el:'s3', dur:12000,
+    term: { id:'tb3', lines:[
+      '<span class="t-red">✗</span> <span class="t-gray">metadata: wrong coin</span>',
+      '<span class="t-red">✗</span> <span class="t-gray">cache: stale</span>',
+      '<span class="t-red">✗</span> <span class="t-gray">search: batcat</span>',
+      '<span class="t-red">✗</span> <span class="t-gray">source tier: Bloomberg → blog</span>',
+    ]},
+    narr:'Four bugs. Every layer.' },
+
+  // S4: 46h / 21 commits
+  { el:'s4', dur:3000,
+    narr:'Forty-six hours. Every layer.' },
+
+  // S5: Phantom table
+  { el:'s5', dur:13000,
+    term: { id:'tb5', lines:[
+      '<span class="t-cyan">SELECT</span> <span class="t-gray">* FROM trend_streak_daily</span>',
+      '<span class="t-red">ERROR: relation does not exist</span>',
+      '<span class="t-dim">  // 3 endpoints. 0 tables. 5 months.</span>',
+    ]},
+    narr:'Built on air.' },
+
+  // S6: WHAT WE KILLED
+  { el:'s6', dur:4000, sound:'caution',
+    narr:'' },
+
+  // S7: Funding paradox
+  { el:'s7', dur:22000, sound:'caution',
+    narr:'74% win rate. Negative eight percent return.' },
+
+  // S8: Squeeze — 22 → 2
+  { el:'s8', dur:16000,
+    narr:'Twenty-two assets. Two carried the whole thing.' },
+
+  // S10: 165K headlines
+  { el:'s10', dur:8000,
+    narr:'165 thousand headlines. Zero edge.' },
+
+  // S11: n=38 watching
+  { el:'s11', dur:21000,
+    narr:'Not what was said. Who said it. Not trading it yet.' },
+
+  // S12: 400 → 3
+  { el:'s12', dur:5000, sound:'notification',
+    narr:'Three survived.' },
+
+  // S13: Redacted
+  { el:'s13', dur:15000,
+    term: { id:'tb13', lines:[
+      '<span class="t-green">strategy:</span> <span class="t-dim">████████████</span>',
+      '<span class="t-green">params:</span>   <span class="t-dim">████████████████</span>',
+      '<span class="t-green">assets:</span>   <span class="t-dim">████████</span>',
+    ]},
+    narr:'Not the rules. What we learned.' },
+
+  // S14: 127/128
+  { el:'s14', dur:20000,
+    narr:'Five folds passed. But 2022 was training data.' },
+
+  // S15: +16.8% OOS
+  { el:'s15', dur:8000,
+    narr:'Sixteen percent out of sample. Survived.' },
+
+  // S16: Concentration pie
+  { el:'s16', dur:28000, sound:'caution',
+    narr:'57% of profit. One trade. Unsolved.' },
+
+  // S17: n=5
+  { el:'s17', dur:12000,
+    narr:'Five data points. Hypothesis. Not a strategy.' },
+
+  // S18: Closing recap
+  { el:'s18', dur:20000,
+    narr:'A process that kills bad ideas fast.' },
+
+  // S19: Tagline
+  { el:'s19', dur:12000, sound:'celebration',
+    narr:'' },
+
+  // S20: End card — physarum
+  { el:'s20', dur:10000,
+    narr:'', physarum: true },
+];
+
+var cur = -1, running = false, total = scenes.length;
+var sceneTimer = null, revealTimers = [];
+
+function killTimers() {
+  clearTimeout(sceneTimer); sceneTimer = null;
+  revealTimers.forEach(function(t){clearTimeout(t);}); revealTimers = [];
+}
+function clearAll() {
+  killTimers();
+  document.querySelectorAll('.scene').forEach(function(s){
+    s.classList.remove('active');
+    s.querySelectorAll('.reveal').forEach(function(r){r.classList.remove('show');});
+    s.querySelectorAll('.mini-term-line').forEach(function(r){r.classList.remove('show');});
+    s.querySelectorAll('.kill-stamp').forEach(function(r){r.classList.remove('slam');});
+  });
+}
+function showNarr(html) {
+  var nt = document.getElementById('nText');
+  nt.classList.remove('show');
+  setTimeout(function(){ nt.innerHTML = html||''; if(html) nt.classList.add('show'); },150);
+}
+
+// Physarum
+var physPreloaded = false;
+function preloadPhysarum() {
+  if (physPreloaded) return;
+  var phys = document.getElementById('physarum');
+  if (phys) {
+    phys.src = 'https://shumi-landing.onrender.com/physarum/stencil.html?lp&seed=60&es=0.57&ew=0.28';
+    physPreloaded = true;
+  }
+}
+function blastPhysarum() {
+  var phys = document.getElementById('physarum');
+  if (phys) phys.classList.add('blast');
+}
+
+function startFilm() {
+  document.getElementById('startScreen').classList.add('hidden');
+  audioEnabled = true;
+  var btn = document.getElementById('audioToggle');
+  btn.textContent = 'VOICE ON';
+  btn.classList.add('on');
+  running = true; startNarration(); nextScene();
+}
+
+function playScene() {
+  var s = scenes[cur];
+  document.getElementById('counter').textContent = String(cur+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((cur+1)/total*100)+'%';
+  if(cur>=1) document.getElementById('recBadge').classList.add('show');
+
+  try{snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.3});}catch(e){}
+  if(s.sound==='caution') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CAUTION,{volume:0.45});},250));}catch(e){}
+  if(s.sound==='notification') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.NOTIFICATION);},250));}catch(e){}
+  if(s.sound==='celebration') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CELEBRATION);},250));}catch(e){}
+
+  // Kill counter: show during Act 2 (kills section), hide after
+  var kc = document.getElementById('killCounter');
+  var kcNum = document.getElementById('kcNum');
+  if (s.el === 's6' || s.el === 's7' || s.el === 's8') {
+    kc.classList.add('show');
+    kc.classList.remove('survived');
+  } else if (s.el === 's12') {
+    // Transition to "SURVIVED: 3 / 400"
+    kc.classList.add('show','survived');
+    kc.innerHTML = 'SURVIVED: <span class="kc-num" id="kcNum">3</span> / 400';
+    revealTimers.push(setTimeout(function(){ kc.classList.remove('show'); }, 3000));
+  } else if (s.el !== 's10' && s.el !== 's11') {
+    kc.classList.remove('show');
+  }
+
+  // Animate kill count up when entering kill scenes
+  if (killTargets[s.el] !== undefined) {
+    var target = killTargets[s.el];
+    var step = Math.ceil((target - killCount) / 30);
+    var counterInterval = setInterval(function(){
+      killCount += step;
+      if (killCount >= target) { killCount = target; clearInterval(counterInterval); }
+      kcNum.textContent = killCount;
+    }, 50);
+    revealTimers.push(setTimeout(function(){ clearInterval(counterInterval); }, 2000));
+  }
+
+  // Kill stamp slam (delayed after data appears)
+  if (s.el === 's7') {
+    revealTimers.push(setTimeout(function(){
+      document.getElementById('ks7').classList.add('slam');
+      try{snd.play(Snd.SOUNDS.TAP,{volume:0.4});}catch(e){}
+    }, 3500));
+  }
+  if (s.el === 's8') {
+    revealTimers.push(setTimeout(function(){
+      document.getElementById('ks8').classList.add('slam');
+      try{snd.play(Snd.SOUNDS.TAP,{volume:0.4});}catch(e){}
+    }, 3500));
+  }
+
+  // Physarum: preload 2 scenes before, blast on entry
+  if (cur >= total - 3) preloadPhysarum();
+  if (s.physarum) blastPhysarum();
+
+  showNarr(s.narr);
+  var el = document.getElementById(s.el);
+  el.classList.add('active');
+
+  el.querySelectorAll('.reveal').forEach(function(r,i){
+    revealTimers.push(setTimeout(function(){
+      r.classList.add('show');
+      try{snd.play(Snd.SOUNDS.TAP,{volume:0.15});}catch(e){}
+    }, 300+i*350));
+  });
+
+  if(s.term){
+    var tb = document.getElementById(s.term.id); tb.innerHTML='';
+    s.term.lines.forEach(function(l,i){
+      var d=document.createElement('div'); d.className='mini-term-line'; d.innerHTML=l; tb.appendChild(d);
+      revealTimers.push(setTimeout(function(){
+        d.classList.add('show');
+        try{snd.play(Snd.SOUNDS.TYPE,{volume:0.18});}catch(e){}
+      }, 500+i*500));
+    });
+  }
+  sceneTimer = setTimeout(nextScene, s.dur);
+}
+
+function nextScene() {
+  clearAll(); cur++;
+  if(cur>=total){running=false;showNarr('');narrationTrack.pause();ambientPad.pause();return;}
+  playScene();
+}
+function goTo(i){clearAll();cur=i;if(cur<0)cur=0;if(cur>=total)cur=total-1;playScene();}
+
+document.addEventListener('keydown',function(e){
+  if(e.code==='Space'){e.preventDefault();if(cur<0){startFilm();return;}
+    if(running){running=false;killTimers();if(audioEnabled)narrationTrack.pause();}
+    else{running=true;if(audioEnabled)narrationTrack.play().catch(function(){});nextScene();}}
+  if(e.code==='ArrowRight'||e.code==='PageDown'){e.preventDefault();if(cur<0){startFilm();return;}running=true;nextScene();}
+  if(e.code==='ArrowLeft'||e.code==='PageUp'){e.preventDefault();if(cur<=0)return;running=true;goTo(cur-1);}
+});
+</script>
+</body>
+</html>
