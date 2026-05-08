@@ -284,7 +284,16 @@
   }
   .tweet-avatar {
     width: 56px; height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
     flex-shrink: 0;
+    background: #1e1e22;
+  }
+  .tweet-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: 50% 14%;
+    display: block;
   }
   .tweet-avatar svg {
     width: 100%; height: 100%; display: block;
@@ -502,12 +511,17 @@
         <div class="tweet-card reveal" id="s1Card">
           <div class="tweet-header">
             <div class="tweet-avatar">
-              <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" aria-label="GCR avatar">
-                <circle cx="28" cy="28" r="28" fill="#d4a843"/>
-                <text x="28" y="38" text-anchor="middle"
-                      font-family="DM Sans, sans-serif"
-                      font-weight="700" font-size="32" fill="#0a0a0a">G</text>
-              </svg>
+              <!--
+                Avatar: shoebill (Balaeniceps rex) at Ueno Zoo, Tokyo.
+                Source: Wikimedia Commons
+                URL: https://commons.wikimedia.org/wiki/File:Balaeniceps_rex_-Ueno_Zoo,_Tokyo,_Japan-8a.jpg
+                License: CC BY-SA 3.0 — credit photographer in YouTube
+                description when this film is published.
+                Used here as quoted-UI per CANON.md — foreign palette
+                allowed inside contained citation region (the avatar
+                circle frame).
+              -->
+              <img src="assets/shoebill-avatar.jpg" alt="GCR avatar — shoebill" loading="lazy"/>
             </div>
             <div class="tweet-meta">
               <span class="tweet-name">GCR</span>
