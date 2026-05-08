@@ -266,35 +266,69 @@
   }
   .eq-marker.show { opacity: 1; }
 
-  /* ── TWEET RENDER ── */
+  /* ── TWEET RENDER (Shumi-typed citation, structurally an X tweet) ── */
   .tweet-wrap {
     display: flex; flex-direction: column; align-items: center;
-    max-width: min(85vw, 900px); padding: 0 24px;
+    max-width: min(85vw, 720px); padding: 0 24px;
   }
-  .tweet-glyph {
-    width: clamp(48px, 4vw, 72px);
-    margin-bottom: 28px;
-    display: flex; justify-content: center;
-    line-height: 0;
+  .tweet-card {
+    width: 100%;
+    display: flex; flex-direction: column;
+    gap: clamp(18px, 2.4vh, 28px);
+    text-align: left;
   }
-  .tweet-glyph svg {
-    width: 100%; height: auto; display: block;
+  .tweet-header {
+    display: flex; align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
   }
-  .tweet-quote {
+  .tweet-avatar {
+    width: 56px; height: 56px;
+    flex-shrink: 0;
+  }
+  .tweet-avatar svg {
+    width: 100%; height: 100%; display: block;
+  }
+  .tweet-meta {
+    display: flex; align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    line-height: 1.2;
+  }
+  .tweet-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(20px, 1.8vw, 24px);
+    font-weight: 600;
+    color: #e0e0e0;
+    letter-spacing: -0.01em;
+  }
+  .tweet-check {
+    font-family: 'DM Sans', sans-serif;
+    color: #d4a843;
+    font-size: clamp(14px, 1.2vw, 18px);
+    line-height: 1;
+    margin-left: -2px;
+  }
+  .tweet-handle, .tweet-time {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 16px);
+    color: #999999;
+    letter-spacing: 0.04em;
+  }
+  .tweet-body {
     font-family: 'Geist Mono', monospace;
     font-size: clamp(28px, 3vw, 44px);
-    color: #999999;
+    color: #e0e0e0;
     line-height: 1.45;
-    text-align: center;
+    letter-spacing: 0.02em;
   }
-  .tweet-handle {
+  .tweet-metrics {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(15px, 1.4vw, 20px);
+    font-size: clamp(11px, 1.1vw, 14px);
     color: #999999;
-    letter-spacing: 0.08em;
-    margin-top: 36px;
-    text-align: center;
-    opacity: 0.85;
+    letter-spacing: 0.04em;
+    opacity: 0.5;
+    margin-top: 4px;
   }
 
   /* ── TYPE ACCENTS ── */
@@ -462,40 +496,29 @@
 <div class="film">
   <div class="stage">
 
-    <!-- S1: Tweet render (the strong claim) -->
+    <!-- S1: Tweet render — structurally an X.com tweet, Shumi typography -->
     <div class="scene" id="s1">
       <div class="tweet-wrap">
-        <div class="tweet-glyph reveal" id="s1Glyph">
-          <svg viewBox="0 0 130 56" xmlns="http://www.w3.org/2000/svg" fill="#D4A843" aria-label="shoebill silhouette">
-            <!--
-              Stylized shoebill profile silhouette, facing right.
-              Designed with deliberately thick blocky beak (the
-              "shoe") roughly equal in vertical extent to the head.
-              Beak hooks slightly down at far right tip.
-
-              Hand-crafted SVG path; if silhouette still doesn't
-              read as bird at preview, replace with a CC0-traced
-              reference path (e.g. PhyloPic Balaeniceps SVG).
-            -->
-            <path d="M 12,40
-                     C 4,36 2,16 10,8
-                     C 22,0 42,0 54,6
-                     C 60,9 64,14 64,20
-                     L 96,18
-                     L 116,22
-                     Q 126,24 126,32
-                     Q 124,40 116,38
-                     L 102,32
-                     Q 92,38 82,34
-                     L 64,30
-                     Q 58,32 54,40
-                     Q 46,46 32,46
-                     L 14,46
-                     Q 6,44 12,40 Z"/>
-          </svg>
+        <div class="tweet-card reveal" id="s1Card">
+          <div class="tweet-header">
+            <div class="tweet-avatar">
+              <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" aria-label="GCR avatar">
+                <circle cx="28" cy="28" r="28" fill="#d4a843"/>
+                <text x="28" y="38" text-anchor="middle"
+                      font-family="DM Sans, sans-serif"
+                      font-weight="700" font-size="32" fill="#0a0a0a">G</text>
+              </svg>
+            </div>
+            <div class="tweet-meta">
+              <span class="tweet-name">GCR</span>
+              <span class="tweet-check">&#10003;</span>
+              <span class="tweet-handle">@GiganticRebirth</span>
+              <span class="tweet-time">&middot; Sep 30, 2021</span>
+            </div>
+          </div>
+          <div class="tweet-body">The best traders will always prioritize intuition over apophenia.</div>
+          <div class="tweet-metrics">37 replies &middot; 178 reposts &middot; 1.1k likes</div>
         </div>
-        <div class="tweet-quote reveal" id="s1Quote">The best traders will always prioritize intuition over apophenia.</div>
-        <div class="tweet-handle reveal" id="s1Handle">GCR &middot; @GiganticRebirth</div>
       </div>
     </div>
 
@@ -811,13 +834,13 @@ var s9Lines = [
 
 // ── Scene definitions ──
 var scenes = [
-  // S1: Tweet render
-  { el: 's1', dur: 7000,
+  // S1: Tweet render — single-card fade-in (structurally an X tweet, Shumi typography)
+  { el: 's1', dur: 8000,
     narr: 'The strong claim &mdash; <span class="hi">under examination</span>.',
     onEnter: function() {
-      revealTimers.push(setTimeout(function(){ document.getElementById('s1Glyph').classList.add('show'); }, 300));
-      revealTimers.push(setTimeout(function(){ document.getElementById('s1Quote').classList.add('show'); }, 500));
-      revealTimers.push(setTimeout(function(){ document.getElementById('s1Handle').classList.add('show'); }, 1100));
+      revealTimers.push(setTimeout(function(){
+        document.getElementById('s1Card').classList.add('show');
+      }, 300));
     } },
 
   // S2: Three propositions + grounding terminal
