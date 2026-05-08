@@ -859,7 +859,7 @@ var scenes = [
     } },
 
   // S2: Three propositions + grounding terminal
-  { el: 's2', dur: 10500,
+  { el: 's2', dur: 14000,
     narr: '<span class="terra">Validation</span> tells you which is which.',
     onEnter: function() {
       // Stagger editorial reveals (3 propositions + 2 rules = 5 elements)
@@ -894,7 +894,7 @@ var scenes = [
     } },
 
   // S3: BTC market context
-  { el: 's3', dur: 9000,
+  { el: 's3', dur: 10500,
     narr: 'Bitcoin. February to May.',
     onEnter: function() {
       stagger('#s3 .reveal', 300);
@@ -921,12 +921,12 @@ var scenes = [
   //    eight six. Plus eight hundred twenty-eight percent. Two hundred forty-
   //    nine trades."
   // ~36 words → ~14 seconds at 3.0 wps × 1.1x speed including sentence pauses.
-  { el: 's4', dur: 14000, sound: 'notification',
+  { el: 's4', dur: 22000, sound: 'notification',
     narr: 'One slice of a <span class="hi">sixteen-month</span> test. <span class="ok">Sharpe 1.86</span>.',
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
   // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
-  { el: 's5', dur: 9000,
+  { el: 's5', dur: 11000,
     narr: 'Same trap, both sides. <span class="red">Drift only covers one of them</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s5 .reveal');
@@ -936,7 +936,7 @@ var scenes = [
     } },
 
   // S5b: ZEC chart (the proof)
-  { el: 's5b', dur: 9000, sound: 'caution',
+  { el: 's5b', dur: 10500, sound: 'caution',
     narr: 'The exit signal <span class="red">never came</span>.',
     onEnter: function() {
       stagger('#s5b .reveal', 300);
@@ -952,7 +952,7 @@ var scenes = [
     } },
 
   // S6: Filter disclosure
-  { el: 's6', dur: 11000,
+  { el: 's6', dur: 15000,
     term: { id: 'tb6', lines: s6Lines, cadence: 400 },
     narr: '<span class="hi">Codified</span>, not discretionary.',
     onEnter: function() {
@@ -971,7 +971,7 @@ var scenes = [
     } },
 
   // S7: Position state
-  { el: 's7', dur: 9000,
+  { el: 's7', dur: 11000,
     narr: 'Six carry positions held from February.',
     onEnter: function() {
       stagger('#s7 .reveal', 300);
@@ -988,7 +988,7 @@ var scenes = [
     } },
 
   // S8: April entries
-  { el: 's8', dur: 8500,
+  { el: 's8', dur: 14000,
     narr: 'Two new entries. <span class="ok">+9</span> and <span class="red">&minus;4</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s8 .reveal');
