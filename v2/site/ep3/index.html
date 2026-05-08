@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Work Is The Work.</title>
+<title>Optimal parameterization is curve fitting.</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
 <script>if(location.search.includes('autoplay'))document.documentElement.classList.add('autoplay')</script>
@@ -428,6 +428,11 @@
     color: #e0e0e0;
   }
   .start-label { font-family: 'Geist Mono', monospace; font-size: 16px; color: #999999; letter-spacing: 0.14em; opacity: 0.6; }
+  .ep-marker {
+    position: absolute; top: 24px; right: 28px;
+    font-family: 'Geist Mono', monospace; font-size: 14px;
+    color: #999999; letter-spacing: 0.14em; opacity: 0.6;
+  }
 
   /* ── PHYSARUM END CARD ── */
   #physarum {
@@ -492,8 +497,11 @@
 <body>
 
 <div class="start" id="startScreen" onclick="startFilm()">
-  <div class="start-label" style="margin-bottom:24px">EPISODE 3</div>
-  <div class="start-title">The Work Is The Work.</div>
+  <div class="ep-marker">Ep 3</div>
+  <div style="text-align:center; margin-bottom:36px;">
+    <div class="start-title" style="margin-bottom:8px;">Optimal parameterization is curve fitting.</div>
+    <div class="start-title" style="margin-bottom:0; color:#999999;">We let the market decide.</div>
+  </div>
   <div class="play-ring"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#999999"/></svg></div>
   <div class="start-label">PRESS TO PLAY</div>
 </div>
