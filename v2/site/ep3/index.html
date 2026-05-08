@@ -617,11 +617,12 @@
       </div>
     </div>
 
-    <!-- S5: Why longs-only (clean editorial) -->
+    <!-- S5: Why longs-only (clean editorial, 3 lines, symmetric framing) -->
     <div class="scene" id="s5">
       <div class="editorial-stack">
         <div class="editorial reveal" style="color:#999999">Why longs-only?</div>
-        <div class="editorial reveal">Mean-reversion shorts have no exit catalyst in a rally.</div>
+        <div class="editorial reveal">Neither side has a clean exit catalyst.</div>
+        <div class="editorial reveal" style="font-size:0.75em">"It's gone up enough" is not a sell signal.</div>
       </div>
     </div>
 
@@ -924,13 +925,14 @@ var scenes = [
     narr: 'One slice of a <span class="hi">sixteen-month</span> test. <span class="ok">Sharpe 1.86</span>.',
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
-  // S5: Why longs-only (clean editorial, 2 lines)
-  { el: 's5', dur: 7000,
-    narr: 'Shorts in a sustained rally have <span class="red">no exit catalyst</span>.',
+  // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
+  { el: 's5', dur: 9000,
+    narr: 'Same trap, both sides. <span class="red">Drift only covers one of them</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s5 .reveal');
       revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
       revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 1200));
+      revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 2100));
     } },
 
   // S5b: ZEC chart (the proof)
