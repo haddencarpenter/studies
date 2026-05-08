@@ -556,39 +556,39 @@
       </div>
     </div>
 
-    <!-- S3: BTC equity curve (market context) -->
+    <!-- S3: BTC market context (Coinbase spot, Feb 7 -> May 7 2026 — verified prices) -->
     <div class="scene" id="s3">
       <div class="eq-wrap">
         <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-07</div>
         <svg class="eq-svg" viewBox="0 0 1200 420" preserveAspectRatio="none">
           <line x1="40" y1="380" x2="1160" y2="380" stroke="#1e1e22" stroke-width="1"/>
           <line x1="40" y1="40"  x2="40"   y2="380" stroke="#1e1e22" stroke-width="1"/>
-          <text x="72" y="80"  fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$100k</text>
-          <text x="72" y="200" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$90k</text>
-          <text x="72" y="320" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$80k</text>
+          <text x="72" y="80"  fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$82k</text>
+          <text x="72" y="200" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$74k</text>
+          <text x="72" y="320" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$66k</text>
           <text x="100"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">FEB</text>
           <text x="430"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAR</text>
           <text x="780"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">APR</text>
           <text x="1100" y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAY</text>
           <polyline class="eq-line" id="eqLine"
             fill="none" stroke="#999999" stroke-width="3" stroke-linejoin="round"
-            points="80,71 160,90 240,140 320,180 400,220 480,260 560,290 640,300 720,310 800,318 870,310 940,260 1010,210 1080,150 1140,118"/>
-          <circle id="eqCursor" cx="80" cy="71" r="6" fill="#e0e0e0" opacity="0">
+            points="80,252 199,277 318,298 437,320 556,241 676,315 723,288 795,231 914,154 1033,149 1140,121"/>
+          <circle id="eqCursor" cx="80" cy="252" r="6" fill="#e0e0e0" opacity="0">
             <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2.6s" begin="indefinite" fill="freeze"/>
-            <animate attributeName="cx" values="80;160;240;320;400;480;560;640;720;800;870;940;1010;1080;1140" dur="2.6s" begin="indefinite" fill="freeze"/>
-            <animate attributeName="cy" values="71;90;140;180;220;260;290;300;310;318;310;260;210;150;118" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cx" values="80;199;318;437;556;676;723;795;914;1033;1140" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cy" values="252;277;298;320;241;315;288;231;154;149;121" dur="2.6s" begin="indefinite" fill="freeze"/>
           </circle>
           <g class="eq-marker" id="m1">
-            <line x1="100" y1="60" x2="100" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
-            <text x="100" y="50" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">FEB 7 &middot; $100,538</text>
+            <line x1="80" y1="252" x2="80" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="80" y="242" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="start">FEB 7 &middot; $70,508</text>
           </g>
           <g class="eq-marker" id="m2">
-            <line x1="800" y1="320" x2="800" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
-            <text x="800" y="345" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">APR 2 &middot; $82,549</text>
+            <line x1="437" y1="320" x2="437" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="437" y="345" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">MAR 9 &middot; $65,978</text>
           </g>
           <g class="eq-marker" id="m3">
-            <line x1="1140" y1="108" x2="1140" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
-            <text x="1100" y="98" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">MAY 7 &middot; $96,816</text>
+            <line x1="1140" y1="111" x2="1140" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="1140" y="101" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">MAY 7 &middot; $79,271</text>
           </g>
         </svg>
       </div>
