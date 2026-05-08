@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>5 Failed. 65 Didn't.</title>
+<title>The Work Is The Work.</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/gh/snd-lib/snd-lib@v1.2.4/dist/browser/snd.js?kit=01"></script>
 <script>if(location.search.includes('autoplay'))document.documentElement.classList.add('autoplay')</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    background: #0A0A0A; color: #E0E0E0;
+    background: #0a0a0a; color: #e0e0e0;
     font-family: 'DM Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow: hidden; width: 100vw; height: 100vh;
@@ -17,638 +18,723 @@
   .film { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
   .stage {
-    flex: 1; display: flex; align-items: center; justify-content: center;
-    padding: 24px; position: relative; overflow: hidden;
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: clamp(24px, 4vh, 60px) clamp(16px, 4vw, 60px);
+    position: relative; overflow: hidden;
+    min-height: 0;
   }
 
   .scene {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     opacity: 0; transition: opacity 0.7s ease;
-    padding: 24px;
+    padding: clamp(24px, 4vh, 60px) clamp(16px, 4vw, 60px);
   }
   .scene.active { opacity: 1; }
-
-  /* ── HERO NUMBERS ── */
-  .hero-num {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(100px, 18vw, 260px);
-    font-weight: 700; line-height: 0.85;
-    letter-spacing: -0.04em; text-align: center;
-  }
-  .hero-sub {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.6vw, 22px);
-    color: #999999; letter-spacing: 0.12em;
-    text-transform: uppercase; margin-top: 20px; text-align: center;
-  }
-
-  .stat-single { text-align: center; }
-  .stat-num {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(72px, 14vw, 180px);
-    font-weight: 700; line-height: 1;
-    letter-spacing: -0.03em;
-  }
-
-  /* ── VERSUS ── */
-  .vs {
-    display: flex; align-items: center; justify-content: center;
-    gap: clamp(32px, 6vw, 80px);
-  }
-  .vs-col { text-align: center; }
-  .vs-num {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(56px, 10vw, 140px);
-    font-weight: 700; line-height: 1; letter-spacing: -0.03em;
-  }
-  .vs-label {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.4vw, 18px);
-    color: #999999; letter-spacing: 0.1em;
-    text-transform: uppercase; margin-top: 10px;
-  }
-  .vs-arrow {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(40px, 6vw, 80px);
-    color: #1E1E22; font-weight: 300;
-  }
-
-  /* ── MINI TERMINAL ── */
-  .mini-term {
-    background: #141414;
-    border-radius: 8px; width: 85vw; max-width: 1400px; overflow: hidden;
-  }
-  .mini-term-bar {
-    display: flex; align-items: center; gap: 7px;
-    padding: clamp(6px, 1vh, 12px) 16px;
-    background: #1E1E22;
-  }
-  .mini-term-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .mini-term-title {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(12px, 1.1vw, 15px); color: #999999; margin-left: 10px;
-  }
-  .mini-term-body {
-    padding: clamp(16px, 2.5vh, 28px) clamp(20px, 3vw, 40px);
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(13px, 1.4vw, 17px); line-height: 1.95;
-    color: #E0E0E0;
-  }
-  .mini-term-line {
-    opacity: 0; transform: translateY(6px);
-    transition: opacity 0.35s, transform 0.35s;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .mini-term-line.show { opacity: 1; transform: translateY(0); }
-
-  .t-red { color: #EF4444; }
-  .t-green { color: #4ADE80; }
-  .t-gold { color: #D4A843; }
-  .t-dim { color: #999999; }
-  .t-gray { color: #999999; }
-  .t-cyan { color: #999999; }
-  .t-terra { color: #D4574A; }
-
-  /* ── BADGE ── */
-  .badge {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.4vw, 18px); font-weight: 700;
-    padding: 8px 20px; border-radius: 4px;
-    letter-spacing: 0.08em; display: inline-block; margin-top: 16px;
-  }
-  .badge-red { background: rgba(239,68,68,0.15); color: #EF4444; }
-  .badge-green { background: rgba(74,222,128,0.15); color: #4ADE80; }
-  .badge-amber { background: rgba(212,168,67,0.15); color: #D4A843; }
-  .badge-terra { background: #1E1E22; color: #D4574A; }
 
   /* ── REVEAL ── */
   .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; }
   .reveal.show { opacity: 1; transform: translateY(0); }
 
-  /* ── GATE GRID ── */
-  .gate-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: clamp(16px, 2.5vw, 32px);
-    max-width: 720px;
+  /* ── EDITORIAL TYPE ── */
+  .editorial {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    text-align: center;
+    max-width: min(85vw, 1000px);
   }
-  .gate-cell { text-align: center; }
-  .gate-dot {
-    width: clamp(28px, 4vw, 44px); height: clamp(28px, 4vw, 44px);
-    border-radius: 50%; background: #1E1E22;
-    margin: 0 auto; transition: background 0.5s ease, box-shadow 0.5s ease;
+  .editorial-sm {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 56px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    text-align: center;
   }
-  .gate-dot.pass { background: #4ADE80; box-shadow: 0 0 12px rgba(74,222,128,0.3); }
-  .gate-dot.fail { background: #EF4444; box-shadow: 0 0 12px rgba(239,68,68,0.3); }
-  .gate-dot.warn { background: #D4A843; box-shadow: 0 0 12px rgba(212,168,67,0.3); }
-  .gate-dot.flash-new { background: #D4A843; box-shadow: 0 0 12px rgba(212,168,67,0.3); }
-  .gate-label {
+  .editorial-stack {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(20px, 3vh, 36px);
+    max-width: 85vw;
+  }
+  .ed-rule { width: 80px; height: 1px; background: #1e1e22; }
+
+  /* ── KICKER + SUB ── */
+  .kicker {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(9px, 1vw, 13px); color: #999999;
-    letter-spacing: 0.06em; margin-top: 6px;
+    font-size: clamp(18px, 1.8vw, 28px);
+    color: #999999;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 85vw;
+  }
+  .footer-mono {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(18px, 1.8vw, 28px);
+    color: #999999;
+    letter-spacing: 0.04em;
+    text-align: center;
+    line-height: 1.6;
+    max-width: 85vw;
   }
 
-  /* ── SCENE PANELS ── */
-  .scene-panel {
-    position: relative;
-    width: min(88vw, 1440px);
-    border-radius: 20px;
-    padding: clamp(28px, 4vw, 48px);
-    background:
-      radial-gradient(circle at top left, rgba(212,168,67,0.08), transparent 35%),
-      #141414;
+  /* ── HERO STAT BLOCKS ── */
+  .stat-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(24px, 4vh, 44px);
+    max-width: 85vw;
+  }
+  .stat-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(28px, 5vw, 64px);
+    flex-wrap: wrap;
+  }
+  .stat-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .stat-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(80px, 14vw, 180px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(14px, 1.5vw, 18px);
+    color: #e0e0e0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .stat-mid {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(56px, 10vw, 140px);
+    font-weight: 300;
+    color: #999999;
+    line-height: 1;
+    align-self: center;
+    padding-bottom: 28px;
+  }
+  .stat-sub {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(18px, 1.8vw, 28px);
+    color: #999999;
+    text-align: center;
+    max-width: min(85vw, 1100px);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── MINI TERMINAL ── */
+  .mini-term {
+    background: #141414;
+    border-radius: 8px;
+    width: min(85vw, 1400px);
     overflow: hidden;
   }
-  .scene-panel.fail-panel {
-    background:
-      radial-gradient(circle at center, rgba(239,68,68,0.14), transparent 45%),
-      #141414;
+  .mini-term.term-small { width: min(60vw, 720px); }
+  .mini-term-bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: clamp(8px, 1vh, 14px) 18px;
+    background: #1e1e22;
   }
-  .panel-kicker {
+  .mini-term-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mini-term-title {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.4vw, 18px);
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: #999999; margin-bottom: 14px;
+    font-size: clamp(15px, 1.4vw, 20px);
+    color: #999999; margin-left: 12px;
+    letter-spacing: 0.04em;
   }
-  .panel-title {
-    font-size: clamp(34px, 4.8vw, 72px);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 0.95;
+  .mini-term-body {
+    padding: clamp(18px, 2.4vh, 32px) clamp(20px, 2.8vw, 40px);
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(18px, 1.8vw, 28px);
+    line-height: 2.0;
+    font-variant-numeric: tabular-nums;
+    color: #e0e0e0;
   }
-  .panel-sub {
-    margin-top: 14px;
-    font-size: clamp(18px, 2vw, 28px);
-    color: #999999; line-height: 1.35; max-width: 900px;
+  .mini-term-line {
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.35s, transform 0.35s;
+    white-space: pre;
   }
+  .mini-term-line.show { opacity: 1; transform: translateY(0); }
+  .mini-term-line.blank { height: 0.6em; }
 
-  /* ── CONFIG TABLE ── */
-  .config-table {
-    margin-top: clamp(28px, 4vh, 40px);
-    width: 100%; border-collapse: separate; border-spacing: 0;
-  }
-  .config-table th, .config-table td {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.6vw, 22px);
-    padding: clamp(10px, 1.5vh, 16px) clamp(12px, 2vw, 24px);
-    text-align: right; letter-spacing: 0.04em;
-  }
-  .config-table th {
-    color: #999999; font-weight: 400; text-transform: uppercase;
-    letter-spacing: 0.1em; font-size: clamp(11px, 1.1vw, 14px);
-    border-bottom: 1px solid #1E1E22;
-  }
-  .config-table th:first-child, .config-table td:first-child { text-align: left; }
-  .config-table tr {
-    opacity: 0; transform: translateY(8px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-  }
-  .config-table tr.show { opacity: 1; transform: translateY(0); }
-  /* Per audit: monochrome ledger rows. Sign treatment carries semantic, not color.
-     .winner / .loser classes preserved for selector compatibility but color rules removed. */
+  .t-cyan  { color: #d4574a; }
+  .t-red   { color: #ef4444; }
+  .t-green { color: #4ade80; }
+  .t-gold  { color: #d4a843; }
+  .t-dim   { color: #999999; }
+  .t-axis  { color: #999999; }
+  .t-label { color: #999999; }
+  .t-val   { color: #e0e0e0; }
 
-  /* ── SPLIT PANEL ── */
-  .split-panel {
-    display: grid; grid-template-columns: 1.1fr 0.9fr;
-    gap: clamp(20px, 3vw, 40px);
-    margin-top: clamp(24px, 3vh, 36px);
-  }
-  .sub-card {
-    background: #1E1E22;
-    border-radius: 18px;
-    padding: clamp(18px, 2.4vw, 28px);
-    opacity: 0; transform: translateY(16px);
-    transition: opacity 0.45s ease, transform 0.45s ease;
-  }
-  .sub-card.show { opacity: 1; transform: translateY(0); }
-  .sub-card-title {
+  /* ── LEDGER ── */
+  .ledger-row {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(12px, 1.1vw, 15px);
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: #999999; margin-bottom: 18px;
-  }
-  .regime-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 8px 0; border-bottom: 1px solid #1E1E22;
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(16px, 1.6vw, 22px);
-  }
-  .regime-row:last-child { border-bottom: 0; }
-  .ci-bracket {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(48px, 7vw, 100px);
-    font-weight: 700; text-align: center;
-    letter-spacing: -0.03em; margin-bottom: 12px;
-  }
-  .ci-range {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(16px, 1.8vw, 24px);
-    color: #999999; text-align: center; letter-spacing: 0.06em;
-  }
-  .ci-note {
-    font-family: 'Geist Mono', monospace;
-    font-size: clamp(12px, 1.1vw, 15px);
-    color: #999999; text-align: center; margin-top: 16px; letter-spacing: 0.04em;
-  }
-
-  /* ── CALLBACK ── */
-  .callback-old {
-    font-size: clamp(20px, 3vw, 36px); font-weight: 500;
-    color: #999999; font-style: italic; line-height: 1.3;
-    max-width: 800px; text-align: center;
-  }
-  .callback-new {
-    font-size: clamp(28px, 4vw, 56px); font-weight: 700;
-    color: #E0E0E0; line-height: 1.2; letter-spacing: -0.02em;
-    margin-top: clamp(20px, 3vh, 40px); text-align: center;
-  }
-
-  /* ── PORTFOLIO CONTEXT ── */
-  .portfolio-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: clamp(16px, 2vw, 28px); margin-top: clamp(28px, 4vh, 40px);
-    max-width: 800px;
-  }
-  .portfolio-cell {
+    font-size: clamp(26px, 3vw, 38px);
+    color: #e0e0e0;
+    letter-spacing: 0.04em;
     text-align: center;
-    opacity: 0; transform: translateY(12px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+    max-width: 92vw;
   }
-  .portfolio-cell.show { opacity: 1; transform: translateY(0); }
-  .portfolio-num {
-    font-family: 'DM Sans', sans-serif;
-    font-size: clamp(36px, 5vw, 64px);
-    font-weight: 700; letter-spacing: -0.03em;
-  }
-  .portfolio-label {
+  .ledger-sub {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(11px, 1.1vw, 14px);
-    color: #999999; letter-spacing: 0.1em;
-    text-transform: uppercase; margin-top: 8px;
+    font-size: clamp(18px, 1.8vw, 28px);
+    color: #999999;
+    text-align: center;
+    letter-spacing: 0.04em;
+    margin-top: 24px;
+    max-width: 85vw;
   }
+  .led-dot { color: #999999; padding: 0 8px; }
+  .led-green { color: #4ade80; }
+  .led-red { color: #ef4444; }
 
-  /* ── VERDICT DOTS ── */
-  .verdict-list {
-    display: flex; flex-direction: column; gap: clamp(14px, 1.8vh, 24px);
-    align-items: flex-start; max-width: 720px;
-    padding: 0 clamp(32px, 5vw, 64px);
+  /* ── POSITION STATE ── */
+  .pos-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    width: min(85vw, 880px);
+  }
+  .pos-header {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(15px, 1.4vw, 20px);
+    color: #999999;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .pos-rule {
+    width: 100%; height: 1px;
+    background: #1e1e22;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.6s ease-out;
+  }
+  .pos-rule.show { transform: scaleX(1); }
+  .pos-rows {
+    margin-top: 22px;
     width: 100%;
-  }
-  .verdict-row {
-    display: flex; align-items: center; gap: 16px;
-    opacity: 0; transform: translateY(8px);
-    transition: opacity 0.5s, transform 0.5s;
-  }
-  .verdict-row.show { opacity: 1; transform: translateY(0); }
-  .verdict-dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; }
-  .verdict-glyph { font-size: 20px; flex-shrink: 0; line-height: 1; }
-  .verdict-text {
+    display: flex; flex-direction: column;
+    gap: clamp(12px, 1.6vh, 20px);
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(14px, 1.6vw, 20px); letter-spacing: 0.02em;
+    font-size: clamp(22px, 2.4vw, 32px);
+    font-variant-numeric: tabular-nums;
+    color: #e0e0e0;
   }
-
-  /* ── COLORS ── */
-  .c-red { color: #EF4444; }
-  .c-green { color: #4ADE80; }
-  .c-gold { color: #D4A843; }
-  .c-dim { color: #999999; }
-  .c-terra { color: #D4574A; }
-
-  .hi { color: #D4A843; }
-  .red { color: #EF4444; }
-
-  /* ── REC ── */
-  .rec-badge {
-    display: none; position: fixed; top: 20px; right: 28px;
-    font-family: 'Geist Mono', monospace; font-size: 11px; color: #EF4444;
-    letter-spacing: 0.1em; align-items: center; gap: 8px;
-    opacity: 0; transition: opacity 0.5s; z-index: 50;
-  }
-  .rec-badge.show { opacity: 1; }
-  .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: #EF4444; animation: blink 1.5s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* ── NARRATION STRIP ── */
-  .narr-strip {
-    height: clamp(72px, 10vh, 110px); flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0 clamp(24px, 6vw, 80px); text-align: center;
-    background: #141414;
-  }
-  .narr-text {
-    font-size: clamp(18px, 2vw, 28px); font-weight: 500;
-    color: #999999; line-height: 1.35; max-width: 800px;
-    opacity: 0; transform: translateY(4px);
+  .pos-row {
+    display: grid;
+    grid-template-columns: 90px 80px 1fr 130px;
+    align-items: center;
+    column-gap: 16px;
+    opacity: 0; transform: translateY(8px);
     transition: opacity 0.4s, transform 0.4s;
   }
-  .narr-text.show { opacity: 1; transform: translateY(0); }
+  .pos-row.show { opacity: 1; transform: translateY(0); }
+  .pos-row .pr-sym { letter-spacing: 0.06em; }
+  .pos-row .pr-dir { color: #999999; font-size: 0.7em; }
+  .pos-row .pr-date { color: #999999; font-size: 0.7em; }
+  .pos-row .pr-pnl { text-align: right; }
 
-  /* ── PROGRESS ── */
-  .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: #D4A843; z-index: 100; transition: width 0.3s linear; }
-  .counter { position: fixed; bottom: 16px; right: 28px; font-family: 'Geist Mono', monospace; font-size: 14px; color: #999999; z-index: 100; }
-  html.autoplay .counter { display: none !important; }
+  /* ── EQUITY CURVE ── */
+  .eq-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(20px, 3vh, 32px);
+    width: min(85vw, 1200px);
+  }
+  .eq-svg {
+    width: 100%;
+    height: clamp(320px, 44vh, 460px);
+  }
+  .eq-line {
+    stroke-dasharray: 2400;
+    stroke-dashoffset: 2400;
+    transition: stroke-dashoffset 2.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .eq-line.draw { stroke-dashoffset: 0; }
+  .eq-marker {
+    opacity: 0; transition: opacity 0.4s ease-out;
+  }
+  .eq-marker.show { opacity: 1; }
+
+  /* ── TWEET RENDER ── */
+  .tweet-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    max-width: min(85vw, 900px); padding: 0 24px;
+  }
+  .tweet-glyph {
+    width: clamp(48px, 4vw, 72px);
+    margin-bottom: 28px;
+    display: flex; justify-content: center;
+    line-height: 0;
+  }
+  .tweet-glyph svg {
+    width: 100%; height: auto; display: block;
+  }
+  .tweet-quote {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(28px, 3vw, 44px);
+    color: #999999;
+    line-height: 1.45;
+    text-align: center;
+  }
+  .tweet-handle {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(15px, 1.4vw, 20px);
+    color: #999999;
+    letter-spacing: 0.08em;
+    margin-top: 36px;
+    text-align: center;
+    opacity: 0.85;
+  }
+
+  /* ── TYPE ACCENTS ── */
+  .terra { color: #d4574a; }
+  .gold  { color: #d4a843; }
+  .dim   { color: #999999; }
+  .body-text { color: #e0e0e0; }
+
+  /* ── REC BADGE ── */
+  .rec-badge {
+    display: none;
+    position: fixed; top: 20px; right: 28px;
+    font-family: 'Geist Mono', monospace; font-size: 13px; color: #ef4444;
+    letter-spacing: 0.1em; align-items: center; gap: 8px;
+    opacity: 0; transition: opacity 0.5s ease; z-index: 50;
+  }
+  .rec-badge.show { opacity: 1; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── AUDIO TOGGLE ── */
+  .audio-toggle {
+    display: none;
+    position: fixed; top: 20px; left: 28px;
+    font-family: 'Geist Mono', monospace; font-size: 13px;
+    letter-spacing: 0.1em; z-index: 50;
+    cursor: pointer; user-select: none;
+    color: #999999; transition: color 0.3s; opacity: 0.5;
+  }
+  .audio-toggle:hover { opacity: 1; }
+  .audio-toggle.on { color: #d4a843; opacity: 1; }
 
   /* ── BACK LINK ── */
   .back-link {
     position: fixed; top: 20px; left: 28px;
-    font-family: 'Geist Mono', monospace; font-size: 12px;
+    font-family: 'Geist Mono', monospace; font-size: 14px;
     color: #999999; letter-spacing: 0.08em; text-decoration: none; z-index: 50;
-    transition: color 0.3s;
+    transition: color 0.3s; opacity: 0.5;
   }
-  .back-link:hover { color: #D4A843; }
+  .back-link:hover { opacity: 1; }
+  html.autoplay .back-link { display: none !important; }
+
+  /* ── NARRATION STRIP ── */
+  .narr-strip {
+    height: clamp(80px, 11vh, 130px); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 clamp(24px, 6vw, 80px); text-align: center;
+    border-top: 1px solid #1e1e22; background: #0a0a0a;
+  }
+  .narr-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(22px, 2.4vw, 32px); font-weight: 500;
+    color: #999999; line-height: 1.35; max-width: 1000px;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .narr-text.show { opacity: 1; transform: translateY(0); }
+  .narr-text .hi { color: #d4a843; }
+  .narr-text .red { color: #ef4444; }
+  .narr-text .terra { color: #d4574a; }
+  .narr-text .ok { color: #4ade80; }
+
+  /* ── PROGRESS ── */
+  .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: #d4a843; z-index: 100; transition: width 0.3s linear; }
+  .counter { position: fixed; bottom: 16px; right: 28px; font-family: 'Geist Mono', monospace; font-size: 16px; color: #999999; z-index: 100; opacity: 0.4; }
+  html.autoplay .counter { display: none !important; }
+  html.autoplay .audio-toggle { display: none !important; }
+  html.autoplay .rec-badge { display: none !important; }
 
   /* ── START ── */
   .start {
     position: fixed; inset: 0; z-index: 200;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: #0A0A0A; cursor: pointer; transition: opacity 0.8s;
+    background: #0a0a0a; cursor: pointer; transition: opacity 0.8s;
   }
   .start.hidden { opacity: 0; pointer-events: none; }
   html.autoplay .start { display: none !important; }
   .play-ring {
-    width: 90px; height: 90px; border-radius: 50%;
-    background: #1E1E22;
+    width: 100px; height: 100px; border-radius: 50%; border: 1px solid #1e1e22;
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 32px; transition: background 0.3s, transform 0.3s;
+    margin-bottom: 36px; transition: border-color 0.3s, transform 0.3s;
   }
-  .start:hover .play-ring { background: #D4574A; transform: scale(1.06); }
-  .play-ring svg { margin-left: 5px; }
+  .start:hover .play-ring { border-color: #d4a843; transform: scale(1.06); }
+  .play-ring svg { margin-left: 6px; }
   .start-title {
-    font-size: clamp(18px, 3vw, 28px); font-weight: 700;
-    letter-spacing: -0.02em; margin-bottom: 32px; text-align: center;
+    font-size: clamp(28px, 4vw, 44px); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 36px; text-align: center;
+    color: #e0e0e0;
   }
-  .start-label { font-family: 'Geist Mono', monospace; font-size: 12px; color: #999999; letter-spacing: 0.14em; }
+  .start-label { font-family: 'Geist Mono', monospace; font-size: 16px; color: #999999; letter-spacing: 0.14em; opacity: 0.6; }
 
   /* ── PHYSARUM END CARD ── */
   #physarum {
     position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
     z-index: 0; pointer-events: none; opacity: 0;
-    transform: scale(1.15);
+    transform: scale(2.2) translateY(8%);
     mix-blend-mode: screen;
-    -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
-    mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 32%, transparent 82%);
+    mask-image: radial-gradient(ellipse at center, black 32%, transparent 82%);
   }
   #physarum.blast {
     animation: physBlast 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
                physPulse 4s ease-in-out 2.5s infinite;
   }
   @keyframes physBlast {
-    0%   { opacity: 0;    transform: scale(1.15); filter: brightness(2.5); }
-    20%  { opacity: 0.8;  transform: scale(1.05); filter: brightness(1.4); }
-    100% { opacity: 0.7;  transform: scale(1);    filter: brightness(1); }
+    0%   { opacity: 0;   transform: scale(2.5) translateY(8%); filter: brightness(3); }
+    20%  { opacity: 0.7; transform: scale(2.3) translateY(8%); filter: brightness(1.8); }
+    100% { opacity: 0.55; transform: scale(2.2) translateY(8%); filter: brightness(1); }
   }
   @keyframes physPulse {
-    0%, 100% { opacity: 0.7;  transform: scale(1);     filter: brightness(1); }
-    50%      { opacity: 0.78; transform: scale(1.008); filter: brightness(1.1); }
+    0%, 100% { opacity: 0.55; transform: scale(2.2) translateY(8%);    filter: brightness(1); }
+    50%      { opacity: 0.62; transform: scale(2.22) translateY(8%);  filter: brightness(1.15); }
   }
   .end-cta {
-    position: absolute; bottom: 3%; left: 0; right: 0; z-index: 1;
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    position: absolute; bottom: 4%; left: 0; right: 0; z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
   }
   .end-cta a {
-    font-size: clamp(28px, 4vw, 36px); font-weight: 500;
-    color: #E0E0E0; letter-spacing: -0.01em; text-decoration: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(48px, 6vw, 72px); font-weight: 500;
+    color: #e0e0e0; letter-spacing: -0.01em; text-decoration: none;
     pointer-events: auto; transition: color 0.3s;
   }
-  .end-cta a:hover { color: #D4A843; }
+  .end-cta a:hover { color: #d4a843; }
   .end-motto {
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(10px, 1.1vw, 13px); color: #999999;
-    letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: clamp(14px, 1.4vw, 18px); color: #999999;
+    letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6;
   }
 
-  @media (max-width: 960px) {
-    .split-panel { grid-template-columns: 1fr; }
-    .portfolio-grid { grid-template-columns: 1fr; gap: 20px; }
+  /* ── MOBILE / NARROW VIEWPORT ── */
+  @media (max-width: 600px) {
+    .stat-row { flex-direction: column; gap: 16px; align-items: center; }
+    .stat-mid { display: none; }
+    .stat-num { font-size: clamp(64px, 18vw, 120px); }
+    .pos-row { grid-template-columns: 80px 1fr 110px; }
+    .pos-row .pr-dir { display: none; }
+    .editorial { font-size: clamp(28px, 7vw, 48px); }
+    .ledger-row { font-size: clamp(20px, 5vw, 30px); }
+    .narr-strip { padding: 0 16px; }
+    .narr-text { font-size: clamp(16px, 4vw, 22px); }
+    /* Terminal sizing on narrow viewports — small terminals need more
+       width and slightly tighter font so the content doesn't clip
+       under the white-space: pre rule. */
+    .mini-term.term-small { width: min(95vw, 720px); }
+    .mini-term { width: min(95vw, 1400px); }
+    .mini-term-body { font-size: clamp(13px, 3.4vw, 22px); }
+    .mini-term-title { font-size: clamp(13px, 3vw, 18px); }
   }
 </style>
 </head>
 <body>
 
 <div class="start" id="startScreen" onclick="startFilm()">
-  <div class="start-label" style="margin-bottom:20px">EPISODE 3</div>
-  <div class="start-title">5 Failed. 65 Didn't.</div>
-  <div class="play-ring"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#E0E0E0"/></svg></div>
+  <div class="start-label" style="margin-bottom:24px">EPISODE 3</div>
+  <div class="start-title">The Work Is The Work.</div>
+  <div class="play-ring"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" fill="#999999"/></svg></div>
   <div class="start-label">PRESS TO PLAY</div>
 </div>
 
 <a class="back-link" href="../">&#8592; studies</a>
+<div class="audio-toggle" id="audioToggle" onclick="toggleAudio()">VOICE OFF</div>
 <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
 
 <div class="film">
   <div class="stage">
 
-    <!-- S0: CALLBACK — EP1 quote -->
-    <div class="scene" id="s0">
-      <div style="max-width:800px">
-        <div class="callback-old reveal">"Results will appear in a future study."</div>
-        <div class="callback-new reveal">This is that study.</div>
-      </div>
-    </div>
-
-    <!-- S1: THE QUESTION — thesis stated cold -->
+    <!-- S1: Tweet render (the strong claim) -->
     <div class="scene" id="s1">
-      <div class="stat-single">
-        <div class="reveal" style="font-size:clamp(34px,5vw,64px); font-weight:700; letter-spacing:-0.02em; line-height:1.3; max-width:800px; text-align:center">
-          Stress-tested.
+      <div class="tweet-wrap">
+        <div class="tweet-glyph reveal" id="s1Glyph">
+          <svg viewBox="0 0 130 56" xmlns="http://www.w3.org/2000/svg" fill="#D4A843" aria-label="shoebill silhouette">
+            <!--
+              Stylized shoebill profile silhouette, facing right.
+              Designed with deliberately thick blocky beak (the
+              "shoe") roughly equal in vertical extent to the head.
+              Beak hooks slightly down at far right tip.
+
+              Hand-crafted SVG path; if silhouette still doesn't
+              read as bird at preview, replace with a CC0-traced
+              reference path (e.g. PhyloPic Balaeniceps SVG).
+            -->
+            <path d="M 12,40
+                     C 4,36 2,16 10,8
+                     C 22,0 42,0 54,6
+                     C 60,9 64,14 64,20
+                     L 96,18
+                     L 116,22
+                     Q 126,24 126,32
+                     Q 124,40 116,38
+                     L 102,32
+                     Q 92,38 82,34
+                     L 64,30
+                     Q 58,32 54,40
+                     Q 46,46 32,46
+                     L 14,46
+                     Q 6,44 12,40 Z"/>
+          </svg>
         </div>
+        <div class="tweet-quote reveal" id="s1Quote">The best traders will always prioritize intuition over apophenia.</div>
+        <div class="tweet-handle reveal" id="s1Handle">GCR &middot; @GiganticRebirth</div>
       </div>
     </div>
 
-    <!-- S2: TITLE — 5 / 65 -->
+    <!-- S2: Three propositions (the reframe) + grounding terminal -->
     <div class="scene" id="s2">
-      <div class="stat-single">
-        <div class="hero-sub reveal" style="margin-bottom:16px">EPISODE 3</div>
-        <div class="hero-num reveal">5 / 65</div>
-        <div class="hero-sub reveal" style="margin-top:24px; color:#999999">failed &nbsp;&middot;&nbsp; didn't</div>
+      <div class="editorial-stack">
+        <div class="editorial reveal">Some patterns are real.</div>
+        <div class="ed-rule reveal"></div>
+        <div class="editorial reveal">Profitability is regime-dependent.</div>
+        <div class="ed-rule reveal"></div>
+        <div class="editorial reveal"><span class="terra">Validation</span> tells you which is which.</div>
+        <div class="mini-term term-small reveal" id="s2Term" style="margin-top:24px">
+          <div class="mini-term-bar">
+            <div class="mini-term-dot" style="background:#FF5F57"></div>
+            <div class="mini-term-dot" style="background:#FEBC2E"></div>
+            <div class="mini-term-dot" style="background:#28C840"></div>
+            <div class="mini-term-title">validation</div>
+          </div>
+          <div class="mini-term-body" id="tb2"></div>
+        </div>
       </div>
     </div>
 
-    <!-- S3: PORTFOLIO CONTEXT -->
+    <!-- S3: BTC equity curve (market context) -->
     <div class="scene" id="s3">
-      <div class="stat-single">
-        <div class="hero-sub reveal" id="pDate" style="margin-bottom:20px; color:#999999">PORTFOLIO SIZING &middot; 2026-04-01</div>
-        <div class="portfolio-grid" id="portfolioGrid">
-          <div class="portfolio-cell" id="pCell1">
-            <div class="portfolio-num c-terra" id="pBalance">$0</div>
-            <div class="portfolio-label">PORTFOLIO</div>
-          </div>
-          <div class="portfolio-cell" id="pCell2">
-            <div class="portfolio-num" style="color:#E0E0E0" id="pPosition">$0</div>
-            <div class="portfolio-label">PER TRADE</div>
-          </div>
-          <div class="portfolio-cell" id="pCell3">
-            <div class="portfolio-num c-green" id="pDrawdown">0%</div>
-            <div class="portfolio-label">MAX DRAWDOWN</div>
-          </div>
-        </div>
-        <div class="hero-sub reveal" id="pNote" style="margin-top:32px; color:#999999">RISK <span class="c-gold">$14,000</span> &nbsp;&rarr;&nbsp; RETURN <span class="c-green">$216,990</span></div>
+      <div class="eq-wrap">
+        <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-07</div>
+        <svg class="eq-svg" viewBox="0 0 1200 420" preserveAspectRatio="none">
+          <line x1="40" y1="380" x2="1160" y2="380" stroke="#1e1e22" stroke-width="1"/>
+          <line x1="40" y1="40"  x2="40"   y2="380" stroke="#1e1e22" stroke-width="1"/>
+          <text x="32" y="80"  fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$100k</text>
+          <text x="32" y="200" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$90k</text>
+          <text x="32" y="320" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$80k</text>
+          <text x="100"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">FEB</text>
+          <text x="430"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAR</text>
+          <text x="780"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">APR</text>
+          <text x="1100" y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAY</text>
+          <polyline class="eq-line" id="eqLine"
+            fill="none" stroke="#999999" stroke-width="3" stroke-linejoin="round"
+            points="80,71 160,90 240,140 320,180 400,220 480,260 560,290 640,300 720,310 800,318 870,310 940,260 1010,210 1080,150 1140,118"/>
+          <circle id="eqCursor" cx="80" cy="71" r="6" fill="#e0e0e0" opacity="0">
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cx" values="80;160;240;320;400;480;560;640;720;800;870;940;1010;1080;1140" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cy" values="71;90;140;180;220;260;290;300;310;318;310;260;210;150;118" dur="2.6s" begin="indefinite" fill="freeze"/>
+          </circle>
+          <g class="eq-marker" id="m1">
+            <line x1="100" y1="60" x2="100" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="100" y="50" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">FEB 7 &middot; $100,538</text>
+          </g>
+          <g class="eq-marker" id="m2">
+            <line x1="800" y1="320" x2="800" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="800" y="345" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">APR 2 &middot; $82,549</text>
+          </g>
+          <g class="eq-marker" id="m3">
+            <line x1="1140" y1="108" x2="1140" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="1100" y="98" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">MAY 7 &middot; $96,816</text>
+          </g>
+        </svg>
       </div>
     </div>
 
-    <!-- S4: SCALE TEST — 65 assets, 293 trades -->
+    <!-- S4: R3 OOS validation — simplified -->
     <div class="scene" id="s4">
-      <div class="scene-panel">
-        <div class="panel-kicker reveal">TEST 1 &middot; SCALE</div>
-        <div class="panel-title reveal">Same rules. <span class="c-green">65 coins.</span></div>
-        <div class="panel-sub reveal">A trend-following system and a regime filter. No retuning. No new indicators. Just more assets.</div>
-        <div style="margin-top:28px">
-          <div class="vs reveal">
-            <div class="vs-col">
-              <div class="vs-num c-terra" id="scaleAssets">0</div>
-              <div class="vs-label">ASSETS</div>
-            </div>
-            <div class="vs-arrow">&rarr;</div>
-            <div class="vs-col">
-              <div class="vs-num c-green" id="scaleTrades">0</div>
-              <div class="vs-label">TRADES</div>
-            </div>
+      <div class="stat-wrap">
+        <div class="stat-row">
+          <div class="stat-col reveal">
+            <div class="stat-num" style="color:#4ade80">1.86</div>
+            <div class="stat-label">OOS SHARPE</div>
           </div>
-          <div class="hero-sub reveal" style="margin-top:20px">57% WIN RATE &middot; 2021&ndash;2025 &middot; LONGS ONLY</div>
+          <div class="stat-mid">&middot;</div>
+          <div class="stat-col reveal">
+            <div class="stat-num" style="color:#4ade80">+828%</div>
+            <div class="stat-label">NET RETURN</div>
+          </div>
+          <div class="stat-mid">&middot;</div>
+          <div class="stat-col reveal">
+            <div class="stat-num" style="color:#4ade80">249</div>
+            <div class="stat-label">TRADES</div>
+          </div>
         </div>
+        <div class="stat-sub reveal">16-month out-of-sample. The system never saw this data.</div>
       </div>
     </div>
 
-    <!-- S5: DISCIPLINE — config table (10x dollars) -->
+    <!-- S5: Why longs-only (clean editorial) -->
     <div class="scene" id="s5">
-      <div class="scene-panel">
-        <div class="panel-kicker reveal">TEST 2 &middot; DISCIPLINE</div>
-        <div class="panel-title reveal">Shorts everywhere? Or <span class="c-green">only when it matters.</span></div>
-        <table class="config-table" id="configTable">
-          <thead><tr class="show"><th></th><th>Trades</th><th>Sharpe</th><th>PnL</th><th>MaxDD</th></tr></thead>
-          <tbody>
-            <tr id="cfgA"><td>Longs only</td><td>474</td><td>1.16</td><td>$200,190</td><td>14.7%</td></tr>
-            <tr id="cfgB" class="loser"><td>Shorts everywhere</td><td>919</td><td>0.65</td><td>$121,460</td><td>35.4%</td></tr>
-            <tr id="cfgC" class="winner"><td>Shorts gated</td><td>496</td><td>1.23</td><td>$216,990</td><td>14.0%</td></tr>
-          </tbody>
-        </table>
-        <div class="badge badge-terra reveal" style="margin-top:20px">22 SHORTS &middot; +$16,800 &middot; DRAWDOWN &darr;</div>
+      <div class="editorial-stack">
+        <div class="editorial reveal" style="color:#999999">Why longs-only?</div>
+        <div class="editorial reveal">Mean-reversion shorts have no exit catalyst in a rally.</div>
       </div>
     </div>
 
-    <!-- S6: SIGNAL ALPHA — staggered H3 -->
+    <!-- S5b: ZEC short chart (the "no exit catalyst" proof) -->
+    <div class="scene" id="s5b">
+      <div class="eq-wrap">
+        <div class="kicker reveal">ZEC SHORT &middot; AUDIT CONFIG</div>
+        <svg class="eq-svg" viewBox="0 0 1200 420" preserveAspectRatio="none">
+          <line x1="40" y1="380" x2="1160" y2="380" stroke="#1e1e22" stroke-width="1"/>
+          <line x1="40" y1="40"  x2="40"   y2="380" stroke="#1e1e22" stroke-width="1"/>
+          <text x="32" y="68"  fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$600</text>
+          <text x="32" y="180" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$450</text>
+          <text x="32" y="382" fill="#999999" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">$200</text>
+          <text x="125"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">FEB</text>
+          <text x="445"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAR</text>
+          <text x="765"  y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">APR</text>
+          <text x="1100" y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAY</text>
+
+          <!-- Entry-price reference line at $248.38 (y=341) -->
+          <line x1="40" y1="341" x2="1160" y2="341" stroke="#999999" stroke-width="1" stroke-dasharray="4,5" opacity="0.4"/>
+          <text x="50" y="335" fill="#999999" font-family="Geist Mono, monospace" font-size="16">short entry $248</text>
+
+          <!-- ZEC price line — failure red because the trade is bleeding -->
+          <polyline class="eq-line" id="zecLine"
+            fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"
+            points="125,358 203,354 281,330 359,349 437,359 515,374 593,341 604,353 682,363 760,347 838,247 915,268 993,266 1071,260 1140,83"/>
+
+          <!-- Entry marker -->
+          <g class="eq-marker" id="zecEntry">
+            <circle cx="593" cy="341" r="7" fill="#999999" stroke="#0a0a0a" stroke-width="2"/>
+            <text x="593" y="320" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">SHORT 03-18</text>
+          </g>
+          <!-- Current marker -->
+          <g class="eq-marker" id="zecCurrent">
+            <circle cx="1140" cy="83" r="8" fill="#ef4444" stroke="#0a0a0a" stroke-width="2"/>
+            <text x="1080" y="73" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">05-07 &middot; $570.96</text>
+            <text x="1080" y="50" fill="#ef4444" font-family="Geist Mono, monospace" font-size="20" text-anchor="end">&minus;130%</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- S6: Filter disclosure (editorial + small terminal + editorial) -->
     <div class="scene" id="s6">
-      <div class="stat-single">
-        <div class="hero-sub reveal" style="margin-bottom:16px">TEST 3 &middot; DOES ENTRY TIMING MATTER?</div>
-        <div class="vs">
-          <div class="vs-col reveal" id="h3Left" style="opacity:0">
-            <div class="vs-num c-dim" id="h3Random">0</div>
-            <div class="vs-label">RANDOM TIMING</div>
+      <div class="editorial-stack">
+        <div class="editorial reveal" id="s6Line1">The filter is mechanical.</div>
+        <div class="mini-term term-small reveal" id="s6Term">
+          <div class="mini-term-bar">
+            <div class="mini-term-dot" style="background:#FF5F57"></div>
+            <div class="mini-term-dot" style="background:#FEBC2E"></div>
+            <div class="mini-term-dot" style="background:#28C840"></div>
+            <div class="mini-term-title">params</div>
           </div>
-          <div class="vs-arrow reveal" id="h3Arrow" style="opacity:0">&rarr;</div>
-          <div class="vs-col reveal" id="h3Right" style="opacity:0">
-            <div class="vs-num c-green" id="h3Signal">0</div>
-            <div class="vs-label">TIMED ENTRIES</div>
-          </div>
+          <div class="mini-term-body" id="tb6"></div>
         </div>
-        <div class="hero-sub reveal" id="h3Sub" style="margin-top:24px; opacity:0">SHARPE RATIO &middot; 1,000 MONTE CARLO ITERATIONS</div>
+        <div class="editorial reveal" id="s6Line2"><span class="gold">Codified</span>, not discretionary.</div>
       </div>
     </div>
 
-    <!-- S7: BREATH -->
+    <!-- S7: Position state snapshot -->
     <div class="scene" id="s7">
-      <div class="stat-single">
-        <div class="reveal" style="font-size:clamp(28px,4.5vw,56px); font-weight:700; letter-spacing:-0.02em; line-height:1.3; max-width:800px; text-align:center">
-          Same rules.<br><span class="c-dim">Different markets.</span>
+      <div class="pos-wrap">
+        <div class="pos-header reveal">Carry positions held from February &middot; 29-asset curated universe</div>
+        <div class="pos-rule" id="s7Rule"></div>
+        <div class="pos-rows">
+          <div class="pos-row" id="pr1">
+            <div class="pr-sym">RNDR</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+57.66%</div>
+          </div>
+          <div class="pos-row" id="pr2">
+            <div class="pr-sym">NEAR</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-13</div>
+            <div class="pr-pnl">+45.56%</div>
+          </div>
+          <div class="pos-row" id="pr3">
+            <div class="pr-sym">BTC</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+30.77%</div>
+          </div>
+          <div class="pos-row" id="pr4">
+            <div class="pr-sym">GMX</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+30.71%</div>
+          </div>
+          <div class="pos-row" id="pr5">
+            <div class="pr-sym">HBAR</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+17.75%</div>
+          </div>
+          <div class="pos-row" id="pr6">
+            <div class="pr-sym">SUI</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+13.02%</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- S8: CROSS-ASSET — TradFi terminal -->
+    <!-- S8: April entries (two-row ledger) — date column dropped, percentages remain prominent -->
     <div class="scene" id="s8">
-      <div class="mini-term">
-        <div class="mini-term-bar">
-          <div class="mini-term-dot" style="background:#FF5F57"></div>
-          <div class="mini-term-dot" style="background:#FEBC2E"></div>
-          <div class="mini-term-dot" style="background:#28C840"></div>
-          <div class="mini-term-title">simulation-engine &mdash; cross-asset</div>
-        </div>
-        <div class="mini-term-body" id="tb8"></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:28px; max-width:92vw">
+        <div class="ledger-row reveal">AAVE<span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+8.80%</span></div>
+        <div class="ledger-row reveal">WLD<span style="display:inline-block;width:1.6ch"></span><span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-red">&minus;4.12%</span></div>
+        <div class="ledger-sub reveal">Two April long entries in the live system. Both shown.</div>
       </div>
     </div>
 
-    <!-- S9: REGIME + CI -->
+    <!-- S9: Validation gate summary terminal -->
     <div class="scene" id="s9">
-      <div class="scene-panel">
-        <div class="panel-kicker reveal">TEST 5 &middot; MARKET CONDITIONS</div>
-        <div class="panel-title reveal">Bull and bear. <span class="c-green">Both profitable.</span></div>
-        <div class="split-panel">
-          <div class="sub-card" id="regimeCard">
-            <div class="sub-card-title">Regime Breakdown</div>
-            <div class="regime-row"><span>Bull</span><span class="c-green">Sharpe 1.03 &middot; 73% of P&amp;L</span></div>
-            <div class="regime-row"><span>Bear</span><span class="c-green">Sharpe 0.46 &middot; 50% of P&amp;L</span></div>
-            <div class="regime-row"><span>Correction</span><span class="c-red">Sharpe −1.88 &middot; −23%</span></div>
-          </div>
-          <div class="sub-card" id="ciCard">
-            <div class="sub-card-title">Confidence Interval (95%)</div>
-            <div class="ci-bracket c-green" id="ciNum">0</div>
-            <div class="ci-range">[<span class="c-dim">0.62</span> <span style="color:#1E1E22">&mdash;&mdash;&mdash;</span> <span class="c-green">1.65</span>]</div>
-            <div class="ci-note">&uarr; entire range stays positive</div>
-            <div class="ci-note" style="margin-top:8px">208 trades &middot; 4.83 years</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- S10: BETRAYAL — mean reversion kill -->
-    <div class="scene" id="s10">
-      <div class="scene-panel fail-panel">
-        <div class="panel-kicker reveal">NOT EVERYTHING PASSES</div>
-        <div class="panel-title reveal">It lied to us.</div>
-        <div class="panel-sub reveal">A mean reversion approach. Looked beautiful in training data. We tested it on data it had never seen.</div>
-        <div class="split-panel" style="margin-top:28px">
-          <div class="sub-card" id="isCard">
-            <div class="sub-card-title">In-Sample</div>
-            <div class="ci-bracket c-green" id="isSharpe">0</div>
-            <div class="ci-range">143 trades</div>
-          </div>
-          <div class="sub-card" id="oosCard">
-            <div class="sub-card-title">Out-of-Sample</div>
-            <div class="ci-bracket c-red" id="oosSharpe">0</div>
-            <div class="ci-range">150 trades</div>
-          </div>
-        </div>
-        <div class="badge badge-red reveal" style="margin-top:20px">KILLED</div>
-      </div>
-    </div>
-
-    <!-- S11: 2026 YTD -->
-    <div class="scene" id="s11">
       <div class="mini-term">
         <div class="mini-term-bar">
           <div class="mini-term-dot" style="background:#FF5F57"></div>
           <div class="mini-term-dot" style="background:#FEBC2E"></div>
           <div class="mini-term-dot" style="background:#28C840"></div>
-          <div class="mini-term-title">simulation-engine &mdash; 2026 YTD</div>
+          <div class="mini-term-title">coinrotatordev &mdash; validation</div>
         </div>
-        <div class="mini-term-body" id="tb11"></div>
+        <div class="mini-term-body" id="tb9"></div>
       </div>
     </div>
 
-    <!-- S12: GATE GRID -->
+    <!-- S10: Synthesis -->
+    <div class="scene" id="s10">
+      <div class="editorial-stack">
+        <div class="editorial reveal dim">The system runs.</div>
+        <div class="editorial reveal dim">The validation holds.</div>
+        <div class="editorial reveal body-text"><span class="terra">Method</span> beats intuition.</div>
+      </div>
+    </div>
+
+    <!-- S11: Tagline -->
+    <div class="scene" id="s11">
+      <div class="editorial-stack">
+        <div class="editorial reveal body-text">Method published.</div>
+        <div class="editorial reveal dim">Misses included.</div>
+      </div>
+    </div>
+
+    <!-- S12: End card -->
     <div class="scene" id="s12">
-      <div class="stat-single">
-        <div class="hero-sub reveal" style="margin-bottom:24px">VALIDATION SCORECARD</div>
-        <div class="gate-grid reveal" id="gateGridFinal"></div>
-        <div class="hero-sub reveal" style="margin-top:24px"><span class="c-green">13</span> passed &middot; <span class="c-dim">0</span> failed &middot; <span class="c-dim">8</span> pending</div>
-      </div>
-    </div>
-
-    <!-- S13: VERDICT + PHYSARUM -->
-    <div class="scene" id="s13">
-      <iframe id="physarum" src="../physarum/stencil.html?seed=60&mode=2&lp&es=0.57&ew=0.28&master=0.18" allow="autoplay"></iframe>
-      <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:clamp(12px, 2vh, 24px); max-height:90vh; overflow:hidden;">
-        <div class="verdict-list" id="verdictList" style="gap:clamp(12px, 1.8vh, 22px)">
-          <div class="verdict-row"><span class="verdict-glyph" style="color:#4ADE80">&#x25CF;&#xFE0E;</span><div class="verdict-text">65 assets. Same rules. Edge held.</div></div>
-          <div class="verdict-row"><span class="verdict-glyph" style="color:#4ADE80">&#x25CF;&#xFE0E;</span><div class="verdict-text">Gated shorts: +$16,800.</div></div>
-          <div class="verdict-row"><span class="verdict-glyph" style="color:#4ADE80">&#x25CF;&#xFE0E;</span><div class="verdict-text">Stocks and gold. Still works.</div></div>
-          <div class="verdict-row"><span class="verdict-glyph" style="color:#D4A843">&#x25CF;&#xFE0E;</span><div class="verdict-text">Mean reversion: killed.</div></div>
-          <div class="verdict-row"><span class="verdict-glyph" style="color:#D4A843">&#x25CF;&#xFE0E;</span><div class="verdict-text">Concentration risk: unsolved.</div></div>
-          <div class="verdict-row" style="margin-top:8px"><span class="verdict-glyph" style="color:#999999">&#x25CB;&#xFE0E;</span><div class="verdict-text" style="color:#999999">Forward test: next.</div></div>
-        </div>
-        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:16px;">
-          <a href="https://shumi.ai/app" target="_blank" class="reveal" style="font-size:clamp(24px,3.5vw,32px); font-weight:500; color:#E0E0E0; text-decoration:none; transition:color 0.3s;">shumi.ai</a>
-          <div class="end-motto reveal">the work continues</div>
-        </div>
+      <iframe id="physarum" src="about:blank" allow="autoplay" loading="lazy"></iframe>
+      <div class="end-cta">
+        <a href="https://shumi.ai/app" target="_blank" class="reveal" id="s12Wordmark">shumi.ai</a>
+        <div class="end-motto reveal" id="s12Motto">the work continues</div>
       </div>
     </div>
 
@@ -663,395 +749,410 @@
 <div class="counter" id="counter"></div>
 
 <script>
-// ── GATE DEFINITIONS (EP3: H3, H6, R3, R5 now pass) ──
-var gates = [
-  { id: 'C1', status: 'pass' },  { id: 'C2', status: 'pass' },  { id: 'C3', status: 'pass' },
-  { id: 'C4', status: 'pass' },  { id: 'C5', status: null },    { id: 'H1', status: 'pass' },
-  { id: 'H2', status: 'pass' },  { id: 'H3', status: 'pass', isNew: true },
-  { id: 'H4', status: null },    { id: 'H5', status: 'pass' },
-  { id: 'H6', status: 'pass', isNew: true },  { id: 'H7', status: null },
-  { id: 'R1', status: 'pass' },  { id: 'R2', status: 'warn' },
-  { id: 'R3', status: 'pass', isNew: true },
-  { id: 'R4', status: null },    { id: 'R5', status: 'pass', isNew: true },
-  { id: 'L1', status: null },
-  { id: '', status: null },      { id: '', status: null },       { id: '', status: null }
+var snd = new Snd(); snd.load(Snd.KITS.SND01);
+
+var ambientPad = new Audio('https://cdn.pixabay.com/audio/2024/11/04/audio_afff2a0498.mp3');
+ambientPad.loop = true; ambientPad.volume = 0.08; ambientPad.preload = 'auto';
+
+var audioEnabled = false;
+var narrationTrack = new Audio('audio/narration.mp3');
+narrationTrack.preload = 'auto';
+
+function toggleAudio() {
+  audioEnabled = !audioEnabled;
+  var btn = document.getElementById('audioToggle');
+  btn.textContent = audioEnabled ? 'VOICE ON' : 'VOICE OFF';
+  btn.classList.toggle('on', audioEnabled);
+  if (audioEnabled && running) { narrationTrack.play().catch(function(){}); ambientPad.play().catch(function(){}); }
+  else { narrationTrack.pause(); ambientPad.pause(); }
+}
+function startNarration() {
+  if (!audioEnabled) return;
+  narrationTrack.currentTime = 0;
+  narrationTrack.play().catch(function(){});
+  ambientPad.currentTime = 0;
+  ambientPad.play().catch(function(){});
+}
+
+// ── S2 grounding terminal lines ──
+var s2Lines = [
+  '<span class="t-cyan">$</span> <span class="t-dim">run_validation --strategy production</span>',
+  '<span class="t-dim">&gt; testing parameters...</span>',
+  '<span class="t-val">&gt; 8 of 9 gates passed.</span>',
 ];
 
-function buildGateGrid(id) {
-  var el = document.getElementById(id);
-  el.innerHTML = '';
-  gates.forEach(function(g) {
-    if (!g.id) { el.appendChild(document.createElement('div')); return; }
-    var cell = document.createElement('div');
-    cell.className = 'gate-cell';
-    var dot = document.createElement('div');
-    dot.className = 'gate-dot';
-    dot.dataset.status = g.status || '';
-    dot.dataset.isNew = g.isNew ? 'true' : '';
-    var label = document.createElement('div');
-    label.className = 'gate-label';
-    label.textContent = g.id;
-    cell.appendChild(dot);
-    cell.appendChild(label);
-    el.appendChild(cell);
-  });
-}
+// ── S6 filter parameter terminal lines ──
+var s6Lines = [
+  '<span class="t-cyan">$</span> <span class="t-dim">params</span>',
+  '__BLANK__',
+  '<span class="t-label">bb_mult:        </span><span class="t-val">1.5</span>',
+  '<span class="t-label">htf_long:       </span><span class="t-val">50</span>',
+  '<span class="t-label">htf_short:      </span><span class="t-val">55</span>',
+  '<span class="t-label">htf_window:     </span><span class="t-val">calendar-week</span>',
+  '<span class="t-label">direction:      </span><span class="t-val">longs only</span>',
+];
 
-function animateGateColors(id) {
-  var dots = document.querySelectorAll('#' + id + ' .gate-dot');
-  var existing = [], newPass = [], warnDots = [];
-  dots.forEach(function(d) {
-    var s = d.dataset.status;
-    if (s === 'pass' && d.dataset.isNew !== 'true') existing.push(d);
-    else if (s === 'pass' && d.dataset.isNew === 'true') newPass.push(d);
-    else if (s === 'warn') warnDots.push(d);
-  });
-  var delay = 0;
-  existing.forEach(function(d) {
-    setTimeout(function() { d.classList.add('pass'); }, delay);
-    delay += 120;
-  });
-  delay += 800;
-  newPass.forEach(function(d) {
-    var lbl = d.parentElement.querySelector('.gate-label');
-    var isR3 = lbl && lbl.textContent === 'R3';
-    var flashDur = isR3 ? 1500 : 500;
-    setTimeout(function() { d.classList.add('flash-new'); }, delay);
-    setTimeout(function() { d.classList.remove('flash-new'); d.classList.add('pass'); }, delay + flashDur);
-    delay += flashDur + 300;
-  });
-  warnDots.forEach(function(d) {
-    setTimeout(function() { d.classList.add('warn'); }, delay);
-    delay += 200;
-  });
-}
+// ── S9 validation gate summary terminal lines ──
+var s9Lines = [
+  '<span class="t-dim">in-sample window:    2022-01-01 &rarr; 2024-12-31</span>',
+  '<span class="t-dim">out-of-sample test:  2025-01-01 &rarr; 2026-05-07</span>',
+  '<span class="t-dim">the parameters never saw the test window</span>',
+  '__BLANK__',
+  '<span class="t-cyan">$</span> <span class="t-dim">validation_summary.js --strategy production</span>',
+  '__BLANK__',
+  '<span class="t-green">&#10003;</span> <span class="t-green">H1  PASS</span>    <span class="t-label">direction         </span><span class="t-val">longsOnly optimal</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">H2  PASS</span>    <span class="t-label">sensitivity       </span><span class="t-val">CV 10.7%</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">R1  PASS</span>    <span class="t-label">monte carlo       </span><span class="t-val">P(Sharpe&gt;0.75) = 100%</span>',
+  '<span class="t-gold">&#9888;</span> <span class="t-gold">R2  WARN</span>    <span class="t-label">concentration     </span><span class="t-val">top trade 57.3% of P&L</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">R3  PASS</span>    <span class="t-label">OOS               </span><span class="t-val">Sharpe 1.86 (gate 0.75)</span>',
+  '__BLANK__',
+  '<span class="t-green">4 PASS</span> <span class="t-dim">&middot;</span> <span class="t-gold">1 WARN</span> <span class="t-dim">&middot;</span> <span class="t-dim">0 FAIL</span>',
+];
 
-// ── TERMINAL LINES ──
-var termLines = {
-  tb8: [
-    '<span class="t-dim">Cross-asset OOS (2024-07 \u2192 present)</span>',
-    '<span class="t-dim">Same system. Same rules. No changes.</span>',
-    '',
-    '<span class="t-gray">S&P 500</span>    <span class="t-green">1.11</span>     <span class="t-gold">Gold (XAU)</span>    <span class="t-green">1.80</span>',
-    '<span class="t-gray">Nasdaq</span>     <span class="t-green">1.05</span>     <span class="t-gray">Small Caps</span>    <span class="t-green">1.84</span>',
-    '<span class="t-gray">Apple</span>      <span class="t-green">1.34</span>     <span class="t-gray">Dow Jones</span>     <span class="t-green">0.64</span>',
-    '<span class="t-gray">Nvidia</span>     <span class="t-gray">0.11</span>     <span class="t-gray">Treasuries</span>    <span class="t-gray">0.04</span>',
-    '<span class="t-gray">Corp Bonds</span> <span class="t-red">−0.11</span>',
-    '',
-    '<span class="t-green">\u2713 9/10 positive</span> <span class="t-gray">\u2014 not a crypto artifact</span>',
-  ],
-  tb11: [
-    '<span class="t-dim">2026 YTD (bear since Dec 13) \u00b7 $100k portfolio</span>',
-    '',
-    '<span class="t-gray">BTC</span>  \u2212$1,370     <span class="t-gray">ETH</span>  +$700',
-    '<span class="t-gray">SOL</span>  \u2212$110       <span class="t-gray">BNB</span>  \u2212$1,120',
-    '<span class="t-gray">XRP</span>  +$320',
-    '',
-    '<span class="t-dim">system:</span>     <span class="t-terra">\u2212$1,590</span>  <span class="t-dim">(\u22121.6%)</span>',
-    '<span class="t-dim">buy & hold:</span> <span class="t-terra">\u2212$18,400</span> <span class="t-dim">(\u221218.4%)</span>',
-    '',
-    '<span class="t-terra">\u2192 regime filter saved $16,810 in drawdown</span>',
-  ],
-};
-
-// ── COUNT-UP ──
-function countUp(elId, target, prefix, suffix, duration) {
-  var el = document.getElementById(elId);
-  if (!el) return;
-  var startTime = null;
-  var isFloat = target % 1 !== 0;
-  var decimals = isFloat ? (String(target).split('.')[1] || '').length : 0;
-  function step(ts) {
-    if (!startTime) startTime = ts;
-    var progress = Math.min((ts - startTime) / duration, 1);
-    var eased = 1 - Math.pow(1 - progress, 3);
-    var val = eased * target;
-    el.textContent = (prefix || '') + (isFloat ? val.toFixed(decimals) : Math.floor(val).toLocaleString()) + (suffix || '');
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function countUpNeg(elId, target, duration) {
-  var el = document.getElementById(elId);
-  if (!el) return;
-  var startTime = null;
-  function step(ts) {
-    if (!startTime) startTime = ts;
-    var p = Math.min((ts - startTime) / duration, 1);
-    var eased = 1 - Math.pow(1 - p, 3);
-    var val = target * eased;
-    // Per canon: render U+2212 minus sign, not ASCII hyphen, on negative values.
-    var rendered = val.toFixed(2);
-    if (val < 0) rendered = '−' + Math.abs(val).toFixed(2);
-    el.textContent = rendered;
-    if (p < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-// ── SCENES ──
+// ── Scene definitions ──
 var scenes = [
-  // S0: Callback to EP1
-  { el: 's0', dur: 8000,
-    narr: 'Episode 1 made a promise.',
+  // S1: Tweet render
+  { el: 's1', dur: 7000,
+    narr: 'The strong claim &mdash; <span class="hi">under examination</span>.',
     onEnter: function() {
-      var r = document.querySelectorAll('#s0 .reveal');
-      r[0] && setTimeout(function(){ r[0].classList.add('show'); }, 400);
-      r[1] && setTimeout(function(){ r[1].classList.add('show'); }, 3000);
-    }
-  },
-  // S1: The question
-  { el: 's1', dur: 6000,
-    narr: '',
+      revealTimers.push(setTimeout(function(){ document.getElementById('s1Glyph').classList.add('show'); }, 300));
+      revealTimers.push(setTimeout(function(){ document.getElementById('s1Quote').classList.add('show'); }, 500));
+      revealTimers.push(setTimeout(function(){ document.getElementById('s1Handle').classList.add('show'); }, 1100));
+    } },
+
+  // S2: Three propositions + grounding terminal
+  { el: 's2', dur: 10500,
+    narr: '<span class="terra">Validation</span> tells you which is which.',
     onEnter: function() {
-      setTimeout(function() { document.querySelector('#s1 .reveal').classList.add('show'); }, 400);
-    }
-  },
-  // S2: Title
-  { el: 's2', dur: 5000,
-    narr: '5 Failed. <span class="hi">65 Didn\u2019t.</span>',
-    onEnter: function() {
-      document.querySelectorAll('#s2 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 400 + i * 400);
+      // Stagger editorial reveals (3 propositions + 2 rules = 5 elements)
+      var reveals = document.querySelectorAll('#s2 .editorial.reveal, #s2 .ed-rule.reveal');
+      reveals.forEach(function(r, i) {
+        revealTimers.push(setTimeout(function() {
+          r.classList.add('show');
+          try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+        }, 300 + i * 250));
       });
-    }
-  },
-  // S3: Portfolio context
+      // Reveal terminal wrapper after the third proposition lands (~3000ms)
+      var term = document.getElementById('s2Term');
+      revealTimers.push(setTimeout(function(){ term.classList.add('show'); }, 3000));
+      // Populate terminal body lines manually (engine's term: spec runs too early)
+      var tb = document.getElementById('tb2');
+      tb.innerHTML = '';
+      s2Lines.forEach(function(l, i) {
+        var d = document.createElement('div');
+        d.className = 'mini-term-line';
+        if (l === '__BLANK__') {
+          d.classList.add('blank');
+          d.innerHTML = '&nbsp;';
+        } else {
+          d.innerHTML = l;
+        }
+        tb.appendChild(d);
+        revealTimers.push(setTimeout(function() {
+          d.classList.add('show');
+          try{snd.play(Snd.SOUNDS.TYPE,{volume:0.16});}catch(e){}
+        }, 3500 + i * 400));
+      });
+    } },
+
+  // S3: BTC market context
   { el: 's3', dur: 9000,
-    narr: '$100k portfolio. 10% per trade. <span class="hi">14% max drawdown.</span>',
+    narr: 'Bitcoin. February to May.',
     onEnter: function() {
-      setTimeout(function() { document.getElementById('pDate').classList.add('show'); }, 200);
-      setTimeout(function() {
-        document.getElementById('pCell1').classList.add('show');
-        countUp('pBalance', 100000, '$', '', 1200);
-      }, 600);
-      setTimeout(function() {
-        document.getElementById('pCell2').classList.add('show');
-        countUp('pPosition', 10000, '$', '', 1000);
-      }, 1600);
-      setTimeout(function() {
-        document.getElementById('pCell3').classList.add('show');
-        countUp('pDrawdown', 14, '', '%', 800);
-      }, 2600);
-      setTimeout(function() {
-        document.getElementById('pNote').classList.add('show');
-      }, 4000);
-    }
-  },
-  // S4: Scale test — 65 assets
-  { el: 's4', dur: 9000,
-    narr: 'If it\u2019s fitted, it breaks on new coins. <span class="hi">It didn\u2019t.</span>',
+      stagger('#s3 .reveal', 300);
+      revealTimers.push(setTimeout(function() {
+        var line = document.getElementById('eqLine');
+        if (line) line.classList.add('draw');
+        var cursor = document.getElementById('eqCursor');
+        if (cursor) {
+          cursor.querySelectorAll('animate').forEach(function(a) {
+            try { a.beginElement(); } catch(e) {}
+          });
+        }
+      }, 600));
+      revealTimers.push(setTimeout(function() { document.getElementById('m1').classList.add('show'); }, 3200));
+      revealTimers.push(setTimeout(function() { document.getElementById('m2').classList.add('show'); }, 3700));
+      revealTimers.push(setTimeout(function() { document.getElementById('m3').classList.add('show'); }, 4200));
+    } },
+
+  // S4: R3 OOS validation (simplified — 2 elements)
+  // Voice line bridges S03's 3-month rally context to the 16-month OOS aggregate.
+  // Voice (TTS production):
+  //   "R3 out-of-sample validation. The rally you just saw is one slice of a
+  //    sixteen-month test. The system never saw this data. Sharpe one point
+  //    eight six. Plus eight hundred twenty-eight percent. Two hundred forty-
+  //    nine trades."
+  // ~36 words → ~14 seconds at 3.0 wps × 1.1x speed including sentence pauses.
+  { el: 's4', dur: 14000, sound: 'notification',
+    narr: 'One slice of a <span class="hi">sixteen-month</span> test. <span class="ok">Sharpe 1.86</span>.',
+    onEnter: function() { staggerScene('s4', 300, 200); } },
+
+  // S5: Why longs-only (clean editorial, 2 lines)
+  { el: 's5', dur: 7000,
+    narr: 'Shorts in a sustained rally have <span class="red">no exit catalyst</span>.',
     onEnter: function() {
-      document.querySelectorAll('#s4 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 250 + i * 220);
-      });
-      setTimeout(function() { countUp('scaleAssets', 65, '', '', 1500); }, 800);
-      setTimeout(function() { countUp('scaleTrades', 293, '', '', 2000); }, 2300);
-    }
-  },
-  // S5: Config table
-  { el: 's5', dur: 13000,
-    narr: 'Shorts everywhere: <span class="red">Sharpe halved, drawdown doubled.</span> Gated: <span class="hi">$216,990.</span>',
+      var rs = document.querySelectorAll('#s5 .reveal');
+      revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
+      revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 1200));
+    } },
+
+  // S5b: ZEC chart (the proof)
+  { el: 's5b', dur: 9000, sound: 'caution',
+    narr: 'The exit signal <span class="red">never came</span>.',
     onEnter: function() {
-      document.querySelectorAll('#s5 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 250 + i * 220);
-      });
-      ['cfgA', 'cfgB', 'cfgC'].forEach(function(id, i) {
-        setTimeout(function() { document.getElementById(id).classList.add('show'); }, 1200 + i * 600);
-      });
-    }
-  },
-  // S6: Signal alpha — staggered
+      stagger('#s5b .reveal', 300);
+      revealTimers.push(setTimeout(function() {
+        var line = document.getElementById('zecLine');
+        if (line) line.classList.add('draw');
+      }, 600));
+      revealTimers.push(setTimeout(function() { document.getElementById('zecEntry').classList.add('show'); }, 3200));
+      revealTimers.push(setTimeout(function() {
+        document.getElementById('zecCurrent').classList.add('show');
+        try{snd.play(Snd.SOUNDS.CAUTION,{volume:0.3});}catch(e){}
+      }, 3900));
+    } },
+
+  // S6: Filter disclosure
   { el: 's6', dur: 11000,
-    narr: 'Random timing: 1.92. &nbsp; Timed entries: <span class="hi">2.85</span>. &nbsp; <span class="hi">+51%</span> from timing alone.',
+    term: { id: 'tb6', lines: s6Lines, cadence: 400 },
+    narr: '<span class="hi">Codified</span>, not discretionary.',
     onEnter: function() {
-      document.querySelectorAll('#s6 > div > .reveal').forEach(function(r, i) {
-        if (i === 0) setTimeout(function() { r.classList.add('show'); }, 300);
+      var line1 = document.getElementById('s6Line1');
+      var term  = document.getElementById('s6Term');
+      var line2 = document.getElementById('s6Line2');
+      revealTimers.push(setTimeout(function(){
+        line1.classList.add('show');
+        try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+      }, 300));
+      revealTimers.push(setTimeout(function(){ term.classList.add('show'); }, 1100));
+      revealTimers.push(setTimeout(function(){
+        line2.classList.add('show');
+        try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+      }, 5600));
+    } },
+
+  // S7: Position state
+  { el: 's7', dur: 9000,
+    narr: 'Six carry positions held from February.',
+    onEnter: function() {
+      stagger('#s7 .reveal', 300);
+      revealTimers.push(setTimeout(function() {
+        document.getElementById('s7Rule').classList.add('show');
+      }, 700));
+      var rows = ['pr1','pr2','pr3','pr4','pr5','pr6'];
+      rows.forEach(function(id, i) {
+        revealTimers.push(setTimeout(function() {
+          document.getElementById(id).classList.add('show');
+          try{snd.play(Snd.SOUNDS.TAP,{volume:0.1});}catch(e){}
+        }, 1300 + i * 250));
       });
-      setTimeout(function() {
-        document.getElementById('h3Left').style.opacity = '1';
-        document.getElementById('h3Left').classList.add('show');
-        countUp('h3Random', 1.92, '', '', 1200);
-      }, 2000);
-      setTimeout(function() {
-        document.getElementById('h3Arrow').style.opacity = '1';
-        document.getElementById('h3Arrow').classList.add('show');
-      }, 4000);
-      setTimeout(function() {
-        document.getElementById('h3Right').style.opacity = '1';
-        document.getElementById('h3Right').classList.add('show');
-        countUp('h3Signal', 2.85, '', '', 1200);
-      }, 5500);
-      setTimeout(function() {
-        document.getElementById('h3Sub').style.opacity = '1';
-        document.getElementById('h3Sub').classList.add('show');
-      }, 7500);
-    }
-  },
-  // S7: Breath
-  { el: 's7', dur: 4000,
+    } },
+
+  // S8: April entries
+  { el: 's8', dur: 8500,
+    narr: 'Two new entries. <span class="ok">+9</span> and <span class="red">&minus;4</span>.',
+    onEnter: function() {
+      var rs = document.querySelectorAll('#s8 .reveal');
+      revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
+      revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 900));
+      revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 1700));
+    } },
+
+  // S9: Validation gate summary
+  { el: 's9', dur: 14000, sound: 'notification',
+    term: { id: 'tb9', lines: s9Lines, cadence: 550 },
+    narr: '<span class="ok">4 PASS</span>. <span class="hi">1 WARN</span>. 0 FAIL.' },
+
+  // S10: Synthesis
+  { el: 's10', dur: 8000, sound: 'celebration',
+    narr: '<span class="terra">Method</span> beats intuition.',
+    onEnter: function() {
+      var rs = document.querySelectorAll('#s10 .reveal');
+      rs.forEach(function(r, i) {
+        revealTimers.push(setTimeout(function() {
+          r.classList.add('show');
+        }, 300 + i * 600));
+      });
+    } },
+
+  // S11: Tagline
+  { el: 's11', dur: 6000,
+    narr: '<span class="hi">Method published.</span> Misses included.',
+    onEnter: function() {
+      var rs = document.querySelectorAll('#s11 .reveal');
+      revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
+      revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 700));
+    } },
+
+  // S12: End card
+  { el: 's12', dur: 8000, physarum: true,
     narr: '',
     onEnter: function() {
-      setTimeout(function() { document.querySelector('#s7 .reveal').classList.add('show'); }, 400);
-    }
-  },
-  // S8: TradFi cross-asset
-  { el: 's8', dur: 11000, term: 'tb8',
-    narr: 'Stocks. Gold. Small caps. <span class="hi">9 of 10 positive.</span>'
-  },
-  // S9: Regime + CI
-  { el: 's9', dur: 10000,
-    narr: 'Bull: 1.03. Bear: 0.46. <span class="hi">Both profitable.</span> Entire CI stays positive.',
-    onEnter: function() {
-      document.querySelectorAll('#s9 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 250 + i * 220);
-      });
-      setTimeout(function() { document.getElementById('regimeCard').classList.add('show'); }, 900);
-      setTimeout(function() {
-        document.getElementById('ciCard').classList.add('show');
-        countUp('ciNum', 1.13, '', '', 1500);
-      }, 1500);
-    }
-  },
-  // S10: Betrayal — mean reversion
-  { el: 's10', dur: 9000,
-    narr: 'In-sample: <span class="hi">4.39</span>. Out-of-sample: <span class="red">\u22120.76</span>. Killed.',
-    onEnter: function() {
-      document.querySelectorAll('#s10 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 250 + i * 220);
-      });
-      setTimeout(function() {
-        document.getElementById('isCard').classList.add('show');
-        countUp('isSharpe', 4.39, '', '', 1200);
-      }, 1000);
-      setTimeout(function() {
-        document.getElementById('oosCard').classList.add('show');
-        countUpNeg('oosSharpe', -0.76, 1200);
-      }, 3000);
-    }
-  },
-  // S11: 2026 YTD
-  { el: 's11', dur: 9000, term: 'tb11',
-    narr: 'Buy &amp; hold: <span class="red">\u2212$18,400</span>. &nbsp; System: <span class="hi">\u2212$1,590</span>. &nbsp; The filter saved <span class="hi">$16,810</span>.'
-  },
-  // S12: Gate grid
-  { el: 's12', dur: 10000,
-    narr: '<span class="hi">13</span> passed. 0 failed. 8 pending.',
-    onEnter: function() {
-      document.querySelectorAll('#s12 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 400 + i * 300);
-      });
-      setTimeout(function() { animateGateColors('gateGridFinal'); }, 800);
-    }
-  },
-  // S13: Verdict + close
-  { el: 's13', dur: 14000,
-    narr: '',
-    onEnter: function() {
-      // Reset verdict rows for re-entry
-      var rows = document.querySelectorAll('#verdictList .verdict-row');
-      rows.forEach(function(r) { r.classList.remove('show'); });
-      // Reset physarum
-      var p = document.getElementById('physarum');
-      p.classList.remove('blast');
-      // Stagger verdict dots
-      rows.forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, 400 + i * 700);
-      });
-      // Physarum blooms after dots (iframe is always running — just reveal it)
-      var physDelay = rows.length * 700 + 1000;
-      setTimeout(function() {
-        p.classList.add('blast');
-      }, physDelay);
-      // CTA reveals
-      document.querySelectorAll('#s13 .reveal').forEach(function(r, i) {
-        setTimeout(function() { r.classList.add('show'); }, physDelay + 800 + i * 400);
-      });
-    }
-  },
+      blastPhysarum();
+      revealTimers.push(setTimeout(function() {
+        document.getElementById('s12Wordmark').classList.add('show');
+        try{snd.play(Snd.SOUNDS.CELEBRATION,{volume:0.25});}catch(e){}
+      }, 1200));
+      revealTimers.push(setTimeout(function() {
+        document.getElementById('s12Motto').classList.add('show');
+      }, 1600));
+    } },
 ];
 
-// ── SCENE ENGINE ──
-var current = -1, running = false, timer = null;
-var total = scenes.length;
+// ── Engine ──
+var cur = -1, running = false, total = scenes.length;
+var sceneTimer = null, revealTimers = [];
+
+function killTimers() {
+  clearTimeout(sceneTimer); sceneTimer = null;
+  revealTimers.forEach(function(t){ clearTimeout(t); }); revealTimers = [];
+}
 
 function clearAll() {
-  if (timer) { clearTimeout(timer); timer = null; }
-  document.querySelectorAll('.scene').forEach(function(s) { s.classList.remove('active'); });
+  killTimers();
+  document.querySelectorAll('.scene').forEach(function(s){
+    s.classList.remove('active');
+    s.querySelectorAll('.reveal').forEach(function(r){ r.classList.remove('show'); });
+    s.querySelectorAll('.mini-term-line').forEach(function(r){ r.classList.remove('show'); });
+    s.querySelectorAll('.eq-line').forEach(function(r){ r.classList.remove('draw'); });
+    s.querySelectorAll('.eq-marker').forEach(function(r){ r.classList.remove('show'); });
+    s.querySelectorAll('.pos-row').forEach(function(r){ r.classList.remove('show'); });
+  });
+  var rule = document.getElementById('s7Rule');
+  if (rule) rule.classList.remove('show');
 }
 
 function showNarr(html) {
   var nt = document.getElementById('nText');
   nt.classList.remove('show');
-  setTimeout(function() {
-    nt.innerHTML = html || '';
-    if (html) nt.classList.add('show');
-  }, 200);
+  setTimeout(function(){ nt.innerHTML = html || ''; if (html) nt.classList.add('show'); }, 150);
 }
 
-function showScene(index) {
-  clearAll();
-  current = index;
-  if (current < 0 || current >= total) { running = false; showNarr(''); return; }
-  var s = scenes[current];
-  document.getElementById('counter').textContent = String(current+1).padStart(2,'0')+'/'+String(total).padStart(2,'0');
-  document.getElementById('progressBar').style.width = ((current+1)/total*100)+'%';
-  showNarr(s.narr);
+function stagger(selector, baseDelay) {
+  var els = document.querySelectorAll(selector);
+  els.forEach(function(el, i) {
+    revealTimers.push(setTimeout(function() {
+      el.classList.add('show');
+      try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+    }, baseDelay + i * 250));
+  });
+}
 
-  var sceneEl = document.getElementById(s.el);
-  sceneEl.classList.add('active');
-  sceneEl.querySelectorAll('.reveal').forEach(function(r) { r.classList.remove('show'); });
+function staggerScene(sceneId, baseDelay, gap) {
+  var els = document.querySelectorAll('#' + sceneId + ' .reveal');
+  els.forEach(function(el, i) {
+    revealTimers.push(setTimeout(function() {
+      el.classList.add('show');
+      try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+    }, baseDelay + i * gap));
+  });
+}
 
-  if (s.term && termLines[s.term]) {
-    var body = document.getElementById(s.term);
-    body.innerHTML = '';
-    termLines[s.term].forEach(function(l, i) {
-      var d = document.createElement('div');
-      d.className = 'mini-term-line';
-      d.innerHTML = l || '&nbsp;';
-      body.appendChild(d);
-      setTimeout(function() { d.classList.add('show'); }, 600 + i * 500);
-    });
+var physPreloaded = false;
+function preloadPhysarum() {
+  if (physPreloaded) return;
+  var phys = document.getElementById('physarum');
+  if (phys) {
+    phys.src = 'https://shumi-landing.onrender.com/physarum/stencil.html?lp&seed=60&es=0.57&ew=0.28';
+    physPreloaded = true;
   }
-
-  if (s.onEnter) s.onEnter();
-  if (running) timer = setTimeout(function() { showScene(current + 1); }, s.dur);
+}
+function blastPhysarum() {
+  var phys = document.getElementById('physarum');
+  if (phys) phys.classList.add('blast');
 }
 
 function startFilm() {
   document.getElementById('startScreen').classList.add('hidden');
-  running = true;
-  showScene(0);
+  audioEnabled = true;
+  var btn = document.getElementById('audioToggle');
+  btn.textContent = 'VOICE ON';
+  btn.classList.add('on');
+  running = true; startNarration(); nextScene();
 }
 
-buildGateGrid('gateGridFinal');
+function playScene() {
+  var s = scenes[cur];
+  document.getElementById('counter').textContent = String(cur+1).padStart(2,'0') + '/' + String(total).padStart(2,'0');
+  document.getElementById('progressBar').style.width = ((cur+1)/total*100) + '%';
+  if (cur >= 1) document.getElementById('recBadge').classList.add('show');
+
+  try{snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.3});}catch(e){}
+  if (s.sound === 'caution') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CAUTION,{volume:0.45});},250));}catch(e){}
+  if (s.sound === 'notification') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.NOTIFICATION);},250));}catch(e){}
+  if (s.sound === 'celebration') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CELEBRATION);},250));}catch(e){}
+
+  if (cur >= total - 3) preloadPhysarum();
+
+  showNarr(s.narr);
+  var el = document.getElementById(s.el);
+  el.classList.add('active');
+
+  if (s.term) {
+    var tb = document.getElementById(s.term.id); tb.innerHTML = '';
+    var cadence = s.term.cadence || 500;
+    s.term.lines.forEach(function(l, i) {
+      var d = document.createElement('div');
+      d.className = 'mini-term-line';
+      if (l === '__BLANK__') {
+        d.classList.add('blank');
+        d.innerHTML = '&nbsp;';
+      } else {
+        d.innerHTML = l;
+      }
+      tb.appendChild(d);
+      revealTimers.push(setTimeout(function() {
+        d.classList.add('show');
+        try{snd.play(Snd.SOUNDS.TYPE,{volume:0.18});}catch(e){}
+      }, 500 + i * cadence));
+    });
+  }
+
+  if (s.onEnter) s.onEnter();
+
+  sceneTimer = setTimeout(nextScene, s.dur);
+}
+
+function nextScene() {
+  if (cur >= 0 && cur < scenes.length && scenes[cur].onExit) scenes[cur].onExit();
+  clearAll(); cur++;
+  if (cur >= total) {
+    running = false; showNarr('');
+    narrationTrack.pause(); ambientPad.pause();
+    return;
+  }
+  playScene();
+}
+function goTo(i) {
+  if (cur >= 0 && cur < scenes.length && scenes[cur].onExit) scenes[cur].onExit();
+  clearAll(); cur = i;
+  if (cur < 0) cur = 0;
+  if (cur >= total) cur = total - 1;
+  playScene();
+}
 
 document.addEventListener('keydown', function(e) {
   if (e.code === 'Space') {
     e.preventDefault();
-    if (current < 0) startFilm();
-    else { running = !running; if (running) showScene(current + 1); }
+    if (cur < 0) { startFilm(); return; }
+    if (running) { running = false; killTimers(); if (audioEnabled) narrationTrack.pause(); }
+    else { running = true; if (audioEnabled) narrationTrack.play().catch(function(){}); nextScene(); }
   }
   if (e.code === 'ArrowRight' || e.code === 'PageDown') {
-    e.preventDefault(); running = false;
-    if (current < 0) showScene(0); else if (current < total - 1) showScene(current + 1);
+    e.preventDefault();
+    if (cur < 0) { startFilm(); return; }
+    running = true; nextScene();
   }
-  if ((e.code === 'ArrowLeft' || e.code === 'PageUp') && current > 0) {
-    e.preventDefault(); running = false; showScene(current - 1);
+  if (e.code === 'ArrowLeft' || e.code === 'PageUp') {
+    e.preventDefault();
+    if (cur <= 0) return;
+    running = true; goTo(cur - 1);
   }
-});
-
-document.addEventListener('click', function(e) {
-  if (e.target.closest('.start') || e.target.closest('a') || e.target.closest('.back-link')) return;
-  if (current < 0) return;
-  running = false;
-  if (e.clientX < window.innerWidth * 0.33 && current > 0) showScene(current - 1);
-  else if (current < total - 1) showScene(current + 1);
 });
 
 if (window.location.search.includes('autoplay')) {
-  setTimeout(function() { running = true; showScene(0); }, 500);
+  document.getElementById('startScreen').style.display = 'none';
+  setTimeout(function() { running = true; nextScene(); }, 500);
 }
 </script>
 </body>
