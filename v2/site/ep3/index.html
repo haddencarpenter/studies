@@ -40,25 +40,29 @@
   /* ── EDITORIAL TYPE ── */
   .editorial {
     font-family: 'DM Sans', sans-serif;
-    font-size: clamp(36px, 5vw, 72px);
+    font-size: clamp(28px, 3.6vw, 64px);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.25;
     text-align: center;
-    max-width: min(85vw, 1000px);
+    max-width: min(80vw, 920px);
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
   .editorial-sm {
     font-family: 'DM Sans', sans-serif;
-    font-size: clamp(28px, 4vw, 56px);
+    font-size: clamp(22px, 3vw, 48px);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.3;
     text-align: center;
+    max-width: min(80vw, 920px);
+    overflow-wrap: break-word;
   }
   .editorial-stack {
     display: flex; flex-direction: column; align-items: center;
-    gap: clamp(20px, 3vh, 36px);
-    max-width: 85vw;
+    gap: clamp(16px, 2.5vh, 32px);
+    max-width: 80vw;
   }
   .ed-rule { width: 80px; height: 1px; background: #1e1e22; }
 
@@ -151,10 +155,10 @@
     letter-spacing: 0.04em;
   }
   .mini-term-body {
-    padding: clamp(18px, 2.4vh, 32px) clamp(20px, 2.8vw, 40px);
+    padding: clamp(12px, 1.4vh, 20px) clamp(16px, 2.2vw, 32px);
     font-family: 'Geist Mono', monospace;
-    font-size: clamp(18px, 1.8vw, 28px);
-    line-height: 2.0;
+    font-size: clamp(12px, 1.3vw, 20px);
+    line-height: 1.45;
     font-variant-numeric: tabular-nums;
     color: #e0e0e0;
   }
@@ -164,7 +168,7 @@
     white-space: pre;
   }
   .mini-term-line.show { opacity: 1; transform: translateY(0); }
-  .mini-term-line.blank { height: 0.6em; }
+  .mini-term-line.blank { height: 0.4em; }
 
   .t-cyan  { color: #d4574a; }
   .t-red   { color: #ef4444; }
@@ -386,6 +390,13 @@
     display: flex; align-items: center; justify-content: center;
     padding: 0 clamp(24px, 6vw, 80px); text-align: center;
     border-top: 1px solid #1e1e22; background: #0a0a0a;
+    transition: border-top-color 0.4s ease, background 0.4s ease;
+  }
+  /* When the editorial visual already carries the message, hide the strip
+     visually but keep its layout slot to avoid scene-to-scene height shifts. */
+  .narr-strip.empty {
+    border-top-color: transparent;
+    background: transparent;
   }
   .narr-text {
     font-family: 'DM Sans', sans-serif;
@@ -471,6 +482,64 @@
     font-family: 'Geist Mono', monospace;
     font-size: clamp(14px, 1.4vw, 18px); color: #999999;
     letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6;
+  }
+
+  /* ── H2B PARAMETER SWEEP GRID (S5c) ── */
+  .h2b-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(20px, 3vh, 32px);
+    max-width: 92vw;
+  }
+  .h2b-grids {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 5vw, 80px);
+  }
+  .h2b-grid-block {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px;
+  }
+  .h2b-grid-title {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(11px, 1.1vw, 14px);
+    color: #999999;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .h2b-grid {
+    display: grid;
+    grid-template-columns: repeat(5, clamp(48px, 5vw, 64px));
+    grid-template-rows: repeat(4, clamp(32px, 4vh, 44px));
+    gap: 2px;
+    background: #1e1e22;
+    padding: 2px;
+    border-radius: 2px;
+  }
+  .h2b-cell {
+    background: #141414;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(10px, 1vw, 12px);
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .h2b-cell.show { opacity: 1; }
+  .h2b-cell.cell-pos { background: #142a1f; color: #4ade80; }
+  .h2b-cell.cell-neg { background: #2a1414; color: #ef4444; }
+  .h2b-cell.cell-baseline { outline: 1px solid #d4a843; outline-offset: -2px; }
+  .h2b-stat {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(13px, 1.4vw, 18px);
+    color: #999999;
+  }
+  .h2b-chyron {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(16px, 1.7vw, 22px);
+    color: #e0e0e0;
+    padding-top: 8px;
+    text-align: center;
+    letter-spacing: 0.02em;
   }
 
   /* ── MOBILE / NARROW VIEWPORT ── */
@@ -561,10 +630,11 @@
       </div>
     </div>
 
-    <!-- S3: BTC market context (Coinbase spot, Feb 7 -> May 7 2026 — verified prices) -->
+    <!-- S3: BTC market context (Coinbase spot, Feb 7 -> May 9 2026 — verified prices) -->
+    <!-- Refreshed 2026-05-09 with OHLCV close-of-day values -->
     <div class="scene" id="s3">
       <div class="eq-wrap">
-        <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-07</div>
+        <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-09</div>
         <svg class="eq-svg" viewBox="0 0 1200 420" preserveAspectRatio="none">
           <line x1="40" y1="380" x2="1160" y2="380" stroke="#1e1e22" stroke-width="1"/>
           <line x1="40" y1="40"  x2="40"   y2="380" stroke="#1e1e22" stroke-width="1"/>
@@ -577,11 +647,11 @@
           <text x="1100" y="406" fill="#999999" font-family="Geist Mono, monospace" font-size="16" text-anchor="middle">MAY</text>
           <polyline class="eq-line" id="eqLine"
             fill="none" stroke="#999999" stroke-width="3" stroke-linejoin="round"
-            points="80,252 199,277 318,298 437,320 556,241 676,315 723,288 795,231 914,154 1033,149 1140,121"/>
+            points="80,252 199,277 318,298 437,320 556,241 676,315 723,288 795,231 914,154 1033,149 1115,121 1160,97"/>
           <circle id="eqCursor" cx="80" cy="252" r="6" fill="#e0e0e0" opacity="0">
             <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.95;1" dur="2.6s" begin="indefinite" fill="freeze"/>
-            <animate attributeName="cx" values="80;199;318;437;556;676;723;795;914;1033;1140" dur="2.6s" begin="indefinite" fill="freeze"/>
-            <animate attributeName="cy" values="252;277;298;320;241;315;288;231;154;149;121" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cx" values="80;199;318;437;556;676;723;795;914;1033;1115;1160" dur="2.6s" begin="indefinite" fill="freeze"/>
+            <animate attributeName="cy" values="252;277;298;320;241;315;288;231;154;149;121;97" dur="2.6s" begin="indefinite" fill="freeze"/>
           </circle>
           <g class="eq-marker" id="m1">
             <line x1="80" y1="252" x2="80" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
@@ -592,33 +662,36 @@
             <text x="437" y="345" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">MAR 9 &middot; $65,978</text>
           </g>
           <g class="eq-marker" id="m3">
-            <line x1="1140" y1="111" x2="1140" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
-            <text x="1140" y="101" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">MAY 7 &middot; $79,271</text>
+            <line x1="1160" y1="87" x2="1160" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="1160" y="77" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">MAY 9 &middot; $80,844</text>
           </g>
         </svg>
       </div>
     </div>
 
-    <!-- S4: R3 OOS validation — simplified -->
+    <!-- S4: Rally window — production capture (Apr 3 → May 9, 2026) -->
+    <!-- Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/prod-longs-current-trades.json -->
+    <!-- Refreshed 2026-05-09 with OHLCV through 2026-05-09. Params verified against shumi-bot/src/modules/signals-regime.js (post-Apr-8 revert). -->
     <div class="scene" id="s4">
       <div class="stat-wrap">
+        <div class="kicker reveal">RALLY WINDOW &middot; APR 3 &rarr; MAY 9 &middot; 79-COIN UNIVERSE &middot; LONGS ONLY</div>
         <div class="stat-row">
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">1.86</div>
-            <div class="stat-label">OOS SHARPE</div>
+            <div class="stat-num" style="color:#4ade80">26</div>
+            <div class="stat-label">TRADES CLOSED</div>
           </div>
           <div class="stat-mid">&middot;</div>
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">+828%</div>
-            <div class="stat-label">NET RETURN</div>
+            <div class="stat-num" style="color:#4ade80">65.4%</div>
+            <div class="stat-label">WIN RATE</div>
           </div>
           <div class="stat-mid">&middot;</div>
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">249</div>
-            <div class="stat-label">TRADES</div>
+            <div class="stat-num" style="color:#4ade80">+5.5%</div>
+            <div class="stat-label">MEAN PER TRADE</div>
           </div>
         </div>
-        <div class="stat-sub reveal">16-month out-of-sample. The system never saw this data.</div>
+        <div class="stat-sub reveal">17 winners of 26. Sum: +142% of returnPct.</div>
       </div>
     </div>
 
@@ -653,20 +726,42 @@
           <!-- ZEC price line — failure red because the trade is bleeding -->
           <polyline class="eq-line" id="zecLine"
             fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"
-            points="125,358 203,354 281,330 359,349 437,359 515,374 593,341 604,353 682,363 760,347 838,247 915,268 993,266 1071,260 1140,83"/>
+            points="125,358 203,354 281,330 359,349 437,359 515,374 593,341 604,353 682,363 760,347 838,247 915,268 993,266 1071,260 1115,83 1140,60"/>
 
           <!-- Entry marker -->
           <g class="eq-marker" id="zecEntry">
             <circle cx="593" cy="341" r="7" fill="#999999" stroke="#0a0a0a" stroke-width="2"/>
             <text x="593" y="320" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">SHORT 03-18</text>
           </g>
-          <!-- Current marker -->
+          <!-- Current marker — refreshed 2026-05-09 -->
           <g class="eq-marker" id="zecCurrent">
-            <circle cx="1140" cy="83" r="8" fill="#ef4444" stroke="#0a0a0a" stroke-width="2"/>
-            <text x="1080" y="73" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">05-07 &middot; $570.96</text>
-            <text x="1080" y="50" fill="#ef4444" font-family="Geist Mono, monospace" font-size="20" text-anchor="end">&minus;130%</text>
+            <circle cx="1140" cy="60" r="8" fill="#ef4444" stroke="#0a0a0a" stroke-width="2"/>
+            <text x="1080" y="50" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">05-09 &middot; $602.92</text>
+            <text x="1080" y="27" fill="#ef4444" font-family="Geist Mono, monospace" font-size="20" text-anchor="end">&minus;143%</text>
           </g>
         </svg>
+      </div>
+    </div>
+
+    <!-- S5c: H2b parameter sensitivity — engineering layer ablation -->
+    <!-- Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/h2b/{config1-prod-longs,config2-uniform-both}.json -->
+    <!-- 20-cell sweep (4 RSI × 5 BB) on 5 majors (BTC, ETH, SOL, BNB, XRP), 2022→2026 -->
+    <div class="scene" id="s5c">
+      <div class="h2b-wrap">
+        <div class="kicker reveal">PARAMETER SWEEP &middot; 20 COMBINATIONS &middot; 5 MAJORS &middot; 2022 &rarr; 2026</div>
+        <div class="h2b-grids">
+          <div class="h2b-grid-block reveal">
+            <div class="h2b-grid-title">STOP ON &middot; LONGS ONLY</div>
+            <div class="h2b-grid" id="h2bGrid1"></div>
+            <div class="h2b-stat">worst cell: <span class="t-green">&minus;94%</span> max DD</div>
+          </div>
+          <div class="h2b-grid-block reveal">
+            <div class="h2b-grid-title">STOP OFF &middot; BOTH DIRECTIONS</div>
+            <div class="h2b-grid" id="h2bGrid2"></div>
+            <div class="h2b-stat">worst cell: <span class="t-red">&minus;850%</span> max DD</div>
+          </div>
+        </div>
+        <div class="h2b-chyron reveal">9 of 20 profitable in both. <span class="hi">Same count. Different tail.</span></div>
       </div>
     </div>
 
@@ -697,37 +792,37 @@
             <div class="pr-sym">RENDER</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+56.85%</div>
+            <div class="pr-pnl">+64.90%</div>
           </div>
           <div class="pos-row" id="pr2">
             <div class="pr-sym">NEAR</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-13</div>
-            <div class="pr-pnl">+43.61%</div>
+            <div class="pr-pnl">+55.33%</div>
           </div>
           <div class="pos-row" id="pr3">
-            <div class="pr-sym">BTC</div>
-            <div class="pr-dir">LONG</div>
-            <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+28.52%</div>
-          </div>
-          <div class="pos-row" id="pr4">
             <div class="pr-sym">GMX</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+29.10%</div>
+            <div class="pr-pnl">+33.40%</div>
+          </div>
+          <div class="pos-row" id="pr4">
+            <div class="pr-sym">BTC</div>
+            <div class="pr-dir">LONG</div>
+            <div class="pr-date">entered 2026-02-06</div>
+            <div class="pr-pnl">+28.79%</div>
           </div>
           <div class="pos-row" id="pr5">
             <div class="pr-sym">HBAR</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+16.13%</div>
+            <div class="pr-pnl">+19.34%</div>
           </div>
           <div class="pos-row" id="pr6">
             <div class="pr-sym">SUI</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+10.34%</div>
+            <div class="pr-pnl">+16.44%</div>
           </div>
         </div>
       </div>
@@ -736,8 +831,8 @@
     <!-- S8: April entries (two-row ledger) — date column dropped, percentages remain prominent -->
     <div class="scene" id="s8">
       <div style="display:flex; flex-direction:column; align-items:center; gap:28px; max-width:92vw">
-        <div class="ledger-row reveal">AAVE<span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+6.87%</span></div>
-        <div class="ledger-row reveal">WLD<span style="display:inline-block;width:1.6ch"></span><span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-red">&minus;5.97%</span></div>
+        <div class="ledger-row reveal">AAVE<span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+10.40%</span></div>
+        <div class="ledger-row reveal">WLD<span style="display:inline-block;width:1.6ch"></span><span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+1.87%</span></div>
         <div class="ledger-sub reveal">Two April long entries in the live system. Both shown.</div>
       </div>
     </div>
@@ -755,20 +850,22 @@
       </div>
     </div>
 
-    <!-- S10: Synthesis -->
+    <!-- S10: Synthesis — apophenia closer (the GCR-loop close) -->
     <div class="scene" id="s10">
       <div class="editorial-stack">
-        <div class="editorial reveal dim">The system runs.</div>
-        <div class="editorial reveal dim">The validation holds.</div>
-        <div class="editorial reveal body-text"><span class="terra">Method</span> beats intuition.</div>
+        <div class="editorial reveal dim">GCR is right. Most charts lie.</div>
+        <div class="editorial reveal">Some don't. <span class="terra">Method</span> tells you which.</div>
+        <div class="editorial reveal">Discipline bounds the cost when method is wrong.</div>
+        <div class="editorial reveal body-text">That's how you make money <span class="hi">without getting lucky</span>.</div>
       </div>
     </div>
 
-    <!-- S11: Tagline -->
+    <!-- S11: Tagline + platform CTA -->
     <div class="scene" id="s11">
       <div class="editorial-stack">
         <div class="editorial reveal body-text">Method published.</div>
         <div class="editorial reveal dim">Misses included.</div>
+        <div class="editorial reveal dim">The signals run on the platform.</div>
       </div>
     </div>
 
@@ -821,35 +918,41 @@ function startNarration() {
 var s2Lines = [
   '<span class="t-cyan">$</span> <span class="t-dim">run_validation --strategy production</span>',
   '<span class="t-dim">&gt; testing parameters...</span>',
-  '<span class="t-val">&gt; 8 of 9 gates passed.</span>',
+  '<span class="t-val">&gt; 6 of 9. 3 findings. work in progress.</span>',
 ];
 
-// ── S6 filter parameter terminal lines ──
+// ── S6 engineering-layer parameter terminal lines ──
+// HTF_CONFIG/LTF_CONFIG values (40/60/14, bb 1.5) intentionally redacted —
+// the engineering layer (stop, hold, cooldown, longs-only) is the disclosure
+// the film argues for; the edge parameters stay private.
 var s6Lines = [
-  '<span class="t-cyan">$</span> <span class="t-dim">params</span>',
+  '<span class="t-cyan">$</span> <span class="t-dim">params --engineering-layer</span>',
   '__BLANK__',
-  '<span class="t-label">bb_mult:        </span><span class="t-val">1.5</span>',
-  '<span class="t-label">htf_long:       </span><span class="t-val">50</span>',
-  '<span class="t-label">htf_short:      </span><span class="t-val">55</span>',
-  '<span class="t-label">htf_window:     </span><span class="t-val">calendar-week</span>',
-  '<span class="t-label">direction:      </span><span class="t-val">longs only</span>',
+  '<span class="t-label">regime catastrophic stop  : </span><span class="t-val">30%</span>',
+  '<span class="t-label">max hold                  : </span><span class="t-val">60d</span>',
+  '<span class="t-label">reentry cooldown          : </span><span class="t-val">30d</span>',
+  '<span class="t-label">direction filter          : </span><span class="t-val">longs-only</span>',
 ];
 
 // ── S9 validation gate summary terminal lines ──
+// Source: simulation-engine/results/validation/validate_all_report.json (dated 2026-04-08)
+// Snapshot at report date — h2b later improved to 9/20 profitable but report not yet refreshed.
 var s9Lines = [
-  '<span class="t-dim">in-sample window:    2022-01-01 &rarr; 2024-12-31</span>',
-  '<span class="t-dim">out-of-sample test:  2025-01-01 &rarr; 2026-05-07</span>',
-  '<span class="t-dim">the parameters never saw the test window</span>',
+  '<span class="t-dim">deployed validation suite &middot; report dated 2026-04-08</span>',
   '__BLANK__',
-  '<span class="t-cyan">$</span> <span class="t-dim">validation_summary.js --strategy production</span>',
+  '<span class="t-cyan">$</span> <span class="t-dim">npm run validate:standard</span>',
   '__BLANK__',
-  '<span class="t-green">&#10003;</span> <span class="t-green">H1  PASS</span>    <span class="t-label">direction         </span><span class="t-val">longsOnly optimal</span>',
-  '<span class="t-green">&#10003;</span> <span class="t-green">H2  PASS</span>    <span class="t-label">sensitivity       </span><span class="t-val">CV 10.7%</span>',
-  '<span class="t-green">&#10003;</span> <span class="t-green">R1  PASS</span>    <span class="t-label">monte carlo       </span><span class="t-val">P(Sharpe&gt;0.75) = 100%</span>',
-  '<span class="t-gold">&#9888;</span> <span class="t-gold">R2  WARN</span>    <span class="t-label">concentration     </span><span class="t-val">top trade 57.3% of P&L</span>',
-  '<span class="t-green">&#10003;</span> <span class="t-green">R3  PASS</span>    <span class="t-label">OOS               </span><span class="t-val">Sharpe 1.86 (gate 0.75)</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">freshness  PASS </span> <span class="t-label">data freshness   </span><span class="t-val">all current</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">parity     PASS </span> <span class="t-label">engine B parity  </span><span class="t-val">5/5 majors</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">surface    PASS </span> <span class="t-label">runner surface   </span><span class="t-val">12/12 executable</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">d1         PASS </span> <span class="t-label">deterministic    </span><span class="t-val">snapshots identical</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">h3         PASS </span> <span class="t-label">random baseline  </span><span class="t-val">alpha beats random</span>',
+  '<span class="t-green">&#10003;</span> <span class="t-green">c5         PASS </span> <span class="t-label">correlation      </span><span class="t-val">bear &gt; bull</span>',
+  '<span class="t-gold">!</span> <span class="t-gold">h2b        FIND </span> <span class="t-label">HTF sensitivity  </span><span class="t-val">7/20 profitable</span>',
+  '<span class="t-gold">!</span> <span class="t-gold">h4         FIND </span> <span class="t-label">entry jitter     </span><span class="t-val">insensitive</span>',
+  '<span class="t-gold">!</span> <span class="t-gold">r3         FIND </span> <span class="t-label">OOS portfolio    </span><span class="t-val">below threshold</span>',
   '__BLANK__',
-  '<span class="t-green">4 PASS</span> <span class="t-dim">&middot;</span> <span class="t-gold">1 WARN</span> <span class="t-dim">&middot;</span> <span class="t-dim">0 FAIL</span>',
+  '<span class="t-green">6 PASS</span> <span class="t-dim">&middot;</span> <span class="t-gold">3 FINDING</span> <span class="t-dim">&middot;</span> <span class="t-dim">0 BLOCKER</span>',
 ];
 
 // ── Scene definitions ──
@@ -864,8 +967,10 @@ var scenes = [
     } },
 
   // S2: Three propositions + grounding terminal
+  // narr carries the voice's archetype metaphor (systematic vs discretionary)
+  // — non-redundant with editorial which carries the thesis (patterns/validation).
   { el: 's2', dur: 21000,
-    narr: '<span class="terra">Validation</span> tells you which is which.',
+    narr: '<span class="terra">Systematic</span> compounds. <span class="dim">Discretionary</span> tells stories.',
     onEnter: function() {
       // Stagger editorial reveals (3 propositions + 2 rules = 5 elements)
       var reveals = document.querySelectorAll('#s2 .editorial.reveal, #s2 .ed-rule.reveal');
@@ -918,16 +1023,14 @@ var scenes = [
       revealTimers.push(setTimeout(function() { document.getElementById('m3').classList.add('show'); }, 4200));
     } },
 
-  // S4: R3 OOS validation (simplified — 2 elements)
-  // Voice line bridges S03's 3-month rally context to the 16-month OOS aggregate.
-  // Voice (TTS production):
-  //   "R3 out-of-sample validation. The rally you just saw is one slice of a
-  //    sixteen-month test. The system never saw this data. Sharpe one point
-  //    eight six. Plus eight hundred twenty-eight percent. Two hundred forty-
-  //    nine trades."
-  // ~36 words → ~14 seconds at 3.0 wps × 1.1x speed including sentence pauses.
-  { el: 's4', dur: 22000, sound: 'notification',
-    narr: 'One slice of a <span class="hi">sixteen-month</span> test. <span class="ok">Sharpe 1.86</span>.',
+  // S4: Rally window — production capture (Apr 3 → May 9, 2026)
+  // Voice (TTS production, refreshed 2026-05-09):
+  //   "Twenty-six trades closed in the rally window. Seventeen winners.
+  //    Sixty-five percent. Longs only. Five-point-five a trade on average."
+  // ~22 words → ~9 seconds at 3.0 wps × 1.1x speed including sentence pauses.
+  // Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/ (data extended through 2026-05-09)
+  { el: 's4', dur: 12000, sound: 'notification',
+    narr: '<span class="ok">26 trades</span>. <span class="hi">65.4%</span>. Longs only.',
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
   // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
@@ -956,10 +1059,38 @@ var scenes = [
       }, 3900));
     } },
 
-  // S6: Filter disclosure
+  // S5c: H2b parameter sweep — engineering layer ablation
+  // Voice (TTS production):
+  //   "Twenty parameter cells around the deployed values. Nine profitable.
+  //    Without the stop, parameter drift produced cells at minus five hundred,
+  //    minus eight hundred max drawdown. The edge is a narrow island."
+  // ~30 words → ~12 seconds. Visual: dual 4×5 grid + chyron.
+  { el: 's5c', dur: 13000,
+    narr: 'A <span class="hi">narrow island</span>, not a continent.',
+    onEnter: function() {
+      populateH2bGrids();
+      var rs = document.querySelectorAll('#s5c .reveal');
+      revealTimers.push(setTimeout(function(){
+        rs[0].classList.add('show');
+        try{snd.play(Snd.SOUNDS.TAP,{volume:0.12});}catch(e){}
+      }, 300));
+      revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 1100));
+      revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 1500));
+      revealTimers.push(setTimeout(function(){
+        rs[3].classList.add('show');
+        try{snd.play(Snd.SOUNDS.NOTIFICATION,{volume:0.25});}catch(e){}
+      }, 9000));
+    } },
+
+  // S6: Engineering-layer disclosure — response to S5c
+  // Voice (TTS production):
+  //   "Thirty-percent stop. Sixty-day max hold. Thirty-day cooldown. Both sides.
+  //    Longs-only is the layer on top because the sweep showed stops alone
+  //    aren't enough. Codified, not discretionary."
+  // ~28 words → ~12s. Terminal shows engineering layer params (not strategy params).
   { el: 's6', dur: 15000,
     term: { id: 'tb6', lines: s6Lines, cadence: 400 },
-    narr: '<span class="hi">Codified</span>, not discretionary.',
+    narr: '<span class="hi">Stops alone aren\'t enough</span>. Longs-only on top.',
     onEnter: function() {
       var line1 = document.getElementById('s6Line1');
       var term  = document.getElementById('s6Term');
@@ -994,7 +1125,7 @@ var scenes = [
 
   // S8: April entries
   { el: 's8', dur: 14000,
-    narr: 'Two new entries. <span class="ok">+9</span> and <span class="red">&minus;4</span>.',
+    narr: 'Two new entries. <span class="ok">+10</span> and <span class="ok">+2</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s8 .reveal');
       revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
@@ -1002,30 +1133,47 @@ var scenes = [
       revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 1700));
     } },
 
-  // S9: Validation gate summary
+  // S9: Deployed validation gate summary (snapshot 2026-04-08)
+  // Voice (TTS production):
+  //   "Nine validation checks. Six pass. Three findings. Zero blockers.
+  //    Findings are open work."
+  // ~13 words → ~6s. Fits 14s scene with terminal reveal cadence (550ms × 14 = 7.7s).
   { el: 's9', dur: 14000, sound: 'notification',
     term: { id: 'tb9', lines: s9Lines, cadence: 550 },
-    narr: '<span class="ok">4 PASS</span>. <span class="hi">1 WARN</span>. 0 FAIL.' },
+    narr: '<span class="ok">6 PASS</span>. <span class="hi">3 FINDING</span>. 0 BLOCKER.' },
 
-  // S10: Synthesis
-  { el: 's10', dur: 8000, sound: 'celebration',
-    narr: '<span class="terra">Method</span> beats intuition.',
+  // S10: Synthesis — apophenia closer (the GCR-loop close)
+  // Voice (TTS production):
+  //   "GCR is right. Most charts lie. Some don't. Method tells you which.
+  //    Discipline bounds the cost when method is wrong. That's how you make
+  //    money in markets without getting lucky."
+  // ~32 words → ~13s.
+  // narr closes the film arc — S1's apophenia tweet → S10's method-as-answer.
+  // Non-redundant with editorial; provides the structural callback non-listeners need.
+  { el: 's10', dur: 14000, sound: 'celebration',
+    narr: 'From <span class="dim">apophenia</span> to <span class="terra">method</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s10 .reveal');
       rs.forEach(function(r, i) {
         revealTimers.push(setTimeout(function() {
           r.classList.add('show');
-        }, 300 + i * 600));
+        }, 300 + i * 1200));
       });
     } },
 
-  // S11: Tagline
-  { el: 's11', dur: 6000,
-    narr: '<span class="hi">Method published.</span> Misses included.',
+  // S11: Tagline + platform CTA
+  // Voice (TTS production):
+  //   "Method published. Misses included. The signals run on the platform."
+  // ~10 words → ~5s.
+  // narr surfaces the platform URL one scene before the S12 end-card.
+  // Voice/editorial say "the platform" abstractly; narr makes it actionable for non-listeners.
+  { el: 's11', dur: 8000,
+    narr: '<span class="hi">shumi.ai</span> &middot; the signals run there.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s11 .reveal');
       revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
       revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 700));
+      revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 1400));
     } },
 
   // S12: End card
@@ -1042,6 +1190,54 @@ var scenes = [
       }, 1600));
     } },
 ];
+
+// ── S5c H2b grid populator ──
+// Cells extracted 2026-05-08 from h2b/{config1,config2}.json.
+// Grid is rsi {8,10,12,14} (rows) × bb {1.0, 1.25, 1.5, 1.75, 2.0} (columns).
+// Baseline cell: rsi=10, bb=1.5 (matches deployed in shumi-bot/src/modules/signals-regime.js).
+var h2bConfig1 = [
+  // rsi=8
+  [-0.8,  1.4, -3.0, -7.1,  1.4],
+  // rsi=10  (baseline at bb=1.5)
+  [ 6.3,  1.4,  0.4, -6.3,  3.9],
+  // rsi=12
+  [-0.3, -3.6, -4.9, -1.3,  1.8],
+  // rsi=14
+  [ 2.8,  0.8, -5.3, -3.8, -0.2],
+];
+var h2bConfig2 = [
+  // rsi=8
+  [ 2.4,  1.8, -2.7, -12.2, -10.8],
+  // rsi=10  (baseline at bb=1.5)
+  [ 5.2,  4.5,  9.5,  15.2, -22.0],
+  // rsi=12
+  [-3.8, -5.1, -3.3,  -4.7,  15.2],
+  // rsi=14
+  [-17.3, 7.4, -4.0,   0.6,  -6.1],
+];
+function populateH2bGrids() {
+  var BASELINE_ROW = 1;  // rsi=10
+  var BASELINE_COL = 2;  // bb=1.5
+  function build(targetId, cells) {
+    var target = document.getElementById(targetId);
+    if (!target) return;
+    target.innerHTML = '';
+    cells.forEach(function(row, ri) {
+      row.forEach(function(val, ci) {
+        var cell = document.createElement('div');
+        cell.className = 'h2b-cell ' + (val >= 0 ? 'cell-pos' : 'cell-neg');
+        if (ri === BASELINE_ROW && ci === BASELINE_COL) cell.classList.add('cell-baseline');
+        cell.textContent = (val >= 0 ? '+' : '') + val.toFixed(1);
+        target.appendChild(cell);
+        revealTimers.push(setTimeout(function(){
+          cell.classList.add('show');
+        }, 1800 + (ri * 5 + ci) * 60));
+      });
+    });
+  }
+  build('h2bGrid1', h2bConfig1);
+  build('h2bGrid2', h2bConfig2);
+}
 
 // ── Engine ──
 var cur = -1, running = false, total = scenes.length;
@@ -1061,6 +1257,7 @@ function clearAll() {
     s.querySelectorAll('.eq-line').forEach(function(r){ r.classList.remove('draw'); });
     s.querySelectorAll('.eq-marker').forEach(function(r){ r.classList.remove('show'); });
     s.querySelectorAll('.pos-row').forEach(function(r){ r.classList.remove('show'); });
+    s.querySelectorAll('.h2b-cell').forEach(function(r){ r.classList.remove('show'); });
   });
   var rule = document.getElementById('s7Rule');
   if (rule) rule.classList.remove('show');
@@ -1068,7 +1265,9 @@ function clearAll() {
 
 function showNarr(html) {
   var nt = document.getElementById('nText');
+  var strip = document.querySelector('.narr-strip');
   nt.classList.remove('show');
+  if (strip) strip.classList.toggle('empty', !html);
   setTimeout(function(){ nt.innerHTML = html || ''; if (html) nt.classList.add('show'); }, 150);
 }
 
