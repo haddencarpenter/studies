@@ -34,7 +34,7 @@ MODEL = "eleven_v3"
 # Voice settings per voice-script bus (differs from ep1):
 #   stability 0.5 (was 0.25 on ep1) - more consistent for documentary cadence
 #   similarity_boost 0.6 (same as ep1)
-#   speed 1.1 (was 0.95 on ep1) - slightly accelerated to fit scene windows
+#   speed 1.2 (bumped from 1.1 per "way too slow" listener feedback 2026-05-11)
 VOICE_STABILITY = 0.5
 VOICE_SIMILARITY = 0.6
 VOICE_SPEED = 1.1
@@ -47,19 +47,19 @@ os.makedirs(CLIPS, exist_ok=True)
 # Empty text = silent scene
 # Scene labels match runtime IDs in index.html (s1, s2, ..., s5b, ..., s12)
 SCENES = [
-    (0,  "S01",  8,    "Twenty twenty-one. A famous crypto trader posted this. Here's where method fits."),
+    (0,  "S01",  8,    "Twenty twenty-one. A legendary crypto trader, G-C-R, posted this. Here's where method fits."),
     (1,  "S02",  21,   "The systematic trader compounds small wins. The discretionary trader gets the glory and never tells you why. One is a great movie. The other is a path. Learning to fish versus finding one in the tank."),
     (2,  "S03",  13.4, "Bitcoin. February to May. Down to sixty-six. Back to eighty-one. The market the system was running in."),
     (3,  "S04",  12,   "Plus one eighty-five percent across twenty-eight trades. Nineteen winners. Sixty-eight percent. Longs only."),
     (4,  "S05",  12.7, "It's gone up enough is not a sell signal. Same trap on shorts in a rally. Drift covers longs. Shorts pay funding to fight it."),
-    (5,  "S05b", 17.4, "Zcash short. Entered two-forty-eight. Currently five-sixty-four. Down one-twenty-seven percent. Forty other shorts in the same state. The exit signal never came."),
-    (6,  "S05c", 17.9, "Twenty parameter combinations around what's actually running. Nine profitable. Without the stop, drift to minus five hundred, minus eight hundred max drawdown. The edge is a narrow island."),
+    (5,  "S05b", 17.4, "Audit caught a Zcash short signal at two-forty-eight. Now five-sixty-four — down one twenty-seven percent. Our longs-only filter blocked it. Forty other shorts in the same state."),
+    (6,  "S05c", 17.9, "Twenty parameter combinations. Nine profitable. Without the stop, drift to minus five hundred, minus eight hundred max drawdown. Narrow island."),
     (7,  "S06",  18,   "Thirty-percent stop. Sixty-day max hold. Thirty-day cooldown. Both sides. Longs-only on top of that because stops alone weren't enough. Codified, not discretionary."),
-    (8,  "S07",  11,   "Five positions held since February. Average plus forty-two percent. Render up sixty-two. We stayed long through the drawdown."),
-    (9,  "S08",  14,   "Then two more in April. aahveigh plus eighteen. Worldcoin plus six. The scanner kept opening positions through the rally."),
-    (10, "S08b", 27.6, "And this is what users do with that. Seven leveraged trades. Twenty-X on most. Two from our regime signals — Sei and Op. The rest were their own conviction on the methodology. Eleven hundred percent on Orca. A thousand on Op. Six hundred on Morpho. Multiplied gains. Multiplied risks."),
+    (8,  "S07",  11,   "Five positions held since February. Average plus forty-two percent. Render up sixty-two percent. We stayed long through the drawdown."),
+    (9,  "S08",  14,   "Then two more in April. aahveigh plus eighteen percent. Worldcoin plus six percent. The scanner kept opening positions through the rally."),
+    (10, "S08b", 27.6, "This is what users do with that. Seven leveraged trades, twenty-X on most. Eleven hundred percent on Orca. A thousand percent on Op. Six hundred percent on Morpho. Multiplied gains, multiplied risks."),
     (11, "S09",  14,   "Nine checks against the strategy. Six clean. Three findings. Findings are open work."),
-    (12, "S10",  14.4, "Same trade. Same window. Intuition shorts Zcash at two-forty-eight — minus one twenty-seven. Method skips it. Intuition picks the calls. Method skips the traps."),
+    (12, "S10",  14.4, "Same trade, same window. Intuition shorts Zcash. Minus one twenty-seven percent. Method skips it."),
     (13, "S11",  8,    "Method published. Misses included. The signals run on the platform."),
     (14, "S12",  8,    ""),  # End-card breathing room
 ]
@@ -113,13 +113,17 @@ def generate_speech(idx, text):
         return None
 
 
-def pad_clip(raw_path, scene_path, duration, lead_delay=0.5):
-    """Add lead silence and pad to exact scene duration."""
-    delay_ms = int(lead_delay * 1000)
+def pad_clip(raw_path, scene_path, duration, lead_delay=0):
+    """Pad to exact scene duration. Default lead_delay=0 — voice hits at scene start."""
+    if lead_delay > 0:
+        delay_ms = int(lead_delay * 1000)
+        af = f"adelay={delay_ms}:all=1,apad=whole_dur={duration}"
+    else:
+        af = f"apad=whole_dur={duration}"
     subprocess.run([
         "ffmpeg", "-y", "-i", raw_path,
-        "-af", f"adelay={delay_ms}:all=1,apad=whole_dur={duration}",
-        "-c:a", "libmp3lame", "-b:a", "128k", "-ar", "44100",
+        "-af", af,
+        "-c:a", "libmp3lame", "-b:a", "128k", "-ar", "44100", "-ac", "1",
         scene_path
     ], capture_output=True)
 

@@ -1,8 +1,8 @@
 const { chromium } = require('/Users/secure/projects/scraper-test/node_modules/playwright');
 
 (async () => {
-  // Film runtime: 217.4s after cadence-pass scene timing bumps. Buffer = 230s.
-  const DURATION_MS = 230000;
+  // Film runtime: 192s after text trim + tight padding. Buffer = 200s.
+  const DURATION_MS = 200000;
   const OUTPUT_DIR = './video/';
 
   console.log('Launching browser at 1920x1080...');

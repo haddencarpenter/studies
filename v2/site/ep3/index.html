@@ -1087,7 +1087,7 @@ var s9Lines = [
 // ── Scene definitions ──
 var scenes = [
   // S1: Tweet render — single-card fade-in (structurally an X tweet, Shumi typography)
-  { el: 's1', dur: 8000,
+  { el: 's1', dur: 9000,
     narr: 'The strong claim &mdash; <span class="hi">under examination</span>.',
     onEnter: function() {
       revealTimers.push(setTimeout(function(){
@@ -1098,7 +1098,7 @@ var scenes = [
   // S2: Three propositions + grounding terminal
   // narr carries the voice's archetype metaphor (systematic vs discretionary)
   // — non-redundant with editorial which carries the thesis (patterns/validation).
-  { el: 's2', dur: 21000,
+  { el: 's2', dur: 18500,
     narr: '<span class="terra">Systematic</span> compounds. <span class="dim">Discretionary</span> tells stories.',
     onEnter: function() {
       // Stagger editorial reveals (3 propositions + 2 rules = 5 elements)
@@ -1133,7 +1133,7 @@ var scenes = [
     } },
 
   // S3: BTC market context
-  { el: 's3', dur: 13400,
+  { el: 's3', dur: 11000,
     narr: 'Bitcoin. February to May.',
     onEnter: function() {
       stagger('#s3 .reveal', 300);
@@ -1158,12 +1158,12 @@ var scenes = [
   //    Sixty-five percent. Longs only. Five-point-five a trade on average."
   // ~22 words → ~9 seconds at 3.0 wps × 1.1x speed including sentence pauses.
   // Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/ (data extended through 2026-05-11)
-  { el: 's4', dur: 12000, sound: 'notification',
+  { el: 's4', dur: 10000, sound: 'notification',
     narr: '<span class="ok">+185%</span> summed. <span class="hi">28 trades</span>. Longs only.',
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
   // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
-  { el: 's5', dur: 12700,
+  { el: 's5', dur: 13500,
     narr: 'Same trap, both sides. <span class="red">Drift only covers one of them</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s5 .reveal');
@@ -1173,7 +1173,7 @@ var scenes = [
     } },
 
   // S5b: ZEC chart (the proof)
-  { el: 's5b', dur: 17400, sound: 'caution',
+  { el: 's5b', dur: 17000, sound: 'caution',
     narr: 'The exit signal <span class="red">never came</span>.',
     onEnter: function() {
       stagger('#s5b .reveal', 300);
@@ -1194,7 +1194,7 @@ var scenes = [
   //    Without the stop, parameter drift produced cells at minus five hundred,
   //    minus eight hundred max drawdown. The edge is a narrow island."
   // ~30 words → ~12 seconds. Visual: dual 4×5 grid + chyron.
-  { el: 's5c', dur: 17900,
+  { el: 's5c', dur: 13000,
     narr: 'A <span class="hi">narrow island</span>, not a continent.',
     onEnter: function() {
       populateH2bGrids();
@@ -1217,7 +1217,7 @@ var scenes = [
   //    Longs-only is the layer on top because the sweep showed stops alone
   //    aren't enough. Codified, not discretionary."
   // ~28 words → ~12s. Terminal shows engineering layer params (not strategy params).
-  { el: 's6', dur: 18000,
+  { el: 's6', dur: 18500,
     term: { id: 'tb6', lines: s6Lines, cadence: 400 },
     narr: '<span class="hi">Stops alone aren\'t enough</span>. Longs-only on top.',
     onEnter: function() {
@@ -1236,7 +1236,7 @@ var scenes = [
     } },
 
   // S7: Position state
-  { el: 's7', dur: 11000,
+  { el: 's7', dur: 13500,
     narr: 'Avg <span class="ok">+42%</span> on five positions held since February.',
     onEnter: function() {
       stagger('#s7 .reveal', 300);
@@ -1269,7 +1269,7 @@ var scenes = [
   //    conviction informed by the methodology. A thousand percent on Orca. Six
   //    hundred on Morpho. Multiplied gains, multiplied risks."
   // ~46 words → ~17s. Visual: 7 user trade cards in flex-wrap grid.
-  { el: 's8b', dur: 27600,
+  { el: 's8b', dur: 19500,
     narr: 'Users execute. <span class="hi">Leverage</span> multiplies. <span class="ok">Two</span> in regime, <span class="ok">five</span> on conviction.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s8b .reveal');
@@ -1286,7 +1286,7 @@ var scenes = [
   //   "Nine validation checks. Six pass. Three findings. Zero blockers.
   //    Findings are open work."
   // ~13 words → ~6s. Fits 14s scene with terminal reveal cadence (550ms × 14 = 7.7s).
-  { el: 's9', dur: 14000, sound: 'notification',
+  { el: 's9', dur: 11000, sound: 'notification',
     term: { id: 'tb9', lines: s9Lines, cadence: 550 },
     narr: '<span class="ok">6 PASS</span>. <span class="hi">3 FINDING</span>. 0 BLOCKER.' },
 
@@ -1297,7 +1297,7 @@ var scenes = [
   //    Method skips the traps."
   // ~24 words → ~10s.
   // narr provides the closing tagline for non-listeners.
-  { el: 's10', dur: 14400, sound: 'celebration',
+  { el: 's10', dur: 10500, sound: 'celebration',
     narr: 'Intuition picks. <span class="terra">Method</span> skips the traps.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s10 .reveal');
@@ -1314,7 +1314,7 @@ var scenes = [
   // ~10 words → ~5s.
   // narr surfaces the platform URL one scene before the S12 end-card.
   // Voice/editorial say "the platform" abstractly; narr makes it actionable for non-listeners.
-  { el: 's11', dur: 8000,
+  { el: 's11', dur: 7000,
     narr: '<span class="hi">shumi.ai</span> &middot; the signals run there.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s11 .reveal');
@@ -1467,7 +1467,8 @@ function playScene() {
   document.getElementById('progressBar').style.width = ((cur+1)/total*100) + '%';
   if (cur >= 1) document.getElementById('recBadge').classList.add('show');
 
-  try{snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.3});}catch(e){}
+  // TRANSITION_UP SFX disabled — was causing abrupt cuts at scene boundaries.
+  // try{snd.play(Snd.SOUNDS.TRANSITION_UP,{volume:0.3});}catch(e){}
   if (s.sound === 'caution') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CAUTION,{volume:0.45});},250));}catch(e){}
   if (s.sound === 'notification') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.NOTIFICATION);},250));}catch(e){}
   if (s.sound === 'celebration') try{revealTimers.push(setTimeout(function(){snd.play(Snd.SOUNDS.CELEBRATION);},250));}catch(e){}
