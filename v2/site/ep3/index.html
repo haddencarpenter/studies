@@ -1133,7 +1133,7 @@ var scenes = [
     } },
 
   // S3: BTC market context
-  { el: 's3', dur: 10500,
+  { el: 's3', dur: 13400,
     narr: 'Bitcoin. February to May.',
     onEnter: function() {
       stagger('#s3 .reveal', 300);
@@ -1163,7 +1163,7 @@ var scenes = [
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
   // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
-  { el: 's5', dur: 11000,
+  { el: 's5', dur: 12700,
     narr: 'Same trap, both sides. <span class="red">Drift only covers one of them</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s5 .reveal');
@@ -1173,7 +1173,7 @@ var scenes = [
     } },
 
   // S5b: ZEC chart (the proof)
-  { el: 's5b', dur: 10500, sound: 'caution',
+  { el: 's5b', dur: 17400, sound: 'caution',
     narr: 'The exit signal <span class="red">never came</span>.',
     onEnter: function() {
       stagger('#s5b .reveal', 300);
@@ -1194,7 +1194,7 @@ var scenes = [
   //    Without the stop, parameter drift produced cells at minus five hundred,
   //    minus eight hundred max drawdown. The edge is a narrow island."
   // ~30 words → ~12 seconds. Visual: dual 4×5 grid + chyron.
-  { el: 's5c', dur: 13000,
+  { el: 's5c', dur: 17900,
     narr: 'A <span class="hi">narrow island</span>, not a continent.',
     onEnter: function() {
       populateH2bGrids();
@@ -1217,7 +1217,7 @@ var scenes = [
   //    Longs-only is the layer on top because the sweep showed stops alone
   //    aren't enough. Codified, not discretionary."
   // ~28 words → ~12s. Terminal shows engineering layer params (not strategy params).
-  { el: 's6', dur: 15000,
+  { el: 's6', dur: 18000,
     term: { id: 'tb6', lines: s6Lines, cadence: 400 },
     narr: '<span class="hi">Stops alone aren\'t enough</span>. Longs-only on top.',
     onEnter: function() {
@@ -1269,7 +1269,7 @@ var scenes = [
   //    conviction informed by the methodology. A thousand percent on Orca. Six
   //    hundred on Morpho. Multiplied gains, multiplied risks."
   // ~46 words → ~17s. Visual: 7 user trade cards in flex-wrap grid.
-  { el: 's8b', dur: 18000,
+  { el: 's8b', dur: 27600,
     narr: 'Users execute. <span class="hi">Leverage</span> multiplies. <span class="ok">Two</span> in regime, <span class="ok">five</span> on conviction.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s8b .reveal');
@@ -1297,7 +1297,7 @@ var scenes = [
   //    Method skips the traps."
   // ~24 words → ~10s.
   // narr provides the closing tagline for non-listeners.
-  { el: 's10', dur: 12000, sound: 'celebration',
+  { el: 's10', dur: 14400, sound: 'celebration',
     narr: 'Intuition picks. <span class="terra">Method</span> skips the traps.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s10 .reveal');
