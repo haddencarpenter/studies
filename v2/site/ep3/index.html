@@ -542,6 +542,109 @@
     letter-spacing: 0.02em;
   }
 
+  /* ── VS COMPARISON (S10) ── */
+  .vs-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(20px, 3vh, 40px);
+    max-width: 92vw;
+  }
+  .vs-kicker {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 18px);
+    color: #999999;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .vs-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: clamp(28px, 5vw, 80px);
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .vs-col {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(10px, 1.4vh, 18px);
+    min-width: 240px;
+  }
+  .vs-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(14px, 1.4vw, 20px);
+    color: #999999;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .vs-call {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(20px, 2.4vw, 36px);
+    font-weight: 500;
+    color: #e0e0e0;
+    text-align: center;
+    font-style: italic;
+  }
+  .vs-stat {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(56px, 9vw, 120px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .vs-detail {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 18px);
+    color: #999999;
+    letter-spacing: 0.04em;
+  }
+  .vs-mid {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(20px, 2.2vw, 32px);
+    font-weight: 300;
+    color: #999999;
+  }
+  .vs-tagline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(22px, 2.6vw, 40px);
+    font-weight: 600;
+    color: #e0e0e0;
+    text-align: center;
+    margin-top: clamp(8px, 1.5vh, 18px);
+  }
+
+  /* ── USER PROOF GRID (S8b) ── */
+  .user-proof-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: clamp(14px, 2vh, 24px);
+    max-width: 94vw;
+  }
+  .user-proof-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 1vw, 14px);
+    max-width: min(94vw, 1680px);
+  }
+  .user-proof-card {
+    height: clamp(160px, 22vh, 240px);
+    width: auto;
+    max-width: clamp(180px, 22vw, 360px);
+    object-fit: contain;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    background: #0a0a0a;
+  }
+  .user-proof-card.show { opacity: 1; transform: translateY(0); }
+  .user-proof-chyron {
+    font-family: 'Geist Mono', monospace;
+    font-size: clamp(13px, 1.3vw, 18px);
+    color: #999999;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+
   /* ── MOBILE / NARROW VIEWPORT ── */
   @media (max-width: 600px) {
     .stat-row { flex-direction: column; gap: 16px; align-items: center; }
@@ -631,10 +734,10 @@
     </div>
 
     <!-- S3: BTC market context (Coinbase spot, Feb 7 -> May 9 2026 — verified prices) -->
-    <!-- Refreshed 2026-05-09 with OHLCV close-of-day values -->
+    <!-- Refreshed 2026-05-11 with OHLCV close-of-day values -->
     <div class="scene" id="s3">
       <div class="eq-wrap">
-        <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-09</div>
+        <div class="kicker reveal">BTC &middot; 2026-02-07 &rarr; 2026-05-11</div>
         <svg class="eq-svg" viewBox="0 0 1200 420" preserveAspectRatio="none">
           <line x1="40" y1="380" x2="1160" y2="380" stroke="#1e1e22" stroke-width="1"/>
           <line x1="40" y1="40"  x2="40"   y2="380" stroke="#1e1e22" stroke-width="1"/>
@@ -662,8 +765,8 @@
             <text x="437" y="345" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">MAR 9 &middot; $65,978</text>
           </g>
           <g class="eq-marker" id="m3">
-            <line x1="1160" y1="87" x2="1160" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
-            <text x="1160" y="77" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">MAY 9 &middot; $80,844</text>
+            <line x1="1160" y1="80" x2="1160" y2="380" stroke="#999999" stroke-width="1" stroke-dasharray="3,4" opacity="0.5"/>
+            <text x="1160" y="70" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">MAY 11 &middot; $81,993</text>
           </g>
         </svg>
       </div>
@@ -671,27 +774,27 @@
 
     <!-- S4: Rally window — production capture (Apr 3 → May 9, 2026) -->
     <!-- Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/prod-longs-current-trades.json -->
-    <!-- Refreshed 2026-05-09 with OHLCV through 2026-05-09. Params verified against shumi-bot/src/modules/signals-regime.js (post-Apr-8 revert). -->
+    <!-- Refreshed 2026-05-11 with OHLCV through 2026-05-11. Params verified against shumi-bot/src/modules/signals-regime.js (post-Apr-8 revert). -->
     <div class="scene" id="s4">
       <div class="stat-wrap">
-        <div class="kicker reveal">RALLY WINDOW &middot; APR 3 &rarr; MAY 9 &middot; 79-COIN UNIVERSE &middot; LONGS ONLY</div>
+        <div class="kicker reveal">RALLY WINDOW &middot; APR 3 &rarr; MAY 11 &middot; 79-COIN UNIVERSE &middot; LONGS ONLY</div>
         <div class="stat-row">
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">26</div>
+            <div class="stat-num" style="color:#4ade80">28</div>
             <div class="stat-label">TRADES CLOSED</div>
           </div>
           <div class="stat-mid">&middot;</div>
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">65.4%</div>
+            <div class="stat-num" style="color:#4ade80">67.9%</div>
             <div class="stat-label">WIN RATE</div>
           </div>
           <div class="stat-mid">&middot;</div>
           <div class="stat-col reveal">
-            <div class="stat-num" style="color:#4ade80">+5.5%</div>
+            <div class="stat-num" style="color:#4ade80">+6.6%</div>
             <div class="stat-label">MEAN PER TRADE</div>
           </div>
         </div>
-        <div class="stat-sub reveal">17 winners of 26. Sum: +142% of returnPct.</div>
+        <div class="stat-sub reveal">19 winners of 28. Sum: +185% of returnPct.</div>
       </div>
     </div>
 
@@ -733,11 +836,11 @@
             <circle cx="593" cy="341" r="7" fill="#999999" stroke="#0a0a0a" stroke-width="2"/>
             <text x="593" y="320" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="middle">SHORT 03-18</text>
           </g>
-          <!-- Current marker — refreshed 2026-05-09 -->
+          <!-- Current marker — refreshed 2026-05-11 -->
           <g class="eq-marker" id="zecCurrent">
-            <circle cx="1140" cy="60" r="8" fill="#ef4444" stroke="#0a0a0a" stroke-width="2"/>
-            <text x="1080" y="50" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">05-09 &middot; $602.92</text>
-            <text x="1080" y="27" fill="#ef4444" font-family="Geist Mono, monospace" font-size="20" text-anchor="end">&minus;143%</text>
+            <circle cx="1140" cy="90" r="8" fill="#ef4444" stroke="#0a0a0a" stroke-width="2"/>
+            <text x="1080" y="80" fill="#e0e0e0" font-family="Geist Mono, monospace" font-size="18" text-anchor="end">05-11 &middot; $564.38</text>
+            <text x="1080" y="57" fill="#ef4444" font-family="Geist Mono, monospace" font-size="20" text-anchor="end">&minus;127%</text>
           </g>
         </svg>
       </div>
@@ -785,44 +888,38 @@
     <!-- S7: Position state snapshot -->
     <div class="scene" id="s7">
       <div class="pos-wrap">
-        <div class="pos-header reveal">Carry positions held from February &middot; 29-asset curated universe</div>
+        <div class="pos-header reveal">Carry positions held from February &middot; live execution &middot; as of 2026-05-11</div>
         <div class="pos-rule" id="s7Rule"></div>
         <div class="pos-rows">
           <div class="pos-row" id="pr1">
             <div class="pr-sym">RENDER</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+64.90%</div>
+            <div class="pr-pnl">+62.48%</div>
           </div>
           <div class="pos-row" id="pr2">
             <div class="pr-sym">NEAR</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-13</div>
-            <div class="pr-pnl">+55.33%</div>
+            <div class="pr-pnl">+53.38%</div>
           </div>
           <div class="pos-row" id="pr3">
             <div class="pr-sym">GMX</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+33.40%</div>
+            <div class="pr-pnl">+36.44%</div>
           </div>
           <div class="pos-row" id="pr4">
             <div class="pr-sym">BTC</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+28.79%</div>
+            <div class="pr-pnl">+31.93%</div>
           </div>
           <div class="pos-row" id="pr5">
             <div class="pr-sym">HBAR</div>
             <div class="pr-dir">LONG</div>
             <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+19.34%</div>
-          </div>
-          <div class="pos-row" id="pr6">
-            <div class="pr-sym">SUI</div>
-            <div class="pr-dir">LONG</div>
-            <div class="pr-date">entered 2026-02-06</div>
-            <div class="pr-pnl">+16.44%</div>
+            <div class="pr-pnl">+25.86%</div>
           </div>
         </div>
       </div>
@@ -831,9 +928,28 @@
     <!-- S8: April entries (two-row ledger) — date column dropped, percentages remain prominent -->
     <div class="scene" id="s8">
       <div style="display:flex; flex-direction:column; align-items:center; gap:28px; max-width:92vw">
-        <div class="ledger-row reveal">AAVE<span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+10.40%</span></div>
-        <div class="ledger-row reveal">WLD<span style="display:inline-block;width:1.6ch"></span><span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+1.87%</span></div>
+        <div class="ledger-row reveal">AAVE<span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+18.38%</span></div>
+        <div class="ledger-row reveal">WLD<span style="display:inline-block;width:1.6ch"></span><span class="led-dot">&middot;</span>LONG<span class="led-dot">&middot;</span><span class="led-green">+5.99%</span></div>
         <div class="ledger-sub reveal">Two April long entries in the live system. Both shown.</div>
+      </div>
+    </div>
+
+    <!-- S8b: User proof — leveraged perps on Shumi methodology -->
+    <!-- 7 cards: 6 BloFin (Martin) + 1 Binance Futures (AmbidextrousDeity). 12-20x leverage. -->
+    <!-- Cards sized by HEIGHT (uniform vertical), width auto from aspect ratio — handles portrait/landscape mix -->
+    <div class="scene" id="s8b">
+      <div class="user-proof-wrap">
+        <div class="kicker reveal">USER PROOF &middot; LEVERAGED PERPS &middot; 12X &ndash; 20X</div>
+        <div class="user-proof-grid">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.50.jpeg" alt="ORCA +1,127% 20x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.38.jpeg" alt="OP +1,045% 20x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.32.jpeg" alt="MORPHO +631% 20x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.35.jpeg" alt="SEI +519% 20x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.26.jpeg" alt="ZBCN +458% 12x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.40.jpeg" alt="ETC +322% 20x" loading="lazy">
+          <img class="user-proof-card reveal" src="assets/martin/photo_2026-05-11 13.50.29.jpeg" alt="SYRUP +304% 20x" loading="lazy">
+        </div>
+        <div class="user-proof-chyron reveal">2 of 7 from our regime universe (SEI, OP) &middot; 5 from user conviction on the methodology</div>
       </div>
     </div>
 
@@ -850,13 +966,26 @@
       </div>
     </div>
 
-    <!-- S10: Synthesis — apophenia closer (the GCR-loop close) -->
+    <!-- S10: Synthesis — data-point comparison (intuition vs method on the same trade) -->
     <div class="scene" id="s10">
-      <div class="editorial-stack">
-        <div class="editorial reveal dim">GCR is right. Most charts lie.</div>
-        <div class="editorial reveal">Some don't. <span class="terra">Method</span> tells you which.</div>
-        <div class="editorial reveal">Discipline bounds the cost when method is wrong.</div>
-        <div class="editorial reveal body-text">That's how you make money <span class="hi">without getting lucky</span>.</div>
+      <div class="vs-wrap">
+        <div class="vs-kicker reveal">SAME TRADE &middot; SAME WINDOW &middot; ZCASH SHORT &middot; APR &rarr; MAY</div>
+        <div class="vs-row">
+          <div class="vs-col reveal">
+            <div class="vs-label">INTUITIONIST</div>
+            <div class="vs-call">"Overbought. Short it."</div>
+            <div class="vs-stat" style="color:#ef4444">&minus;127%</div>
+            <div class="vs-detail">$248 &rarr; $564</div>
+          </div>
+          <div class="vs-mid">vs</div>
+          <div class="vs-col reveal">
+            <div class="vs-label">METHODIST</div>
+            <div class="vs-call">"No exit catalyst. Skip."</div>
+            <div class="vs-stat" style="color:#4ade80">0%</div>
+            <div class="vs-detail">trade not taken</div>
+          </div>
+        </div>
+        <div class="vs-tagline reveal">Intuition picks the calls. <span class="terra">Method</span> skips the traps.</div>
       </div>
     </div>
 
@@ -1024,13 +1153,13 @@ var scenes = [
     } },
 
   // S4: Rally window — production capture (Apr 3 → May 9, 2026)
-  // Voice (TTS production, refreshed 2026-05-09):
+  // Voice (TTS production, refreshed 2026-05-11):
   //   "Twenty-six trades closed in the rally window. Seventeen winners.
   //    Sixty-five percent. Longs only. Five-point-five a trade on average."
   // ~22 words → ~9 seconds at 3.0 wps × 1.1x speed including sentence pauses.
-  // Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/ (data extended through 2026-05-09)
+  // Source: simulation-engine/results/rally-window-2026-04-03_2026-05-07/ (data extended through 2026-05-11)
   { el: 's4', dur: 12000, sound: 'notification',
-    narr: '<span class="ok">26 trades</span>. <span class="hi">65.4%</span>. Longs only.',
+    narr: '<span class="ok">+185%</span> summed. <span class="hi">28 trades</span>. Longs only.',
     onEnter: function() { staggerScene('s4', 300, 200); } },
 
   // S5: Why longs-only (clean editorial, 3 lines, symmetric framing)
@@ -1108,13 +1237,13 @@ var scenes = [
 
   // S7: Position state
   { el: 's7', dur: 11000,
-    narr: 'Six carry positions held from February.',
+    narr: 'Avg <span class="ok">+42%</span> on five positions held since February.',
     onEnter: function() {
       stagger('#s7 .reveal', 300);
       revealTimers.push(setTimeout(function() {
         document.getElementById('s7Rule').classList.add('show');
       }, 700));
-      var rows = ['pr1','pr2','pr3','pr4','pr5','pr6'];
+      var rows = ['pr1','pr2','pr3','pr4','pr5'];
       rows.forEach(function(id, i) {
         revealTimers.push(setTimeout(function() {
           document.getElementById(id).classList.add('show');
@@ -1125,12 +1254,31 @@ var scenes = [
 
   // S8: April entries
   { el: 's8', dur: 14000,
-    narr: 'Two new entries. <span class="ok">+10</span> and <span class="ok">+2</span>.',
+    narr: 'Two new entries. <span class="ok">+18</span> and <span class="ok">+6</span>.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s8 .reveal');
       revealTimers.push(setTimeout(function(){ rs[0].classList.add('show'); }, 300));
       revealTimers.push(setTimeout(function(){ rs[1].classList.add('show'); }, 900));
       revealTimers.push(setTimeout(function(){ rs[2].classList.add('show'); }, 1700));
+    } },
+
+  // S8b: User proof — community trades on Shumi methodology
+  // Voice (TTS production):
+  //   "What users do with this is theirs. Seven leveraged trades. Twenty-X on
+  //    most. Two from our regime signals — Sei and Op. The rest were their own
+  //    conviction informed by the methodology. A thousand percent on Orca. Six
+  //    hundred on Morpho. Multiplied gains, multiplied risks."
+  // ~46 words → ~17s. Visual: 7 user trade cards in flex-wrap grid.
+  { el: 's8b', dur: 18000,
+    narr: 'Users execute. <span class="hi">Leverage</span> multiplies. <span class="ok">Two</span> in regime, <span class="ok">five</span> on conviction.',
+    onEnter: function() {
+      var rs = document.querySelectorAll('#s8b .reveal');
+      rs.forEach(function(r, i) {
+        revealTimers.push(setTimeout(function() {
+          r.classList.add('show');
+          try{snd.play(Snd.SOUNDS.TAP,{volume:0.10});}catch(e){}
+        }, 300 + i * 250));
+      });
     } },
 
   // S9: Deployed validation gate summary (snapshot 2026-04-08)
@@ -1142,22 +1290,21 @@ var scenes = [
     term: { id: 'tb9', lines: s9Lines, cadence: 550 },
     narr: '<span class="ok">6 PASS</span>. <span class="hi">3 FINDING</span>. 0 BLOCKER.' },
 
-  // S10: Synthesis — apophenia closer (the GCR-loop close)
+  // S10: Synthesis — data-point comparison (intuition vs method on ZEC short)
   // Voice (TTS production):
-  //   "GCR is right. Most charts lie. Some don't. Method tells you which.
-  //    Discipline bounds the cost when method is wrong. That's how you make
-  //    money in markets without getting lucky."
-  // ~32 words → ~13s.
-  // narr closes the film arc — S1's apophenia tweet → S10's method-as-answer.
-  // Non-redundant with editorial; provides the structural callback non-listeners need.
-  { el: 's10', dur: 14000, sound: 'celebration',
-    narr: 'From <span class="dim">apophenia</span> to <span class="terra">method</span>.',
+  //   "Same trade. Same window. Intuition shorts Zcash at two-forty-eight —
+  //    minus one twenty-seven. Method skips it. Intuition picks the calls.
+  //    Method skips the traps."
+  // ~24 words → ~10s.
+  // narr provides the closing tagline for non-listeners.
+  { el: 's10', dur: 12000, sound: 'celebration',
+    narr: 'Intuition picks. <span class="terra">Method</span> skips the traps.',
     onEnter: function() {
       var rs = document.querySelectorAll('#s10 .reveal');
       rs.forEach(function(r, i) {
         revealTimers.push(setTimeout(function() {
           r.classList.add('show');
-        }, 300 + i * 1200));
+        }, 300 + i * 700));
       });
     } },
 
